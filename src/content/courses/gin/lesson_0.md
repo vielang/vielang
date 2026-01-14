@@ -21,7 +21,7 @@ Khóa học này được thiết kế cho các bạn đã có kiến thức cơ
 ## Giới thiệu cấu trúc thư mục trong dự án mẫu
 
 ```
-vievlog-gin/
+vielang-gin/
 ├── api/                  # Tất cả các thành phần liên quan đến API
 │   ├── controllers/      # Xử lý logic điều khiển HTTP request
 │   │   ├── post.go       # Controller cho post endpoints

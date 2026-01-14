@@ -57,7 +57,7 @@ export function Header({ showAuth = true, className }: HeaderProps) {
                 <span className="text-white font-bold text-sm">V</span>
               </div>
               <span className="text-xl font-bold text-slate-900 dark:text-foreground">
-                VieVlog
+                VieLang
               </span>
             </Link>
             <nav className="hidden md:flex">

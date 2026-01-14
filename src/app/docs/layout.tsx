@@ -6,13 +6,13 @@ import '@/styles/docs.css'
 import { CustomNavbar } from '../../components/common/custom-navbar';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://vievlog.com'),
+  metadataBase: new URL('https://vielang.com'),
   title: {
-    template: '%s - VieVlog Docs',
-    default: 'VieVlog Documentation'
+    template: '%s - VieLang Docs',
+    default: 'VieLang Documentation'
   },
-  description: 'VieVlog Documentation with Nextra',
-  applicationName: 'VieVlog Docs'
+  description: 'VieLang Documentation with Nextra',
+  applicationName: 'VieLang Docs'
 }
 
 interface DocsLayoutProps {
@@ -37,7 +37,7 @@ export default async function DocsLayout({ children }: DocsLayoutProps) {
     <>
       <Layout
         navbar={<CustomNavbar />}
-        footer={<Footer>MIT {CURRENT_YEAR} © VieVlog.</Footer>}
+        footer={<Footer>MIT {CURRENT_YEAR} © VieLang.</Footer>}
         sidebar={{ defaultMenuCollapseLevel: 1 }}
         pageMap={filteredPageMap}
         feedback={{ content: null }}

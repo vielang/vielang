@@ -58,7 +58,7 @@ src/app/docs/layout.tsx (37:7) @ DocsLayout
      |       ^
   38 |       <Layout
   39 |         navbar={<CustomNavbar />}
-  40 |         footer={<Footer>MIT {CURRENT_YEAR} © VieVlog.</Footer>}
+  40 |         footer={<Footer>MIT {CURRENT_YEAR} © VieLang.</Footer>}
 
 
   Console Error
@@ -94,4 +94,4 @@ src/app/docs/layout.tsx (37:7) @ DocsLayout
      |       ^
   38 |       <Layout
   39 |         navbar={<CustomNavbar />}
-  40 |         footer={<Footer>MIT {CURRENT_YEAR} © VieVlog.</Footer>}
+  40 |         footer={<Footer>MIT {CURRENT_YEAR} © VieLang.</Footer>}

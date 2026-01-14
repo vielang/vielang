@@ -26,7 +26,7 @@ export function AuthLayout({
           <div className="flex items-center gap-6">
             {showLogo && (
               <Link href="/" className="flex items-center gap-2">
-                <span className="text-xl font-bold">VieVlog</span>
+                <span className="text-xl font-bold">VieLang</span>
               </Link>
             )}
           </div>

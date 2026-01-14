@@ -24,7 +24,7 @@ export function CustomNavbar() {
 
   return (
     <Navbar
-      logo={<span className="font-bold text-primary">VieVlog</span>}
+      logo={<span className="font-bold text-primary">VieLang</span>}
       logoLink="/"
     >
       <div className="flex items-center gap-4">

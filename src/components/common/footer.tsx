@@ -17,7 +17,7 @@ export function Footer({ className }: { className?: string }) {
           <div className="space-y-4">
             <Link href="/" className="flex items-center gap-2">
               <span className="text-lg font-semibold text-foreground">
-                VieVlog
+                VieLang
               </span>
             </Link>
             <p className="text-sm text-muted-foreground">
@@ -104,7 +104,7 @@ export function Footer({ className }: { className?: string }) {
         <div className="mt-8 pt-6 border-t">
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
             <p className="text-sm text-muted-foreground">
-              &copy; {new Date().getFullYear()} VieVlog. {t("footer.allRightsReserved")}
+              &copy; {new Date().getFullYear()} VieLang. {t("footer.allRightsReserved")}
             </p>
             <div className="flex items-center gap-4 text-sm">
               <Link href="/privacy" className="text-muted-foreground hover:text-foreground transition-colors">

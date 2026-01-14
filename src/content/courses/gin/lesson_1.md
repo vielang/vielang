@@ -78,7 +78,7 @@ Domain-Driven Design là một phương pháp thiết kế phần mềm tập tr
 #### 3.2 Cấu trúc thư mục theo DDD
 
 ```
-vievlog-gin/
+vielang-gin/
 ├── api/                  
 │   ├── controllers/      
 │   ├── middleware/       
@@ -137,14 +137,14 @@ vievlog-gin/
 #### 5.1 Tạo thư mục dự án
 
 ```bash
-mkdir vievlog-gin
-cd vievlog-gin
+mkdir vielang-gin
+cd vielang-gin
 ```
 
 #### 5.2 Khởi tạo Go module
 
 ```bash
-go mod init github.com/khieu-dv/vievlog-gin
+go mod init github.com/khieu-dv/vielang-gin
 ```
 
 Lệnh này sẽ tạo file `go.mod` trong thư mục dự án.

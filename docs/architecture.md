@@ -1,4 +1,4 @@
-# VieVlog Architecture Documentation
+# VieLang Architecture Documentation
 
 ## 📁 Cấu trúc dự án
 

@@ -23,7 +23,7 @@ const nextConfig = {
       { protocol: "https", hostname: "**.unsplash.com" },
       { protocol: "https", hostname: "**.digitaloceanspaces.com" },
       { protocol: "https", hostname: "api.github.com" },
-      { protocol: "https", hostname: "**.vievlog.com" },
+      { protocol: "https", hostname: "**.vielang.com" },
     ],
   },
   eslint: { ignoreDuringBuilds: true },

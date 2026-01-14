@@ -1,4 +1,4 @@
-# VieVlog - Programming Education Platform
+# VieLang - Programming Education Platform
 
 A comprehensive online learning platform for Vietnamese developers featuring interactive tutorials, company reviews, and educational games.
 
@@ -19,8 +19,8 @@ A comprehensive online learning platform for Vietnamese developers featuring int
 
 ```bash
 # Clone repository
-git clone https://github.com/khieu-dv/vievlog.git
-cd vievlog
+git clone https://github.com/khieu-dv/vielang.git
+cd vielang
 
 # Install dependencies
 npm install

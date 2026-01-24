@@ -16,7 +16,7 @@ const securityHeaders = [
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: https: blob:",
       "font-src 'self' data:",
-      "connect-src 'self' http://localhost:7350 ws://localhost:7350 http://localhost:8080 http://localhost:8085 ",
+      "connect-src 'self' http://localhost:7350 ws://localhost:7350 http://localhost:8080 http://localhost:8085 https://vielang-portal.vielang.com https://vielang-admin.vielang.com https://www.google-analytics.com https://analytics.google.com",
       "manifest-src 'self'",
       "frame-ancestors 'none'",
       "base-uri 'self'",

@@ -1,18 +1,23 @@
 {
-  "typescript.tsdk": "node_modules\\typescript\\lib",
-  "editor.formatOnSave": true,
-  "editor.codeActionsOnSave": {
-    "source.fixAll": "explicit",
-    "source.organizeImports.biome": "explicit"
-  },
-  "editor.defaultFormatter": "biomejs.biome",
-  "[markdown]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[html]": {
-    "editor.defaultFormatter": "vscode.html-language-features"
-  },
-  "[typescriptreact]": {
-    "editor.defaultFormatter": "vscode.typescript-language-features"
-  }
+	"tailwindCSS.includeLanguages": {
+		"plaintext": "html"
+	},
+	"tailwindCSS.experimental.classRegex": [
+		["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
+		["cn\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
+		["tw=\"([^\"]*)\""]
+	],
+	"markdownlint.config": {
+		"MD033": {
+			"allowed_elements": ["img", "p", "a"]
+		},
+		"MD045": false
+	},
+	"json.schemas": [
+		{
+			"fileMatch": ["/package.json"],
+			"url": "https://json.schemastore.org/package",
+			"schema": true
+		}
+	]
 }

@@ -1,101 +1,110 @@
-import { SpeedInsights } from "@vercel/speed-insights/next";
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import { ThemeProvider } from "../components/common/theme-provider";
-import Providers from "../components/common/providers";
-import I18nProvider from "../components/common/i18n-provider";
-import { NavigationHandler } from "../components/common/navigation-handler";
+import type { Metadata, Viewport } from "next"
+import { env } from "@/env.js"
 
+import "@/styles/globals.css"
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+import { GeistMono } from "geist/font/mono"
+import { GeistSans } from "geist/font/sans"
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import { siteConfig } from "@/config/site"
+import { fontHeading } from "@/lib/fonts"
+import { AuthProvider } from "@/lib/hooks/use-auth-axios"
+import { AuthProvider as VielangAuthProvider } from "@/lib/hooks/use-auth"
+import { SecureAuthProvider } from "@/lib/hooks/use-secure-auth"
+import { absoluteUrl, cn } from "@/lib/utils"
+import { Toaster } from "@/components/ui/toaster"
+import { Analytics } from "@/components/analytics"
+import { GoogleAnalytics } from "@/components/google-analytics"
+import { ThemeProvider } from "@/components/providers"
+import { TailwindIndicator } from "@/components/tailwind-indicator"
 
 export const metadata: Metadata = {
-  title: "VieLang - Advanced Programming Channel",
-  description:
-    "Welcome to the advanced programming channel! Here, I share practical knowledge and detailed tutorials on modern languages and frameworks such as Go, Rust, ReactJS, and Next.js. Suitable for both beginners and developers looking to enhance their skills.",
-  keywords: [
-    "programming",
-    "VieLang",
-    "Go",
-    "Rust",
-    "ReactJS",
-    "Next.js",
-    "learn programming",
-    "coding tutorials",
-    "frontend",
-    "backend",
-    "fullstack development",
-  ],
-  authors: [{ name: "VieLang" }],
-  creator: "VieLang",
-  generator: "Next.js",
-  metadataBase: new URL("https://vielang.com"),
-  openGraph: {
-    title: "VieLang - Advanced Programming Channel",
-    description:
-      "Practical insights & detailed tutorials on Go, Rust, ReactJS, and Next.js. Perfect for beginners and experienced developers alike.",
-    url: "https://vielang.com",
-    siteName: "VieLang",
-    images: [
-      {
-        url: "https://vielang.com/og-image.jpg",
-        width: 1200,
-        height: 630,
-        alt: "VieLang - Advanced Programming Channel",
-      },
-    ],
-    locale: "en_US",
-    type: "website",
+  metadataBase: new URL(env.NEXT_PUBLIC_APP_URL),
+  title: {
+    default: siteConfig.name,
+    template: `%s - ${siteConfig.name}`,
   },
-};
+  description: siteConfig.description,
+  keywords: [
+    "nextjs",
+    "react",
+    "react server components",
+    "vielang",
+    "social platform",
+    "community",
+  ],
+  authors: [
+    {
+      name: "khieu-dv",
+      url: "https://www.vielang.com",
+    },
+  ],
+  creator: "khieu-dv",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: siteConfig.url,
+    title: siteConfig.name,
+    description: siteConfig.description,
+    siteName: siteConfig.name,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteConfig.name,
+    description: siteConfig.description,
+    images: [`${siteConfig.url}/og.jpg`],
+    creator: "@khieu-dv",
+  },
+  icons: {
+    icon: "/icon.png",
+  },
+  manifest: absoluteUrl("/site.webmanifest"),
+}
 
+export const viewport: Viewport = {
+  colorScheme: "dark light",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "white" },
+    { media: "(prefers-color-scheme: dark)", color: "black" },
+  ],
+}
 
-export default function RootLayout({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
+interface RootLayoutProps {
+  children: React.ReactNode
+}
+
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        {/* Google Tag (gtag.js) */}
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-1PNDJK7RXF"></script>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-1PNDJK7RXF');
-            `,
-          }}
-        />
-
-      </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background`}>
+      <head />
+      <body
+        className={cn(
+          "bg-background min-h-screen font-sans antialiased",
+          GeistSans.variable,
+          GeistMono.variable,
+          fontHeading.variable
+        )}
+      >
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
-          <I18nProvider>
-            <Providers>
-              <NavigationHandler />
-              {children}
-              {/* <DevToolsDetector /> */}
-            </Providers>
-          </I18nProvider>
+          <AuthProvider>
+            <VielangAuthProvider>
+              <SecureAuthProvider>
+                {children}
+                <TailwindIndicator />
+                {/* Analytics temporarily disabled due to CORS issues with loglib.io */}
+                {/* <Analytics /> */}
+              </SecureAuthProvider>
+            </VielangAuthProvider>
+          </AuthProvider>
         </ThemeProvider>
-        <SpeedInsights />
+        <GoogleAnalytics />
+        <Toaster />
       </body>
     </html>
-  );
+  )
 }

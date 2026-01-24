@@ -1,29 +1,62 @@
-tsconfig.tsbuildinfo
-/auth-schema.ts
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
 /node_modules
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# database
+
+# next.js
+/.next/
+/out/
 next-env.d.ts
-.vercel
-.next
-.yarn
-.env
-package-lock.json
-/public/_pagefind
-target
-temp-search
 
-# Build outputs
-dist
-build
+# production
+/build
 
-# IDE
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-.idea
-
-# OS
+# misc
 .DS_Store
-*.swp
-*.swo
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# local env files
+# do not commit any .env files to git, except for the .env.example file. https://create.t3.gg/en/usage/env-variables#using-environment-variables
+.env
+.env*.local
+
+# web vitals
+.unlighthouse
+
+# external
+.react-email
+
+# vercel
+.vercel
+
+# MCP config (contains API keys)
+.mcp.json
+
+# typescript
+.contentlayer
+*.tsbuildinfo
+
+/viemall-gin-private
+/viemall-axum-private
+# Playwright
+test-results/
+playwright-report/
+playwright/.cache/
+
+# Rust/WASM
+/wasm/**/target/
+/wasm/**/*.rs.bk
+/wasm/**/Cargo.lock

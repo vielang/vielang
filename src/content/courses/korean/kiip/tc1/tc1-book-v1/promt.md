@@ -1,3 +1,0 @@
-Hãy đọc toàn bộ nội dung trong tệp /doc-korean/kiip/tc1/tc1-book-bk/lesson_16.pdf và so sánh với nội dung trong tệp /doc-korean/kiip/tc1/tc1-book-bk/lesson-16.md.
-Nếu phát hiện bất kỳ nội dung nào trong lesson-16.md còn thiếu so với tài liệu gốc trong PDF, hãy bổ sung đầy đủ vào tệp.
-Sau đó, hãy kiểm tra toàn bộ nội dung của lesson-16.md để phát hiện và chỉnh sửa các lỗi còn tồn tại (bao gồm chính tả, ngữ pháp, cấu trúc câu hoặc định dạng nếu cần)

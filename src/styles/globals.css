@@ -1,0 +1,176 @@
+@import "./tailwind.css";
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 5.9% 10%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+  }
+}
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  .zoom-image [data-rmiz-modal-overlay="visible"] {
+    @apply bg-background/10 backdrop-blur;
+  }
+
+  .zoom-image [data-rmiz-modal-img] {
+    @apply rounded-md lg:rounded-2xl;
+  }
+}
+
+/* Ensure container is always centered on all screen sizes */
+.container {
+  @apply mx-auto px-4;
+}
+
+@media (min-width: 640px) {
+  .container {
+    @apply px-6;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    @apply px-8;
+  }
+}
+
+/* Fix Tiptap table styling in prose */
+.prose table,
+.prose-slate table {
+  border: none !important;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  width: 100%;
+}
+
+.prose th,
+.prose-slate th {
+  border: 1px solid hsl(var(--border)) !important;
+  border-width: 1px !important;
+  padding: 0.5rem;
+  background-color: hsl(var(--muted));
+  font-weight: 600;
+}
+
+.prose td,
+.prose-slate td {
+  border: 1px solid hsl(var(--border)) !important;
+  border-width: 1px !important;
+  padding: 0.5rem;
+}
+
+.prose tbody tr,
+.prose-slate tbody tr {
+  border: none !important;
+}
+
+.prose thead,
+.prose-slate thead {
+  border: none !important;
+}
+
+/* Fix lesson content spacing on mobile */
+.lesson-content {
+  margin-left: 3px !important;
+  margin-right: 3px !important;
+}
+
+/* Override prose default margins and padding for lesson content on mobile */
+@media (max-width: 640px) {
+  .lesson-content.prose,
+  .lesson-content.prose-slate {
+    margin-left: 3px !important;
+    margin-right: 3px !important;
+    padding-left: 3px !important;
+    padding-right: 3px !important;
+  }
+
+  .lesson-content.prose > *,
+  .lesson-content.prose-slate > * {
+    margin-left: 3px !important;
+    margin-right: 3px !important;
+  }
+
+  /* Ensure Tiptap editor content has no extra margins on mobile */
+  .lesson-content .ProseMirror {
+    margin-left: 3px !important;
+    margin-right: 3px !important;
+    padding-left: 3px !important;
+    padding-right: 3px !important;
+  }
+}
+
+/* Custom scrollbar for better visibility */
+.overflow-y-auto::-webkit-scrollbar {
+  width: 10px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+  border-radius: 5px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 5px;
+  border: 2px solid hsl(var(--muted));
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}
+
+/* Firefox scrollbar */
+.overflow-y-auto {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--border)) hsl(var(--muted));
+}

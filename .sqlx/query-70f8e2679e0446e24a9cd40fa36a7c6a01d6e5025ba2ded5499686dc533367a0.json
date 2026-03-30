@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM domain_oauth2_client WHERE domain_id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "70f8e2679e0446e24a9cd40fa36a7c6a01d6e5025ba2ded5499686dc533367a0"
+}

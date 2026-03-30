@@ -1,0 +1,19 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO scheduled_job\n                (tenant_id, name, job_type, schedule_type, cron_expression,\n                 configuration, enabled, next_run_at, created_time)\n            VALUES ($1, $2, $3, 'CRON', $4, $5, true, 0, $6)\n            ON CONFLICT DO NOTHING\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Jsonb",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "ed2cca89fef3a0978ee39c2204c893fa88ad6d548f156ef0544e8a2d8f152b11"
+}

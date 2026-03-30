@@ -1,0 +1,14 @@
+[package]
+name = "vl-actor"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+vl-core     = { workspace = true }
+serde       = { workspace = true }
+thiserror   = { workspace = true }
+tokio       = { workspace = true }
+tracing     = { workspace = true }
+async-trait = { workspace = true }
+uuid        = { workspace = true }
+dashmap     = { workspace = true }

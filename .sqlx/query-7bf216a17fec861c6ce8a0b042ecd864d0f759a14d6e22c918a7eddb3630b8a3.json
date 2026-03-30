@@ -1,0 +1,20 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO entity_group\n                   (id, tenant_id, customer_id, name, entity_type, additional_info, created_time)\n               VALUES ($1, $2, $3, $4, $5, $6, $7)\n               ON CONFLICT (id) DO UPDATE SET\n                   name            = EXCLUDED.name,\n                   customer_id     = EXCLUDED.customer_id,\n                   additional_info = EXCLUDED.additional_info",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Uuid",
+        "Varchar",
+        "Varchar",
+        "Jsonb",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "7bf216a17fec861c6ce8a0b042ecd864d0f759a14d6e22c918a7eddb3630b8a3"
+}

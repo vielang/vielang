@@ -1,0 +1,85 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT id, created_time, tenant_id, customer_id,\n                   asset_profile_id, name, type as asset_type, label,\n                   external_id, additional_info, version\n            FROM asset\n            WHERE customer_id = $1\n            AND ($2::text IS NULL OR LOWER(name) LIKE LOWER($2))\n            ORDER BY created_time DESC\n            LIMIT $3 OFFSET $4\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "created_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "customer_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 4,
+        "name": "asset_profile_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 5,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "asset_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "label",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 8,
+        "name": "external_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 9,
+        "name": "additional_info",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 10,
+        "name": "version",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      false
+    ]
+  },
+  "hash": "60e6c5d0eab4302ad6de15d54af13e51953e4ebed2fda394c1661a5877041d58"
+}

@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT COUNT(*) FROM widgets_bundle\n               WHERE (tenant_id IS NULL OR tenant_id = $1)\n               AND ($2::text IS NULL OR LOWER(title) LIKE LOWER($2))",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "count",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "f85520d2957bd876bb40b4c1bd252d3a7fd2f61243882ca11b1dad6c287110ea"
+}

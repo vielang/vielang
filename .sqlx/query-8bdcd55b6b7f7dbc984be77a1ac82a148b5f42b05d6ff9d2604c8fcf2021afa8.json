@@ -1,0 +1,20 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO alarm\n               (id, created_time, tenant_id, type, originator_id, originator_type,\n                severity, acknowledged, cleared, start_ts, end_ts, assign_ts, details)\n               VALUES ($1,$2,$3,$4,$5,0,$6,false,false,$7,0,0,'{}')\n               ON CONFLICT (id) DO UPDATE SET type = EXCLUDED.type",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8",
+        "Uuid",
+        "Varchar",
+        "Uuid",
+        "Varchar",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "8bdcd55b6b7f7dbc984be77a1ac82a148b5f42b05d6ff9d2604c8fcf2021afa8"
+}

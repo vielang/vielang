@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE scheduled_job\n            SET cron_expression = $3,\n                configuration   = $4,\n                enabled         = true\n            WHERE tenant_id = $1 AND job_type = $2\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Varchar",
+        "Jsonb"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "874ac3627606ab0ebe28d4aa5a6a12b53ba86f68d7899e9c849017d1108ec8c0"
+}

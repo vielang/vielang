@@ -1,0 +1,29 @@
+apiVersion: v2
+name: vielang
+description: VieLang — Rust re-implementation of the ThingsBoard IoT Platform
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - iot
+  - thingsboard
+  - mqtt
+  - timeseries
+home: https://github.com/yourorg/vielang
+sources:
+  - https://github.com/yourorg/vielang
+maintainers:
+  - name: VieLang Team
+dependencies:
+  - name: postgresql
+    version: "15.x.x"
+    repository: https://charts.bitnami.com/bitnami
+    condition: postgresql.enabled
+  - name: redis
+    version: "19.x.x"
+    repository: https://charts.bitnami.com/bitnami
+    condition: redis.enabled
+  - name: kafka
+    version: "29.x.x"
+    repository: https://charts.bitnami.com/bitnami
+    condition: kafka.enabled

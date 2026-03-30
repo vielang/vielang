@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO domain_oauth2_client (domain_id, oauth2_client_id)\n                 VALUES ($1, $2) ON CONFLICT DO NOTHING",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "efd5870ac5e853072a75c5b4fd305cd1728e2247a77286ada02a581d570275ac"
+}

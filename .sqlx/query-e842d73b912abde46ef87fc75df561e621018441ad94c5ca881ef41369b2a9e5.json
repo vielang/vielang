@@ -1,0 +1,88 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id, tenant_id, entity_id, entity_type, name, expression,\n                      output_key, input_keys, trigger_mode, output_ttl_ms, enabled, created_time\n               FROM calculated_field WHERE entity_id = $1 ORDER BY created_time",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "entity_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "entity_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "expression",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "output_key",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "input_keys",
+        "type_info": "TextArray"
+      },
+      {
+        "ordinal": 8,
+        "name": "trigger_mode",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 9,
+        "name": "output_ttl_ms",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 10,
+        "name": "enabled",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 11,
+        "name": "created_time",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "e842d73b912abde46ef87fc75df561e621018441ad94c5ca881ef41369b2a9e5"
+}

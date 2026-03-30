@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE alarm SET acknowledged = TRUE, ack_ts = $1 WHERE id = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "f2f972cf9c8b7a19d1af9f2ed530e044fae4279e9f912f0496176fac1ecdae15"
+}

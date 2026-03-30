@@ -1,0 +1,18 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE resource SET\n                title               = $2,\n                is_public           = $3,\n                public_resource_key = $4,\n                descriptor          = $5,\n                version             = version + 1\n            WHERE id = $1\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Varchar",
+        "Bool",
+        "Varchar",
+        "Jsonb"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "7dc4537d6b0bb11bb529c912f7905c45b7cbe4db9b827d2142a5e1c762077eea"
+}

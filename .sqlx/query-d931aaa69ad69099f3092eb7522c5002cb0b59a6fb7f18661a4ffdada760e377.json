@@ -1,0 +1,130 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT\n                d.id, d.created_time, d.tenant_id, d.customer_id,\n                d.device_profile_id, d.name, d.type as device_type, d.label,\n                d.device_data, d.firmware_id, d.software_id,\n                d.external_id, d.additional_info, d.version,\n                dc.id as cred_id, dc.created_time as cred_created_time,\n                dc.credentials_type, dc.credentials_id as cred_id_str,\n                dc.credentials_value\n            FROM device d\n            JOIN device_credentials dc ON dc.device_id = d.id\n            WHERE dc.credentials_id = $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "created_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "customer_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 4,
+        "name": "device_profile_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 5,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "device_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "label",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 8,
+        "name": "device_data",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 9,
+        "name": "firmware_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 10,
+        "name": "software_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 11,
+        "name": "external_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 12,
+        "name": "additional_info",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 13,
+        "name": "version",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 14,
+        "name": "cred_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 15,
+        "name": "cred_created_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 16,
+        "name": "credentials_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 17,
+        "name": "cred_id_str",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 18,
+        "name": "credentials_value",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "d931aaa69ad69099f3092eb7522c5002cb0b59a6fb7f18661a4ffdada760e377"
+}

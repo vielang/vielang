@@ -1,0 +1,26 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT\n                   to_char(to_timestamp(canceled_at / 1000), 'YYYY-MM') AS month,\n                   COUNT(*)::bigint                                       AS churned\n               FROM tenant_subscription\n               WHERE canceled_at IS NOT NULL\n                 AND canceled_at >= extract(epoch from now() - interval '13 months')::bigint * 1000\n               GROUP BY month",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "month",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 1,
+        "name": "churned",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      null,
+      null
+    ]
+  },
+  "hash": "58849f176efae88eee471c71bc673cbb0c4c0dd3b6351d4607bbaf9f83c159d4"
+}

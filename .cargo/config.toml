@@ -1,0 +1,24 @@
+[build]
+# sccache: cache compiled crates across builds (install: cargo install sccache)
+rustc-wrapper = "sccache"
+
+[target.x86_64-pc-windows-msvc]
+# Dùng rust-lld thay link.exe để tránh crash khi binary test quá lớn
+linker = "rust-lld"
+# Tăng stack size
+rustflags = ["-C", "link-arg=/STACK:67108864"]
+
+[env]
+# SQLX offline mode — compile không cần DB chạy, dùng cache trong .sqlx/
+# Chạy `cargo sqlx prepare --workspace` để refresh cache khi thêm query mới
+SQLX_OFFLINE = "true"
+
+[alias]
+# cargo ck        — check toàn workspace, bỏ qua Bevy (nhanh nhất để kiểm tra lỗi)
+# cargo t         — chạy tất cả tests, bỏ qua Bevy
+# cargo tp vl-api — chạy tests của 1 crate cụ thể
+# cargo tfast     — chạy tests crates không dùng DB (vl-core, vl-auth...) với 8 threads
+ck     = "check --workspace --exclude vl-digital-twin"
+t      = "nextest run --workspace --exclude vl-digital-twin"
+tp     = "nextest run -p"
+tfast  = "nextest run --workspace --exclude vl-digital-twin --exclude vl-dao --exclude vl-api -P fast"

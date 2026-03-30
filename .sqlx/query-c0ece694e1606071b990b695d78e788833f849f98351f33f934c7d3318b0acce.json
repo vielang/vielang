@@ -1,0 +1,88 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO cluster_node\n                (node_id, host, port, grpc_port, service_type, metadata, last_heartbeat, joined_at, status)\n            VALUES ($1, $2, $3, $4, $5, $6, $7, $7, 'ACTIVE')\n            ON CONFLICT (node_id) DO UPDATE\n            SET host           = EXCLUDED.host,\n                port           = EXCLUDED.port,\n                grpc_port      = EXCLUDED.grpc_port,\n                service_type   = EXCLUDED.service_type,\n                metadata       = EXCLUDED.metadata,\n                last_heartbeat = EXCLUDED.last_heartbeat,\n                status         = 'ACTIVE'\n            RETURNING node_id, host, port, grpc_port, status, service_type,\n                      last_heartbeat, joined_at, metadata,\n                      is_leader, leader_epoch\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "node_id",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 1,
+        "name": "host",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "port",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 3,
+        "name": "grpc_port",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 4,
+        "name": "status",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "service_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "last_heartbeat",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 7,
+        "name": "joined_at",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 8,
+        "name": "metadata",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 9,
+        "name": "is_leader",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 10,
+        "name": "leader_epoch",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Varchar",
+        "Int4",
+        "Int4",
+        "Varchar",
+        "Jsonb",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "c0ece694e1606071b990b695d78e788833f849f98351f33f934c7d3318b0acce"
+}

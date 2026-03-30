@@ -1,0 +1,88 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id, tenant_id, name, job_type, schedule_type, interval_ms,\n                      cron_expression, configuration as \"configuration: serde_json::Value\",\n                      enabled, last_run_at, next_run_at, created_time\n               FROM scheduled_job WHERE id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "job_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "schedule_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "interval_ms",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 6,
+        "name": "cron_expression",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "configuration: serde_json::Value",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 8,
+        "name": "enabled",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 9,
+        "name": "last_run_at",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 10,
+        "name": "next_run_at",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 11,
+        "name": "created_time",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "0802c50fabdf637082e8bfbb43687c96825e10029f2f68ddd3076f8b2524c96b"
+}

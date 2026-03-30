@@ -1,0 +1,77 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT entity_id, attribute_type, attribute_key,\n                   bool_v, str_v, long_v, dbl_v, json_v, last_update_ts, version\n            FROM attribute_kv\n            WHERE entity_id = $1\n            AND ($2::int[] IS NULL OR attribute_key = ANY($2))\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "entity_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "attribute_type",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 2,
+        "name": "attribute_key",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 3,
+        "name": "bool_v",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 4,
+        "name": "str_v",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "long_v",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 6,
+        "name": "dbl_v",
+        "type_info": "Float8"
+      },
+      {
+        "ordinal": 7,
+        "name": "json_v",
+        "type_info": "Json"
+      },
+      {
+        "ordinal": 8,
+        "name": "last_update_ts",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 9,
+        "name": "version",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int4Array"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "746730e9761350b0fccde94136828eca05b130ce635e211922ff407ee82f8a62"
+}

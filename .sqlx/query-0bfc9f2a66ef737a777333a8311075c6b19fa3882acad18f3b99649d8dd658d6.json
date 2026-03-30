@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO key_dictionary (key) VALUES ($1) ON CONFLICT (key) DO NOTHING",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Varchar"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "0bfc9f2a66ef737a777333a8311075c6b19fa3882acad18f3b99649d8dd658d6"
+}

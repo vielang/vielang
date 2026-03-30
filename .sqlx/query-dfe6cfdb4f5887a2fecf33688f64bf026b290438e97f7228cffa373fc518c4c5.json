@@ -1,0 +1,20 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT COALESCE(SUM(CASE ts.billing_cycle\n                   WHEN 'monthly' THEN sp.price_monthly\n                   WHEN 'annual'  THEN sp.price_annually / 12\n                   ELSE 0 END), 0)::bigint\n               FROM tenant_subscription ts\n               JOIN subscription_plan sp ON sp.id = ts.plan_id\n               WHERE ts.status IN ('active', 'trialing')\n                 AND sp.price_monthly > 0",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "coalesce",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "dfe6cfdb4f5887a2fecf33688f64bf026b290438e97f7228cffa373fc518c4c5"
+}

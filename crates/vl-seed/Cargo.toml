@@ -1,0 +1,28 @@
+[package]
+name = "vl-seed"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "seed"
+path = "src/main.rs"
+
+[[bin]]
+name = "pg-to-cassandra"
+path = "src/pg_to_cassandra.rs"
+
+[dependencies]
+vl-auth      = { path = "../vl-auth" }
+vl-core      = { path = "../vl-core" }
+vl-dao       = { path = "../vl-dao" }
+vl-config    = { path = "../vl-config" }
+vl-cassandra = { path = "../vl-cassandra" }
+sqlx       = { workspace = true }
+uuid       = { workspace = true }
+tokio      = { workspace = true }
+serde_json = { workspace = true }
+chrono     = { workspace = true }
+tracing    = { workspace = true }
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+anyhow     = { workspace = true }
+reqwest    = { workspace = true }

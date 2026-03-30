@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT COUNT(*) FROM device_profile\n               WHERE tenant_id = $1\n               AND ($2::text IS NULL OR LOWER(name) LIKE LOWER($2))",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "count",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "43ccd38de45f75ccb014f25331f6ea063e7bff2d32b6a9784fab765c594757de"
+}

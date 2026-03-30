@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO customer\n           (id, created_time, tenant_id, title, country, city, phone, email,\n            is_public, additional_info, version)\n           VALUES ($1,$2,$3,$4,'Vietnam','Hanoi','0987654321','customer@vielang.dev',\n                   false,'{}',1)\n           ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8",
+        "Uuid",
+        "Varchar"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "d431cfeee05d3f74989a4719bcc50bf5a66f1f210b3f7d86122d3f4e119365a2"
+}

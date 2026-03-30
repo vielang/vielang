@@ -1,0 +1,60 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id, created_time, tenant_id, email, first_name, last_name,\n                      ts_rank(search_text, to_tsquery('english', $2)) AS \"rank!: f32\"\n               FROM tb_user\n               WHERE tenant_id = $1\n                 AND search_text IS NOT NULL\n                 AND search_text @@ to_tsquery('english', $2)\n               ORDER BY ts_rank(search_text, to_tsquery('english', $2)) DESC, created_time DESC\n               LIMIT $3",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "created_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "email",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "first_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "last_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "rank!: f32",
+        "type_info": "Float4"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false,
+      true,
+      true,
+      null
+    ]
+  },
+  "hash": "e78a4adc0cb6e0bf0ab67e1fab7152fab23fface4867917e7ec52a85fa1edf5b"
+}

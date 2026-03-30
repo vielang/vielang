@@ -1,0 +1,85 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT id, created_time, tenant_id, customer_id, email,\n                   authority, first_name, last_name, phone, additional_info, version\n            FROM tb_user\n            WHERE tenant_id = $1\n            AND ($2::text IS NULL OR LOWER(email) LIKE LOWER($2)\n                 OR LOWER(first_name) LIKE LOWER($2)\n                 OR LOWER(last_name) LIKE LOWER($2))\n            ORDER BY created_time DESC\n            LIMIT $3 OFFSET $4\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "created_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "customer_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 4,
+        "name": "email",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "authority",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "first_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "last_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 8,
+        "name": "phone",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 9,
+        "name": "additional_info",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 10,
+        "name": "version",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      false
+    ]
+  },
+  "hash": "5b59d2ff1ef3a5e0c3ec8f83c246f02a1e909accde97c9d39ffa78f2baadf29e"
+}

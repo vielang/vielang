@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT kd.key FROM ts_kv_latest tkl\n            JOIN key_dictionary kd ON kd.key_id = tkl.key\n            WHERE tkl.entity_id = $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "key",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "1c46de29b0d166b7b17a680a8b6444169b886c9aadfd20d1c720e8ffbc88392b"
+}

@@ -1,0 +1,25 @@
+[package]
+name = "vl-dao"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+vl-core    = { workspace = true }
+vl-config  = { workspace = true }
+sqlx       = { workspace = true }
+serde      = { workspace = true }
+serde_json = { workspace = true }
+uuid       = { workspace = true }
+chrono     = { workspace = true }
+thiserror  = { workspace = true }
+tokio      = { workspace = true }
+tracing     = { workspace = true }
+async-trait = { workspace = true }
+dashmap     = { workspace = true }
+moka        = { workspace = true }
+evalexpr    = { workspace = true }
+json-patch  = { workspace = true }
+metrics     = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true }

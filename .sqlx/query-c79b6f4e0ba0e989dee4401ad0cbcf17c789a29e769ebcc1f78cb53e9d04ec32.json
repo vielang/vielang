@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE cluster_node SET is_leader = false WHERE node_id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "c79b6f4e0ba0e989dee4401ad0cbcf17c789a29e769ebcc1f78cb53e9d04ec32"
+}

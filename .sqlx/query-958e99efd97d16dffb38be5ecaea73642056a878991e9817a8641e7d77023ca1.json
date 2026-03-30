@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO customer (id, created_time, tenant_id, title, is_public, version)\n           VALUES ($1, $2, $3, $4, false, 1)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8",
+        "Uuid",
+        "Varchar"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "958e99efd97d16dffb38be5ecaea73642056a878991e9817a8641e7d77023ca1"
+}

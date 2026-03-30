@@ -1,0 +1,31 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO oauth2_client_registration_template\n               (id, created_time, additional_info, provider_id, name,\n                authorization_uri, token_uri, scope, user_info_uri,\n                user_name_attribute_name, jwk_set_uri, client_authentication_method,\n                type, comment, login_button_icon, login_button_label, help_link, platforms)\n               VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)\n               ON CONFLICT (id) DO UPDATE SET\n                   additional_info               = EXCLUDED.additional_info,\n                   provider_id                   = EXCLUDED.provider_id,\n                   name                          = EXCLUDED.name,\n                   authorization_uri             = EXCLUDED.authorization_uri,\n                   token_uri                     = EXCLUDED.token_uri,\n                   scope                         = EXCLUDED.scope,\n                   user_info_uri                 = EXCLUDED.user_info_uri,\n                   user_name_attribute_name      = EXCLUDED.user_name_attribute_name,\n                   jwk_set_uri                   = EXCLUDED.jwk_set_uri,\n                   client_authentication_method  = EXCLUDED.client_authentication_method,\n                   type                          = EXCLUDED.type,\n                   comment                       = EXCLUDED.comment,\n                   login_button_icon             = EXCLUDED.login_button_icon,\n                   login_button_label            = EXCLUDED.login_button_label,\n                   help_link                     = EXCLUDED.help_link,\n                   platforms                     = EXCLUDED.platforms",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8",
+        "Jsonb",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "a60da17f32de89a847466ec689c65cbdce4563b884f15e7f2bc9b70479f70ce1"
+}

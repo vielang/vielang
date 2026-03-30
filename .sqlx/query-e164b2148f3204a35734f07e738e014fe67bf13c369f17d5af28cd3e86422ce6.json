@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE tb_user\n               SET additional_info = jsonb_set(\n                   COALESCE(additional_info::jsonb, '{}'::jsonb),\n                   '{notificationSettings}',\n                   $2\n               )\n               WHERE id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Jsonb"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "e164b2148f3204a35734f07e738e014fe67bf13c369f17d5af28cd3e86422ce6"
+}

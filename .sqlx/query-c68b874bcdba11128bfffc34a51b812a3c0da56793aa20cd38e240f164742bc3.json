@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE asset_profile SET is_default = FALSE WHERE tenant_id = $1 AND is_default = TRUE",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "c68b874bcdba11128bfffc34a51b812a3c0da56793aa20cd38e240f164742bc3"
+}

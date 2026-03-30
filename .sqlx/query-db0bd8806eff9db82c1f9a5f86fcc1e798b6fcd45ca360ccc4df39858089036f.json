@@ -1,0 +1,94 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id, created_time, tenant_id, provider_name, client_id, client_secret,\n                    authorization_uri, token_uri, user_info_uri, scope, user_name_attribute,\n                    mapper_config, enabled\n             FROM oauth2_client_registration\n             WHERE tenant_id = $1 AND enabled = true\n             ORDER BY created_time ASC",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "created_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "provider_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "client_id",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "client_secret",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "authorization_uri",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "token_uri",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 8,
+        "name": "user_info_uri",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 9,
+        "name": "scope",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 10,
+        "name": "user_name_attribute",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 11,
+        "name": "mapper_config",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 12,
+        "name": "enabled",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "db0bd8806eff9db82c1f9a5f86fcc1e798b6fcd45ca360ccc4df39858089036f"
+}

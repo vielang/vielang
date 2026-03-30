@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT device_id\n            FROM device_activity\n            WHERE active = TRUE AND last_activity_ts < $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "device_id",
+        "type_info": "Uuid"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "b85388bbf2c9e81f0ab49caa04f0d1ae283c89e02852bc652020f28c4d08a451"
+}

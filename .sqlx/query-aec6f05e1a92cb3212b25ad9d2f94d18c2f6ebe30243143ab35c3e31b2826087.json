@@ -1,0 +1,20 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE housekeeper_execution\n            SET finished_at        = $1,\n                cleaned_telemetry  = $2,\n                cleaned_events     = $3,\n                cleaned_alarms     = $4,\n                cleaned_rpc        = $5,\n                status             = $6\n            WHERE id = $7\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8",
+        "Int8",
+        "Int8",
+        "Int8",
+        "Varchar",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "aec6f05e1a92cb3212b25ad9d2f94d18c2f6ebe30243143ab35c3e31b2826087"
+}

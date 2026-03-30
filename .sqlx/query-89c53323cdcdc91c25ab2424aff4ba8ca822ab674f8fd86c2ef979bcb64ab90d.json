@@ -1,0 +1,35 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT id, created_time, body\n        FROM event\n        WHERE entity_id = $1\n          AND entity_type = 'RULE_NODE'\n          AND event_type  = 'DEBUG_RULE_NODE'\n        ORDER BY created_time DESC\n        LIMIT $2\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "created_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "body",
+        "type_info": "Jsonb"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "89c53323cdcdc91c25ab2424aff4ba8ca822ab674f8fd86c2ef979bcb64ab90d"
+}

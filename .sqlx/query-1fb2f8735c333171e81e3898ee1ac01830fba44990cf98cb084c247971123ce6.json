@@ -1,0 +1,118 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT op.id, op.created_time, op.tenant_id, op.device_profile_id,\n                   op.type as ota_type, op.title, op.version, op.tag, op.url,\n                   op.file_name, op.content_type, op.data_size,\n                   op.checksum_algorithm, op.checksum,\n                   op.data IS NOT NULL as has_data,\n                   op.additional_info, op.ver\n            FROM device d\n            JOIN ota_package op ON op.id = d.firmware_id\n            WHERE d.id = $1\n              AND d.firmware_id IS NOT NULL\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "created_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "device_profile_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 4,
+        "name": "ota_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "title",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "version",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "tag",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 8,
+        "name": "url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 9,
+        "name": "file_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 10,
+        "name": "content_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 11,
+        "name": "data_size",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 12,
+        "name": "checksum_algorithm",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 13,
+        "name": "checksum",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 14,
+        "name": "has_data",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 15,
+        "name": "additional_info",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 16,
+        "name": "ver",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      null,
+      true,
+      false
+    ]
+  },
+  "hash": "1fb2f8735c333171e81e3898ee1ac01830fba44990cf98cb084c247971123ce6"
+}

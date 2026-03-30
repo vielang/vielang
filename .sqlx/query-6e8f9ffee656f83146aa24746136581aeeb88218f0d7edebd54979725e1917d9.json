@@ -1,0 +1,58 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT da.device_id, da.last_connect_ts, da.last_disconnect_ts, da.last_activity_ts,\n                   da.last_telemetry_ts, da.last_rpc_ts, da.active\n            FROM device_activity da\n            JOIN device d ON d.id = da.device_id\n            WHERE da.active = TRUE AND d.tenant_id = $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "device_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "last_connect_ts",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "last_disconnect_ts",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "last_activity_ts",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 4,
+        "name": "last_telemetry_ts",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 5,
+        "name": "last_rpc_ts",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 6,
+        "name": "active",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "6e8f9ffee656f83146aa24746136581aeeb88218f0d7edebd54979725e1917d9"
+}

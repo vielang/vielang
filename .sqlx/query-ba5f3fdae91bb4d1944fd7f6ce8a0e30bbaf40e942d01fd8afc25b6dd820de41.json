@@ -1,0 +1,20 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO ts_kv_latest\n                       (entity_id, key, ts, bool_v, long_v, dbl_v, str_v, json_v, version)\n                       VALUES ($1,$2,$3,$4,$5,$6,$7,NULL,0)\n                       ON CONFLICT (entity_id, key) DO UPDATE\n                       SET ts=$3, bool_v=$4, long_v=$5, dbl_v=$6, str_v=$7",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int4",
+        "Int8",
+        "Bool",
+        "Int8",
+        "Float8",
+        "Varchar"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "ba5f3fdae91bb4d1944fd7f6ce8a0e30bbaf40e942d01fd8afc25b6dd820de41"
+}

@@ -1,0 +1,89 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT id, tenant_id, created_time,\n                   device_count, asset_count, customer_count,\n                   dashboard_count, rule_chain_count, user_count,\n                   include_telemetry, status, error_message\n            FROM backup_export_log\n            WHERE tenant_id = $1\n            ORDER BY created_time DESC\n            LIMIT $2\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "created_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "device_count",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 4,
+        "name": "asset_count",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 5,
+        "name": "customer_count",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 6,
+        "name": "dashboard_count",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 7,
+        "name": "rule_chain_count",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 8,
+        "name": "user_count",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 9,
+        "name": "include_telemetry",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 10,
+        "name": "status",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 11,
+        "name": "error_message",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "4f34b055f7de9b2845c0dd1e3f1279b67dd8c2db45112882bcd05d28b8b24218"
+}

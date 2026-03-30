@@ -1,0 +1,34 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT k.key, l.dbl_v, l.long_v FROM ts_kv_latest l\n         JOIN key_dictionary k ON k.key_id = l.key\n         WHERE l.entity_id = $1\n         ORDER BY k.key",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "key",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 1,
+        "name": "dbl_v",
+        "type_info": "Float8"
+      },
+      {
+        "ordinal": 2,
+        "name": "long_v",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      true,
+      true
+    ]
+  },
+  "hash": "9bb766ddb4f0e62426211005af79b408270b22d7bd23553a9d449824eb23f798"
+}

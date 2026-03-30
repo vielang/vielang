@@ -1,0 +1,94 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT id, created_time, tenant_id, fqn, name, descriptor,\n                   deprecated, scada, image, description, tags, external_id, version\n            FROM widget_type WHERE fqn = $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "created_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "fqn",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "descriptor",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 6,
+        "name": "deprecated",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 7,
+        "name": "scada",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 8,
+        "name": "image",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 9,
+        "name": "description",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 10,
+        "name": "tags",
+        "type_info": "TextArray"
+      },
+      {
+        "ordinal": 11,
+        "name": "external_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 12,
+        "name": "version",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      false
+    ]
+  },
+  "hash": "01e2247c90225dc20bebee80c2af623b1ba22999601c73218a4cf1bdf36edc0b"
+}

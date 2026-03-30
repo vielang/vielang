@@ -1,0 +1,82 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT d.id, d.created_time, d.tenant_id, d.customer_id, d.name, d.label,\n                   d.device_profile_id, dp.name as device_profile_name,\n                   c.title as \"customer_title?\",\n                   d.firmware_id, d.software_id\n            FROM device d\n            JOIN device_profile dp ON d.device_profile_id = dp.id\n            LEFT JOIN customer c ON d.customer_id = c.id\n            WHERE d.id = $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "created_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "customer_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 4,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "label",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "device_profile_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 7,
+        "name": "device_profile_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 8,
+        "name": "customer_title?",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 9,
+        "name": "firmware_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 10,
+        "name": "software_id",
+        "type_info": "Uuid"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      false,
+      true,
+      false,
+      false,
+      false,
+      true,
+      true
+    ]
+  },
+  "hash": "6745217e2e80d423f4c2639f68356ed1453c3b84395bc37996505285bc0fb1c8"
+}

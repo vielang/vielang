@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM device_template WHERE id=$1 AND is_builtin = false",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "6a56c2b8e9f9a2d1fa4f8cf821cf125cdb7ff770f52a511c231d02c0c9e98f5d"
+}

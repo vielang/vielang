@@ -1,0 +1,24 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT substring(data FROM $2::int FOR $3::int) as chunk\n            FROM ota_package\n            WHERE id = $1 AND data IS NOT NULL\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "chunk",
+        "type_info": "Bytea"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int4",
+        "Int4"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "e7627e9e70e903df8e3ecf98d75af2ac927dc2aab05b5b274a436e5bb7463532"
+}

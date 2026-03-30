@@ -1,0 +1,27 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO device (\n                id, created_time, tenant_id, customer_id, device_profile_id,\n                name, type, label, device_data, firmware_id, software_id,\n                external_id, additional_info, version\n            ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)\n            ON CONFLICT (id) DO UPDATE SET\n                name              = EXCLUDED.name,\n                type              = EXCLUDED.type,\n                label             = EXCLUDED.label,\n                customer_id       = EXCLUDED.customer_id,\n                device_profile_id = EXCLUDED.device_profile_id,\n                device_data       = EXCLUDED.device_data,\n                firmware_id       = EXCLUDED.firmware_id,\n                software_id       = EXCLUDED.software_id,\n                external_id       = EXCLUDED.external_id,\n                additional_info   = EXCLUDED.additional_info,\n                version           = device.version + 1\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8",
+        "Uuid",
+        "Uuid",
+        "Uuid",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Jsonb",
+        "Uuid",
+        "Uuid",
+        "Uuid",
+        "Varchar",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "80264106b3b25f2c394092ba86543b47a5ade51a6ecd933d3b0c81dc14b637c0"
+}

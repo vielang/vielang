@@ -1,0 +1,98 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO calculated_field\n               (tenant_id, entity_id, entity_type, name, expression, output_key,\n                input_keys, trigger_mode, output_ttl_ms, enabled, created_time)\n               VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)\n               RETURNING id, tenant_id, entity_id, entity_type, name, expression,\n                         output_key, input_keys, trigger_mode, output_ttl_ms, enabled, created_time",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "entity_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "entity_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "expression",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "output_key",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "input_keys",
+        "type_info": "TextArray"
+      },
+      {
+        "ordinal": 8,
+        "name": "trigger_mode",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 9,
+        "name": "output_ttl_ms",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 10,
+        "name": "enabled",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 11,
+        "name": "created_time",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Varchar",
+        "Varchar",
+        "Text",
+        "Varchar",
+        "TextArray",
+        "Varchar",
+        "Int8",
+        "Bool",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "15b5ce7b45cc9bf3a3116287696e7eebb43216d79ac450dc63d16618bc4b13b7"
+}

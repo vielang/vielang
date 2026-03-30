@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE cluster_node SET status = 'SUSPECT' WHERE node_id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "2bb31b814a7b18e48d7f8097581c6066324c2f84bb5cdcf42cdd1333de509793"
+}

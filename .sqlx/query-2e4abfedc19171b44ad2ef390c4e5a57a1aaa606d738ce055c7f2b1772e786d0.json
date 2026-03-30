@@ -1,0 +1,25 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT COUNT(*) FROM entity_view\n               WHERE tenant_id = $1 AND customer_id = $2\n               AND ($3::text IS NULL OR type = $3)\n               AND ($4::text IS NULL OR LOWER(name) LIKE LOWER($4))",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "count",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "2e4abfedc19171b44ad2ef390c4e5a57a1aaa606d738ce055c7f2b1772e786d0"
+}

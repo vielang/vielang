@@ -1,0 +1,94 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT id, created_time, tenant_id, name, description, image,\n                   is_default, default_rule_chain_id, default_dashboard_id,\n                   default_queue_name, default_edge_rule_chain_id,\n                   external_id, version\n            FROM asset_profile WHERE tenant_id = $1 AND is_default = TRUE\n            LIMIT 1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "created_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "description",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "image",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "is_default",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 7,
+        "name": "default_rule_chain_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 8,
+        "name": "default_dashboard_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 9,
+        "name": "default_queue_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 10,
+        "name": "default_edge_rule_chain_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 11,
+        "name": "external_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 12,
+        "name": "version",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false
+    ]
+  },
+  "hash": "c3e440eeaa0b3621f02978bb0e33851281d017359009ab44a9d68fd18715cb20"
+}

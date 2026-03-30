@@ -1,0 +1,48 @@
+# ── Build artifacts ──────────────────────────────────────
+target/
+**/target/
+
+# ── Git ───────────────────────────────────────────────────
+.git/
+.gitignore
+.github/
+
+# ── Large external repos (not needed for build) ──────────
+thingsboard/
+vielang-ui/
+
+# ── Dev / test tooling (load-tests/ giữ lại vì workspace dep) ────────────
+e2e/
+scripts/
+docs/
+monitoring/
+postgres/
+charts/
+
+# ── IDE / OS ──────────────────────────────────────────────
+.idea/
+.vscode/
+.DS_Store
+*.swp
+*.swo
+
+# ── Secrets ───────────────────────────────────────────────
+.env
+.env.*
+secrets/
+*.pem
+*.key
+*.crt
+
+# ── Logs / benchmarks ────────────────────────────────────
+*.log
+logs/
+criterion/
+bevy_asset_cache/
+
+# ── Docs (không cần trong image) ─────────────────────────
+*.md
+!README.md
+
+# ── Claude ────────────────────────────────────────────────
+.claude/

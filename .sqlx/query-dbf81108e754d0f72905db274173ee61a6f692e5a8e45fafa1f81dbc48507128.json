@@ -1,0 +1,53 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT\n                   t.id                                   AS tenant_id,\n                   t.title                                AS tenant_name,\n                   COALESCE(sp.name, 'free')              AS plan_name,\n                   COUNT(DISTINCT d.id)::bigint           AS device_count,\n                   COALESCE(aus.transport_msg_count, 0)   AS transport_msgs,\n                   COALESCE(CASE ts.billing_cycle\n                       WHEN 'monthly' THEN sp.price_monthly\n                       WHEN 'annual'  THEN sp.price_annually / 12\n                       ELSE 0\n                   END, 0)                                AS mrr_cents\n               FROM tenant t\n               LEFT JOIN device d ON d.tenant_id = t.id\n               LEFT JOIN tenant_subscription ts ON ts.tenant_id = t.id\n               LEFT JOIN subscription_plan sp ON sp.id = ts.plan_id\n               LEFT JOIN api_usage_state aus ON aus.tenant_id = t.id AND aus.billing_period = $1\n               GROUP BY t.id, t.title, sp.name, ts.billing_cycle, sp.price_monthly, sp.price_annually, aus.transport_msg_count\n               ORDER BY device_count DESC\n               LIMIT $2",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "tenant_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "plan_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "device_count",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 4,
+        "name": "transport_msgs",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 5,
+        "name": "mrr_cents",
+        "type_info": "Int4"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  "hash": "dbf81108e754d0f72905db274173ee61a6f692e5a8e45fafa1f81dbc48507128"
+}

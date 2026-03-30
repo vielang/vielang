@@ -1,0 +1,26 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO asset_profile (\n                id, created_time, tenant_id, name, description, image,\n                is_default, default_rule_chain_id, default_dashboard_id,\n                default_queue_name, default_edge_rule_chain_id,\n                external_id, version\n            ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)\n            ON CONFLICT (id) DO UPDATE SET\n                name                      = EXCLUDED.name,\n                description               = EXCLUDED.description,\n                image                     = EXCLUDED.image,\n                is_default                = EXCLUDED.is_default,\n                default_rule_chain_id     = EXCLUDED.default_rule_chain_id,\n                default_dashboard_id      = EXCLUDED.default_dashboard_id,\n                default_queue_name        = EXCLUDED.default_queue_name,\n                default_edge_rule_chain_id = EXCLUDED.default_edge_rule_chain_id,\n                external_id               = EXCLUDED.external_id,\n                version                   = asset_profile.version + 1\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8",
+        "Uuid",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Bool",
+        "Uuid",
+        "Uuid",
+        "Varchar",
+        "Uuid",
+        "Uuid",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "c13a26a2c3419b83bbccc19d8b6c8f5a1e77e12d7595f1d2d6ca5324b72466cc"
+}

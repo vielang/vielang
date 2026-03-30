@@ -1,0 +1,18 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE tenant_subscription\n               SET status               = $2,\n                   current_period_end   = $3,\n                   cancel_at_period_end = $4,\n                   updated_time         = $5\n               WHERE tenant_id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Varchar",
+        "Int8",
+        "Bool",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "5dccf396dba3a3954d50d8dee1124082e062768356eca81e730f613b20bb5d12"
+}

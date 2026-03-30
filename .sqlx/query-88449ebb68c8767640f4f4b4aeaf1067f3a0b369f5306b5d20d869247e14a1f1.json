@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO rpc (\n                id, created_time, tenant_id, device_id, request_id,\n                expiration_time, request, response, status, additional_info\n            ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)\n            ON CONFLICT (id) DO UPDATE SET\n                response        = EXCLUDED.response,\n                status          = EXCLUDED.status,\n                additional_info = EXCLUDED.additional_info\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8",
+        "Uuid",
+        "Uuid",
+        "Int4",
+        "Int8",
+        "Jsonb",
+        "Jsonb",
+        "Varchar",
+        "Jsonb"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "88449ebb68c8767640f4f4b4aeaf1067f3a0b369f5306b5d20d869247e14a1f1"
+}

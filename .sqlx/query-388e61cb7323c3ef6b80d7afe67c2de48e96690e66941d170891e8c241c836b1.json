@@ -1,0 +1,32 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT partition_id, node_id, assigned_at\n            FROM cluster_partition\n            ORDER BY partition_id\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "partition_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "node_id",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "assigned_at",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "388e61cb7323c3ef6b80d7afe67c2de48e96690e66941d170891e8c241c836b1"
+}

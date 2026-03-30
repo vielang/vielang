@@ -1,0 +1,35 @@
+[package]
+name = "vl-rule-engine"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+vl-core      = { workspace = true }
+vl-dao       = { workspace = true }
+serde        = { workspace = true }
+serde_json   = { workspace = true }
+thiserror    = { workspace = true }
+tokio        = { workspace = true }
+tracing      = { workspace = true }
+async-trait  = { workspace = true }
+uuid         = { workspace = true }
+chrono       = { workspace = true }
+dashmap      = { workspace = true }
+futures      = { workspace = true }
+
+# Rhai scripting engine — sandboxed JS-like scripting
+# sync feature makes Engine: Send + Sync (required for multi-threaded use)
+rhai    = { workspace = true }
+metrics = { workspace = true }
+
+# JSONPath transform node
+jsonpath-rust = "0.7"
+
+# External action nodes
+reqwest  = { workspace = true }
+rumqttc  = { workspace = true }
+lettre   = { workspace = true }
+
+[dev-dependencies]
+sqlx = { workspace = true }
+tokio = { workspace = true }

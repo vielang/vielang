@@ -1,0 +1,29 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO customer (\n                id, created_time, tenant_id, title, country, state, city,\n                address, address2, zip, phone, email, is_public,\n                external_id, additional_info, version\n            ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)\n            ON CONFLICT (id) DO UPDATE SET\n                title           = EXCLUDED.title,\n                country         = EXCLUDED.country,\n                state           = EXCLUDED.state,\n                city            = EXCLUDED.city,\n                address         = EXCLUDED.address,\n                address2        = EXCLUDED.address2,\n                zip             = EXCLUDED.zip,\n                phone           = EXCLUDED.phone,\n                email           = EXCLUDED.email,\n                is_public       = EXCLUDED.is_public,\n                external_id     = EXCLUDED.external_id,\n                additional_info = EXCLUDED.additional_info,\n                version         = customer.version + 1\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8",
+        "Uuid",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Bool",
+        "Uuid",
+        "Varchar",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "22af25bdac6ee6e31a06d82bb3bd66f5ab0fa98067fb510d90f71c1b730ffaa9"
+}

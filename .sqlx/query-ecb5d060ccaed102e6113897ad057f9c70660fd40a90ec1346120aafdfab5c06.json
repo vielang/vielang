@@ -1,0 +1,34 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT k.key, a.str_v, a.long_v FROM attribute_kv a\n         JOIN key_dictionary k ON k.key_id = a.attribute_key\n         WHERE a.entity_id = $1 AND a.attribute_type = 1\n         ORDER BY k.key",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "key",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 1,
+        "name": "str_v",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "long_v",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      true,
+      true
+    ]
+  },
+  "hash": "ecb5d060ccaed102e6113897ad057f9c70660fd40a90ec1346120aafdfab5c06"
+}

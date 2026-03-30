@@ -1,0 +1,117 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT ev.id, ev.created_time, ev.tenant_id, ev.customer_id,\n                   ev.entity_id, ev.entity_type, ev.name,\n                   ev.type AS ev_type,\n                   ev.keys, ev.start_ts, ev.end_ts,\n                   ev.additional_info, ev.external_id, ev.version,\n                   c.title AS \"customer_title: Option<String>\",\n                   c.is_public AS \"customer_is_public: Option<bool>\"\n            FROM entity_view ev\n            LEFT JOIN customer c ON c.id = ev.customer_id\n            WHERE ev.tenant_id = $1 AND ev.customer_id = $2\n            AND ($3::text IS NULL OR ev.type = $3)\n            AND ($4::text IS NULL OR LOWER(ev.name) LIKE LOWER($4))\n            ORDER BY ev.created_time DESC\n            LIMIT $5 OFFSET $6\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "created_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "customer_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 4,
+        "name": "entity_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 5,
+        "name": "entity_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "ev_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 8,
+        "name": "keys",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 9,
+        "name": "start_ts",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 10,
+        "name": "end_ts",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 11,
+        "name": "additional_info",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 12,
+        "name": "external_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 13,
+        "name": "version",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 14,
+        "name": "customer_title: Option<String>",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 15,
+        "name": "customer_is_public: Option<bool>",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Text",
+        "Text",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "32b79dac6d6e70d235e0f6b63dc5fc86f6875abe81d2049b5e974b15f08166a3"
+}

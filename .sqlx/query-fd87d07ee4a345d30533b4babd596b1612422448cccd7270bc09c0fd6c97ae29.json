@@ -1,0 +1,25 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO rule_node (\n                id, created_time, rule_chain_id, additional_info,\n                configuration_version, configuration, type, name,\n                debug_settings, singleton_mode, queue_name, external_id\n            )\n            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)\n            ON CONFLICT (id) DO UPDATE SET\n                rule_chain_id         = EXCLUDED.rule_chain_id,\n                additional_info       = EXCLUDED.additional_info,\n                configuration_version = EXCLUDED.configuration_version,\n                configuration         = EXCLUDED.configuration,\n                type                  = EXCLUDED.type,\n                name                  = EXCLUDED.name,\n                debug_settings        = EXCLUDED.debug_settings,\n                singleton_mode        = EXCLUDED.singleton_mode,\n                queue_name            = EXCLUDED.queue_name,\n                external_id           = EXCLUDED.external_id\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8",
+        "Uuid",
+        "Varchar",
+        "Int4",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Bool",
+        "Varchar",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "fd87d07ee4a345d30533b4babd596b1612422448cccd7270bc09c0fd6c97ae29"
+}

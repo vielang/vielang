@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM rule_node_debug_event WHERE tenant_id = $1 AND ts < $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "be6af5408108d4c7fd7c4eee8c0779c06c3240dcac79e2f7277bc2e67dba5eec"
+}

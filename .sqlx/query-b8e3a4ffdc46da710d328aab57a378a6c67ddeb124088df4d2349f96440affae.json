@@ -1,0 +1,136 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT id, created_time, tenant_id, name, description, image,\n                   is_default,\n                   type        AS \"profile_type: _\",\n                   transport_type AS \"transport_type: _\",\n                   provision_type AS \"provision_type: _\",\n                   profile_data, default_rule_chain_id, default_dashboard_id,\n                   default_queue_name, default_edge_rule_chain_id,\n                   provision_device_key, firmware_id, software_id,\n                   external_id, version\n            FROM device_profile WHERE id = $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "created_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "description",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "image",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "is_default",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 7,
+        "name": "profile_type: _",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 8,
+        "name": "transport_type: _",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 9,
+        "name": "provision_type: _",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 10,
+        "name": "profile_data",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 11,
+        "name": "default_rule_chain_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 12,
+        "name": "default_dashboard_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 13,
+        "name": "default_queue_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 14,
+        "name": "default_edge_rule_chain_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 15,
+        "name": "provision_device_key",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 16,
+        "name": "firmware_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 17,
+        "name": "software_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 18,
+        "name": "external_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 19,
+        "name": "version",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false
+    ]
+  },
+  "hash": "b8e3a4ffdc46da710d328aab57a378a6c67ddeb124088df4d2349f96440affae"
+}

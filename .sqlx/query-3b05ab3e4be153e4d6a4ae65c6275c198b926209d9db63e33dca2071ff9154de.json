@@ -1,0 +1,26 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO oauth2_client_registration\n                (id, created_time, tenant_id, provider_name, client_id, client_secret,\n                 authorization_uri, token_uri, user_info_uri, scope, user_name_attribute,\n                 mapper_config, enabled)\n             VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)\n             ON CONFLICT (id) DO UPDATE SET\n                provider_name       = EXCLUDED.provider_name,\n                client_id           = EXCLUDED.client_id,\n                client_secret       = EXCLUDED.client_secret,\n                authorization_uri   = EXCLUDED.authorization_uri,\n                token_uri           = EXCLUDED.token_uri,\n                user_info_uri       = EXCLUDED.user_info_uri,\n                scope               = EXCLUDED.scope,\n                user_name_attribute = EXCLUDED.user_name_attribute,\n                mapper_config       = EXCLUDED.mapper_config,\n                enabled             = EXCLUDED.enabled",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8",
+        "Uuid",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Jsonb",
+        "Varchar",
+        "Jsonb",
+        "Bool"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "3b05ab3e4be153e4d6a4ae65c6275c198b926209d9db63e33dca2071ff9154de"
+}

@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE notification_inbox SET status = 'READ', read_time = $3\n             WHERE id = $1 AND recipient_user_id = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "0b12e6892ef0d78b5b1c8aec34232ad3eb4717695e2acc5e6f520a0b46f0e93c"
+}

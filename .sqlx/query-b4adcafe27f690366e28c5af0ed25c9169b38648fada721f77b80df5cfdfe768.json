@@ -1,0 +1,50 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT id, ts, service_id, e_messages_processed, e_errors_occurred\n            FROM stats_event\n            WHERE tenant_id = $1 AND entity_id = $2\n              AND ts >= $3 AND ts < $4\n            ORDER BY ts DESC\n            LIMIT $5\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "ts",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "service_id",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "e_messages_processed",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 4,
+        "name": "e_errors_occurred",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Int8",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "b4adcafe27f690366e28c5af0ed25c9169b38648fada721f77b80df5cfdfe768"
+}

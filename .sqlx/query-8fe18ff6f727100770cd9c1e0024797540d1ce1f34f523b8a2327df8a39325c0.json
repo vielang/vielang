@@ -1,0 +1,33 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO device_profile (\n                id, created_time, tenant_id, name, description, image,\n                is_default, type, transport_type, provision_type, profile_data,\n                default_rule_chain_id, default_dashboard_id, default_queue_name,\n                default_edge_rule_chain_id, provision_device_key,\n                firmware_id, software_id, external_id, version\n            ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20)\n            ON CONFLICT (id) DO UPDATE SET\n                name                     = EXCLUDED.name,\n                description              = EXCLUDED.description,\n                image                    = EXCLUDED.image,\n                is_default               = EXCLUDED.is_default,\n                type                     = EXCLUDED.type,\n                transport_type           = EXCLUDED.transport_type,\n                provision_type           = EXCLUDED.provision_type,\n                profile_data             = EXCLUDED.profile_data,\n                default_rule_chain_id    = EXCLUDED.default_rule_chain_id,\n                default_dashboard_id     = EXCLUDED.default_dashboard_id,\n                default_queue_name       = EXCLUDED.default_queue_name,\n                default_edge_rule_chain_id = EXCLUDED.default_edge_rule_chain_id,\n                provision_device_key     = EXCLUDED.provision_device_key,\n                firmware_id              = EXCLUDED.firmware_id,\n                software_id              = EXCLUDED.software_id,\n                external_id              = EXCLUDED.external_id,\n                version                  = device_profile.version + 1\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8",
+        "Uuid",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Bool",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Jsonb",
+        "Uuid",
+        "Uuid",
+        "Varchar",
+        "Uuid",
+        "Varchar",
+        "Uuid",
+        "Uuid",
+        "Uuid",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "8fe18ff6f727100770cd9c1e0024797540d1ce1f34f523b8a2327df8a39325c0"
+}

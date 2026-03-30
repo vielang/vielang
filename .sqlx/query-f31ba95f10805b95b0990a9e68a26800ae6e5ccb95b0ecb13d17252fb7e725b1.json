@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO key_dictionary (key) VALUES ($1)\n             ON CONFLICT (key) DO UPDATE SET key = EXCLUDED.key\n             RETURNING key_id",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "key_id",
+        "type_info": "Int4"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Varchar"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "f31ba95f10805b95b0990a9e68a26800ae6e5ccb95b0ecb13d17252fb7e725b1"
+}

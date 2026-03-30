@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM mobile_session WHERE fcm_token = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "6098e03e569723f1b6bc7388521ea0643e48d206a0fb8e4b99c0f934afed4131"
+}

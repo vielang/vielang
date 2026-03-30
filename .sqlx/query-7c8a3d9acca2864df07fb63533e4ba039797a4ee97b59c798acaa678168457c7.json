@@ -1,0 +1,64 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id, created_time, tenant_id, title, android_app_id, ios_app_id,\n                    layout_config, oauth2_client_ids\n             FROM mobile_app_bundle WHERE id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "created_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "title",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "android_app_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 5,
+        "name": "ios_app_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 6,
+        "name": "layout_config",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 7,
+        "name": "oauth2_client_ids",
+        "type_info": "Jsonb"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      false
+    ]
+  },
+  "hash": "7c8a3d9acca2864df07fb63533e4ba039797a4ee97b59c798acaa678168457c7"
+}

@@ -1,0 +1,80 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id, tenant_id, device_id, name, enabled, interval_ms,\n                      telemetry_schema as \"telemetry_schema: serde_json::Value\",\n                      script, transport_mode, created_time, updated_time\n               FROM simulator_config WHERE enabled = true\n               ORDER BY created_time",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "device_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "enabled",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 5,
+        "name": "interval_ms",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 6,
+        "name": "telemetry_schema: serde_json::Value",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 7,
+        "name": "script",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 8,
+        "name": "transport_mode",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 9,
+        "name": "created_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 10,
+        "name": "updated_time",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "8d5aad340f94b5b901b40ab96c6154c1969c894ee6d75c36556b9688d368d964"
+}

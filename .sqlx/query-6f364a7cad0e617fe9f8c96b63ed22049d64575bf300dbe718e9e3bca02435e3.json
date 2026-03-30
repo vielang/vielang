@@ -1,0 +1,68 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT entity_id, key, ts, bool_v, str_v, long_v, dbl_v, json_v\n            FROM ts_kv\n            WHERE entity_id = $1 AND key = $2 AND ts >= $3 AND ts <= $4\n            ORDER BY ts DESC\n            LIMIT $5\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "entity_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "key",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 2,
+        "name": "ts",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "bool_v",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 4,
+        "name": "str_v",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "long_v",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 6,
+        "name": "dbl_v",
+        "type_info": "Float8"
+      },
+      {
+        "ordinal": 7,
+        "name": "json_v",
+        "type_info": "Json"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int4",
+        "Int8",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "6f364a7cad0e617fe9f8c96b63ed22049d64575bf300dbe718e9e3bca02435e3"
+}

@@ -1,0 +1,52 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT id, created_time, device_id, credentials_type,\n                   credentials_id, credentials_value\n            FROM device_credentials WHERE device_id = $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "created_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "device_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "credentials_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "credentials_id",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "credentials_value",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "b4d1e4e0c703299394b5f1975d8767887a3beb84fe6367d21c8bdbe2707980a7"
+}

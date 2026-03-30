@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE notification_request\n            SET status = $2, error = $3, sent_time = $4, version = version + 1\n            WHERE id = $1\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Varchar",
+        "Text",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "858a10e52ab148ec1aa96a6e22bc24492578fe126ec60899873a3d4c87d6b026"
+}

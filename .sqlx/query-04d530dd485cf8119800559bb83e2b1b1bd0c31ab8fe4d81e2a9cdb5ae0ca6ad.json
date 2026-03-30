@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            DELETE FROM relation\n            WHERE (from_id = $1 AND from_type = $2 AND relation_type_group = 'COMMON')\n               OR (to_id = $1 AND to_type = $2 AND relation_type_group = 'COMMON')\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "04d530dd485cf8119800559bb83e2b1b1bd0c31ab8fe4d81e2a9cdb5ae0ca6ad"
+}

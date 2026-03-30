@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM user_activation_token WHERE used = TRUE OR expires_at < $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "c23f11f8835a8e56d52789abb41d1487e2e1c7a26446b7facc5202bce8dd5627"
+}

@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO admin_settings (id, created_time, tenant_id, key, json_value)\n            VALUES (gen_random_uuid(), $1, $2, 'home_dashboard', $3)\n            ON CONFLICT (tenant_id, key) DO UPDATE SET json_value = EXCLUDED.json_value\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Uuid",
+        "Jsonb"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "03df72b6981504003e0b035c56b2d4d38a381334a5503a988e946f38f93a59ac"
+}

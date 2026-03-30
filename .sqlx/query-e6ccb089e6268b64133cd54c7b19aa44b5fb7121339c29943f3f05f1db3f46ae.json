@@ -1,0 +1,112 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT id, created_time, tenant_id, title, resource_type,\n                   resource_sub_type, resource_key, file_name, is_public,\n                   public_resource_key, etag, descriptor, data, preview,\n                   external_id, version\n            FROM resource WHERE id = $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "created_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "title",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "resource_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "resource_sub_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "resource_key",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "file_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 8,
+        "name": "is_public",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 9,
+        "name": "public_resource_key",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 10,
+        "name": "etag",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 11,
+        "name": "descriptor",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 12,
+        "name": "data",
+        "type_info": "Bytea"
+      },
+      {
+        "ordinal": 13,
+        "name": "preview",
+        "type_info": "Bytea"
+      },
+      {
+        "ordinal": 14,
+        "name": "external_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 15,
+        "name": "version",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false
+    ]
+  },
+  "hash": "e6ccb089e6268b64133cd54c7b19aa44b5fb7121339c29943f3f05f1db3f46ae"
+}

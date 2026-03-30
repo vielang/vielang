@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE device\n             SET customer_id = $1, claiming_data = NULL, claim_expiry_ts = NULL\n             WHERE id = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "56ff1d9d07f51825d6de481d5bae330c52d1f0c5550977bcb9257a9f4bb09ada"
+}

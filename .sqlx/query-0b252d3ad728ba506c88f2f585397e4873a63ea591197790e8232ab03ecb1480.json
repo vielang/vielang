@@ -1,0 +1,27 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO entity_view (\n                id, created_time, tenant_id, customer_id,\n                entity_id, entity_type, name, type,\n                keys, start_ts, end_ts,\n                additional_info, external_id, version\n            ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)\n            ON CONFLICT (id) DO UPDATE SET\n                name           = EXCLUDED.name,\n                type           = EXCLUDED.type,\n                customer_id    = EXCLUDED.customer_id,\n                entity_id      = EXCLUDED.entity_id,\n                entity_type    = EXCLUDED.entity_type,\n                keys           = EXCLUDED.keys,\n                start_ts       = EXCLUDED.start_ts,\n                end_ts         = EXCLUDED.end_ts,\n                additional_info = EXCLUDED.additional_info,\n                external_id    = EXCLUDED.external_id,\n                version        = entity_view.version + 1\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8",
+        "Uuid",
+        "Uuid",
+        "Uuid",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Jsonb",
+        "Int8",
+        "Int8",
+        "Jsonb",
+        "Uuid",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "0b252d3ad728ba506c88f2f585397e4873a63ea591197790e8232ab03ecb1480"
+}

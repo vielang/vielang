@@ -1,0 +1,19 @@
+[package]
+name = "vl-cassandra"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+vl-core      = { workspace = true }
+vl-config    = { workspace = true }
+vl-dao       = { workspace = true }
+
+scylla       = { workspace = true }
+async-trait  = { workspace = true }
+uuid         = { workspace = true }
+chrono       = { workspace = true }
+tokio        = { workspace = true }
+tracing      = { workspace = true }
+thiserror    = { workspace = true }
+dashmap      = { workspace = true }
+serde_json   = { workspace = true }

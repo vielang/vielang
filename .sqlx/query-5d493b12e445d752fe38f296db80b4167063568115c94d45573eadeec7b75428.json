@@ -1,0 +1,19 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            DELETE FROM relation\n            WHERE from_id = $1 AND from_type = $2 AND to_id = $3\n              AND to_type = $4 AND relation_type = $5 AND relation_type_group = $6\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Uuid",
+        "Text",
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "5d493b12e445d752fe38f296db80b4167063568115c94d45573eadeec7b75428"
+}

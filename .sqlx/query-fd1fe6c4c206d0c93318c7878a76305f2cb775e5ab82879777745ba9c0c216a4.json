@@ -1,0 +1,91 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO simulator_config\n               (tenant_id, device_id, name, enabled, interval_ms, telemetry_schema, script,\n                transport_mode, created_time, updated_time)\n               VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)\n               RETURNING id, tenant_id, device_id, name, enabled, interval_ms,\n                         telemetry_schema as \"telemetry_schema: serde_json::Value\",\n                         script, transport_mode, created_time, updated_time",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "device_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "enabled",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 5,
+        "name": "interval_ms",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 6,
+        "name": "telemetry_schema: serde_json::Value",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 7,
+        "name": "script",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 8,
+        "name": "transport_mode",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 9,
+        "name": "created_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 10,
+        "name": "updated_time",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Varchar",
+        "Bool",
+        "Int8",
+        "Jsonb",
+        "Text",
+        "Varchar",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "fd1fe6c4c206d0c93318c7878a76305f2cb775e5ab82879777745ba9c0c216a4"
+}

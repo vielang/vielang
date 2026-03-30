@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT l.long_v FROM ts_kv_latest l\n         JOIN key_dictionary k ON k.key_id = l.key\n         WHERE l.entity_id = $1 AND k.key = 'seq_val'",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "long_v",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      true
+    ]
+  },
+  "hash": "e1d97af9bb18310fbd528553d44101d3c28df8794932bc5a47c639f6aa64e32c"
+}

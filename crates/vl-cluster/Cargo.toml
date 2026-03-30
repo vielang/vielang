@@ -1,0 +1,29 @@
+[package]
+name = "vl-cluster"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+vl-core  = { workspace = true }
+vl-config = { workspace = true }
+
+tonic       = { workspace = true }
+tonic-prost = { workspace = true }  # ProstCodec runtime for generated gRPC code
+prost       = { workspace = true }
+tokio-stream = { workspace = true }
+
+reqwest     = { workspace = true }
+uuid        = { workspace = true }
+rand        = { workspace = true }
+dashmap     = { workspace = true }
+async-trait = { workspace = true }
+serde       = { workspace = true }
+serde_json  = { workspace = true }
+tokio       = { workspace = true }
+tracing     = { workspace = true }
+thiserror   = { workspace = true }
+bytes       = { workspace = true }
+
+[build-dependencies]
+tonic-prost-build = { workspace = true }  # tonic-build 0.14 moved proto compilation here
+protox            = { workspace = true }

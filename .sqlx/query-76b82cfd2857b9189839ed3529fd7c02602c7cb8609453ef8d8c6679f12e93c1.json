@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE cluster_node SET last_heartbeat = $2 WHERE node_id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "76b82cfd2857b9189839ed3529fd7c02602c7cb8609453ef8d8c6679f12e93c1"
+}

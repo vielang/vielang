@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT l.dbl_v, l.ts FROM ts_kv_latest l\n         JOIN key_dictionary k ON k.key_id = l.key\n         WHERE l.entity_id = $1 AND k.key = 'voltage'",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "dbl_v",
+        "type_info": "Float8"
+      },
+      {
+        "ordinal": 1,
+        "name": "ts",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      true,
+      false
+    ]
+  },
+  "hash": "b11225944165e195ab6965924e5513ec15369c51b9d186a4528e281d140f8884"
+}

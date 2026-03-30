@@ -1,0 +1,34 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO alarm (\n                id, created_time, tenant_id, customer_id, type,\n                originator_id, originator_type, severity,\n                acknowledged, cleared, assignee_id,\n                start_ts, end_ts, ack_ts, clear_ts, assign_ts,\n                propagate, propagate_to_owner, propagate_to_tenant,\n                propagate_relation_types, details\n            ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21)\n            ON CONFLICT (id) DO UPDATE SET\n                severity                 = EXCLUDED.severity,\n                acknowledged             = EXCLUDED.acknowledged,\n                cleared                  = EXCLUDED.cleared,\n                assignee_id              = EXCLUDED.assignee_id,\n                end_ts                   = EXCLUDED.end_ts,\n                ack_ts                   = EXCLUDED.ack_ts,\n                clear_ts                 = EXCLUDED.clear_ts,\n                assign_ts                = EXCLUDED.assign_ts,\n                propagate                = EXCLUDED.propagate,\n                propagate_to_owner       = EXCLUDED.propagate_to_owner,\n                propagate_to_tenant      = EXCLUDED.propagate_to_tenant,\n                propagate_relation_types = EXCLUDED.propagate_relation_types,\n                details                  = EXCLUDED.details\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8",
+        "Uuid",
+        "Uuid",
+        "Varchar",
+        "Uuid",
+        "Int4",
+        "Varchar",
+        "Bool",
+        "Bool",
+        "Uuid",
+        "Int8",
+        "Int8",
+        "Int8",
+        "Int8",
+        "Int8",
+        "Bool",
+        "Bool",
+        "Bool",
+        "Varchar",
+        "Varchar"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "6eeb2e3322e5f97985b1c2b5fba69b6f36413f4cee8035bc5a37097d8970c159"
+}

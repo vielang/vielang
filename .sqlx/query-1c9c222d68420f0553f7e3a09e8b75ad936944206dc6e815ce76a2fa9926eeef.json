@@ -1,0 +1,82 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT id, created_time, type, scope, clustering_mode, name, clazz,\n                   configuration_descriptor, configuration_version, actions, has_queue_name\n            FROM component_descriptor\n            WHERE type = ANY($1::text[])\n            ORDER BY name\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "created_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "scope",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "clustering_mode",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "clazz",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "configuration_descriptor",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 8,
+        "name": "configuration_version",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 9,
+        "name": "actions",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 10,
+        "name": "has_queue_name",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "TextArray"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "1c9c222d68420f0553f7e3a09e8b75ad936944206dc6e815ce76a2fa9926eeef"
+}

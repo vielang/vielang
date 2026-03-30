@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            WITH deleted AS (\n                DELETE FROM rpc\n                WHERE id IN (\n                    SELECT id FROM rpc WHERE expiration_time < $1 LIMIT $2\n                )\n                RETURNING id\n            )\n            SELECT count(*) FROM deleted\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "count",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "278d74fe2bb43a7137e3d593c46def347f1e89d5784e56af3edbe4ef950d2b0a"
+}

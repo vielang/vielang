@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT COUNT(*) FROM asset\n               WHERE tenant_id = $1\n               AND ($2::text IS NULL OR LOWER(name) LIKE LOWER($2))",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "count",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "a4de76476db09e55c2a42fc12ccd6b02b78e1da5e246513819e33ca9a42d835a"
+}

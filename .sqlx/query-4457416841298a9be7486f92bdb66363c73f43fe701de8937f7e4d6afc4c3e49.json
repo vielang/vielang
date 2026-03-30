@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM event WHERE tenant_id = $1 AND created_time < $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "4457416841298a9be7486f92bdb66363c73f43fe701de8937f7e4d6afc4c3e49"
+}

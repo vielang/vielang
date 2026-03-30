@@ -1,0 +1,38 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT\n                   sp.name,\n                   sp.display_name,\n                   COUNT(ts.id)::bigint                                     AS tenant_count,\n                   COALESCE(SUM(\n                       CASE ts.billing_cycle\n                           WHEN 'monthly' THEN sp.price_monthly\n                           WHEN 'annual'  THEN sp.price_annually / 12\n                           ELSE 0\n                       END\n                   ), 0)::bigint                                            AS mrr_cents\n               FROM subscription_plan sp\n               LEFT JOIN tenant_subscription ts\n                   ON ts.plan_id = sp.id AND ts.status IN ('active', 'trialing', 'free')\n               WHERE sp.is_active = true\n               GROUP BY sp.id, sp.name, sp.display_name, sp.sort_order\n               ORDER BY sp.sort_order",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 1,
+        "name": "display_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "tenant_count",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "mrr_cents",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      false,
+      null,
+      null
+    ]
+  },
+  "hash": "efcaa69bbd61c3d8a18c3bdede429f8f7c242014955579ebee5eba647f3a17ad"
+}

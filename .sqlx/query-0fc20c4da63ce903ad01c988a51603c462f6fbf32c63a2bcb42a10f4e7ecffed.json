@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE mobile_app_bundle SET oauth2_client_ids = $1 WHERE id = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Jsonb",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "0fc20c4da63ce903ad01c988a51603c462f6fbf32c63a2bcb42a10f4e7ecffed"
+}

@@ -1,0 +1,19 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO tb_role (id, tenant_id, name, role_type, permissions, created_time)\n               VALUES ($1, $2, $3, $4, $5, $6)\n               ON CONFLICT (id) DO UPDATE SET\n                   name        = EXCLUDED.name,\n                   role_type   = EXCLUDED.role_type,\n                   permissions = EXCLUDED.permissions",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Varchar",
+        "Varchar",
+        "Jsonb",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "19085924f3690b39f611166c92fd290da86c3606c70dd924917f66f1e3adf88b"
+}

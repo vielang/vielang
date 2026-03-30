@@ -1,0 +1,139 @@
+# Default values for the VieLang Helm chart.
+# Override with: helm install vielang ./charts/vielang -f my-values.yaml
+
+replicaCount: 3
+
+image:
+  repository: vielang
+  tag: latest
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+# ── Service ───────────────────────────────────────────────────
+service:
+  type: LoadBalancer
+  httpPort: 8080
+  mqttPort: 1883
+  mqttTlsPort: 8883
+  coapPort: 5683
+
+# ── Ingress ───────────────────────────────────────────────────
+ingress:
+  enabled: false
+  className: nginx
+  annotations: {}
+  hosts:
+    - host: vielang.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+# ── Resource limits ───────────────────────────────────────────
+resources:
+  requests:
+    memory: "128Mi"
+    cpu: "250m"
+  limits:
+    memory: "512Mi"
+    cpu: "2000m"
+
+# ── Autoscaling ───────────────────────────────────────────────
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+# ── Pod configuration ─────────────────────────────────────────
+podAnnotations: {}
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: false
+  capabilities:
+    drop: ["ALL"]
+
+nodeSelector: {}
+tolerations: []
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values: ["vielang"]
+          topologyKey: kubernetes.io/hostname
+
+# ── Application config ─────────────────────────────────────────
+config:
+  logLevel: "vielang=info,tower_http=info"
+  allowedOrigins: ""
+  jwtSecret: ""           # Required — set in production
+  cacheType: "inmemory"   # "inmemory" | "redis"
+  queueType: "inmemory"   # "inmemory" | "kafka"
+
+# ── PostgreSQL (Bitnami sub-chart) ────────────────────────────
+postgresql:
+  enabled: true
+  auth:
+    database: vielang
+    username: vielang
+    password: vielang
+  primary:
+    persistence:
+      size: 50Gi
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "250m"
+      limits:
+        memory: "1Gi"
+        cpu: "1000m"
+
+# ── Redis (Bitnami sub-chart) ─────────────────────────────────
+redis:
+  enabled: false   # enable when cacheType = "redis"
+  architecture: standalone
+  auth:
+    enabled: false
+  master:
+    persistence:
+      size: 8Gi
+
+# ── Kafka (Bitnami sub-chart) ─────────────────────────────────
+kafka:
+  enabled: false   # enable when queueType = "kafka"
+  replicaCount: 1
+  persistence:
+    size: 20Gi
+
+# ── Probes ────────────────────────────────────────────────────
+livenessProbe:
+  httpGet:
+    path: /api/health
+    port: 8080
+  initialDelaySeconds: 15
+  periodSeconds: 30
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /api/health
+    port: 8080
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 3

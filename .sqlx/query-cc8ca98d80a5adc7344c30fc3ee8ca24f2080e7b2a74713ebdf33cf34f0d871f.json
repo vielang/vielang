@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT COUNT(*) FROM asset\n               WHERE customer_id = $1\n               AND ($2::text IS NULL OR LOWER(name) LIKE LOWER($2))",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "count",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "cc8ca98d80a5adc7344c30fc3ee8ca24f2080e7b2a74713ebdf33cf34f0d871f"
+}

@@ -1,0 +1,124 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id, tenant_id, enabled, server_url, use_tls, base_dn,\n                      search_filter, bind_dn, bind_password, username_attr,\n                      first_name_attr, last_name_attr, email_attr, default_authority,\n                      created_time, updated_time,\n                      group_search_base, group_filter\n               FROM tenant_ldap_config WHERE tenant_id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "enabled",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 3,
+        "name": "server_url",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "use_tls",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 5,
+        "name": "base_dn",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "search_filter",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "bind_dn",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 8,
+        "name": "bind_password",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 9,
+        "name": "username_attr",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 10,
+        "name": "first_name_attr",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 11,
+        "name": "last_name_attr",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 12,
+        "name": "email_attr",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 13,
+        "name": "default_authority",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 14,
+        "name": "created_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 15,
+        "name": "updated_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 16,
+        "name": "group_search_base",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 17,
+        "name": "group_filter",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true
+    ]
+  },
+  "hash": "9baee602e1316b64d9ffc8544993d5fdfabad55395d137068ac6b00909d8a27b"
+}

@@ -1,0 +1,21 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO mobile_app_bundle\n               (id, created_time, tenant_id, title, android_app_id, ios_app_id,\n                layout_config, oauth2_client_ids)\n               VALUES ($1, $2, $3, $4, $5, $6, $7, $8)\n               ON CONFLICT (id)\n               DO UPDATE SET title = EXCLUDED.title,\n                             android_app_id = EXCLUDED.android_app_id,\n                             ios_app_id = EXCLUDED.ios_app_id,\n                             layout_config = EXCLUDED.layout_config,\n                             oauth2_client_ids = EXCLUDED.oauth2_client_ids",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8",
+        "Uuid",
+        "Varchar",
+        "Uuid",
+        "Uuid",
+        "Jsonb",
+        "Jsonb"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "4452b2409d4c543ee69d5bd7321be3fd1707973fdcfe00d29220ba8ba7cb8e3c"
+}

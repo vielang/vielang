@@ -1,0 +1,76 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT id, created_time, tenant_id, device_id, request_id,\n                   expiration_time, request, response, status, additional_info\n            FROM rpc WHERE id = $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "created_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "device_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 4,
+        "name": "request_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 5,
+        "name": "expiration_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 6,
+        "name": "request",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 7,
+        "name": "response",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 8,
+        "name": "status",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 9,
+        "name": "additional_info",
+        "type_info": "Jsonb"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      true
+    ]
+  },
+  "hash": "71088ae6e6ee4ce62e5ebca56681b7870b94305ffb5447573c42e42ba2dd254f"
+}

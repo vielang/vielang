@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE device SET additional_info = '{\"gateway\":true}'::jsonb WHERE id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "74d273d1cd3459f7f8b283ec0d28cea7fc5dc1da318b7a2a0141a60aa8dc8fe7"
+}

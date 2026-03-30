@@ -1,0 +1,19 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            DELETE FROM event\n            WHERE tenant_id = $1 AND entity_id = $2 AND entity_type = $3\n            AND ($4::text IS NULL OR event_type = $4)\n            AND created_time >= $5 AND created_time <= $6\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Text",
+        "Text",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "95f2df894c48714e264a4d71877670877e221e714e6cc5e4cdd385095c99f150"
+}

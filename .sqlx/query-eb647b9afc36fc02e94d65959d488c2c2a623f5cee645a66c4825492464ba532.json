@@ -1,0 +1,103 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT id, created_time, tenant_id, customer_id,\n                   device_profile_id, name, type as device_type, label,\n                   device_data, firmware_id, software_id,\n                   external_id, additional_info, version\n            FROM device\n            WHERE customer_id = $1\n            AND ($2::text IS NULL OR LOWER(name) LIKE LOWER($2))\n            ORDER BY created_time DESC\n            LIMIT $3 OFFSET $4\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "created_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "customer_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 4,
+        "name": "device_profile_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 5,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "device_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "label",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 8,
+        "name": "device_data",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 9,
+        "name": "firmware_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 10,
+        "name": "software_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 11,
+        "name": "external_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 12,
+        "name": "additional_info",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 13,
+        "name": "version",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false
+    ]
+  },
+  "hash": "eb647b9afc36fc02e94d65959d488c2c2a623f5cee645a66c4825492464ba532"
+}

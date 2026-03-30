@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM event\n             WHERE entity_id = $1 AND entity_type = 'RULE_NODE'\n               AND event_type = 'DEBUG_RULE_NODE'",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "e068c694d392dc14726af8d2f644122561a881148c8827388427d802589ba666"
+}

@@ -1,0 +1,110 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT e.id, e.created_time, e.tenant_id, e.customer_id,\n                   e.root_rule_chain_id, e.name, e.type AS edge_type,\n                   e.label, e.routing_key, e.secret,\n                   e.additional_info, e.external_id, e.version,\n                   c.title AS \"customer_title: Option<String>\",\n                   c.is_public AS \"customer_is_public: Option<bool>\"\n            FROM edge e\n            LEFT JOIN customer c ON c.id = e.customer_id\n            WHERE e.tenant_id = $1\n            AND ($2::text IS NULL OR e.type = $2)\n            AND ($3::text IS NULL OR LOWER(e.name) LIKE LOWER($3))\n            ORDER BY e.created_time DESC\n            LIMIT $4 OFFSET $5\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "created_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "customer_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 4,
+        "name": "root_rule_chain_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 5,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "edge_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "label",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 8,
+        "name": "routing_key",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 9,
+        "name": "secret",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 10,
+        "name": "additional_info",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 11,
+        "name": "external_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 12,
+        "name": "version",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 13,
+        "name": "customer_title: Option<String>",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 14,
+        "name": "customer_is_public: Option<bool>",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Text",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      true,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "6b15c875c2f2709cb1e618d4a959631c32c2d5cfb3abd79b5f50f29a6876d8b8"
+}

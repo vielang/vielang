@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE user_credentials\n            SET reset_token = $1\n            WHERE user_id = $2\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "8d9b48d08e5562405d98d845e7b68fe6535d0eb79a0e582f378d56c3be18a91f"
+}

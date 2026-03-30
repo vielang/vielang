@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE stripe_event\n               SET processed      = true,\n                   processed_time = $2,\n                   error          = $3\n               WHERE stripe_event_id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Int8",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "026fa248dbdec21302525f6536395ba59bb83832d7bc0ff982d8e60bf8aa2a72"
+}

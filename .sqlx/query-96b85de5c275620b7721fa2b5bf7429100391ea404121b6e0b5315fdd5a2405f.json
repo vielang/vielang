@@ -1,0 +1,56 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO simulator_schematic (tenant_id, name, graph_data, created_time, updated_time)\n               VALUES ($1,$2,$3,$4,$5)\n               RETURNING id, tenant_id, name,\n                         graph_data as \"graph_data: serde_json::Value\",\n                         created_time, updated_time",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "graph_data: serde_json::Value",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 4,
+        "name": "created_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 5,
+        "name": "updated_time",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Varchar",
+        "Jsonb",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "96b85de5c275620b7721fa2b5bf7429100391ea404121b6e0b5315fdd5a2405f"
+}

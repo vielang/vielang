@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM calculated_field WHERE id=$1 AND tenant_id=$2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "4071dc5cb1a3818612d899ab5afeb12e6f457dce7ae88fcfb872d313f78a397c"
+}

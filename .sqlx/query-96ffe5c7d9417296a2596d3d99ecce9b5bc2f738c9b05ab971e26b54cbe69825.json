@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT DISTINCT kd.key\n            FROM attribute_kv a\n            JOIN device d ON d.id = a.entity_id\n            JOIN key_dictionary kd ON kd.key_id = a.attribute_key\n            WHERE d.tenant_id = $1\n              AND ($2::uuid IS NULL OR d.device_profile_id = $2)\n            ORDER BY kd.key\n            LIMIT 1000\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "key",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "96ffe5c7d9417296a2596d3d99ecce9b5bc2f738c9b05ab971e26b54cbe69825"
+}

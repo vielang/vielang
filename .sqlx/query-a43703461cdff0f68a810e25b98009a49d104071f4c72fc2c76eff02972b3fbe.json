@@ -1,0 +1,84 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO entity_version\n               (tenant_id, entity_id, entity_type, version_number, commit_msg, snapshot, diff, created_by, created_time)\n               VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)\n               RETURNING id,\n                         tenant_id,\n                         entity_id,\n                         entity_type,\n                         version_number,\n                         commit_msg,\n                         snapshot as \"snapshot: serde_json::Value\",\n                         diff,\n                         created_by,\n                         created_time",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "entity_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "entity_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "version_number",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 5,
+        "name": "commit_msg",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "snapshot: serde_json::Value",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 7,
+        "name": "diff",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 8,
+        "name": "created_by",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 9,
+        "name": "created_time",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Varchar",
+        "Int8",
+        "Varchar",
+        "Jsonb",
+        "Jsonb",
+        "Uuid",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      true,
+      true,
+      false
+    ]
+  },
+  "hash": "a43703461cdff0f68a810e25b98009a49d104071f4c72fc2c76eff02972b3fbe"
+}

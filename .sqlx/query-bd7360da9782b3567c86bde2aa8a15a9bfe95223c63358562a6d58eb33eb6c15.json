@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT COUNT(*) FROM dashboard\n               WHERE tenant_id = $1\n               AND ($2::text IS NULL OR LOWER(title) LIKE LOWER($2))",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "count",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "bd7360da9782b3567c86bde2aa8a15a9bfe95223c63358562a6d58eb33eb6c15"
+}

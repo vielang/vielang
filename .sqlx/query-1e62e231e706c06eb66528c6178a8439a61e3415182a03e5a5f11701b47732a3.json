@@ -1,0 +1,88 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT id, created_time, tenant_id, name,\n                   type as chain_type,\n                   first_rule_node_id, root, debug_mode,\n                   configuration, additional_info, external_id, version\n            FROM rule_chain\n            WHERE tenant_id = $1 AND root = TRUE\n            LIMIT 1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "created_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "chain_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "first_rule_node_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 6,
+        "name": "root",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 7,
+        "name": "debug_mode",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 8,
+        "name": "configuration",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 9,
+        "name": "additional_info",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 10,
+        "name": "external_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 11,
+        "name": "version",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      true,
+      true,
+      true,
+      false
+    ]
+  },
+  "hash": "1e62e231e706c06eb66528c6178a8439a61e3415182a03e5a5f11701b47732a3"
+}

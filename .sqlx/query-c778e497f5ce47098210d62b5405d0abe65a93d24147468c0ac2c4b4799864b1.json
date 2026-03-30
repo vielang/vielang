@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            WITH deleted AS (\n                DELETE FROM ts_kv\n                WHERE (entity_id, key, ts) IN (\n                    SELECT entity_id, key, ts\n                    FROM ts_kv\n                    WHERE ts < $1\n                    LIMIT $2\n                )\n                RETURNING entity_id\n            )\n            SELECT count(*) FROM deleted\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "count",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "c778e497f5ce47098210d62b5405d0abe65a93d24147468c0ac2c4b4799864b1"
+}

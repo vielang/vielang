@@ -1,0 +1,100 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id, created_time, updated_time, tenant_id, plan_id,\n                      stripe_customer_id, stripe_subscription_id, billing_cycle, status,\n                      current_period_start, current_period_end, trial_end,\n                      cancel_at_period_end, canceled_at\n               FROM tenant_subscription\n               WHERE tenant_id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "created_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "updated_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 4,
+        "name": "plan_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 5,
+        "name": "stripe_customer_id",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "stripe_subscription_id",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "billing_cycle",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 8,
+        "name": "status",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 9,
+        "name": "current_period_start",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 10,
+        "name": "current_period_end",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 11,
+        "name": "trial_end",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 12,
+        "name": "cancel_at_period_end",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 13,
+        "name": "canceled_at",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      true,
+      true,
+      true,
+      false,
+      true
+    ]
+  },
+  "hash": "3f8bb8afb74c2ed9b4e0c693bc924510c077f3d4903b8bc06bb7fe0691ed31cc"
+}

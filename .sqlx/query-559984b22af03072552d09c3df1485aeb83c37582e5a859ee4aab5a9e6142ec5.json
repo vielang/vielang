@@ -1,0 +1,26 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO widget_type (\n                id, created_time, tenant_id, fqn, name, descriptor,\n                deprecated, scada, image, description, tags, external_id, version\n            ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)\n            ON CONFLICT (id) DO UPDATE SET\n                name        = EXCLUDED.name,\n                descriptor  = EXCLUDED.descriptor,\n                deprecated  = EXCLUDED.deprecated,\n                scada       = EXCLUDED.scada,\n                image       = EXCLUDED.image,\n                description = EXCLUDED.description,\n                tags        = EXCLUDED.tags,\n                external_id = EXCLUDED.external_id,\n                version     = widget_type.version + 1\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8",
+        "Uuid",
+        "Varchar",
+        "Varchar",
+        "Jsonb",
+        "Bool",
+        "Bool",
+        "Text",
+        "Varchar",
+        "TextArray",
+        "Uuid",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "559984b22af03072552d09c3df1485aeb83c37582e5a859ee4aab5a9e6142ec5"
+}

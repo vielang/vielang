@@ -1,0 +1,24 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO notification_rule (\n                id, created_time, tenant_id, name, template_id,\n                trigger_type, trigger_config, recipients_config,\n                additional_config, enabled, version\n            ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)\n            ON CONFLICT (id) DO UPDATE SET\n                name              = EXCLUDED.name,\n                template_id       = EXCLUDED.template_id,\n                trigger_type      = EXCLUDED.trigger_type,\n                trigger_config    = EXCLUDED.trigger_config,\n                recipients_config = EXCLUDED.recipients_config,\n                additional_config = EXCLUDED.additional_config,\n                enabled           = EXCLUDED.enabled,\n                version           = notification_rule.version + 1\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8",
+        "Uuid",
+        "Varchar",
+        "Uuid",
+        "Varchar",
+        "Jsonb",
+        "Jsonb",
+        "Jsonb",
+        "Bool",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "b7dd8e8ea14230bc551739a72d5786a43f6f12c1d77428e1916d6cdc631ed42a"
+}

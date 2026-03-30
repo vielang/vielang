@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE cluster_node\n            SET last_heartbeat = $3\n            WHERE node_id = $1 AND is_leader = true AND leader_epoch = $2\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "3dc32164a6ec623599bb993252d08a9578368ecd6d33e4b2aff09ee2d203c2da"
+}

@@ -1,0 +1,29 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO ota_package (\n                id, created_time, tenant_id, device_profile_id,\n                type, title, version, tag, url,\n                file_name, content_type, checksum_algorithm, checksum,\n                data_size, additional_info, ver\n            ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)\n            ON CONFLICT (id) DO UPDATE SET\n                device_profile_id = EXCLUDED.device_profile_id,\n                type              = EXCLUDED.type,\n                title             = EXCLUDED.title,\n                version           = EXCLUDED.version,\n                tag               = EXCLUDED.tag,\n                url               = EXCLUDED.url,\n                file_name         = EXCLUDED.file_name,\n                content_type      = EXCLUDED.content_type,\n                checksum_algorithm = EXCLUDED.checksum_algorithm,\n                checksum          = EXCLUDED.checksum,\n                data_size         = EXCLUDED.data_size,\n                additional_info   = EXCLUDED.additional_info,\n                ver               = ota_package.ver + 1\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8",
+        "Uuid",
+        "Uuid",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Int8",
+        "Varchar",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "17a024250c3beb6ce940a434f4af17a7bfe315ab9aee618eaca71ac5e9afa200"
+}

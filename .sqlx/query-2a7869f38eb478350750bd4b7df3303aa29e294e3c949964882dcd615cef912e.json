@@ -1,0 +1,56 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO schematic_node_config\n               (schematic_id, node_id, simulator_config_id, node_type, properties)\n               VALUES ($1,$2,$3,$4,$5)\n               ON CONFLICT (id) DO UPDATE SET\n                 simulator_config_id = EXCLUDED.simulator_config_id,\n                 node_type = EXCLUDED.node_type,\n                 properties = EXCLUDED.properties\n               RETURNING id, schematic_id, node_id, simulator_config_id, node_type,\n                         properties as \"properties: serde_json::Value\"",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "schematic_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "node_id",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "simulator_config_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 4,
+        "name": "node_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "properties: serde_json::Value",
+        "type_info": "Jsonb"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Varchar",
+        "Uuid",
+        "Varchar",
+        "Jsonb"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "2a7869f38eb478350750bd4b7df3303aa29e294e3c949964882dcd615cef912e"
+}

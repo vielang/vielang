@@ -1,0 +1,84 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO edge_event (\n                id, created_time, tenant_id, edge_id,\n                edge_event_type, edge_event_action, entity_id, body, uid\n            ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)\n            RETURNING id, created_time, seq_id, tenant_id, edge_id,\n                      edge_event_type, edge_event_action, entity_id, body, uid\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "created_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "seq_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 4,
+        "name": "edge_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 5,
+        "name": "edge_event_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "edge_event_action",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "entity_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 8,
+        "name": "body",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 9,
+        "name": "uid",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8",
+        "Uuid",
+        "Uuid",
+        "Varchar",
+        "Varchar",
+        "Uuid",
+        "Jsonb",
+        "Varchar"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "3ed821c262450fe203eda1f85a877d4cfe9d878a78243bce61fe3806ae174d4c"
+}

@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE user_credentials\n            SET password       = $1,\n                activate_token = NULL,\n                enabled        = true\n            WHERE activate_token = $2\n            RETURNING user_id\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "user_id",
+        "type_info": "Uuid"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Text"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "7f2aca18063d8d178f1bda10c98fae1717afdef7e8706f07f71d22eb2d1ec55d"
+}

@@ -1,0 +1,52 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id, schematic_id, node_id, simulator_config_id, node_type,\n                      properties as \"properties: serde_json::Value\"\n               FROM schematic_node_config WHERE schematic_id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "schematic_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "node_id",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "simulator_config_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 4,
+        "name": "node_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "properties: serde_json::Value",
+        "type_info": "Jsonb"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "b5bbe5d6f280d01c7945b15d6e99ea1ce184eb8e51cadd2dbd90ef52cc0675df"
+}

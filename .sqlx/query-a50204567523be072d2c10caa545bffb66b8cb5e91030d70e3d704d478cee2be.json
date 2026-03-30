@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT DISTINCT kd.key FROM attribute_kv akv\n            JOIN key_dictionary kd ON kd.key_id = akv.attribute_key\n            WHERE akv.entity_id = $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "key",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "a50204567523be072d2c10caa545bffb66b8cb5e91030d70e3d704d478cee2be"
+}

@@ -1,0 +1,106 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT id, created_time, tenant_profile_id, title, region,\n                   country, state, city, address, address2, zip, phone, email,\n                   additional_info, version\n            FROM tenant WHERE id = $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "created_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "tenant_profile_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "title",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "region",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "country",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "state",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "city",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 8,
+        "name": "address",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 9,
+        "name": "address2",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 10,
+        "name": "zip",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 11,
+        "name": "phone",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 12,
+        "name": "email",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 13,
+        "name": "additional_info",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 14,
+        "name": "version",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false
+    ]
+  },
+  "hash": "7dd81b0ade45bc603d563c07cba130f7292f7e49a9c737c2e55c9d22ca90c494"
+}

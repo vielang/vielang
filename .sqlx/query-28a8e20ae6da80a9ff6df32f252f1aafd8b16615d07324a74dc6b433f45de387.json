@@ -1,0 +1,91 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id, created_time, tenant_id, user_id, user_name, action_type,\n                    action_data, action_status, action_failure_details,\n                    entity_type, entity_id, entity_name\n             FROM audit_log\n             WHERE entity_type = $1 AND entity_id = $2\n             ORDER BY created_time DESC\n             LIMIT $3 OFFSET $4",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "created_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "user_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 4,
+        "name": "user_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "action_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "action_data",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 7,
+        "name": "action_status",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 8,
+        "name": "action_failure_details",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 9,
+        "name": "entity_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 10,
+        "name": "entity_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 11,
+        "name": "entity_name",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Uuid",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "28a8e20ae6da80a9ff6df32f252f1aafd8b16615d07324a74dc6b433f45de387"
+}

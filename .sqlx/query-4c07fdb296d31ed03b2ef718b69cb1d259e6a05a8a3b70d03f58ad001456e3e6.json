@@ -1,0 +1,58 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT id, created_time, tenant_id, title,\n                   assigned_customers, mobile_hide, mobile_order\n            FROM dashboard WHERE id = $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "created_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "title",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "assigned_customers",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "mobile_hide",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 6,
+        "name": "mobile_order",
+        "type_info": "Int4"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      true
+    ]
+  },
+  "hash": "4c07fdb296d31ed03b2ef718b69cb1d259e6a05a8a3b70d03f58ad001456e3e6"
+}

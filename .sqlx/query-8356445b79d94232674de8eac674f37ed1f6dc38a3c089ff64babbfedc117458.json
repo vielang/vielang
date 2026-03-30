@@ -1,0 +1,53 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT k.key, akv.str_v, akv.long_v, akv.dbl_v, akv.bool_v, akv.last_update_ts\n            FROM attribute_kv akv\n            JOIN key_dictionary k ON k.key_id = akv.attribute_key\n            WHERE akv.entity_id = $1\n              AND k.key = ANY($2::text[])\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "key",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 1,
+        "name": "str_v",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "long_v",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "dbl_v",
+        "type_info": "Float8"
+      },
+      {
+        "ordinal": 4,
+        "name": "bool_v",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 5,
+        "name": "last_update_ts",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "TextArray"
+      ]
+    },
+    "nullable": [
+      false,
+      true,
+      true,
+      true,
+      true,
+      false
+    ]
+  },
+  "hash": "8356445b79d94232674de8eac674f37ed1f6dc38a3c089ff64babbfedc117458"
+}

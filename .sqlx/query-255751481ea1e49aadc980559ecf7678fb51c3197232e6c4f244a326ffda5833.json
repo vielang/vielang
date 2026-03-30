@@ -1,0 +1,30 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO tenant_saml_config\n                (id, tenant_id, enabled, entity_id, sso_url, slo_url,\n                 idp_certificate, sp_private_key, sp_certificate,\n                 email_attr, first_name_attr, last_name_attr,\n                 force_authn, name_id_format, default_authority, created_time, updated_time)\n               VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)\n               ON CONFLICT (tenant_id) DO UPDATE SET\n                 enabled          = EXCLUDED.enabled,\n                 entity_id        = EXCLUDED.entity_id,\n                 sso_url          = EXCLUDED.sso_url,\n                 slo_url          = EXCLUDED.slo_url,\n                 idp_certificate  = EXCLUDED.idp_certificate,\n                 sp_private_key   = EXCLUDED.sp_private_key,\n                 sp_certificate   = EXCLUDED.sp_certificate,\n                 email_attr       = EXCLUDED.email_attr,\n                 first_name_attr  = EXCLUDED.first_name_attr,\n                 last_name_attr   = EXCLUDED.last_name_attr,\n                 force_authn      = EXCLUDED.force_authn,\n                 name_id_format   = EXCLUDED.name_id_format,\n                 default_authority = EXCLUDED.default_authority,\n                 updated_time     = EXCLUDED.updated_time",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Bool",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Bool",
+        "Text",
+        "Text",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "255751481ea1e49aadc980559ecf7678fb51c3197232e6c4f244a326ffda5833"
+}

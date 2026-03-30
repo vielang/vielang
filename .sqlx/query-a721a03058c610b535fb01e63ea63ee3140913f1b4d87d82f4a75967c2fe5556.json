@@ -1,0 +1,97 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT wt.id, wt.created_time, wt.tenant_id, wt.fqn, wt.name, wt.descriptor,\n                   wt.deprecated, wt.scada, wt.image, wt.description, wt.tags, wt.external_id, wt.version\n            FROM widget_type wt\n            JOIN widgets_bundle_widget wbw ON wbw.widget_type_id = wt.id\n            WHERE wbw.widgets_bundle_id = $1\n            AND ($2::text IS NULL OR LOWER(wt.name) LIKE LOWER($2))\n            ORDER BY wbw.widget_type_order, wt.name\n            LIMIT $3 OFFSET $4\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "created_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "fqn",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "descriptor",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 6,
+        "name": "deprecated",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 7,
+        "name": "scada",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 8,
+        "name": "image",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 9,
+        "name": "description",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 10,
+        "name": "tags",
+        "type_info": "TextArray"
+      },
+      {
+        "ordinal": 11,
+        "name": "external_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 12,
+        "name": "version",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      false
+    ]
+  },
+  "hash": "a721a03058c610b535fb01e63ea63ee3140913f1b4d87d82f4a75967c2fe5556"
+}

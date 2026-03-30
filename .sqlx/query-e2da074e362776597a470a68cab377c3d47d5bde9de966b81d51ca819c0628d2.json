@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT akv.long_v\n            FROM attribute_kv akv\n            JOIN key_dictionary k ON k.key_id = akv.attribute_key\n            WHERE akv.entity_id = $1\n              AND k.key = 'lastActivityTime'\n              AND akv.attribute_type = 1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "long_v",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      true
+    ]
+  },
+  "hash": "e2da074e362776597a470a68cab377c3d47d5bde9de966b81d51ca819c0628d2"
+}

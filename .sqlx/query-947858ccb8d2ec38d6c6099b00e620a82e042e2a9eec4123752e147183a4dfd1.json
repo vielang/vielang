@@ -1,0 +1,48 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id, created_time, tenant_id, title,\n                      ts_rank(search_text, to_tsquery('english', $2)) AS \"rank!: f32\"\n               FROM dashboard\n               WHERE tenant_id = $1\n                 AND search_text IS NOT NULL\n                 AND search_text @@ to_tsquery('english', $2)\n               ORDER BY ts_rank(search_text, to_tsquery('english', $2)) DESC, created_time DESC\n               LIMIT $3",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "created_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "title",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "rank!: f32",
+        "type_info": "Float4"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      null
+    ]
+  },
+  "hash": "947858ccb8d2ec38d6c6099b00e620a82e042e2a9eec4123752e147183a4dfd1"
+}

@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO tenant (id, created_time, title, tenant_profile_id, region, version)\n           VALUES ($1, $2, $3, $4, 'EU', 1)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8",
+        "Varchar",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "58084b4a7c214c03c764d772597f2fcb544a1cf5148cb1dab362d212ead8fc37"
+}

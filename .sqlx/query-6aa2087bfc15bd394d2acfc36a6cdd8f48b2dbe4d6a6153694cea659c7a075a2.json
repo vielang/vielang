@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT COUNT(*) FROM ts_kv_latest l\n         JOIN key_dictionary k ON k.key_id = l.key\n         WHERE l.entity_id = $1 AND k.key LIKE 'sensor_%'",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "count",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "6aa2087bfc15bd394d2acfc36a6cdd8f48b2dbe4d6a6153694cea659c7a075a2"
+}

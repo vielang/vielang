@@ -1,62 +1,66 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# Build artifacts
+/target/
+**/target/
+/target_check/
+/.claude/
+/.claude/worktrees/
 
-# dependencies
-/node_modules
-/.pnp
-.pnp.js
+# sqlx offline query cache — committed so CI builds without a live DB.
+# Regenerate with: ./scripts/generate_sqlx_cache.sh
+# .sqlx/   ← intentionally NOT ignored; keep the cache committed
 
-# testing
-/coverage
-
-# database
-
-# next.js
-/.next/
-/out/
-next-env.d.ts
-
-# production
-/build
-
-# misc
-.DS_Store
-*.pem
-
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
-# local env files
-# do not commit any .env files to git, except for the .env.example file. https://create.t3.gg/en/usage/env-variables#using-environment-variables
+# Environment variables
 .env
-.env*.local
+.env.local
+.env.*.local
 
-# web vitals
-.unlighthouse
+# IDE
+.idea/
+.vscode/
+*.iml
+*.swp
+*.swo
+.DS_Store
 
-# external
-.react-email
+# Logs
+*.log
+logs/
 
-# vercel
-.vercel
+# Bevy / WGPU cache
+bevy_asset_cache/
+wgpu_trace/
 
-# MCP config (contains API keys)
-.mcp.json
+# WASM build output
+pkg/
+dist/
+web-build/
 
-# typescript
-.contentlayer
-*.tsbuildinfo
+# Config overrides (giữ vielang.toml mẫu, bỏ qua file local override)
+config/local.toml
+config/*.local.toml
 
-/viemall-gin-private
-/viemall-axum-private
-# Playwright
-test-results/
-playwright-report/
-playwright/.cache/
+# Secrets & certs
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+secrets/
 
-# Rust/WASM
-/wasm/**/target/
-/wasm/**/*.rs.bk
-/wasm/**/Cargo.lock
+# Docker volumes
+postgres-data/
+redis-data/
+
+# Benchmark output
+criterion/
+
+# Windows reserved device names (NUL, CON, PRN, etc.) — tránh lỗi commit trên Windows
+nul
+NUL
+nul.*
+NUL.*
+
+# Test artifacts
+e2e/test-results/
+vielang-ui/**/test-results/
+

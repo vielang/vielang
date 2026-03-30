@@ -1,0 +1,27 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO tenant_subscription (\n                   id, created_time, updated_time, tenant_id, plan_id,\n                   stripe_customer_id, stripe_subscription_id, billing_cycle, status,\n                   current_period_start, current_period_end, trial_end,\n                   cancel_at_period_end, canceled_at\n               ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)\n               ON CONFLICT (tenant_id) DO UPDATE SET\n                   updated_time           = $3,\n                   plan_id                = EXCLUDED.plan_id,\n                   stripe_customer_id     = EXCLUDED.stripe_customer_id,\n                   stripe_subscription_id = EXCLUDED.stripe_subscription_id,\n                   billing_cycle          = EXCLUDED.billing_cycle,\n                   status                 = EXCLUDED.status,\n                   current_period_start   = EXCLUDED.current_period_start,\n                   current_period_end     = EXCLUDED.current_period_end,\n                   trial_end              = EXCLUDED.trial_end,\n                   cancel_at_period_end   = EXCLUDED.cancel_at_period_end,\n                   canceled_at            = EXCLUDED.canceled_at",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8",
+        "Int8",
+        "Uuid",
+        "Uuid",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Int8",
+        "Int8",
+        "Int8",
+        "Bool",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "506dfbe6163ece90e491666937f2e5d248b8cd8aab5a6d7c1d177bc0c40222da"
+}

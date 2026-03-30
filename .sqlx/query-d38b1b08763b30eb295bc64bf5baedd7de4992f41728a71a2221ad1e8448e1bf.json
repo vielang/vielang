@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE rpc SET status = 'EXPIRED'\n            WHERE status IN ('QUEUED', 'SENT', 'DELIVERED')\n            AND expiration_time < $1\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "d38b1b08763b30eb295bc64bf5baedd7de4992f41728a71a2221ad1e8448e1bf"
+}

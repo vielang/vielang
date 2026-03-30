@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT tenant_id FROM admin_settings\n               WHERE key = 'partnerTenantId' AND json_value->>'tenantId' = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "3d86736e30ddc629939d301ab92e14fb95dc21bb17891ef7a7aa8ea3f0c7e9f6"
+}

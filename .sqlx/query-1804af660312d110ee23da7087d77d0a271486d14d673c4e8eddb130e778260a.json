@@ -1,0 +1,82 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT node_id, host, port, grpc_port, status, service_type,\n                   last_heartbeat, joined_at, metadata, is_leader, leader_epoch\n            FROM cluster_node\n            WHERE status = 'ACTIVE' AND last_heartbeat > $1\n            ORDER BY joined_at ASC\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "node_id",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 1,
+        "name": "host",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "port",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 3,
+        "name": "grpc_port",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 4,
+        "name": "status",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "service_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "last_heartbeat",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 7,
+        "name": "joined_at",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 8,
+        "name": "metadata",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 9,
+        "name": "is_leader",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 10,
+        "name": "leader_epoch",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "1804af660312d110ee23da7087d77d0a271486d14d673c4e8eddb130e778260a"
+}

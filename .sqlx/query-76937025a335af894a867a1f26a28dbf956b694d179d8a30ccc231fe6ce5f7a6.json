@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT COUNT(*) FROM tb_user\n               WHERE tenant_id = $1\n               AND ($2::text IS NULL OR LOWER(email) LIKE LOWER($2)\n                    OR LOWER(first_name) LIKE LOWER($2)\n                    OR LOWER(last_name) LIKE LOWER($2))",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "count",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "76937025a335af894a867a1f26a28dbf956b694d179d8a30ccc231fe6ce5f7a6"
+}

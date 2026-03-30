@@ -1,0 +1,31 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO tenant_ldap_config\n                (id, tenant_id, enabled, server_url, use_tls, base_dn, search_filter,\n                 bind_dn, bind_password, username_attr, first_name_attr, last_name_attr,\n                 email_attr, default_authority, created_time, updated_time,\n                 group_search_base, group_filter)\n               VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)\n               ON CONFLICT (tenant_id) DO UPDATE SET\n                 enabled          = EXCLUDED.enabled,\n                 server_url       = EXCLUDED.server_url,\n                 use_tls          = EXCLUDED.use_tls,\n                 base_dn          = EXCLUDED.base_dn,\n                 search_filter    = EXCLUDED.search_filter,\n                 bind_dn          = EXCLUDED.bind_dn,\n                 bind_password    = EXCLUDED.bind_password,\n                 username_attr    = EXCLUDED.username_attr,\n                 first_name_attr  = EXCLUDED.first_name_attr,\n                 last_name_attr   = EXCLUDED.last_name_attr,\n                 email_attr       = EXCLUDED.email_attr,\n                 default_authority = EXCLUDED.default_authority,\n                 updated_time     = EXCLUDED.updated_time,\n                 group_search_base = EXCLUDED.group_search_base,\n                 group_filter      = EXCLUDED.group_filter",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Bool",
+        "Text",
+        "Bool",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Int8",
+        "Int8",
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "ed51c21ec71681047dd2ea8b90d8b1992106f8f57434d421063acbcd5c65d05c"
+}

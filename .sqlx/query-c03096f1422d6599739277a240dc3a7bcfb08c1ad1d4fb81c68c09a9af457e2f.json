@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM ts_kv_latest WHERE entity_id = $1 AND key = ANY($2)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int4Array"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "c03096f1422d6599739277a240dc3a7bcfb08c1ad1d4fb81c68c09a9af457e2f"
+}

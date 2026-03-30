@@ -1,0 +1,56 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT DISTINCT ON (queue_name)\n                id, queue_name, messages_total, messages_per_second, consumers_total, lag, collected_at\n            FROM queue_stats\n            ORDER BY queue_name, collected_at DESC\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "queue_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "messages_total",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "messages_per_second",
+        "type_info": "Float8"
+      },
+      {
+        "ordinal": 4,
+        "name": "consumers_total",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 5,
+        "name": "lag",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 6,
+        "name": "collected_at",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "cca462a45bb23242f77d71b0f21186959f86fef372e55efee7dcb65d70c96a06"
+}

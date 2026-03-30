@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE asset_profile SET is_default = TRUE WHERE id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "88636f12b4d5b598c4fc0b905ecd639492b6f9fca9dadfc3c6130fbd0d47e2b2"
+}

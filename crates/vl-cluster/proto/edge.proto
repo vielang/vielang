@@ -1,0 +1,135 @@
+// Edge gRPC protocol — khớp với ThingsBoard Java edge proto
+// Ref: thingsboard/common/proto/src/main/proto/
+syntax = "proto3";
+
+package edge;
+
+service EdgeRpcService {
+    rpc HandleMsgs(stream UplinkMsg) returns (stream DownlinkMsg);
+}
+
+// ── Uplink (Edge → Cloud) ─────────────────────────────────────────────────────
+
+message UplinkMsg {
+    int32 uplink_msg_id = 1;
+    repeated EntityUpdateMsg entity_data_msg = 2;
+    repeated DeviceCredentialsRequestMsg device_credentials_request_msg = 3;
+    repeated ConnectRequestMsg connect_request_msg = 4;
+    repeated DisconnectRequestMsg disconnect_request_msg = 5;
+    repeated RuleChainMetadataRequestMsg rule_chain_metadata_request_msg = 6;
+    repeated AttributesRequestMsg attributes_request_msg = 7;
+    repeated RelationRequestMsg relation_request_msg = 8;
+    repeated TelemetryUploadRequestMsg telemetry_msg = 9;
+    repeated DeviceRpcCallMsg device_rpc_call_msg = 10;
+}
+
+message ConnectRequestMsg {
+    string routing_key = 1;
+    string secret = 2;
+}
+
+message DisconnectRequestMsg {
+    string routing_key = 1;
+}
+
+message DeviceCredentialsRequestMsg {
+    string device_id_msc = 1;
+}
+
+message RuleChainMetadataRequestMsg {
+    string rule_chain_id_msc = 1;
+}
+
+message AttributesRequestMsg {
+    string entity_type = 1;
+    string entity_id_msc = 2;
+    string scope = 3;
+}
+
+message RelationRequestMsg {
+    string entity_type = 1;
+    string entity_id_msc = 2;
+}
+
+message TelemetryUploadRequestMsg {
+    string entity_type = 1;
+    string entity_id_msc = 2;
+    repeated TsKvListProto data = 3;
+}
+
+message DeviceRpcCallMsg {
+    string device_id_msc = 1;
+    int64 request_id = 2;
+    string method = 3;
+    string params = 4;
+    bool one_way = 5;
+}
+
+message TsKvListProto {
+    int64 ts = 1;
+    repeated KeyValueProto kv = 2;
+}
+
+message KeyValueProto {
+    string key = 1;
+    KeyValueType type = 2;
+    bool bool_v = 3;
+    int64 long_v = 4;
+    double double_v = 5;
+    string string_v = 6;
+    bytes json_v = 7;
+}
+
+enum KeyValueType {
+    BOOLEAN_V = 0;
+    LONG_V = 1;
+    DOUBLE_V = 2;
+    STRING_V = 3;
+    JSON_V = 4;
+}
+
+// ── Downlink (Cloud → Edge) ───────────────────────────────────────────────────
+
+message DownlinkMsg {
+    int32 downlink_msg_id = 1;
+    repeated EntityUpdateMsg entity_data_msg = 2;
+    repeated EntityDataProto entity_data = 3;
+    repeated DeviceCredentialsUpdateMsg device_credentials_update_msg = 4;
+}
+
+message EntityUpdateMsg {
+    int32 entity_type = 1;
+    string entity_id_msc = 2;
+    bytes entity_body = 3;
+}
+
+message EntityDataProto {
+    string entity_type = 1;
+    string entity_id_msc = 2;
+    bytes data = 3;
+}
+
+message DeviceCredentialsUpdateMsg {
+    string device_id_msc = 1;
+    string credentials_type = 2;
+    string credentials_id = 3;
+    string credentials_value = 4;
+}
+
+// ── Entity type enum ──────────────────────────────────────────────────────────
+
+enum EdgeEntityType {
+    DEVICE = 0;
+    DEVICE_PROFILE = 1;
+    ASSET = 2;
+    ASSET_PROFILE = 3;
+    RULE_CHAIN = 4;
+    DASHBOARD = 5;
+    CUSTOMER = 6;
+    USER = 7;
+    EDGE = 8;
+    TENANT = 9;
+    TENANT_PROFILE = 10;
+    WIDGETS_BUNDLE = 11;
+    QUEUE = 12;
+}

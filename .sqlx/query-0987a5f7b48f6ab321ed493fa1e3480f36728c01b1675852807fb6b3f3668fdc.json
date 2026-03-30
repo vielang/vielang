@@ -1,0 +1,77 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id,\n                      tenant_id,\n                      entity_id,\n                      entity_type,\n                      version_number,\n                      commit_msg,\n                      snapshot as \"snapshot: serde_json::Value\",\n                      diff,\n                      created_by,\n                      created_time\n               FROM entity_version\n               WHERE entity_id = $1 AND version_number = $2",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "entity_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "entity_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "version_number",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 5,
+        "name": "commit_msg",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "snapshot: serde_json::Value",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 7,
+        "name": "diff",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 8,
+        "name": "created_by",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 9,
+        "name": "created_time",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      true,
+      true,
+      false
+    ]
+  },
+  "hash": "0987a5f7b48f6ab321ed493fa1e3480f36728c01b1675852807fb6b3f3668fdc"
+}

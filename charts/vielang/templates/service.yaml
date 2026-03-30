@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "vielang.fullname" . }}
+  labels:
+    {{- include "vielang.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.httpPort }}
+      targetPort: http
+      protocol: TCP
+      name: http
+    - port: {{ .Values.service.mqttPort }}
+      targetPort: mqtt
+      protocol: TCP
+      name: mqtt
+    - port: {{ .Values.service.mqttTlsPort }}
+      targetPort: mqtt-tls
+      protocol: TCP
+      name: mqtt-tls
+    - port: {{ .Values.service.coapPort }}
+      targetPort: coap
+      protocol: UDP
+      name: coap
+  selector:
+    {{- include "vielang.selectorLabels" . | nindent 4 }}

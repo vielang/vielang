@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            WITH deleted AS (\n                DELETE FROM event\n                WHERE id IN (\n                    SELECT id FROM event WHERE created_time < $1 LIMIT $2\n                )\n                RETURNING id\n            )\n            SELECT count(*) FROM deleted\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "count",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "7b3e5c2a7d43b95ed3334262aa067cd284148565f81d616a27139a93e2d09e72"
+}

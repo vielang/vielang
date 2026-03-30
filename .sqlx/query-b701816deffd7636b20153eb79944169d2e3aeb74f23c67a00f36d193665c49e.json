@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            WITH deleted AS (\n                DELETE FROM alarm\n                WHERE id IN (\n                    SELECT id FROM alarm WHERE start_ts < $1 LIMIT $2\n                )\n                RETURNING id\n            )\n            SELECT count(*) FROM deleted\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "count",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "b701816deffd7636b20153eb79944169d2e3aeb74f23c67a00f36d193665c49e"
+}

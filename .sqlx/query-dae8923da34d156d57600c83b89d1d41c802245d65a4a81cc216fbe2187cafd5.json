@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE device\n             SET customer_id = NULL, claiming_data = NULL, claim_expiry_ts = NULL\n             WHERE tenant_id = $1 AND name = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "dae8923da34d156d57600c83b89d1d41c802245d65a4a81cc216fbe2187cafd5"
+}

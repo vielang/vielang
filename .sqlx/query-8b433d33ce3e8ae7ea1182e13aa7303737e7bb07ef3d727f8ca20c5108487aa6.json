@@ -1,0 +1,92 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO notification_inbox\n             (id, tenant_id, recipient_user_id, subject, body, notification_type, severity,\n              status, sent_time, read_time, additional_config)\n             VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)\n             ON CONFLICT (id) DO UPDATE SET\n               status = EXCLUDED.status,\n               read_time = EXCLUDED.read_time\n             RETURNING id, tenant_id, recipient_user_id, subject, body,\n                       notification_type, severity, status, sent_time, read_time, additional_config",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "recipient_user_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "subject",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "body",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "notification_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "severity",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "status",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 8,
+        "name": "sent_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 9,
+        "name": "read_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 10,
+        "name": "additional_config",
+        "type_info": "Jsonb"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Uuid",
+        "Text",
+        "Text",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Int8",
+        "Int8",
+        "Jsonb"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      false,
+      true,
+      false,
+      false,
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "8b433d33ce3e8ae7ea1182e13aa7303737e7bb07ef3d727f8ca20c5108487aa6"
+}

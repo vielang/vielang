@@ -1,0 +1,27 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT COUNT(*) FROM event\n               WHERE tenant_id = $1 AND entity_id = $2 AND entity_type = $3\n               AND ($4::text IS NULL OR event_type = $4)\n               AND created_time >= $5 AND created_time <= $6",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "count",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Text",
+        "Text",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "6b820bd03dcee8da1409957107481bcaf5244aa78b8f070915e2b5e8a38e4283"
+}

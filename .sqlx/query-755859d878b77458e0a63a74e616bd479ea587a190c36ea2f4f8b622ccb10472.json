@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT credentials_id FROM device_credentials WHERE device_id = $1 AND credentials_type = 'ACCESS_TOKEN' LIMIT 1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "credentials_id",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "755859d878b77458e0a63a74e616bd479ea587a190c36ea2f4f8b622ccb10472"
+}

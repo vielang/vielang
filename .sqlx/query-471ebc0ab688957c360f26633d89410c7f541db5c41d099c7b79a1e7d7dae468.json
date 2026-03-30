@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE tenant_profile SET is_default = FALSE WHERE is_default = TRUE",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": []
+  },
+  "hash": "471ebc0ab688957c360f26633d89410c7f541db5c41d099c7b79a1e7d7dae468"
+}

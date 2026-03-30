@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO asset_profile\n           (id, created_time, tenant_id, name, is_default)\n           VALUES ($1, $2, $3, $4, false)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8",
+        "Uuid",
+        "Varchar"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "a8af559638a7e0d9c2939032f6681fc7a53761c4577d9bae33665f51f7b67af5"
+}

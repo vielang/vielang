@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM widgets_bundle WHERE id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "618df2ca2cc72088852a3330d1eface5aabdb591eb761b53c9bc7fd2c2a6c3d3"
+}

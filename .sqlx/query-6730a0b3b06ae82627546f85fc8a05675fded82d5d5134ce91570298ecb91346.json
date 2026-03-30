@@ -1,0 +1,20 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO lc_event (\n                tenant_id, ts, entity_id, service_id, e_type, e_success, e_error\n            ) VALUES ($1,$2,$3,$4,$5,$6,$7)\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8",
+        "Uuid",
+        "Varchar",
+        "Varchar",
+        "Bool",
+        "Varchar"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "6730a0b3b06ae82627546f85fc8a05675fded82d5d5134ce91570298ecb91346"
+}

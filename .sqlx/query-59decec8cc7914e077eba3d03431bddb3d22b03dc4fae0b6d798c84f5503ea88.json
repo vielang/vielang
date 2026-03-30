@@ -1,0 +1,27 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO rule_node_debug_event (\n                tenant_id, ts, entity_id, service_id,\n                e_type, e_entity_id, e_entity_type, e_msg_id, e_msg_type,\n                e_data_type, e_relation_type, e_data, e_metadata, e_error\n            ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8",
+        "Uuid",
+        "Varchar",
+        "Varchar",
+        "Uuid",
+        "Varchar",
+        "Uuid",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "59decec8cc7914e077eba3d03431bddb3d22b03dc4fae0b6d798c84f5503ea88"
+}

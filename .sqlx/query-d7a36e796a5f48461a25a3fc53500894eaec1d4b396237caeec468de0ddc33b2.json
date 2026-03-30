@@ -1,0 +1,54 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id, created_time, tenant_id, name, label,\n                      ts_rank(search_text, to_tsquery('english', $2)) AS \"rank!: f32\"\n               FROM asset\n               WHERE tenant_id = $1\n                 AND search_text IS NOT NULL\n                 AND search_text @@ to_tsquery('english', $2)\n               ORDER BY ts_rank(search_text, to_tsquery('english', $2)) DESC, created_time DESC\n               LIMIT $3",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "created_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "label",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "rank!: f32",
+        "type_info": "Float4"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      null
+    ]
+  },
+  "hash": "d7a36e796a5f48461a25a3fc53500894eaec1d4b396237caeec468de0ddc33b2"
+}

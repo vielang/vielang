@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE cluster_node\n            SET is_leader    = true,\n                leader_epoch = leader_epoch + 1,\n                last_heartbeat = $2\n            WHERE node_id = $1\n              AND (\n                  -- No current leader\n                  NOT EXISTS (\n                      SELECT 1 FROM cluster_node\n                      WHERE is_leader = true AND last_heartbeat > $3\n                  )\n              )\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "32300bc2251aba3c85e7dc6c540d54d7bdb28bd08d14c159541e2d15bb5803af"
+}

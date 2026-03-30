@@ -1,0 +1,100 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT id, created_time, tenant_id, title, resource_type,\n                   resource_sub_type, resource_key, file_name, is_public,\n                   public_resource_key, etag, descriptor, external_id, version\n            FROM resource WHERE id = $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "created_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "title",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "resource_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "resource_sub_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "resource_key",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "file_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 8,
+        "name": "is_public",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 9,
+        "name": "public_resource_key",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 10,
+        "name": "etag",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 11,
+        "name": "descriptor",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 12,
+        "name": "external_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 13,
+        "name": "version",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      false
+    ]
+  },
+  "hash": "f293f3cb6357a9006a255b0198dae0648403950aa2afb453e167a42b1f1c512c"
+}

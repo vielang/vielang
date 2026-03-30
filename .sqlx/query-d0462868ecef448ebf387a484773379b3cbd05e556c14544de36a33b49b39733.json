@@ -1,0 +1,24 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO widgets_bundle (\n                id, created_time, tenant_id, alias, title,\n                image, scada, description, order_index, external_id, version\n            ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)\n            ON CONFLICT (id) DO UPDATE SET\n                title        = EXCLUDED.title,\n                image        = EXCLUDED.image,\n                scada        = EXCLUDED.scada,\n                description  = EXCLUDED.description,\n                order_index  = EXCLUDED.order_index,\n                external_id  = EXCLUDED.external_id,\n                version      = widgets_bundle.version + 1\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8",
+        "Uuid",
+        "Varchar",
+        "Varchar",
+        "Text",
+        "Bool",
+        "Varchar",
+        "Int4",
+        "Uuid",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "d0462868ecef448ebf387a484773379b3cbd05e556c14544de36a33b49b39733"
+}

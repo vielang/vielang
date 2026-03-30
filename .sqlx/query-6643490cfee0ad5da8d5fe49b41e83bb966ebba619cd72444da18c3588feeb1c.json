@@ -1,0 +1,82 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT id, created_time, tenant_id, alias, title,\n                   image, scada, description, order_index, external_id, version\n            FROM widgets_bundle WHERE id = $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "created_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "alias",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "title",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "image",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "scada",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 7,
+        "name": "description",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 8,
+        "name": "order_index",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 9,
+        "name": "external_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 10,
+        "name": "version",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false,
+      false,
+      true,
+      false,
+      true,
+      true,
+      true,
+      false
+    ]
+  },
+  "hash": "6643490cfee0ad5da8d5fe49b41e83bb966ebba619cd72444da18c3588feeb1c"
+}

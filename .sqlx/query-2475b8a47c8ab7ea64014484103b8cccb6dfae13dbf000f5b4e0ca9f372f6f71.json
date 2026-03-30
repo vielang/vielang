@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM user_settings WHERE user_id = $1 AND type = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "2475b8a47c8ab7ea64014484103b8cccb6dfae13dbf000f5b4e0ca9f372f6f71"
+}

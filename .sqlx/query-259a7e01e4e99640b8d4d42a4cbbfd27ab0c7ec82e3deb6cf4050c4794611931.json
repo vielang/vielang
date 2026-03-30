@@ -1,0 +1,26 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT\n                   to_char(to_timestamp(t.created_time / 1000), 'YYYY-MM') AS month,\n                   COUNT(*)::bigint                                         AS new_tenants\n               FROM tenant t\n               WHERE t.created_time >= extract(epoch from now() - interval '13 months')::bigint * 1000\n               GROUP BY month\n               ORDER BY month",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "month",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 1,
+        "name": "new_tenants",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      null,
+      null
+    ]
+  },
+  "hash": "259a7e01e4e99640b8d4d42a4cbbfd27ab0c7ec82e3deb6cf4050c4794611931"
+}

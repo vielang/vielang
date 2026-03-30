@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT fqn FROM widget_type WHERE id = ANY($1) ORDER BY fqn",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "fqn",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "UuidArray"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "6a9d13fb4a4acc252632d7b7acce49f894fba99da00a5d78eae8b6aa961416a3"
+}

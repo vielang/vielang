@@ -1,0 +1,93 @@
+[package]
+name = "vl-api"
+version.workspace = true
+edition.workspace = true
+
+[[bin]]
+name = "vielang"
+path = "src/main.rs"
+
+[dependencies]
+vl-core         = { workspace = true }
+vl-config       = { workspace = true }
+vl-dao          = { workspace = true }
+vl-auth         = { workspace = true }
+vl-transport    = { workspace = true }
+vl-rule-engine  = { workspace = true }
+vl-queue        = { workspace = true, features = ["persistent"] }
+vl-cache        = { workspace = true }
+vl-cluster      = { workspace = true }
+vl-cassandra    = { workspace = true }
+vl-actor        = { workspace = true }
+
+tokio      = { workspace = true }
+axum       = { workspace = true }
+tower      = { workspace = true }
+tower-http = { workspace = true }
+hyper      = { workspace = true }
+
+serde      = { workspace = true }
+serde_json = { workspace = true }
+csv        = { workspace = true }
+zip        = { workspace = true }
+uuid       = { workspace = true }
+chrono     = { workspace = true }
+thiserror  = { workspace = true }
+anyhow     = { workspace = true }
+git2       = { workspace = true }
+
+tracing            = { workspace = true }
+tracing-subscriber = { workspace = true }
+opentelemetry         = { workspace = true }
+opentelemetry_sdk     = { workspace = true }
+opentelemetry-otlp    = { workspace = true }
+tracing-opentelemetry = { workspace = true }
+
+metrics                     = { workspace = true }
+metrics-exporter-prometheus = { workspace = true }
+
+futures-util = { workspace = true }
+tokio-util   = { workspace = true }
+rhai         = { workspace = true }
+base64       = { workspace = true }
+rumqttc      = { workspace = true }
+
+# System monitoring
+sysinfo = { workspace = true }
+
+# Hashing for OTA checksums + HMAC signatures
+sha2      = { workspace = true }
+hmac      = { workspace = true }
+md-5      = { workspace = true }
+crc32fast = { workspace = true }
+
+# Email delivery for notification channels
+lettre = { workspace = true }
+
+# HTTP client for notification channels (slack, webhook) + OAuth2 token exchange
+reqwest = { workspace = true }
+
+# Security — Phase 16
+jsonwebtoken = { workspace = true }
+oauth2       = { workspace = true }
+governor     = { workspace = true }
+rand         = { workspace = true }
+rustls       = { version = "0.23", features = ["ring"] }
+
+utoipa            = { workspace = true }
+utoipa-swagger-ui = { workspace = true }
+evalexpr          = { workspace = true }
+dashmap           = { workspace = true }
+sqlx              = { workspace = true }
+async-trait       = { workspace = true }
+
+# P9: QR code image generation
+qrcode = { workspace = true }
+image  = { workspace = true }
+
+# P10: Cron expression parsing
+cron = { workspace = true }
+
+[dev-dependencies]
+tower      = { workspace = true }
+serde_json = { workspace = true }

@@ -1,0 +1,19 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO two_factor_auth_settings (user_id, provider, enabled, secret, backup_codes, verified)\n             VALUES ($1, $2, $3, $4, $5, $6)\n             ON CONFLICT (user_id) DO UPDATE SET\n                provider     = EXCLUDED.provider,\n                enabled      = EXCLUDED.enabled,\n                secret       = EXCLUDED.secret,\n                backup_codes = EXCLUDED.backup_codes,\n                verified     = EXCLUDED.verified",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Varchar",
+        "Bool",
+        "Varchar",
+        "Jsonb",
+        "Bool"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "24660be11887cb0864f69c4d280b84d6973805e849cbe6d0814a98858f157af7"
+}

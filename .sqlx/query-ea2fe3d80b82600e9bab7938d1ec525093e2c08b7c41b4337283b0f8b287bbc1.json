@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT json_value FROM admin_settings WHERE tenant_id = $1 AND key = 'home_dashboard'",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "json_value",
+        "type_info": "Jsonb"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "ea2fe3d80b82600e9bab7938d1ec525093e2c08b7c41b4337283b0f8b287bbc1"
+}

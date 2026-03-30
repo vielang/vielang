@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT COUNT(*) FROM widget_type wt\n               JOIN widgets_bundle_widget wbw ON wbw.widget_type_id = wt.id\n               WHERE wbw.widgets_bundle_id = $1\n               AND ($2::text IS NULL OR LOWER(wt.name) LIKE LOWER($2))",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "count",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "dd9fdc60c0dd820b3e3337dd84e532401c9951cc36b8fd62f65bbe7844ee9cd8"
+}

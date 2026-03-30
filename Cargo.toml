@@ -1,0 +1,202 @@
+[workspace]
+members = [
+    "crates/vl-core",
+    "crates/vl-config",
+    "crates/vl-dao",
+    "crates/vl-auth",
+    "crates/vl-cache",
+    "crates/vl-queue",
+    "crates/vl-actor",
+    "crates/vl-transport",
+    "crates/vl-rule-engine",
+    "crates/vl-cluster",
+    "crates/vl-api",
+    "crates/vl-cassandra",
+    "crates/vl-digital-twin",
+    "crates/vl-seed",
+    "load-tests",
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+authors = ["vielang"]
+license = "Apache-2.0"
+
+[workspace.dependencies]
+# ── Async runtime ──────────────────────────────────────────────────────────────
+tokio             = { version = "1", features = ["full"] }
+tokio-util        = { version = "0.7" }
+tokio-stream      = { version = "0.1" }
+tokio-tungstenite = { version = "0.21", features = ["native-tls"] }
+
+# ── Web framework ──────────────────────────────────────────────────────────────
+axum        = { version = "0.8", features = ["ws", "multipart", "macros"] }
+tower       = { version = "0.5" }
+tower-http  = { version = "0.6", features = ["cors", "trace", "compression-gzip", "request-id"] }
+hyper       = { version = "1" }
+
+# ── Serialization ──────────────────────────────────────────────────────────────
+serde            = { version = "1", features = ["derive"] }
+serde_json       = { version = "1" }
+serde_with       = { version = "3" }
+csv              = { version = "1" }
+zip              = { version = "2", default-features = false, features = ["deflate"] }
+
+# ── Database ───────────────────────────────────────────────────────────────────
+sqlx = { version = "0.8", features = [
+    "postgres",
+    "runtime-tokio",
+    "uuid",
+    "chrono",
+    "json",
+    "migrate",
+] }
+
+# ── Cache ──────────────────────────────────────────────────────────────────────
+fred  = { version = "10" }
+moka  = { version = "0.12", features = ["future", "sync"] }
+
+# ── Message Queue ──────────────────────────────────────────────────────────────
+rdkafka      = { version = "0.39", features = ["cmake-build", "ssl", "sasl"] }
+lapin        = { version = "2.3" }
+aws-sdk-sqs  = { version = "1" }
+aws-config   = { version = "1" }
+aws-credential-types = { version = "1" }
+
+# ── gRPC / Protobuf ────────────────────────────────────────────────────────────
+tonic             = { version = "0.14" }
+prost             = { version = "0.14" }
+tonic-prost       = { version = "0.14" }        # prost codec runtime for tonic 0.14
+tonic-prost-build = { version = "0.14" }        # prost proto compilation (build scripts)
+
+# ── MQTT ───────────────────────────────────────────────────────────────────────
+rumqttd   = { version = "0.20" }
+rumqttc   = { version = "0.25" }
+mqttbytes = { version = "0.6" }
+
+# ── CoAP ───────────────────────────────────────────────────────────────────────
+coap-lite = { version = "0.13" }
+
+# ── Auth ───────────────────────────────────────────────────────────────────────
+jsonwebtoken = { version = "10", features = ["rust_crypto"] }
+argon2       = { version = "0.5" }
+oauth2       = { version = "5" }
+ldap3        = { version = "0.11", features = ["tls"] }
+
+# ── Encoding / Compression ─────────────────────────────────────────────────────
+base64  = { version = "0.22" }
+flate2  = { version = "1" }
+
+# ── XML ────────────────────────────────────────────────────────────────────────
+quick-xml = { version = "0.37", features = ["serialize"] }
+
+# ── Config ─────────────────────────────────────────────────────────────────────
+config  = { version = "0.15" }
+figment = { version = "0.10", features = ["toml", "env"] }
+
+# ── Logging & Tracing ──────────────────────────────────────────────────────────
+tracing            = { version = "0.1" }
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+
+# ── OpenTelemetry (Phase P7) ───────────────────────────────────────────────────
+opentelemetry         = { version = "0.22", features = ["trace"] }
+opentelemetry_sdk     = { version = "0.22", features = ["rt-tokio"] }
+opentelemetry-otlp    = { version = "0.15", features = ["http-proto", "reqwest-blocking-client"] }
+tracing-opentelemetry = { version = "0.23" }
+
+# ── Metrics ────────────────────────────────────────────────────────────────────
+metrics                     = { version = "0.24" }
+metrics-exporter-prometheus = { version = "0.18" }
+
+# ── OpenAPI ────────────────────────────────────────────────────────────────────
+utoipa            = { version = "5", features = ["axum_extras", "uuid", "chrono"] }
+utoipa-swagger-ui = { version = "9", features = ["axum"] }
+
+# ── HTTP Client ────────────────────────────────────────────────────────────────
+reqwest = { version = "0.13", features = ["json", "form"] }
+
+# ── Cluster coordination ───────────────────────────────────────────────────────
+etcd-client  = { version = "0.16" }
+tonic-build  = { version = "0.14" }
+protox       = { version = "0.9" }  # Pure Rust proto compiler — no protoc required
+
+# ── Job Scheduler (Phase P10) ─────────────────────────────────────────────────
+cron = { version = "0.12" }
+
+# ── Utilities ──────────────────────────────────────────────────────────────────
+uuid        = { version = "1", features = ["v4", "serde"] }
+chrono      = { version = "0.4", features = ["serde"] }
+thiserror   = { version = "2" }
+anyhow      = { version = "1" }
+bytes       = { version = "1" }
+async-trait = { version = "0.1" }
+dashmap     = { version = "6" }
+git2        = { version = "0.19" }
+futures     = { version = "0.3" }
+futures-util= { version = "0.3" }
+pin-project = { version = "1" }
+rand        = { version = "0.9" }  # 0.10 available but rand_core 0.6 in vl-auth needs sync
+
+# ── Email delivery ────────────────────────────────────────────────────────────
+lettre = { version = "0.11", features = ["tokio1", "smtp-transport", "builder", "tokio1-native-tls"] }
+
+# ── Security ──────────────────────────────────────────────────────────────────
+totp-rs   = { version = "5", features = ["otpauth", "gen_secret"] }
+governor  = { version = "0.10" }
+x509-cert = { version = "0.2" }
+
+# ── System Info ───────────────────────────────────────────────────────────────
+sysinfo    = { version = "0.38" }
+
+# ── QR Code generation (Phase P9) ─────────────────────────────────────────────
+qrcode     = { version = "0.14" }
+image      = { version = "0.25", default-features = false, features = ["png"] }
+
+# ── Hashing & Checksums ───────────────────────────────────────────────────────
+sha2       = { version = "0.10" }
+hmac       = { version = "0.12" }
+md-5       = { version = "0.10" }
+crc32fast  = { version = "1" }
+
+# ── Expression evaluation & JSON patching (Phase 34/37) ───────────────────
+evalexpr        = { version = "13" }
+rhai            = { version = "1", features = ["sync"] }
+json-patch      = { version = "4" }
+jsonpath-rust   = { version = "0.7" }
+
+# ── Cassandra / ScyllaDB ────────────────────────────────────────────────────────
+scylla = { version = "1" }
+
+# ── Internal crates ────────────────────────────────────────────────────────────
+vl-core         = { path = "crates/vl-core" }
+vl-config       = { path = "crates/vl-config" }
+vl-dao          = { path = "crates/vl-dao" }
+vl-auth         = { path = "crates/vl-auth" }
+vl-cache        = { path = "crates/vl-cache" }
+vl-queue        = { path = "crates/vl-queue" }
+vl-actor        = { path = "crates/vl-actor" }
+vl-transport    = { path = "crates/vl-transport" }
+vl-rule-engine  = { path = "crates/vl-rule-engine" }
+vl-cluster      = { path = "crates/vl-cluster" }
+vl-cassandra    = { path = "crates/vl-cassandra" }
+
+# ── Build profiles ─────────────────────────────────────────────────────────────
+[profile.dev]
+opt-level = 1   # nhanh hơn default (0), vẫn đủ để debug
+debug = 1       # giảm debug info → link nhanh hơn
+
+[profile.dev.package."*"]
+opt-level = 3   # external deps compile tối ưu, chỉ phải compile 1 lần
+
+[profile.test]
+opt-level = 1   # test binary cũng hưởng lợi
+
+# Phase 59: profiling profile — release + debug symbols for flamegraph/heaptrack
+# Usage: cargo build --profile profiling --bin vl-api
+#        cargo flamegraph --profile profiling --bin vl-api
+[profile.profiling]
+inherits = "release"
+debug = true        # full symbols for profilers
+strip = false       # keep symbol table

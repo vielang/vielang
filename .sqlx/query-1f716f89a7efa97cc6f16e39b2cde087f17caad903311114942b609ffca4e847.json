@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                INSERT INTO cluster_partition (partition_id, node_id, assigned_at)\n                VALUES ($1, $2, $3)\n                ON CONFLICT (partition_id) DO NOTHING\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Varchar",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "1f716f89a7efa97cc6f16e39b2cde087f17caad903311114942b609ffca4e847"
+}

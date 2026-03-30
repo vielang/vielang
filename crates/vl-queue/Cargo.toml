@@ -1,0 +1,52 @@
+[package]
+name = "vl-queue"
+version.workspace = true
+edition.workspace = true
+
+[features]
+default = []
+# Enable Kafka support (requires cmake + libssl + libsasl2 on the build machine)
+kafka = ["dep:rdkafka"]
+# Enable RabbitMQ support (lapin AMQP client)
+rabbitmq = ["dep:lapin"]
+# Enable Redis Streams support (fred async Redis client)
+redis-streams = ["dep:fred"]
+# Enable AWS SQS support
+sqs = ["dep:aws-sdk-sqs", "dep:aws-config", "dep:aws-credential-types"]
+# Enable PostgreSQL-backed persistent queue
+persistent = ["dep:vl-dao"]
+
+[dependencies]
+vl-core     = { workspace = true }
+vl-config   = { workspace = true }
+# Optional: PostgreSQL-backed persistent queue
+vl-dao      = { workspace = true, optional = true }
+chrono      = { workspace = true }
+serde       = { workspace = true }
+serde_json  = { workspace = true }
+thiserror   = { workspace = true }
+tokio       = { workspace = true }
+tracing     = { workspace = true }
+async-trait = { workspace = true }
+dashmap     = { workspace = true }
+bytes       = { workspace = true }
+uuid        = { workspace = true }
+base64      = { workspace = true }
+metrics     = { workspace = true }
+
+# Optional Kafka backend
+rdkafka = { workspace = true, optional = true }
+
+# Optional RabbitMQ backend
+lapin = { workspace = true, optional = true }
+
+# Optional Redis Streams backend
+fred = { workspace = true, optional = true }
+
+# Optional AWS SQS backend
+aws-sdk-sqs          = { workspace = true, optional = true }
+aws-config           = { workspace = true, optional = true }
+aws-credential-types = { workspace = true, optional = true }
+
+[dev-dependencies]
+tokio = { workspace = true }

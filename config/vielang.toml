@@ -1,0 +1,244 @@
+# VieLang Configuration
+# Tương đương thingsboard.yml trong ThingsBoard Java
+# Env vars override với prefix VL__ (double underscore = nesting)
+# Ví dụ: VL__DATABASE__POSTGRES__URL="postgres://..."
+
+[server]
+host = "0.0.0.0"
+port = 8080
+# workers = 4  # Mặc định = số CPU cores
+# Production: restrict to known origins. Empty = deny all cross-origin requests.
+# Development: allowed_origins = ["http://localhost:3000", "http://localhost:4200"]
+# Self-hosted (users enter backend URL in Flutter/Angular): allowed_origins = ["*"]
+#   NOTE: wildcard disables allow_credentials — OAuth2 login via cookies won't work with "*"
+#   For OAuth2 flows, list explicit origins instead.
+allowed_origins = ["*", "http://localhost:4200", "http://localhost:3000"]
+
+[database.postgres]
+url                  = "postgres://vielang:vielang@localhost:5432/vielang"
+max_connections      = 50
+min_connections      = 1
+connect_timeout_secs = 30
+idle_timeout_secs    = 600    # close idle connections after 10 min
+max_lifetime_secs    = 1800   # recycle connections after 30 min
+
+# SSL: "disable" | "prefer" | "require" | "verify-ca" | "verify-full"
+# Development: "prefer" (auto-upgrade nếu server hỗ trợ, không bắt buộc)
+# Production:  "require" hoặc "verify-full" (bắt buộc TLS, verify cert)
+ssl_mode             = "prefer"
+
+# Tên hiện trong pg_stat_activity — giúp DBA nhận dạng kết nối
+application_name     = "vielang"
+
+# Hủy query sau N ms nếu chưa xong (bảo vệ pool khỏi slow query)
+# Development: bỏ comment nếu muốn; Production: nên set 30000 (30s)
+# statement_timeout_ms = 30000
+
+# Timeseries backend: "sql" (PostgreSQL, default) or "cassandra"
+[database.timeseries]
+ts_type        = "sql"
+ts_latest_type = "sql"
+
+# Uncomment and configure if ts_type = "cassandra"
+# [database.timeseries.cassandra]
+# url                  = "127.0.0.1:9042"
+# keyspace             = "thingsboard"
+# local_datacenter     = "datacenter1"
+# partition_granularity = "MONTHS"   # MINUTES | HOURS | DAYS | MONTHS | YEARS
+# ttl_seconds          = -1          # -1 = no TTL
+# partition_cache_size = 100000
+# username = ""   # omit if no auth
+# password = ""   # omit if no auth
+
+[cache]
+cache_type = "inmemory"   # "inmemory" | "redis"
+
+[cache.local]
+max_size    = 100000
+ttl_seconds = 900
+
+[cache.redis]
+url         = "redis://localhost:6379"
+ttl_seconds = 900
+
+[queue]
+queue_type               = "in_memory"  # "in_memory" | "kafka" | "rabbit_mq" | "redis_streams" | "sqs" | "persistent"
+consumer_threads         = 1            # số parallel RE consumer tasks
+processing_timeout_secs  = 30           # timeout per message → DLQ nếu quá
+dlq_topic                = "tb.rule-engine.dlq"
+message_retention_hours  = 72           # xóa acked messages sau 3 ngày
+
+[queue.kafka]
+bootstrap_servers = "localhost:9092"
+acks              = "all"
+retries           = 3
+
+# ── PostgreSQL-backed persistent queue (queue_type = "persistent") ────────────
+# Messages are written to the queue_message table and replayed after restart.
+# [queue.persistent]
+# cleanup_interval_h = 1    # run cleanup every 1 hour
+# message_ttl_h      = 24   # delete acked messages older than 24h
+# batch_size         = 500  # max messages per poll
+# poll_interval_ms   = 100  # wait between polls on empty topic
+
+[security.jwt]
+# QUAN TRỌNG: Đổi secret này trong production!
+secret                   = "vielang-change-this-secret-in-production"
+# Rotation: set previous_signing_key = old secret, generate new secret, restart.
+# After all old tokens expire (expiration_secs), remove previous_signing_key.
+# previous_signing_key = "old-secret-still-valid-during-rotation-window"
+expiration_secs          = 9000      # 2.5 giờ (khớp TB Java default)
+refresh_expiration_secs  = 604800    # 7 ngày
+
+[transport.mqtt]
+enabled     = true
+bind        = "0.0.0.0"
+port        = 1883
+ws_enabled  = false   # set true để bật MQTT over WebSocket (port ws_port)
+ws_port     = 8083
+ws_path     = "/mqtt"
+max_clients = 10000
+
+[transport.http]
+enabled = true
+bind    = "0.0.0.0"
+port    = 8081
+
+[transport.coap]
+enabled            = false
+bind               = "0.0.0.0"
+port               = 5683
+observe_enabled    = true    # RFC 7641 CoAP Observe
+max_observe_rels   = 50000
+notify_timeout_s   = 30
+
+[transport.lwm2m]
+enabled = false   # opt-in; disabled by default
+bind    = "0.0.0.0"
+port    = 5783
+
+# SNMP Trap Receiver — receives unsolicited SNMPv1/v2c traps from network devices.
+# Device resolution: set server attribute "snmpHost" = "<device_ip>" on each device.
+# Each trap's OID varbinds are mapped to telemetry keys (MIB-II names where known).
+# Community string must match for traps to be accepted.
+# Override: VL__TRANSPORT__SNMP__ENABLED=true VL__TRANSPORT__SNMP__BIND_PORT=10162
+[transport.snmp]
+enabled    = false       # set true to receive SNMP traps
+bind_port  = 10162       # UDP port (non-privileged alternative to standard 162)
+community  = "public"   # SNMPv1/v2c community string
+
+[cluster]
+enabled  = false  # single-node by default; set true + configure etcd for distributed mode
+etcd_url = "http://localhost:2379"
+node_id  = ""     # auto-generated UUID if empty
+rpc_host = "localhost"
+rpc_port = 9090
+
+[housekeeper]
+enabled         = true
+interval_secs   = 3600
+ts_ttl_days     = 365
+events_ttl_days = 7
+alarms_ttl_days = 30
+rpc_ttl_days    = 1
+batch_size      = 10000
+
+# ── Edge gRPC (Phase 56) ──────────────────────────────────────────────────────
+# TB Edge instances connect here to sync entities and push telemetry to cloud.
+# Requires protoc for build: https://grpc.io/docs/protoc-installation/
+[edge_grpc]
+enabled = false   # set true to accept TB Edge connections
+bind    = "0.0.0.0"
+port    = 7070    # TB Edge default gRPC port
+
+# ── Trendz Analytics (Phase 62) ───────────────────────────────────────────────
+# Trendz is a separate commercial analytics product by ThingsBoard Inc.
+# Set enabled = true and configure base_url + secret_key if you have a Trendz license.
+[trendz]
+enabled    = false
+base_url   = ""       # e.g. "http://trendz:8888"
+secret_key = ""       # shared secret for Trendz JWT signing
+
+# ── Firebase FCM Push Notifications (Phase 67) ────────────────────────────────
+# Set enabled = true and paste your Firebase Legacy Server Key to enable push.
+[firebase]
+enabled    = false
+server_key = ""       # Firebase Console → Project Settings → Cloud Messaging → Server key
+
+# ── Stripe Billing (Phase 70) ─────────────────────────────────────────────────
+# Set enabled = true and configure keys to activate SaaS billing features.
+# secret_key and webhook_secret should be set via environment variables in production:
+#   VL__STRIPE__SECRET_KEY=sk_live_...
+#   VL__STRIPE__WEBHOOK_SECRET=whsec_...
+[stripe]
+enabled        = false
+secret_key     = ""
+webhook_secret = ""
+# After Stripe checkout, redirect user to these URLs
+success_url = "http://localhost:4200/billing/success"
+cancel_url  = "http://localhost:4200/billing/cancel"
+
+# ── Full-Text Search (Phase P5) ───────────────────────────────────────────────
+# PostgreSQL FTS with tsvector/tsquery + GIN indexes.
+# GET /api/search?query=sensor&types=DEVICE,ASSET&pageSize=20&page=0
+[search]
+enabled              = true
+language             = "english"   # PostgreSQL FTS language dictionary
+prefix_matching      = true        # append :* for partial word matching (e.g. "sens" → "sensor")
+min_query_length     = 2           # ignore queries shorter than this
+max_results_per_type = 100         # max rows fetched per entity type before merging
+
+# ── RabbitMQ backend (queue_type = "rabbit_mq") ───────────────────────────────
+# [queue.rabbitmq]
+# url            = "amqp://guest:guest@localhost:5672/%2F"
+# exchange       = "thingsboard"
+# prefetch_count = 100
+# dlx_enabled    = true
+# dlx_exchange   = "thingsboard.dlx"
+
+# ── Redis Streams backend (queue_type = "redis_streams") ──────────────────────
+# [queue.redis_streams]
+# url            = "redis://localhost:6379"
+# group          = "thingsboard"
+# consumer_name  = "vielang"
+# batch_size     = 500
+# max_len        = 1000000
+# pending_ttl_s  = 30
+
+# ── AWS SQS backend (queue_type = "sqs") ──────────────────────────────────────
+# [queue.sqs]
+# region       = "us-east-1"
+# access_key   = ""   # prefer env var AWS_ACCESS_KEY_ID
+# secret_key   = ""   # prefer env var AWS_SECRET_ACCESS_KEY
+# queue_prefix = "thingsboard-"
+# fifo         = true
+# max_messages = 10
+# wait_seconds = 20
+
+# ── Job Scheduler (Phase P10) ─────────────────────────────────────────────────
+[scheduler]
+enabled                = true
+check_interval_s       = 60     # check for due jobs every 60 seconds
+max_concurrent_jobs    = 10     # max parallel job executions
+execution_history_days = 30     # keep execution records for 30 days
+
+# ── Advanced Geofencing (Phase P8) ────────────────────────────────────────────
+# PostGIS-backed geofence polygons and circles.
+# Requires the postgis extension to be installed on the PostgreSQL server.
+# Set enabled = true to activate migration 043 and the /api/geofence endpoints.
+[geofence]
+enabled = false   # set true once postgis is installed
+
+# ── Observability (Phase P7) ───────────────────────────────────────────────────
+# Prometheus /metrics and optional OpenTelemetry OTLP export.
+[observability]
+metrics_enabled  = true
+log_format       = "json"       # "json" (production) | "pretty" (development)
+log_level        = "info"       # error | warn | info | debug | trace
+                                # Override per module with RUST_LOG env var.
+
+# OpenTelemetry OTLP — leave otlp_endpoint empty to disable distributed tracing.
+# HTTP/proto protocol (port 4318 for Jaeger / OTel Collector).
+# Example: VL__OBSERVABILITY__OTLP_ENDPOINT=http://jaeger:4318
+tracing_enabled  = false
+otlp_endpoint    = ""           # e.g. "http://localhost:4318"

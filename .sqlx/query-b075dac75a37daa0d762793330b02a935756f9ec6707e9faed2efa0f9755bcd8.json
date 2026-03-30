@@ -1,0 +1,118 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id, tenant_id, enabled, entity_id, sso_url, slo_url,\n                      idp_certificate, sp_private_key, sp_certificate,\n                      email_attr, first_name_attr, last_name_attr,\n                      force_authn, name_id_format, default_authority,\n                      created_time, updated_time\n               FROM tenant_saml_config WHERE tenant_id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "enabled",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 3,
+        "name": "entity_id",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "sso_url",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "slo_url",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "idp_certificate",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "sp_private_key",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 8,
+        "name": "sp_certificate",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 9,
+        "name": "email_attr",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 10,
+        "name": "first_name_attr",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 11,
+        "name": "last_name_attr",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 12,
+        "name": "force_authn",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 13,
+        "name": "name_id_format",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 14,
+        "name": "default_authority",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 15,
+        "name": "created_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 16,
+        "name": "updated_time",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "b075dac75a37daa0d762793330b02a935756f9ec6707e9faed2efa0f9755bcd8"
+}

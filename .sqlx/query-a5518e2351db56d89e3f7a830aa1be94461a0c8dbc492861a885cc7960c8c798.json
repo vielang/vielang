@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT COUNT(*) FROM widgets_bundle\n               WHERE ($1::text IS NULL OR LOWER(title) LIKE LOWER($1))",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "count",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "a5518e2351db56d89e3f7a830aa1be94461a0c8dbc492861a885cc7960c8c798"
+}

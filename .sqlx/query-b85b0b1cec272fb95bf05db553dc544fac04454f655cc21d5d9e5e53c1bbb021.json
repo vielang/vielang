@@ -1,0 +1,24 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT entity_id\n            FROM attribute_kv\n            WHERE attribute_key = $1\n              AND str_v = $2\n              AND attribute_type = $3\n            LIMIT 1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "entity_id",
+        "type_info": "Uuid"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Text",
+        "Int4"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "b85b0b1cec272fb95bf05db553dc544fac04454f655cc21d5d9e5e53c1bbb021"
+}

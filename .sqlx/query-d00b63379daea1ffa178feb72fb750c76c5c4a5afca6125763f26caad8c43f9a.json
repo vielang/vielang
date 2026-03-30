@@ -1,0 +1,59 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT from_id, from_type, to_id, to_type,\n                   relation_type, relation_type_group, additional_info\n            FROM relation\n            WHERE from_id = $1 AND from_type = $2\n            ORDER BY relation_type, to_type\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "from_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "from_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "to_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "to_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "relation_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "relation_type_group",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "additional_info",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "d00b63379daea1ffa178feb72fb750c76c5c4a5afca6125763f26caad8c43f9a"
+}

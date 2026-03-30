@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                INSERT INTO widgets_bundle_widget (widgets_bundle_id, widget_type_id, widget_type_order)\n                SELECT $1, id, $3 FROM widget_type WHERE fqn = $2\n                ON CONFLICT (widgets_bundle_id, widget_type_id) DO UPDATE\n                    SET widget_type_order = EXCLUDED.widget_type_order\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "0ca7cfafb2906fea06d33a4c105dbb1e1e88dd35f4572f0c24fa57bf87d0828a"
+}

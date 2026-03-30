@@ -1,0 +1,88 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT id, created_time, rule_chain_id, additional_info,\n                   configuration_version, configuration,\n                   type as \"type_\", name, debug_settings,\n                   singleton_mode, queue_name, external_id\n            FROM rule_node WHERE id = $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "created_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "rule_chain_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "additional_info",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "configuration_version",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 5,
+        "name": "configuration",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "type_",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 8,
+        "name": "debug_settings",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 9,
+        "name": "singleton_mode",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 10,
+        "name": "queue_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 11,
+        "name": "external_id",
+        "type_info": "Uuid"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true
+    ]
+  },
+  "hash": "b7126a052114a2f9a87836ac0af7f0980093261329906e351e52ab02d359249f"
+}

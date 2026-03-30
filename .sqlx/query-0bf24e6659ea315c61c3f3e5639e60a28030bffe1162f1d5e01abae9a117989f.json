@@ -1,0 +1,144 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT id, created_time, tenant_id, customer_id, type as alarm_type,\n                   originator_id, originator_type, severity,\n                   acknowledged, cleared, assignee_id,\n                   start_ts, end_ts, ack_ts, clear_ts, assign_ts,\n                   propagate, propagate_to_owner, propagate_to_tenant,\n                   propagate_relation_types, details\n            FROM alarm\n            WHERE tenant_id = $1\n            ORDER BY start_ts DESC\n            LIMIT $2 OFFSET $3\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "created_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "customer_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 4,
+        "name": "alarm_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "originator_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 6,
+        "name": "originator_type",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 7,
+        "name": "severity",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 8,
+        "name": "acknowledged",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 9,
+        "name": "cleared",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 10,
+        "name": "assignee_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 11,
+        "name": "start_ts",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 12,
+        "name": "end_ts",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 13,
+        "name": "ack_ts",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 14,
+        "name": "clear_ts",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 15,
+        "name": "assign_ts",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 16,
+        "name": "propagate",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 17,
+        "name": "propagate_to_owner",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 18,
+        "name": "propagate_to_tenant",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 19,
+        "name": "propagate_relation_types",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 20,
+        "name": "details",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true
+    ]
+  },
+  "hash": "0bf24e6659ea315c61c3f3e5639e60a28030bffe1162f1d5e01abae9a117989f"
+}

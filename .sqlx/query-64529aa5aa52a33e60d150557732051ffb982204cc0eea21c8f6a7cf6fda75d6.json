@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO asset_profile (id, created_time, tenant_id, name, is_default)\n           VALUES ($1,$2,$3,'Default',true)\n           ON CONFLICT (id) DO UPDATE SET is_default = true",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "64529aa5aa52a33e60d150557732051ffb982204cc0eea21c8f6a7cf6fda75d6"
+}

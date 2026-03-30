@@ -1,0 +1,98 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT id, ts, service_id, e_type, e_entity_id, e_entity_type,\n                   e_msg_id, e_msg_type, e_data_type, e_relation_type,\n                   e_data, e_metadata, e_error\n            FROM rule_node_debug_event\n            WHERE tenant_id = $1 AND entity_id = $2\n              AND ts >= $3 AND ts < $4\n            ORDER BY ts DESC\n            LIMIT $5\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "ts",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "service_id",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "e_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "e_entity_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 5,
+        "name": "e_entity_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "e_msg_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 7,
+        "name": "e_msg_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 8,
+        "name": "e_data_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 9,
+        "name": "e_relation_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 10,
+        "name": "e_data",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 11,
+        "name": "e_metadata",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 12,
+        "name": "e_error",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Int8",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "36f9c7e995f5aebf102d857919b7006cbd1c4837e61915f3035886c427a108c3"
+}

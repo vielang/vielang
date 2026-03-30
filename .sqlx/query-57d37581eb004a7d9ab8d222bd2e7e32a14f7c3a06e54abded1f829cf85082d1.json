@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO tenant\n           (id, created_time, title, tenant_profile_id, region, country, state, city, address,\n            address2, zip, phone, email, additional_info, version)\n           VALUES ($1,$2,$3,$4,'','Vietnam','','Hanoi','123 Test St',\n                   '','100000','0912345678','admin@vielang.dev','{}',1)\n           ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8",
+        "Varchar",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "57d37581eb004a7d9ab8d222bd2e7e32a14f7c3a06e54abded1f829cf85082d1"
+}

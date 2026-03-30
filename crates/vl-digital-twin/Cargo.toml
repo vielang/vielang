@@ -1,0 +1,83 @@
+[package]
+name = "vl-digital-twin"
+version = "0.1.0"
+edition = "2021"
+
+# Standalone Bevy 3D client — NOT a server crate.
+# KHÔNG import vl-api, vl-dao, hay bất kỳ server crate nào.
+# Sync state từ vl-api via REST + WebSocket.
+
+[[bin]]
+name = "vl-digital-twin"
+path = "src/main.rs"
+
+[lib]
+name = "vl_digital_twin"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+# ── Bevy core ────────────────────────────────────────────────────────────────
+bevy        = { version = "0.18", default-features = false, features = [
+    "bevy_asset",
+    "bevy_core_pipeline",
+    "bevy_gltf",
+    "bevy_pbr",
+    "bevy_render",
+    "bevy_scene",
+    "bevy_sprite",
+    "bevy_state",
+    "bevy_text",
+    "bevy_winit",
+    "bevy_window",
+    "bevy_color",
+    "bevy_picking",
+    "x11",
+    "default_font",
+    "multi_threaded",
+] }
+
+# ── UI ────────────────────────────────────────────────────────────────────────
+bevy_egui       = "0.39"
+egui_plot       = "0.34"
+
+# ── Camera ────────────────────────────────────────────────────────────────────
+bevy_panorbit_camera = "0.34"
+
+# ── Serialization (shared with workspace) ────────────────────────────────────
+serde      = { workspace = true }
+serde_json = { workspace = true }
+uuid       = { workspace = true }
+
+# ── Utilities ─────────────────────────────────────────────────────────────────
+thiserror = { workspace = true }
+tracing   = { workspace = true }
+url       = "2"
+toml      = "0.8"
+base64    = "0.22"
+chrono    = { workspace = true }
+
+# ── Async (native only) ───────────────────────────────────────────────────────
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+tokio            = { workspace = true }
+tokio-tungstenite = { version = "0.28", features = ["native-tls"] }
+futures-util     = { workspace = true }
+reqwest          = { workspace = true }
+dirs             = "5"
+notify-rust      = "4"
+rfd              = "0.15"
+
+# ── WASM ─────────────────────────────────────────────────────────────────────
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen         = "0.2"
+wasm-bindgen-futures = "0.4"
+gloo-net             = { version = "0.6", features = ["websocket", "http"] }
+gloo-timers          = { version = "0.3", features = ["futures"] }
+futures-util         = { workspace = true }
+web-sys              = { version = "0.3", features = ["Window", "History"] }
+
+# ── Optimize dependencies in dev builds ───────────────────────────────────────
+[profile.dev.package."*"]
+opt-level = 3
+
+[profile.dev]
+opt-level = 1

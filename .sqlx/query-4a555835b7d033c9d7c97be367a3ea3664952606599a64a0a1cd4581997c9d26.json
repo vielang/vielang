@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM cluster_node WHERE status = 'DOWN' AND last_heartbeat < $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "4a555835b7d033c9d7c97be367a3ea3664952606599a64a0a1cd4581997c9d26"
+}

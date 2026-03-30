@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM entity_alarm WHERE alarm_id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "1918d6fe4fdea4011d724b9188ce54e799478a6e9637c5cf118659c6e46c1ed0"
+}

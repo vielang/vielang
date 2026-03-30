@@ -1,0 +1,79 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT a.id, a.created_time, a.tenant_id, a.customer_id,\n                   a.name, a.type as asset_type, a.label,\n                   a.asset_profile_id, ap.name as asset_profile_name,\n                   c.title as \"customer_title?\"\n            FROM asset a\n            JOIN asset_profile ap ON a.asset_profile_id = ap.id\n            LEFT JOIN customer c ON a.customer_id = c.id\n            WHERE a.tenant_id = $1\n            AND ($2::text IS NULL OR LOWER(a.name) LIKE LOWER($2))\n            ORDER BY a.created_time DESC\n            LIMIT $3 OFFSET $4\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "created_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "customer_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 4,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "asset_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "label",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "asset_profile_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 8,
+        "name": "asset_profile_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 9,
+        "name": "customer_title?",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "f683a6e2256486909bd71beda4332ab6f90c4b63f4839a30cf9379c47e627be0"
+}

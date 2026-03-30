@@ -1,0 +1,24 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT COUNT(*) FROM ota_package\n               WHERE tenant_id = $1 AND type = $2\n               AND ($3::text IS NULL OR LOWER(title) LIKE LOWER($3))",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "count",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "a9408b29de3235e12d4e876be24a669b24edc54f064dd458c2b7abaadc04694b"
+}

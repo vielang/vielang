@@ -1,0 +1,63 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO queue_stats\n                (queue_name, messages_total, messages_per_second, consumers_total, lag, collected_at)\n            VALUES ($1, $2, $3, $4, $5, $6)\n            ON CONFLICT (queue_name, collected_at) DO UPDATE\n                SET messages_total       = EXCLUDED.messages_total,\n                    messages_per_second  = EXCLUDED.messages_per_second,\n                    consumers_total      = EXCLUDED.consumers_total,\n                    lag                  = EXCLUDED.lag\n            RETURNING id, queue_name, messages_total, messages_per_second, consumers_total, lag, collected_at\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "queue_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "messages_total",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "messages_per_second",
+        "type_info": "Float8"
+      },
+      {
+        "ordinal": 4,
+        "name": "consumers_total",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 5,
+        "name": "lag",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 6,
+        "name": "collected_at",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Int8",
+        "Float8",
+        "Int4",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "1a3a0a19e9e57fffbef0a401e435e21659b5f964e941bb6d986631d024fe815d"
+}

@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO device_profile\n               (id, created_time, tenant_id, name, type, transport_type, provision_type, is_default)\n               VALUES ($1, $2, $3, $4, 'DEFAULT', 'DEFAULT', 'DISABLED', false)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8",
+        "Uuid",
+        "Varchar"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "d900a2971a68700a53ee9f7c0eea444ddffa4c0e9a41980d677ffe781275d51f"
+}

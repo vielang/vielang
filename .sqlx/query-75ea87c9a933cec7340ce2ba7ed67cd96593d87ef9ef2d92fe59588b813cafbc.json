@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT snapshot as \"snapshot: serde_json::Value\"\n                   FROM entity_version\n                   WHERE entity_id = $1 AND version_number = $2",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "snapshot: serde_json::Value",
+        "type_info": "Jsonb"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "75ea87c9a933cec7340ce2ba7ed67cd96593d87ef9ef2d92fe59588b813cafbc"
+}

@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO rule_chain\n           (id, created_time, tenant_id, name, type, root, debug_mode, version)\n           VALUES ($1, $2, $3, $4, 'CORE', false, false, 1)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8",
+        "Uuid",
+        "Varchar"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "352aa17526a87456a3a66eca88a2c4d7e59e5c157e94ee1c606d08f3add62401"
+}

@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE tb_user\n               SET additional_info = jsonb_set(\n                   COALESCE(additional_info::jsonb, '{}'::jsonb),\n                   '{avatarBase64}',\n                   to_jsonb($2::text)\n               )\n               WHERE id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "1b78ba6b2886acf13552df95f99b8b9ea14a9b310150e5239ddc766091b6923b"
+}

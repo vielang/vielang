@@ -1,0 +1,74 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id, created_time, tenant_id, title, configuration,\n                      external_id, mobile_hide, mobile_order, version\n               FROM dashboard\n               WHERE tenant_id = $1\n               AND ($2::text IS NULL OR LOWER(title) LIKE LOWER($2))\n               AND ($3::boolean IS NULL OR NOT $3 OR mobile_hide = false)\n               ORDER BY created_time DESC\n               LIMIT $4 OFFSET $5",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "created_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "title",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "configuration",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "external_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 6,
+        "name": "mobile_hide",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 7,
+        "name": "mobile_order",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 8,
+        "name": "version",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Bool",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "c889be5c758cbbf308523ec275d26036047031dc563e5ed6fdd35e5008563d70"
+}

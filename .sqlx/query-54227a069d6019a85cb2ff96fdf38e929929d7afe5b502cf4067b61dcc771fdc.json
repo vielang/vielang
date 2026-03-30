@@ -1,0 +1,190 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id, created_time, name, display_name, description,\n                      price_monthly, price_annually,\n                      stripe_price_id_monthly, stripe_price_id_annually,\n                      max_devices, max_users, max_assets, max_dashboards,\n                      max_rule_chains, max_edges, max_transport_msgs_month,\n                      max_js_execs_month, max_emails_month, max_sms_month,\n                      max_alarms, max_api_keys,\n                      feature_white_label, feature_edge_computing,\n                      feature_advanced_rbac, feature_audit_log,\n                      feature_sso, feature_api_export,\n                      sort_order, is_active\n               FROM subscription_plan\n               WHERE id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "created_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "display_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "description",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "price_monthly",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 6,
+        "name": "price_annually",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 7,
+        "name": "stripe_price_id_monthly",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 8,
+        "name": "stripe_price_id_annually",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 9,
+        "name": "max_devices",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 10,
+        "name": "max_users",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 11,
+        "name": "max_assets",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 12,
+        "name": "max_dashboards",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 13,
+        "name": "max_rule_chains",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 14,
+        "name": "max_edges",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 15,
+        "name": "max_transport_msgs_month",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 16,
+        "name": "max_js_execs_month",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 17,
+        "name": "max_emails_month",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 18,
+        "name": "max_sms_month",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 19,
+        "name": "max_alarms",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 20,
+        "name": "max_api_keys",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 21,
+        "name": "feature_white_label",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 22,
+        "name": "feature_edge_computing",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 23,
+        "name": "feature_advanced_rbac",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 24,
+        "name": "feature_audit_log",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 25,
+        "name": "feature_sso",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 26,
+        "name": "feature_api_export",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 27,
+        "name": "sort_order",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 28,
+        "name": "is_active",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "54227a069d6019a85cb2ff96fdf38e929929d7afe5b502cf4067b61dcc771fdc"
+}

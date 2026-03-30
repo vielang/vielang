@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE alarm SET assignee_id = $1, assign_ts = $2 WHERE id = $3",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "00cdc81826512fa301cf9a6369fb82cc910f16be1fdad3f65a75b58cb1a9d4d8"
+}

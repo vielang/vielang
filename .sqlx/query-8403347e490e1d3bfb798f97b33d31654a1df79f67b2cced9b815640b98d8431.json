@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM notification_channel_settings WHERE tenant_id = $1 AND channel = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "8403347e490e1d3bfb798f97b33d31654a1df79f67b2cced9b815640b98d8431"
+}

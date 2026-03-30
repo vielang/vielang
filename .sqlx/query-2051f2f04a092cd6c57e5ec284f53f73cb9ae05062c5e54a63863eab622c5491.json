@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO user_settings (user_id, type, settings)\n            VALUES ($1, $2, $3)\n            ON CONFLICT (user_id, type) DO UPDATE SET\n                settings = EXCLUDED.settings\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Varchar",
+        "Jsonb"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "2051f2f04a092cd6c57e5ec284f53f73cb9ae05062c5e54a63863eab622c5491"
+}

@@ -1,0 +1,110 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT id, created_time, tenant_id, device_profile_id,\n                   type as ota_type, title, version, tag, url,\n                   file_name, content_type, data_size,\n                   checksum_algorithm, checksum,\n                   data IS NOT NULL as has_data\n            FROM ota_package\n            WHERE tenant_id = $1 AND type = $2\n            AND ($3::text IS NULL OR LOWER(title) LIKE LOWER($3))\n            ORDER BY created_time DESC\n            LIMIT $4 OFFSET $5\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "created_time",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "device_profile_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 4,
+        "name": "ota_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "title",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "version",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "tag",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 8,
+        "name": "url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 9,
+        "name": "file_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 10,
+        "name": "content_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 11,
+        "name": "data_size",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 12,
+        "name": "checksum_algorithm",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 13,
+        "name": "checksum",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 14,
+        "name": "has_data",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Text",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      null
+    ]
+  },
+  "hash": "d77e9b6be0c79e3fff5be9adc1785bbcd2f437ced20c38324c99be5bf5c01ed6"
+}

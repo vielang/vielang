@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT COUNT(*)::bigint FROM tenant_subscription WHERE created_time < $1 AND status IN ('active', 'trialing', 'past_due')",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "count",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "f982dc3ccf6064cd3b0ffce99cf37b786e9eec1182b59c22c81f0e75b0ca540f"
+}

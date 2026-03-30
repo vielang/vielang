@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VieLang — 3D Digital Twin</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <canvas id="bevy-canvas"></canvas>
+    <div id="loading">
+        <p>Loading Digital Twin...</p>
+    </div>
+
+    <script type="module">
+        import init from './vl_digital_twin.js';
+
+        async function run() {
+            await init();
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        run().catch(err => {
+            console.error('Failed to load Digital Twin:', err);
+            document.getElementById('loading').textContent = 'Failed to load: ' + err;
+        });
+    </script>
+</body>
+</html>

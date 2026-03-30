@@ -1,0 +1,14 @@
+[profile.default]
+# Giới hạn 2 threads để tránh sqlx test DB pool exhaustion
+# (vl-api có 319+ tests, mỗi test cần DB connection riêng)
+test-threads = 2
+fail-fast = false
+
+[profile.ci]
+test-threads = 1
+retries = 1
+
+[profile.fast]
+# Dùng cho crates không cần DB (vl-core, vl-auth, vl-config...)
+test-threads = 8
+fail-fast = true

@@ -1,0 +1,5 @@
+{
+  "name": "VieLang — Learn English Online",
+  "description": "English learning platform with 1-on-1 video call sessions via LiveKit. Pivoted from Sota-Golf/VinaRounding codebase.",
+  "requestFramePermissions": []
+}

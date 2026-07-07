@@ -1,0 +1,303 @@
+/* Fonts loaded via next/font/google in layout.tsx — CSS variables
+   `--font-inter` and `--font-playfair` are injected onto <html> and consumed
+   by the --font-sans / --font-serif tokens below. */
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  /* Brand palette — Indigo primary + Amber accent.
+     Replaced golf-era `forest-green` + `metallic-gold` on 2026-07-02.
+     Tailwind class rename: `forest-green` → `brand`, `metallic-gold` → `accent-warm`. */
+  --color-brand: #4f46e5; /* indigo-600 */
+  --color-brand-hover: #4338ca; /* indigo-700 */
+  --color-brand-soft: #eef2ff; /* indigo-50 — tinted surface */
+  --color-accent-warm: #f59e0b; /* amber-500 */
+  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-serif: var(--font-playfair), Georgia, serif;
+
+  /* Responsive breakpoints — Tailwind v4 CSS-first.
+     Extends the default (sm 640, md 768, lg 1024, xl 1280) with:
+       xs 375  — iPhone SE / Galaxy S8 baseline
+       2xl 1440 — laptop 14" / MacBook standard
+       3xl 1920 — desktop 1080p
+       4xl 2560 — 4K / ultrawide
+     Container queries via `@container` are also available on any element. */
+  --breakpoint-xs: 375px;
+  --breakpoint-2xl: 1440px;
+  --breakpoint-3xl: 1920px;
+  --breakpoint-4xl: 2560px;
+
+  /* Touch target tokens — respect iOS HIG (44px) and Material (48px). Used
+     via `.tap-min` / `.tap-comfy` utility classes and hard-coded into the
+     Button + Input primitive sizes. */
+  --tap-min: 44px;
+  --tap-comfy: 48px;
+}
+
+@layer base {
+  img {
+    image-rendering: -webkit-optimize-contrast;
+  }
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}
+
+@layer base {
+  body {
+    @apply min-h-screen bg-linear-to-br from-slate-50 via-indigo-50/40 to-slate-50 font-sans text-slate-900 dark:from-[#0b1220] dark:via-[#111a33] dark:to-[#0b1220] dark:text-slate-100;
+  }
+}
+
+/* --------------------------------------------------------------
+   Typography scale — documented once here so pages don't invent
+   their own. Use the semantic utility classes below (or match the
+   underlying Tailwind combo) so all headings + body types line up.
+
+   Role            Utility          Underlying
+   ----            -------          ----------
+   Hero h1         .type-hero       text-4xl sm:text-5xl md:text-6xl font-serif font-bold tracking-tight
+   Page h1         .type-page       text-2xl md:text-3xl font-serif font-bold tracking-tight
+   Section h2      .type-section    text-lg md:text-xl font-semibold tracking-tight
+   Card title      .type-title      text-sm font-semibold
+   KPI number      .type-kpi        text-2xl font-sans font-bold tabular-nums
+   Body            .type-body       text-sm text-slate-700 dark:text-slate-300 leading-relaxed
+   Muted           .type-muted      text-xs text-slate-500 dark:text-slate-400
+   Eyebrow         .type-eyebrow    text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400
+
+   Focus ring      .focus-ring      shared visible focus for custom interactive elements
+   -------------------------------------------------------------- */
+@layer utilities {
+  /* Fluid typography via clamp() — scales continuously between 320px and
+     2560px viewports so 4K screens don't stretch text weirdly and iPhone SE
+     doesn't overflow headings. The clamps are capped high so the biggest
+     screens still get a reasonable visual line-length. */
+  .type-hero {
+    font-family: var(--font-serif);
+    font-size: clamp(2rem, 5vw + 1rem, 4.5rem);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    font-weight: 700;
+  }
+  .type-page {
+    font-family: var(--font-serif);
+    font-size: clamp(1.5rem, 2.5vw + 0.5rem, 2.25rem);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    font-weight: 700;
+  }
+  .type-section {
+    font-size: clamp(1.125rem, 1.2vw + 0.5rem, 1.5rem);
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    font-weight: 600;
+  }
+  .type-title {
+    @apply text-sm font-semibold;
+  }
+  .type-kpi {
+    font-family: var(--font-sans);
+    font-size: clamp(1.75rem, 2.5vw + 0.5rem, 2.75rem);
+    line-height: 1.05;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .type-body {
+    @apply leading-relaxed text-slate-700 dark:text-slate-300;
+    font-size: clamp(0.9375rem, 0.3vw + 0.85rem, 1rem);
+    max-width: 65ch;
+  }
+  .type-muted {
+    @apply text-xs text-slate-500 dark:text-slate-400;
+  }
+  .type-eyebrow {
+    @apply text-[10px] font-semibold tracking-wider text-slate-500 uppercase dark:text-slate-400;
+  }
+  .focus-ring {
+    @apply focus-visible:ring-brand/40 focus-visible:ring-offset-background focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none;
+  }
+
+  /* Safe-area utilities — respect iOS home-indicator + notch, Android nav bar.
+     Prefer these over hard-coded padding on any component that sits at the
+     edge of the viewport (header, footer, bottom-sheet, video controls). */
+  .pt-safe {
+    padding-top: max(0.5rem, env(safe-area-inset-top));
+  }
+  .pb-safe {
+    padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+  }
+  .px-safe {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+  .h-dvh-safe {
+    min-height: 100dvh;
+  }
+
+  /* Touch-target utilities. `.tap-min` = 44×44 (iOS HIG minimum),
+     `.tap-comfy` = 48×48 (Material recommended, better for accessibility). */
+  .tap-min {
+    min-height: var(--tap-min);
+    min-width: var(--tap-min);
+  }
+  .tap-comfy {
+    min-height: var(--tap-comfy);
+    min-width: var(--tap-comfy);
+  }
+}
+
+/* Reduced-motion safety net. `<MotionConfig reducedMotion="user">` in
+   providers.tsx handles motion/react animations; this CSS covers CSS
+   transitions, Tailwind `animate-*`, and any third-party keyframes. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@layer utilities {
+  .mobile-compact {
+    @apply max-sm:m-1 max-sm:p-3 max-sm:text-[0.8rem];
+  }
+  .mobile-compact-title {
+    @apply max-sm:text-sm max-sm:leading-tight;
+  }
+  .mobile-grid-2 {
+    @apply grid grid-cols-2 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4;
+  }
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@theme inline {
+  --font-heading: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  /* Brand: indigo-600 #4F46E5 → primary, amber-500 #F59E0B → accent (2026-07-02). */
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.48 0.19 279); /* indigo-600 */
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.78 0.16 74); /* amber-500 */
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.48 0.19 279 / 0.4); /* match primary */
+  --chart-1: oklch(0.48 0.19 279); /* indigo-600 */
+  --chart-2: oklch(0.78 0.16 74); /* amber-500 */
+  --chart-3: oklch(0.62 0.19 260); /* violet-500 */
+  --chart-4: oklch(0.65 0.19 340); /* pink-500 */
+  --chart-5: oklch(0.7 0.14 190); /* teal-400 */
+  --radius: 0.75rem; /* rounded-xl base */
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.48 0.19 279);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.48 0.19 279 / 0.4);
+}
+
+.dark {
+  /* Slate-indigo tinted dark palette to sit with the brand primary. */
+  --background: oklch(0.18 0.015 260);
+  --foreground: oklch(0.96 0.005 260);
+  --card: oklch(0.22 0.018 260);
+  --card-foreground: oklch(0.96 0.005 260);
+  --popover: oklch(0.22 0.018 260);
+  --popover-foreground: oklch(0.96 0.005 260);
+  --primary: oklch(0.72 0.15 279); /* indigo-400 — brighter to pop on dark */
+  --primary-foreground: oklch(0.15 0.02 279);
+  --secondary: oklch(0.27 0.02 260);
+  --secondary-foreground: oklch(0.96 0.005 260);
+  --muted: oklch(0.26 0.018 260);
+  --muted-foreground: oklch(0.72 0.015 260);
+  --accent: oklch(0.82 0.15 74); /* amber-400 */
+  --accent-foreground: oklch(0.2 0.015 260);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 14%);
+  --input: oklch(1 0 0 / 18%);
+  --ring: oklch(0.72 0.15 279 / 0.5);
+  --chart-1: oklch(0.72 0.15 279);
+  --chart-2: oklch(0.82 0.15 74);
+  --chart-3: oklch(0.72 0.16 260);
+  --chart-4: oklch(0.72 0.15 340);
+  --chart-5: oklch(0.78 0.12 190);
+  --sidebar: oklch(0.2 0.018 260);
+  --sidebar-foreground: oklch(0.96 0.005 260);
+  --sidebar-primary: oklch(0.72 0.15 279);
+  --sidebar-primary-foreground: oklch(0.15 0.02 279);
+  --sidebar-accent: oklch(0.27 0.02 260);
+  --sidebar-accent-foreground: oklch(0.96 0.005 260);
+  --sidebar-border: oklch(1 0 0 / 14%);
+  --sidebar-ring: oklch(0.72 0.15 279 / 0.5);
+}

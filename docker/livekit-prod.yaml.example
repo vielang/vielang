@@ -1,0 +1,46 @@
+# LiveKit server config — PRODUCTION TEMPLATE
+# Server IP: 64.23.133.199
+# Signaling domain: wss://livekit.vielang.com (fronted by host nginx + certbot,
+# see /etc/nginx/sites-available/livekit.vielang.com — this box is shared with
+# other products, so TLS termination uses the existing nginx, not Caddy)
+# Webhook target: https://vielang.com/api/livekit/webhook
+#
+# This is a template, not the real config — it's safe to commit. The real
+# docker/livekit-prod.yaml (gitignored) is rendered from this file on the
+# droplet via envsubst, reading secrets out of docker/.env.prod — see the
+# boot instructions at the top of docker-compose.prod.yml.
+#
+# Re-run the render step any time docker/.env.prod changes (key rotation etc).
+
+port: 7880
+log_level: info
+
+rtc:
+  tcp_port: 7881
+  port_range_start: 50000
+  port_range_end: 60100
+  use_external_ip: true
+
+# Embedded TURN/UDP (also serves as STUN) — needed for clients behind
+# symmetric NAT / restrictive mobile carrier networks where direct ICE
+# fails. No separate domain/cert required (that's only for TURN/TLS on 443,
+# which this deployment doesn't need yet).
+turn:
+  enabled: true
+  udp_port: 3478
+
+room:
+  empty_timeout: 300
+  max_participants: 50
+
+keys:
+  ${LIVEKIT_API_KEY}: ${LIVEKIT_API_SECRET}
+
+redis:
+  address: 127.0.0.1:6379
+  password: ${REDIS_PASSWORD}
+
+webhook:
+  api_key: ${LIVEKIT_API_KEY}
+  urls:
+    - https://vielang.com/api/livekit/webhook

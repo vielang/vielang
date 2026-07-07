@@ -1,0 +1,40 @@
+# VieLang local LiveKit + Redis. Boot with `docker compose -f docker-compose.dev.yml up`.
+#
+# Keys live in livekit.yaml and are echoed into .env.local for the Next.js
+# side. Rotate both together if you regenerate a key.
+#
+# The UDP range is intentionally small (100 ports) for local dev; production
+# on DigitalOcean uses 50000-60100 through Caddy. Windows Docker Desktop is
+# fine with this range as long as the ports aren't blocked by antivirus /
+# corporate VPN.
+
+services:
+  livekit:
+    image: livekit/livekit-server:v1.13.3
+    command: --config /etc/livekit.yaml --node-ip 127.0.0.1
+    # `--node-ip 127.0.0.1` forces LiveKit to advertise localhost as the ICE
+    # candidate host — without it the auto-detected value is the container's
+    # internal 172.x address which the browser can't reach on Windows Docker
+    # Desktop, so every WebRTC negotiation times out.
+    volumes:
+      - ./livekit.yaml:/etc/livekit.yaml:ro
+    ports:
+      - '7880:7880'
+      - '7881:7881'
+      - '50000-50100:50000-50100/udp'
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: ['redis-server', '--save', '', '--appendonly', 'no']
+    ports:
+      - '6379:6379'
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 3s
+      timeout: 2s
+      retries: 20
+    restart: unless-stopped

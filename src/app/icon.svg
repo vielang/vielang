@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="VieLang">
+  <title>VieLang</title>
+  <path d="M 144 152 L 256 384 L 368 152"
+        stroke="#4F46E5"
+        stroke-width="56"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        fill="none"/>
+  <circle cx="256" cy="440" r="18" fill="#F59E0B"/>
+</svg>

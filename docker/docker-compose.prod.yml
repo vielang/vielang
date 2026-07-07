@@ -1,0 +1,81 @@
+# VieLang production LiveKit + Redis
+# Server: 64.23.133.199 — a SHARED droplet. Host nginx (systemd, not docker)
+# already owns 80/443 for other products (nakama/pocketbase/vaultwarden/etc
+# under vietopik.com) — do NOT add a container that publishes 80 or 443 here.
+# TLS for livekit.vielang.com is terminated by that same host nginx (see
+# /etc/nginx/sites-available, certbot-managed), reverse-proxying to
+# 127.0.0.1:7880. This matches the existing pattern used for the other vhosts
+# on this box instead of introducing a second TLS stack (Caddy) that would
+# conflict with nginx on 80/443.
+#
+# Firewall (DigitalOcean cloud firewall + ufw) must allow inbound:
+#   80/tcp, 443/tcp — already open for the existing nginx vhosts
+#   7881/tcp — LiveKit ICE/TCP fallback (corporate firewalls, VPNs)
+#   3478/udp — embedded TURN/STUN
+#   50000-60100/udp — WebRTC media
+#
+# Do NOT add an inbound rule for 7880/tcp. livekit runs with network_mode:
+# host (below), so LiveKit's own bind is no longer restricted to loopback by
+# a Docker port mapping — the *absence* of a firewall rule for 7880 is what
+# keeps it nginx-only now. (LiveKit's `bind_addresses` config key affects RTC/
+# ICE interface selection, not the HTTP listener, and has open upstream bugs
+# for TURN — don't rely on it for this.)
+#
+# Secrets (REDIS_PASSWORD, LIVEKIT_API_KEY, LIVEKIT_API_SECRET) live in
+# docker/.env.prod (gitignored, never committed). docker/livekit-prod.yaml is
+# ALSO gitignored — it's rendered from the committed livekit-prod.yaml.example
+# template so the real HMAC secret + redis password never touch git history.
+#
+# Boot (from repo root):
+#   set -a && source docker/.env.prod && set +a
+#   envsubst '${LIVEKIT_API_KEY} ${LIVEKIT_API_SECRET} ${REDIS_PASSWORD}' \
+#     < docker/livekit-prod.yaml.example > docker/livekit-prod.yaml
+#   docker compose -f docker/docker-compose.prod.yml --env-file docker/.env.prod up -d
+
+services:
+  livekit:
+    image: livekit/livekit-server:v1.13.3
+    command: --config /etc/livekit.yaml
+    volumes:
+      - ./livekit-prod.yaml:/etc/livekit.yaml:ro
+    # network_mode: host — NOT `ports:`. Publishing the 50000-60100/udp range
+    # (10,101 ports) via Docker's default userland-proxy spawns one
+    # docker-proxy process PER PORT (~10k processes), which OOM-killed this
+    # 4GB droplet's kernel repeatedly (killed docker-compose, rsyslogd, even
+    # unrelated ssh sessions) every time this stack was started. Host
+    # networking makes LiveKit bind the range directly with no per-port
+    # proxy/iptables-DNAT explosion — this is LiveKit's own recommended mode
+    # for large UDP ranges. The 7880 signaling port is now protected only by
+    # the firewall (see the "Do NOT add an inbound rule for 7880/tcp" note
+    # above), not by a Docker loopback port mapping — nginx still reaches it
+    # over 127.0.0.1:7880 since it's on the same host.
+    network_mode: host
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command:
+      [
+        'redis-server',
+        '--save',
+        '',
+        '--appendonly',
+        'no',
+        '--requirepass',
+        '${REDIS_PASSWORD}',
+      ]
+    # Loopback-only port mapping: livekit now runs with network_mode: host, so
+    # it can no longer reach redis via the compose bridge network / service
+    # name — it connects over 127.0.0.1:6379 instead. Still never publish
+    # 6379 beyond loopback — an unauthenticated Redis here is a known RCE vector.
+    ports:
+      - '127.0.0.1:6379:6379'
+    healthcheck:
+      test: ['CMD', 'redis-cli', '-a', '${REDIS_PASSWORD}', 'ping']
+      interval: 3s
+      timeout: 2s
+      retries: 20
+    restart: unless-stopped

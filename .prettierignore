@@ -1,0 +1,17 @@
+node_modules
+.next
+build
+dist
+coverage
+.turbo
+*.min.js
+*.min.css
+public/sw.js
+supabase/migrations
+supabase/.temp
+playwright-report
+test-results
+src/types/database.ts
+package-lock.json
+docs/acc.txt
+.env*

@@ -1,0 +1,50 @@
+# LiveKit server config — LOCAL DEV ONLY. Do not deploy this file as-is; the
+# production droplet uses its own copy with a real HMAC secret and public IP.
+#
+# The `keys` map is <api_key>: <api_secret>. `devkey` matches
+# LIVEKIT_API_KEY in .env.local; `LIVEKIT_API_SECRET` must equal the value
+# on the right — mismatched keys give a silent 401 from the client's
+# perspective.
+
+port: 7880
+
+rtc:
+  tcp_port: 7881
+  # Small UDP range keeps Docker port publishing manageable on Windows.
+  # Real prod uses 50000-60100.
+  port_range_start: 50000
+  port_range_end: 50100
+  # `use_external_ip: false` tells LiveKit to only advertise localhost so the
+  # browser doesn't try to reach the container's internal IP.
+  use_external_ip: false
+  # Allow TCP fallback when UDP is unreachable — necessary on Windows Docker
+  # Desktop where NAT/WSL2 makes UDP ports unreliable for WebRTC media.
+  # tcp_port (7881) must be published in docker-compose for this to work.
+  allow_tcp_fallback: true
+
+# Room defaults that apply to every room LiveKit auto-creates when a
+# participant joins. These prevent runaway costs from empty rooms and
+# individual rooms exceeding capacity.
+#   • empty_timeout — close a room this many seconds after the last
+#     participant leaves. 300s is generous enough that a network flake
+#     doesn't tear down a class the moment the tutor's laptop suspends,
+#     but tight enough that abandoned rooms don't linger for hours.
+#   • max_participants — hard cap. Group sessions cap at 100 in the app
+#     layer; this sets a floor at 50 so a misconfigured session can't
+#     drown the SFU node.
+room:
+  empty_timeout: 300
+  max_participants: 50
+
+keys:
+  devkey: devsecret_at_least_32_chars_long_xxxxxxxx
+
+redis:
+  address: redis:6379
+
+# Enable webhook signing so the Next.js webhook endpoint can verify events.
+# The api_key here MUST match `keys` above.
+webhook:
+  api_key: devkey
+  urls:
+    - http://host.docker.internal:3000/api/livekit/webhook

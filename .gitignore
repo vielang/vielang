@@ -1,66 +1,38 @@
-# Build artifacts
-/target/
-**/target/
-/target_check/
-/.claude/
-/.claude/worktrees/
-
-# sqlx offline query cache — committed so CI builds without a live DB.
-# Regenerate with: ./scripts/generate_sqlx_cache.sh
-# .sqlx/   ← intentionally NOT ignored; keep the cache committed
-
-# Environment variables
-.env
-.env.local
-.env.*.local
-
-# IDE
-.idea/
-.vscode/
-*.iml
-*.swp
-*.swo
-.DS_Store
-
-# Logs
-*.log
-logs/
-
-# Bevy / WGPU cache
-bevy_asset_cache/
-wgpu_trace/
-
-# WASM build output
-pkg/
+node_modules/
+build/
 dist/
-web-build/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example
 
-# Config overrides (giữ vielang.toml mẫu, bỏ qua file local override)
-config/local.toml
-config/*.local.toml
+# Firebase service account key (NEVER commit)
+*-firebase-admin*.json
 
-# Secrets & certs
-*.pem
-*.key
-*.crt
-*.p12
-*.pfx
-secrets/
+# IDE & local data
+.vscode/
+/data/
 
-# Docker volumes
-postgres-data/
-redis-data/
+# Next.js
+.next/
+next-env.d.ts
+*.tsbuildinfo
 
-# Benchmark output
-criterion/
+# Claude Code local agent state
+.claude/
 
-# Windows reserved device names (NUL, CON, PRN, etc.) — tránh lỗi commit trên Windows
-nul
-NUL
-nul.*
-NUL.*
+# Test artifacts (Playwright e2e runs)
+test-results/
+playwright-report/
+.playwright/
+e2e/artifacts/
 
-# Test artifacts
-e2e/test-results/
-vielang-ui/**/test-results/
+# Local credentials notes — NEVER commit (contains seeded admin/owner passwords)
+docs/acc.txt
+dev.txt
+
+# LiveKit prod config — rendered from livekit-prod.yaml.example at deploy time,
+# contains the real HMAC secret + redis password, NEVER commit
+docker/livekit-prod.yaml
 

@@ -18,9 +18,13 @@
  * Cần các biến môi trường trong web/.env.local (xem .env.local.example):
  *   R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME
  */
-import "dotenv/config";
+import { config as loadEnv } from "dotenv";
 import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
+
+// Next.js tự đọc .env.local, nhưng script standalone này thì không — nạp
+// tường minh (ưu tiên .env.local, không ghi đè biến đã có sẵn trong shell).
+loadEnv({ path: path.resolve(process.cwd(), ".env.local"), quiet: true });
 import sharp from "sharp";
 import {
   S3Client,

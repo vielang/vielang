@@ -6,6 +6,7 @@ import {
   Bookmark,
   ChevronLeft,
   ChevronRight,
+  NotebookText,
   RotateCcw,
   X,
 } from "lucide-react";
@@ -19,6 +20,8 @@ import {
 } from "@/components/ui/dialog";
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { NoteSheet } from "@/components/reader/note-sheet";
 import { cn } from "@/lib/utils";
 import type { Book } from "@/lib/books";
 
@@ -29,6 +32,10 @@ export function ReaderControls({
   isBookmarked,
   jumpOpen,
   onJumpOpenChange,
+  hasNote,
+  noteContent,
+  noteOpen,
+  onNoteOpenChange,
   onPrev,
   onNext,
   onJump,
@@ -41,6 +48,10 @@ export function ReaderControls({
   isBookmarked: boolean;
   jumpOpen: boolean;
   onJumpOpenChange: (open: boolean) => void;
+  hasNote: boolean;
+  noteContent: string | null;
+  noteOpen: boolean;
+  onNoteOpenChange: (open: boolean) => void;
   onPrev: () => void;
   onNext: () => void;
   onJump: (page: number) => void;
@@ -71,20 +82,50 @@ export function ReaderControls({
         <div className="min-w-0 flex-1 truncate text-center text-sm font-medium">
           {book.titleVi}
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="text-white hover:bg-white/10 hover:text-white"
-          onClick={onToggleBookmark}
-          aria-label={isBookmarked ? "Bỏ đánh dấu trang" : "Đánh dấu trang"}
-          aria-pressed={isBookmarked}
-        >
-          <Bookmark
-            className={cn("size-5", isBookmarked && "fill-current")}
-            aria-hidden
-          />
-        </Button>
+        <div className="flex items-center gap-1">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              {/* span bọc ngoài để tooltip vẫn hoạt động khi button disabled */}
+              <span>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-white hover:bg-white/10 hover:text-white disabled:opacity-40"
+                  onClick={() => onNoteOpenChange(true)}
+                  disabled={!hasNote}
+                  aria-label="Xem bài giảng trang này"
+                >
+                  <NotebookText className="size-5" aria-hidden />
+                </Button>
+              </span>
+            </TooltipTrigger>
+            <TooltipContent>
+              {hasNote ? "Bài giảng trang này" : "Chưa có bài giảng cho trang này"}
+            </TooltipContent>
+          </Tooltip>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-white hover:bg-white/10 hover:text-white"
+            onClick={onToggleBookmark}
+            aria-label={isBookmarked ? "Bỏ đánh dấu trang" : "Đánh dấu trang"}
+            aria-pressed={isBookmarked}
+          >
+            <Bookmark
+              className={cn("size-5", isBookmarked && "fill-current")}
+              aria-hidden
+            />
+          </Button>
+        </div>
       </div>
+
+      <NoteSheet
+        open={noteOpen}
+        onOpenChange={onNoteOpenChange}
+        content={noteContent}
+        page={page}
+      />
 
       {/* Bottom bar */}
       <div

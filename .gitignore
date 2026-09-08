@@ -40,3 +40,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# notes: build-notes.ts sinh ra từ content/notes/<bookId>/*.md, luôn chạy
+# lại qua predev/prebuild — không commit file .json này
+/content/notes/*.json

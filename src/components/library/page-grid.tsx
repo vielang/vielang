@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Bookmark, Check } from "lucide-react";
+import { Bookmark, Check, NotebookText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getThumbUrl } from "@/lib/books";
 import { useProgressStore } from "@/lib/progress-store";
@@ -10,14 +10,18 @@ import { useProgressStore } from "@/lib/progress-store";
 export function PageGrid({
   bookId,
   totalPages,
+  notePages,
 }: {
   bookId: string;
   totalPages: number;
+  /** Số trang có sẵn bài giảng (xem lib/notes.ts) */
+  notePages: number[];
 }) {
   const books = useProgressStore((s) => s.books);
   const toggleBookmark = useProgressStore((s) => s.toggleBookmark);
   const readPages = new Set(books[bookId]?.readPages ?? []);
   const bookmarks = new Set(books[bookId]?.bookmarks ?? []);
+  const notedPages = new Set(notePages);
 
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
@@ -26,6 +30,7 @@ export function PageGrid({
       {pages.map((page) => {
         const isRead = readPages.has(page);
         const isBookmarked = bookmarks.has(page);
+        const hasNote = notedPages.has(page);
         return (
           <div key={page} className="group relative">
             <Link
@@ -47,6 +52,14 @@ export function PageGrid({
                 {isRead && (
                   <span className="absolute right-1 bottom-1 rounded-full bg-primary p-0.5 text-primary-foreground shadow">
                     <Check className="size-3" aria-hidden />
+                  </span>
+                )}
+                {hasNote && (
+                  <span
+                    className="absolute top-1 left-1 rounded-full bg-background/90 p-0.5 text-primary shadow"
+                    title="Có bài giảng"
+                  >
+                    <NotebookText className="size-3" aria-hidden />
                   </span>
                 )}
                 <span className="absolute bottom-1 left-1.5 rounded bg-background/80 px-1 text-[10px] tabular-nums text-foreground">

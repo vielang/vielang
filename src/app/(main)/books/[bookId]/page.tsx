@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { BOOKS, getBook } from "@/lib/books";
+import { getNotePages } from "@/lib/notes";
 import { BookDetailHeader } from "@/components/library/book-detail-header";
 import { PageGrid } from "@/components/library/page-grid";
 
@@ -35,7 +36,11 @@ export default async function BookDetailPage({
   return (
     <div className="flex flex-col gap-6">
       <BookDetailHeader book={book} />
-      <PageGrid bookId={book.id} totalPages={book.totalPages} />
+      <PageGrid
+        bookId={book.id}
+        totalPages={book.totalPages}
+        notePages={getNotePages(book.id)}
+      />
     </div>
   );
 }

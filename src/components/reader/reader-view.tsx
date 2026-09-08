@@ -10,9 +10,19 @@ import { AdjacentPreload } from "@/components/reader/adjacent-preload";
 
 const INTERACTIVE_TAGS = new Set(["INPUT", "TEXTAREA", "SELECT"]);
 
-export function ReaderView({ book, page }: { book: Book; page: number }) {
+export function ReaderView({
+  book,
+  page,
+  noteContent,
+}: {
+  book: Book;
+  page: number;
+  /** null = trang này chưa có bài giảng. */
+  noteContent: string | null;
+}) {
   const router = useRouter();
   const viewerRef = useRef<PageViewerHandle>(null);
+  const hasNote = noteContent !== null;
 
   const markPageRead = useProgressStore((s) => s.markPageRead);
   const toggleBookmark = useProgressStore((s) => s.toggleBookmark);
@@ -21,6 +31,7 @@ export function ReaderView({ book, page }: { book: Book; page: number }) {
 
   const [toolbarVisible, setToolbarVisible] = useState(true);
   const [jumpOpen, setJumpOpen] = useState(false);
+  const [noteOpen, setNoteOpen] = useState(false);
 
   const goTo = useCallback(
     (target: number) => {
@@ -39,9 +50,9 @@ export function ReaderView({ book, page }: { book: Book; page: number }) {
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
-      // Dialog nhảy trang (Slider/Input/Esc riêng của Radix) đang mở — nhường
-      // toàn bộ phím tắt cho dialog, tránh vừa đóng dialog vừa chuyển trang.
-      if (jumpOpen) return;
+      // Dialog nhảy trang / Sheet bài giảng đang mở (Slider/Input/Esc riêng
+      // của Radix) — nhường toàn bộ phím tắt, tránh vừa đóng vừa chuyển trang.
+      if (jumpOpen || noteOpen) return;
       const target = e.target as HTMLElement | null;
       if (target && INTERACTIVE_TAGS.has(target.tagName)) return;
 
@@ -65,6 +76,10 @@ export function ReaderView({ book, page }: { book: Book; page: number }) {
         case "B":
           toggleBookmark(book.id, page);
           break;
+        case "n":
+        case "N":
+          if (hasNote) setNoteOpen(true);
+          break;
         default:
           return;
       }
@@ -72,7 +87,17 @@ export function ReaderView({ book, page }: { book: Book; page: number }) {
     }
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [goTo, page, book.id, book.totalPages, router, toggleBookmark, jumpOpen]);
+  }, [
+    goTo,
+    page,
+    book.id,
+    book.totalPages,
+    router,
+    toggleBookmark,
+    jumpOpen,
+    noteOpen,
+    hasNote,
+  ]);
 
   return (
     <div className="fixed inset-0 overflow-hidden bg-black">
@@ -94,6 +119,10 @@ export function ReaderView({ book, page }: { book: Book; page: number }) {
         isBookmarked={isBookmarked}
         jumpOpen={jumpOpen}
         onJumpOpenChange={setJumpOpen}
+        hasNote={hasNote}
+        noteContent={noteContent}
+        noteOpen={noteOpen}
+        onNoteOpenChange={setNoteOpen}
         onPrev={() => goTo(page - 1)}
         onNext={() => goTo(page + 1)}
         onJump={goTo}

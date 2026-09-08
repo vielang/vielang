@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getBook, isValidPage } from "@/lib/books";
+import { getNoteContent } from "@/lib/notes";
 import { ReaderView } from "@/components/reader/reader-view";
 
 interface Params {
@@ -30,6 +31,9 @@ export default async function ReadPage({ params }: { params: Promise<Params> }) 
   const resolved = resolve(await params);
   if (!resolved) notFound();
   const { book, page } = resolved;
+  const noteContent = getNoteContent(book.id, page);
 
-  return <ReaderView key={page} book={book} page={page} />;
+  return (
+    <ReaderView key={page} book={book} page={page} noteContent={noteContent} />
+  );
 }

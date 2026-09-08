@@ -8,7 +8,7 @@ import { getPageAudio } from "@/lib/audio";
 import { PageViewer, type PageViewerHandle } from "@/components/reader/page-viewer";
 import { ReaderControls } from "@/components/reader/reader-controls";
 import { AdjacentPreload } from "@/components/reader/adjacent-preload";
-import { AudioBar } from "@/components/reader/audio-bar";
+import { AudioWidget } from "@/components/reader/audio-widget";
 
 const INTERACTIVE_TAGS = new Set(["INPUT", "TEXTAREA", "SELECT"]);
 
@@ -115,7 +115,7 @@ export function ReaderView({
         onSwipeNext={() => goTo(page + 1)}
       />
 
-      <AudioBar tracks={audioTracks} visible={toolbarVisible} />
+      <AudioWidget tracks={audioTracks} />
 
       <ReaderControls
         visible={toolbarVisible}

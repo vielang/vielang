@@ -2,14 +2,16 @@
 
 Web app đọc sách văn hóa – xã hội Hàn Quốc (chương trình 사회통합프로그램 / KIIP),
 dành cho người Việt học tiếng Hàn. Đọc theo trang ảnh scan, có zoom/vuốt
-trang, ghi nhớ tiến độ đọc và bookmark ngay trên trình duyệt (không cần tài
-khoản).
+trang, bài giảng tiếng Việt + audio nghe/phát âm theo từng trang, ghi nhớ
+tiến độ đọc và bookmark ngay trên trình duyệt (không cần tài khoản).
 
 ## Tech stack
 
 - Next.js 16 (App Router, TypeScript) + Tailwind CSS v4 + shadcn/ui
-- Ảnh trang sách lưu trên Cloudflare R2, phục vụ qua `next/image`
-  (remote loader + Image Optimization của Vercel)
+- Ảnh + audio trang sách lưu trên Cloudflare R2, phục vụ qua `next/image`
+  (remote loader + Image Optimization của Vercel) và thẻ `<audio>`
+- Note "bài giảng" tiếng Việt: file Markdown tĩnh (`content/notes/`), render
+  bằng `react-markdown`
 - Zustand (`persist` → localStorage) cho tiến độ đọc/bookmark — không backend
 - Vitest cho unit test
 
@@ -59,15 +61,40 @@ Kiểm tra nhanh sau khi upload: mở
 `https://<NEXT_PUBLIC_IMAGE_BASE_URL>/books/step1/pages/0001.webp` trên
 trình duyệt — phải thấy ảnh trang 1.
 
-## 4. Thêm sách mới sau này
+## 4. Đẩy audio lên R2
+
+Audio nghe/phát âm/nói mẫu — nguồn công khai từ NXB Hawoo (không cần đăng
+nhập): `https://hawoopub01.cafe24.com/satongmp3/{step1..4}.zip`. Tải + giải
+nén vào `../SB_step<N>_audio/*.mp3` (cùng cấp với `SB_step<N>_images/`), rồi:
+
+```bash
+npm run prepare-audio                 # tất cả sách, bỏ qua file đã có
+npm run prepare-audio -- --book step1 # chỉ 1 sách
+```
+
+Mapping "bài học → trang" đã xác minh thủ công, xem
+`src/lib/audio-config.ts` (có ghi chú giả định cho step4 cần spot-check
+nếu sau này phát hiện sai).
+
+## 5. Thêm bài giảng (note)
+
+Mỗi trang có thể có 1 file `content/notes/<bookId>/<page>.md` (4 chữ số,
+vd `0018.md`) — nội dung tiếng Việt giải thích trang đó, theo template:
+Tóm tắt / Từ vựng / Ngữ pháp / Văn hoá. Không cần chạy gì thêm — script
+`build-notes.ts` tự gộp thành JSON qua `predev`/`prebuild`.
+
+## 6. Thêm sách mới sau này
 
 1. Tải ảnh bằng `download_ebook.py` (ở thư mục gốc `kiip/`, xem hướng dẫn
    trong đó) → ra `SB_step<N>_images/pages/`.
 2. Thêm 1 entry vào mảng `BOOKS` trong `src/lib/books.ts`.
 3. `npm run prepare-images -- --book step<N>`.
-4. Deploy lại.
+4. (Tuỳ chọn) tải audio + `npm run prepare-audio -- --book step<N>`, thêm
+   layout vào `src/lib/audio-config.ts`.
+5. (Tuỳ chọn) viết note vào `content/notes/step<N>/`.
+6. Deploy lại.
 
-## 5. Deploy lên Vercel
+## 7. Deploy lên Vercel
 
 1. Push repo này lên GitHub.
 2. Trên [vercel.com](https://vercel.com) → **Add New Project** → import repo
@@ -88,15 +115,22 @@ trình duyệt — phải thấy ảnh trang 1.
 | `npm run lint`            | ESLint                                    |
 | `npm run test`            | Unit test (Vitest)                        |
 | `npm run prepare-images`  | Convert + upload ảnh trang sách lên R2    |
+| `npm run prepare-audio`   | Upload audio trang sách lên R2            |
+| `npm run build-notes`     | Gộp note .md → JSON (tự chạy qua predev/prebuild) |
 
 ## Cấu trúc chính
 
 ```
 src/app/(main)/              trang chủ (thư viện) + chi tiết sách — có header
 src/app/read/[bookId]/[page] trang đọc full-screen — không header
-src/components/reader/       zoom/pan (page-viewer), toolbar, preload trang kế
+src/components/reader/       zoom/pan (page-viewer), toolbar, note-sheet, audio-bar
 src/components/library/      book card, lưới thumbnail trang
 src/lib/books.ts             metadata sách + URL ảnh
+src/lib/notes.ts             nội dung bài giảng theo trang
+src/lib/audio.ts, audio-config.ts   mapping + URL audio theo trang
 src/lib/progress-store.ts    tiến độ đọc/bookmark (Zustand + localStorage)
 scripts/prepare-images.ts    pipeline convert JPG→WebP + upload R2
+scripts/prepare-audio.ts     pipeline upload audio lên R2
+scripts/build-notes.ts       gộp content/notes/*.md → JSON
+content/notes/               nguồn nội dung bài giảng (.md, 1 file/trang)
 ```

@@ -11,6 +11,7 @@
     "lint": "eslint",
     "test": "vitest run",
     "prepare-images": "tsx scripts/prepare-images.ts",
+    "prepare-audio": "tsx scripts/prepare-audio.ts",
     "build-notes": "tsx scripts/build-notes.ts"
   },
   "dependencies": {

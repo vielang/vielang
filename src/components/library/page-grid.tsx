@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Bookmark, Check, NotebookText } from "lucide-react";
+import { Bookmark, Check, NotebookText, Volume2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getThumbUrl } from "@/lib/books";
 import { useProgressStore } from "@/lib/progress-store";
@@ -11,17 +11,21 @@ export function PageGrid({
   bookId,
   totalPages,
   notePages,
+  audioPages,
 }: {
   bookId: string;
   totalPages: number;
   /** Số trang có sẵn bài giảng (xem lib/notes.ts) */
   notePages: number[];
+  /** Số trang có sẵn audio (xem lib/audio.ts) */
+  audioPages: number[];
 }) {
   const books = useProgressStore((s) => s.books);
   const toggleBookmark = useProgressStore((s) => s.toggleBookmark);
   const readPages = new Set(books[bookId]?.readPages ?? []);
   const bookmarks = new Set(books[bookId]?.bookmarks ?? []);
   const notedPages = new Set(notePages);
+  const audioedPages = new Set(audioPages);
 
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
@@ -31,6 +35,7 @@ export function PageGrid({
         const isRead = readPages.has(page);
         const isBookmarked = bookmarks.has(page);
         const hasNote = notedPages.has(page);
+        const hasAudio = audioedPages.has(page);
         return (
           <div key={page} className="group relative">
             <Link
@@ -54,13 +59,25 @@ export function PageGrid({
                     <Check className="size-3" aria-hidden />
                   </span>
                 )}
-                {hasNote && (
-                  <span
-                    className="absolute top-1 left-1 rounded-full bg-background/90 p-0.5 text-primary shadow"
-                    title="Có bài giảng"
-                  >
-                    <NotebookText className="size-3" aria-hidden />
-                  </span>
+                {(hasNote || hasAudio) && (
+                  <div className="absolute top-1 left-1 flex gap-1">
+                    {hasNote && (
+                      <span
+                        className="rounded-full bg-background/90 p-0.5 text-primary shadow"
+                        title="Có bài giảng"
+                      >
+                        <NotebookText className="size-3" aria-hidden />
+                      </span>
+                    )}
+                    {hasAudio && (
+                      <span
+                        className="rounded-full bg-background/90 p-0.5 text-primary shadow"
+                        title="Có audio"
+                      >
+                        <Volume2 className="size-3" aria-hidden />
+                      </span>
+                    )}
+                  </div>
                 )}
                 <span className="absolute bottom-1 left-1.5 rounded bg-background/80 px-1 text-[10px] tabular-nums text-foreground">
                   {page}

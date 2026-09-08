@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { BOOKS, getBook } from "@/lib/books";
 import { getNotePages } from "@/lib/notes";
+import { getAudioPages } from "@/lib/audio";
 import { BookDetailHeader } from "@/components/library/book-detail-header";
 import { PageGrid } from "@/components/library/page-grid";
 
@@ -40,6 +41,7 @@ export default async function BookDetailPage({
         bookId={book.id}
         totalPages={book.totalPages}
         notePages={getNotePages(book.id)}
+        audioPages={getAudioPages(book.id)}
       />
     </div>
   );

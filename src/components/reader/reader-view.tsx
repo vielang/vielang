@@ -4,9 +4,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Book } from "@/lib/books";
 import { useProgressStore } from "@/lib/progress-store";
+import { getPageAudio } from "@/lib/audio";
 import { PageViewer, type PageViewerHandle } from "@/components/reader/page-viewer";
 import { ReaderControls } from "@/components/reader/reader-controls";
 import { AdjacentPreload } from "@/components/reader/adjacent-preload";
+import { AudioBar } from "@/components/reader/audio-bar";
 
 const INTERACTIVE_TAGS = new Set(["INPUT", "TEXTAREA", "SELECT"]);
 
@@ -23,6 +25,7 @@ export function ReaderView({
   const router = useRouter();
   const viewerRef = useRef<PageViewerHandle>(null);
   const hasNote = noteContent !== null;
+  const audioTracks = getPageAudio(book.id, page);
 
   const markPageRead = useProgressStore((s) => s.markPageRead);
   const toggleBookmark = useProgressStore((s) => s.toggleBookmark);
@@ -111,6 +114,8 @@ export function ReaderView({
         onSwipePrev={() => goTo(page - 1)}
         onSwipeNext={() => goTo(page + 1)}
       />
+
+      <AudioBar tracks={audioTracks} visible={toolbarVisible} />
 
       <ReaderControls
         visible={toolbarVisible}

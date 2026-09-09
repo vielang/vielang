@@ -1,0 +1,24 @@
+[
+  {
+    "title": "어휘와 문법 2 — 1",
+    "instruction": "아나이스 씨와 안젤라 씨의 하루예요. 두 사람이 뭐 해요? (보기: 아나이스 씨가 오늘 뭐 해요? → 한국어를 배워요.)",
+    "items": [
+      { "id": "p66-1", "label": "thức dậy", "kind": "fill", "prompt": "______", "answers": ["일어나다", "일어나요"] },
+      { "id": "p66-2", "label": "rửa mặt", "kind": "fill", "prompt": "______", "answers": ["세수하다", "세수해요"] },
+      { "id": "p66-3", "label": "mặc quần áo", "kind": "fill", "prompt": "______", "answers": ["옷을 입다", "옷을 입어요"] },
+      { "id": "p66-4", "label": "học tiếng Hàn", "kind": "fill", "prompt": "______", "answers": ["한국어를 배우다", "한국어를 배워요"] },
+      { "id": "p66-5", "label": "gặp bạn", "kind": "fill", "prompt": "______", "answers": ["친구를 만나다", "친구를 만나요"] },
+      { "id": "p66-6", "label": "đi ngủ", "kind": "fill", "prompt": "______", "answers": ["잠을 자다", "잠을 자요", "자다", "자요"] },
+      { "id": "p66-7", "label": "đi làm (đến công ty)", "kind": "fill", "prompt": "______", "answers": ["출근하다", "출근해요"] },
+      { "id": "p66-8", "label": "làm việc", "kind": "fill", "prompt": "______", "answers": ["일하다", "일해요"] },
+      { "id": "p66-9", "label": "tan làm, về", "kind": "fill", "prompt": "______", "answers": ["퇴근하다", "퇴근해요"] }
+    ]
+  },
+  {
+    "title": "어휘와 문법 2 — 2",
+    "instruction": "여러분은 내일 뭐 해요? 이야기해 보세요. (보기: 커피숍에서 친구를 만나요. 그리고 이야기해요.)",
+    "items": [
+      { "id": "p66-2-1", "kind": "free", "multiline": true, "prompt": "내일 뭐 해요?" }
+    ]
+  }
+]

@@ -1,0 +1,20 @@
+[
+  {
+    "title": "발음 1",
+    "instruction": "다음을 듣고 따라 읽으세요. (Viết cách đọc)",
+    "items": [
+      { "id": "p31-p1-1", "label": "1)", "kind": "fill", "prompt": "교실에 → [ ______ ]", "answers": ["교시레"], "explain": "Patchim ㄹ của 실 nối sang 에." },
+      { "id": "p31-p1-2", "label": "2)", "kind": "fill", "prompt": "없어요 → [ ______ ]", "answers": ["업써요"], "explain": "Patchim đôi ㅄ: ㅂ giữ lại, ㅅ nối sang 어 và đọc căng thành ㅆ." },
+      { "id": "p31-p1-3", "label": "3)", "kind": "fill", "prompt": "있어요 → [ ______ ]", "answers": ["이써요"], "explain": "Patchim ㅆ nối sang 어." }
+    ]
+  },
+  {
+    "title": "발음 2",
+    "instruction": "다음을 듣고 연습해 보세요.",
+    "items": [
+      { "id": "p31-p2-1", "label": "1)", "kind": "free", "prompt": "교실에 책상이 있어요. — Đọc theo, chú ý nối âm.", "model": "[교시레 책상이 이써요.]" },
+      { "id": "p31-p2-2", "label": "2)", "kind": "free", "prompt": "집에 에어컨이 없어요. — Đọc theo, chú ý nối âm.", "model": "[지베 에어커니 업써요.]" },
+      { "id": "p31-p2-3", "label": "3)", "kind": "free", "prompt": "가: 부엌에 식탁이 있어요? / 나: 네, 부엌에 식탁이 있어요. — Đọc theo.", "model": "[부어케 식타기 이써요?] / [네, 부어케 식타기 이써요.]" }
+    ]
+  }
+]

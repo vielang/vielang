@@ -1,0 +1,10 @@
+[
+  {
+    "title": "단원 도입",
+    "instruction": "그림을 보고 이야기해 보세요.",
+    "items": [
+      { "id": "p33-1", "kind": "free", "prompt": "이 사람들이 무엇을 해요?", "model": "한국어를 공부해요. 일해요. 회사에서 일해요." },
+      { "id": "p33-2", "kind": "free", "multiline": true, "prompt": "여러분은 오늘 무엇을 해요?" }
+    ]
+  }
+]

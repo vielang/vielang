@@ -8,8 +8,14 @@ import { useAudioWidgetStore } from "@/lib/audio-widget-store";
 
 const SIZE = 48; // đường kính nút tròn lúc thu nhỏ
 const PANEL_WIDTH = 256;
-/** Ước lượng chiều cao panel (thanh kéo + hàng chọn track + thẻ audio). */
-const PANEL_HEIGHT = 112;
+/** Chiều cao panel: thanh kéo + thẻ audio. */
+const PANEL_BASE_HEIGHT = 74;
+/** Hàng chọn track chỉ xuất hiện khi trang có nhiều hơn 1 track. */
+const TRACK_ROW_HEIGHT = 28;
+
+function panelHeightFor(trackCount: number): number {
+  return PANEL_BASE_HEIGHT + (trackCount > 1 ? TRACK_ROW_HEIGHT : 0);
+}
 const MARGIN = 10;
 const DRAG_THRESHOLD = 5;
 
@@ -27,16 +33,23 @@ function defaultCollapsedPosition(): Pos {
   };
 }
 
-/** Mở panel thì đưa ra giữa màn hình cho dễ bấm, không bám mép nữa. */
-function centeredPanelPosition(): Pos {
-  if (typeof window === "undefined") return { x: MARGIN, y: MARGIN };
+/**
+ * Mở panel ngay tại chỗ nút tròn đang đứng, nhưng bung sang TRÁI và LÊN TRÊN
+ * (neo theo mép phải-dưới của nút) — nút mặc định nằm góc dưới phải nên panel
+ * cũng mở ra ở góc dưới phải, không đè vào giữa trang sách.
+ *
+ * Neo theo mép phải-dưới chứ không giữ nguyên (x, y) là điểm mấu chốt: bề
+ * rộng nhảy 48 -> 256, giữ nguyên x thì panel tràn hẳn khỏi mép phải, mang
+ * theo cả nút "Thu nhỏ" ra ngoài màn hình.
+ */
+function panelPositionFrom(collapsedPos: Pos, panelHeight: number): Pos {
   return clamp(
     {
-      x: (window.innerWidth - PANEL_WIDTH) / 2,
-      y: (window.innerHeight - PANEL_HEIGHT) / 2,
+      x: collapsedPos.x + SIZE - PANEL_WIDTH,
+      y: collapsedPos.y + SIZE - panelHeight,
     },
     PANEL_WIDTH,
-    PANEL_HEIGHT
+    panelHeight
   );
 }
 
@@ -94,12 +107,13 @@ export function AudioWidget({ tracks }: { tracks: AudioTrack[] }) {
   const pos =
     (collapsed ? collapsedPosition : panelPosition) ?? { x: MARGIN, y: MARGIN };
   const active = tracks.find((t) => t.type === activeType) ?? tracks[0];
+  const panelHeight = panelHeightFor(tracks.length);
   const width = collapsed ? SIZE : PANEL_WIDTH;
-  const height = collapsed ? SIZE : PANEL_HEIGHT;
+  const height = collapsed ? SIZE : panelHeight;
   const setPos = collapsed ? setCollapsedPosition : setPanelPosition;
 
   function expand() {
-    setPanelPosition(centeredPanelPosition());
+    setPanelPosition(panelPositionFrom(pos, panelHeight));
     setCollapsed(false);
   }
 
@@ -134,7 +148,7 @@ export function AudioWidget({ tracks }: { tracks: AudioTrack[] }) {
     const d = drag.current;
     if (!d || d.pointerId !== e.pointerId) return;
     drag.current = null;
-    // Nhấn (không kéo) trên nút tròn lúc thu nhỏ -> mở rộng ra giữa màn hình.
+    // Nhấn (không kéo) trên nút tròn lúc thu nhỏ -> bung ra tại chỗ.
     if (!d.moved && collapsed) expand();
   }
 
@@ -160,7 +174,11 @@ export function AudioWidget({ tracks }: { tracks: AudioTrack[] }) {
           <Volume2 className="size-5" aria-hidden />
         </button>
       ) : (
-        <div className="overflow-hidden rounded-xl bg-black/80 text-white shadow-lg backdrop-blur">
+        // Nền trong suốt: thẻ <audio> của trình duyệt đã có nền riêng của nó,
+        // bọc thêm 1 hộp đen nữa là thừa và che mất trang sách. Đổi lại phần
+        // chữ/icon phải tự lo tương phản — dùng drop-shadow để vẫn đọc được
+        // cả khi nằm trên vùng trắng của trang.
+        <div className="overflow-hidden rounded-xl bg-transparent text-white">
           {/* Thanh kéo — chỉ vùng này chịu trách nhiệm drag, để không cấn
               vào thanh trượt/nút play của thẻ audio bên dưới. */}
           <div
@@ -168,7 +186,7 @@ export function AudioWidget({ tracks }: { tracks: AudioTrack[] }) {
             onPointerMove={onPointerMove}
             onPointerUp={onPointerUp}
             onPointerCancel={onPointerUp}
-            className="flex cursor-grab items-center justify-between px-2 py-1.5 active:cursor-grabbing"
+            className="flex cursor-grab items-center justify-between px-2 py-1.5 drop-shadow-[0_1px_2px_rgb(0_0_0/0.9)] active:cursor-grabbing"
           >
             <GripVertical className="size-4 text-white/50" aria-hidden />
             <span className="text-xs font-medium text-white/80">Audio</span>
@@ -191,10 +209,13 @@ export function AudioWidget({ tracks }: { tracks: AudioTrack[] }) {
                     type="button"
                     onClick={() => setActiveType(t.type)}
                     className={cn(
+                      // Nền panel trong suốt nên các chip phải tự có nền đục,
+                      // không dựa vào hộp bọc như trước (bg-white/10 trên nền
+                      // trắng của trang sách là mất hút).
                       "rounded-full px-2 py-0.5 text-[11px] transition-colors",
                       t.type === active.type
                         ? "bg-primary"
-                        : "bg-white/10 hover:bg-white/20"
+                        : "bg-black/70 hover:bg-black/85"
                     )}
                   >
                     {t.label}

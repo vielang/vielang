@@ -32,8 +32,8 @@ export function ReaderControls({
   isBookmarked,
   jumpOpen,
   onJumpOpenChange,
-  hasNote,
-  noteContent,
+  originalNote,
+  noteHasContent,
   noteOpen,
   onNoteOpenChange,
   onPrev,
@@ -48,8 +48,10 @@ export function ReaderControls({
   isBookmarked: boolean;
   jumpOpen: boolean;
   onJumpOpenChange: (open: boolean) => void;
-  hasNote: boolean;
-  noteContent: string | null;
+  /** HTML bài giảng gốc; null = trang này chưa biên soạn. */
+  originalNote: string | null;
+  /** Có bài giảng để đọc (gốc hoặc do người dùng viết) — chấm báo trên nút. */
+  noteHasContent: boolean;
   noteOpen: boolean;
   onNoteOpenChange: (open: boolean) => void;
   onPrev: () => void;
@@ -85,22 +87,26 @@ export function ReaderControls({
         <div className="flex items-center gap-1">
           <Tooltip>
             <TooltipTrigger asChild>
-              {/* span bọc ngoài để tooltip vẫn hoạt động khi button disabled */}
-              <span>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-white hover:bg-white/10 hover:text-white disabled:opacity-40"
-                  onClick={() => onNoteOpenChange(true)}
-                  disabled={!hasNote}
-                  aria-label="Xem bài giảng trang này"
-                >
-                  <NotebookText className="size-5" aria-hidden />
-                </Button>
-              </span>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative text-white hover:bg-white/10 hover:text-white"
+                onClick={() => onNoteOpenChange(true)}
+                aria-label="Bài giảng trang này"
+              >
+                <NotebookText className="size-5" aria-hidden />
+                {/* Chấm báo trang đã có bài giảng — nút không bao giờ bị
+                    disable nữa vì trang trống vẫn mở được để tự soạn. */}
+                {noteHasContent && (
+                  <span
+                    className="absolute right-1.5 top-1.5 size-1.5 rounded-full bg-sky-400"
+                    aria-hidden
+                  />
+                )}
+              </Button>
             </TooltipTrigger>
             <TooltipContent>
-              {hasNote ? "Bài giảng trang này" : "Chưa có bài giảng cho trang này"}
+              {noteHasContent ? "Bài giảng trang này" : "Soạn bài giảng cho trang này"}
             </TooltipContent>
           </Tooltip>
 
@@ -123,7 +129,8 @@ export function ReaderControls({
       <NoteSheet
         open={noteOpen}
         onOpenChange={onNoteOpenChange}
-        content={noteContent}
+        originalContent={originalNote}
+        bookId={book.id}
         page={page}
       />
 

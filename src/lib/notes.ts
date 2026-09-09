@@ -1,7 +1,9 @@
 /**
  * Note "bài giảng" tiếng Việt cho từng trang — nội dung do biên soạn thủ
- * công (xem `content/notes/<bookId>/<page>.md`), gộp sẵn thành JSON qua
- * `npm run build-notes` (tự chạy qua predev/prebuild, xem package.json).
+ * công (xem `content/notes/<bookId>/<page>.md`), convert Markdown -> HTML và
+ * gộp thành JSON qua `npm run build-notes` (tự chạy qua predev/prebuild, xem
+ * package.json). Đây là bản GỐC, chỉ đọc; bản người dùng tự sửa nằm ở
+ * localStorage — xem `lib/note-store.ts`.
  *
  * Import TĨNH (không phải fs.readFileSync với path động ở runtime) — chỉ
  * có 4 sách cố định nên liệt kê hết ra đây là đủ, tránh rủi ro Output File

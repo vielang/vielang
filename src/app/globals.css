@@ -132,3 +132,46 @@
     @apply font-sans;
   }
 }
+/*
+ * Tiptap/ProseMirror — vùng soạn bài giảng (components/reader/note-editor).
+ * Phần typography đã do plugin `prose` lo (xem NOTE_PROSE_CLASS), ở đây chỉ
+ * bù những thứ prose không biết: placeholder, con trỏ ô bảng, và bảng rộng
+ * hơn màn hình điện thoại.
+ */
+@layer components {
+  .ProseMirror {
+    outline: none;
+  }
+
+  /* Placeholder chỉ hiện ở block rỗng đầu tiên khi cả document còn trống. */
+  .ProseMirror p.is-editor-empty:first-child::before {
+    content: attr(data-placeholder);
+    @apply pointer-events-none float-left h-0 text-muted-foreground;
+  }
+
+  /* Bảng ngữ pháp trong sách rộng — cho cuộn ngang thay vì tràn ra ngoài. */
+  .ProseMirror table {
+    @apply w-full table-fixed;
+  }
+  .ProseMirror td,
+  .ProseMirror th {
+    @apply relative align-top;
+  }
+  /* Ô đang chọn khi kéo chuột qua nhiều ô (ProseMirror tables). */
+  .ProseMirror .selectedCell::after {
+    content: "";
+    @apply pointer-events-none absolute inset-0 z-10 bg-primary/15;
+  }
+  /* Tay cầm kéo giãn cột — TableKit configure({ table: { resizable } }). */
+  .ProseMirror .column-resize-handle {
+    @apply pointer-events-none absolute -right-0.5 top-0 bottom-0 z-20 w-1 bg-primary/60;
+  }
+  .ProseMirror.resize-cursor {
+    cursor: col-resize;
+  }
+
+  /* Gap cursor giữa 2 block (vd ngay sau bảng) — mặc định trong suốt. */
+  .ProseMirror-gapcursor::after {
+    @apply border-t-foreground;
+  }
+}

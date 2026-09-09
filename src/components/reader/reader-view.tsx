@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Book } from "@/lib/books";
 import { useProgressStore } from "@/lib/progress-store";
+import { useEffectiveNote, useNoteStore } from "@/lib/note-store";
 import { getPageAudio } from "@/lib/audio";
 import { PageViewer, type PageViewerHandle } from "@/components/reader/page-viewer";
 import { ReaderControls } from "@/components/reader/reader-controls";
@@ -19,13 +20,18 @@ export function ReaderView({
 }: {
   book: Book;
   page: number;
-  /** null = trang này chưa có bài giảng. */
+  /** HTML bài giảng gốc; null = trang này chưa biên soạn. */
   noteContent: string | null;
 }) {
   const router = useRouter();
   const viewerRef = useRef<PageViewerHandle>(null);
-  const hasNote = noteContent !== null;
   const audioTracks = getPageAudio(book.id, page);
+
+  // Bài giảng có thể đã được người dùng sửa/tự viết rồi lưu ở localStorage —
+  // chờ rehydrate xong mới hiện chấm báo, tránh lệch với HTML server render.
+  const notesHydrated = useNoteStore((s) => s.hasHydrated);
+  const { hasContent } = useEffectiveNote(book.id, page, noteContent);
+  const noteHasContent = notesHydrated && hasContent;
 
   const markPageRead = useProgressStore((s) => s.markPageRead);
   const toggleBookmark = useProgressStore((s) => s.toggleBookmark);
@@ -81,7 +87,7 @@ export function ReaderView({
           break;
         case "n":
         case "N":
-          if (hasNote) setNoteOpen(true);
+          setNoteOpen(true);
           break;
         default:
           return;
@@ -99,7 +105,6 @@ export function ReaderView({
     toggleBookmark,
     jumpOpen,
     noteOpen,
-    hasNote,
   ]);
 
   return (
@@ -124,8 +129,8 @@ export function ReaderView({
         isBookmarked={isBookmarked}
         jumpOpen={jumpOpen}
         onJumpOpenChange={setJumpOpen}
-        hasNote={hasNote}
-        noteContent={noteContent}
+        originalNote={noteContent}
+        noteHasContent={noteHasContent}
         noteOpen={noteOpen}
         onNoteOpenChange={setNoteOpen}
         onPrev={() => goTo(page - 1)}

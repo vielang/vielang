@@ -12,7 +12,8 @@
     "test": "vitest run",
     "prepare-images": "tsx scripts/prepare-images.ts",
     "prepare-audio": "tsx scripts/prepare-audio.ts",
-    "build-notes": "tsx scripts/build-notes.ts"
+    "build-notes": "tsx scripts/build-notes.ts",
+    "crawl-orgs": "tsx scripts/crawl-kiip-orgs.ts"
   },
   "dependencies": {
     "@tiptap/extension-highlight": "^3.31.3",
@@ -39,6 +40,7 @@
     "@aws-sdk/client-s3": "^3.1127.0",
     "@tailwindcss/postcss": "^4",
     "@tailwindcss/typography": "^0.5.20",
+    "@types/jsdom": "^30.0.0",
     "@types/node": "^22.20.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",

@@ -8,6 +8,8 @@ import { useAudioWidgetStore } from "@/lib/audio-widget-store";
 
 const SIZE = 48; // đường kính nút tròn lúc thu nhỏ
 const PANEL_WIDTH = 256;
+/** Ước lượng chiều cao panel (thanh kéo + hàng chọn track + thẻ audio). */
+const PANEL_HEIGHT = 112;
 const MARGIN = 10;
 const DRAG_THRESHOLD = 5;
 
@@ -16,7 +18,7 @@ interface Pos {
   y: number;
 }
 
-function defaultPosition(): Pos {
+function defaultCollapsedPosition(): Pos {
   if (typeof window === "undefined") return { x: MARGIN, y: MARGIN };
   return {
     x: window.innerWidth - SIZE - MARGIN,
@@ -25,10 +27,29 @@ function defaultPosition(): Pos {
   };
 }
 
-function clamp(pos: Pos, width: number): Pos {
+/** Mở panel thì đưa ra giữa màn hình cho dễ bấm, không bám mép nữa. */
+function centeredPanelPosition(): Pos {
+  if (typeof window === "undefined") return { x: MARGIN, y: MARGIN };
+  return clamp(
+    {
+      x: (window.innerWidth - PANEL_WIDTH) / 2,
+      y: (window.innerHeight - PANEL_HEIGHT) / 2,
+    },
+    PANEL_WIDTH,
+    PANEL_HEIGHT
+  );
+}
+
+/**
+ * Kẹp trong màn hình theo ĐÚNG kích thước của trạng thái hiện tại. Trước đây
+ * chiều cao luôn tính bằng SIZE và clamp chỉ chạy lúc kéo, nên mở panel ở sát
+ * mép phải là nó tràn hẳn ra ngoài — mang theo cả nút thu nhỏ, thành ra mở
+ * rồi không đóng lại được.
+ */
+function clamp(pos: Pos, width: number, height: number): Pos {
   if (typeof window === "undefined") return pos;
   const maxX = window.innerWidth - width - MARGIN;
-  const maxY = window.innerHeight - SIZE - MARGIN;
+  const maxY = window.innerHeight - height - MARGIN;
   return {
     x: Math.min(Math.max(pos.x, MARGIN), Math.max(maxX, MARGIN)),
     y: Math.min(Math.max(pos.y, MARGIN), Math.max(maxY, MARGIN)),
@@ -42,8 +63,10 @@ function clamp(pos: Pos, width: number): Pos {
  * chuyển trang (xem lib/audio-widget-store.ts).
  */
 export function AudioWidget({ tracks }: { tracks: AudioTrack[] }) {
-  const storedPosition = useAudioWidgetStore((s) => s.position);
-  const setStoredPosition = useAudioWidgetStore((s) => s.setPosition);
+  const panelPosition = useAudioWidgetStore((s) => s.position);
+  const setPanelPosition = useAudioWidgetStore((s) => s.setPosition);
+  const collapsedPosition = useAudioWidgetStore((s) => s.collapsedPosition);
+  const setCollapsedPosition = useAudioWidgetStore((s) => s.setCollapsedPosition);
   const collapsed = useAudioWidgetStore((s) => s.collapsed);
   const setCollapsed = useAudioWidgetStore((s) => s.setCollapsed);
   const activeType = useAudioWidgetStore((s) => s.activeType);
@@ -64,13 +87,21 @@ export function AudioWidget({ tracks }: { tracks: AudioTrack[] }) {
   // Render trước khi effect này chạy (SSR + lần vẽ đầu) dùng fallback cố
   // định {MARGIN,MARGIN} — không phụ thuộc window nên không lệch hydration.
   useEffect(() => {
-    if (!storedPosition) setStoredPosition(defaultPosition());
+    if (!collapsedPosition) setCollapsedPosition(defaultCollapsedPosition());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const pos = storedPosition ?? { x: MARGIN, y: MARGIN };
+  const pos =
+    (collapsed ? collapsedPosition : panelPosition) ?? { x: MARGIN, y: MARGIN };
   const active = tracks.find((t) => t.type === activeType) ?? tracks[0];
   const width = collapsed ? SIZE : PANEL_WIDTH;
+  const height = collapsed ? SIZE : PANEL_HEIGHT;
+  const setPos = collapsed ? setCollapsedPosition : setPanelPosition;
+
+  function expand() {
+    setPanelPosition(centeredPanelPosition());
+    setCollapsed(false);
+  }
 
   function onPointerDown(e: React.PointerEvent) {
     // Nút "Thu nhỏ" nằm ngay trong thanh kéo: bấm vào nó thì đừng bắt đầu
@@ -96,22 +127,24 @@ export function AudioWidget({ tracks }: { tracks: AudioTrack[] }) {
     const dx = e.clientX - d.startX;
     const dy = e.clientY - d.startY;
     if (Math.abs(dx) > DRAG_THRESHOLD || Math.abs(dy) > DRAG_THRESHOLD) d.moved = true;
-    setStoredPosition(clamp({ x: d.originX + dx, y: d.originY + dy }, width));
+    setPos(clamp({ x: d.originX + dx, y: d.originY + dy }, width, height));
   }
 
   function onPointerUp(e: React.PointerEvent) {
     const d = drag.current;
     if (!d || d.pointerId !== e.pointerId) return;
     drag.current = null;
-    // Nhấn (không kéo) trên nút tròn lúc thu nhỏ -> mở rộng ra.
-    if (!d.moved && collapsed) setCollapsed(false);
+    // Nhấn (không kéo) trên nút tròn lúc thu nhỏ -> mở rộng ra giữa màn hình.
+    if (!d.moved && collapsed) expand();
   }
 
   if (tracks.length === 0) return null;
 
+  // z-[55]: trên tooltip (z-50) để panel canh giữa không bị tooltip che, nhưng
+  // dưới panel bài giảng (z-[60]) khi cả hai cùng mở.
   return (
     <div
-      className="fixed z-30 touch-none select-none"
+      className="fixed z-[55] touch-none select-none"
       style={{ left: pos.x, top: pos.y, width }}
     >
       {collapsed ? (

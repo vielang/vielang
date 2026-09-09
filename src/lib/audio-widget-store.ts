@@ -8,11 +8,19 @@ interface Position {
 }
 
 interface AudioWidgetState {
-  /** null = chưa từng kéo, dùng vị trí mặc định (góc dưới phải). */
+  /** Vị trí panel lúc mở rộng. null = chưa mở lần nào (sẽ canh giữa). */
   position: Position | null;
+  /**
+   * Vị trí nút tròn lúc thu nhỏ — tách riêng khỏi `position` để mỗi trạng
+   * thái giữ chỗ của nó: mở ra thì panel canh giữa cho dễ bấm, thu lại thì
+   * nút tròn về đúng góc người dùng đã đặt, không nằm chình ình giữa trang.
+   * null = chưa từng kéo, dùng góc dưới phải.
+   */
+  collapsedPosition: Position | null;
   collapsed: boolean;
   activeType: string | null;
   setPosition: (p: Position) => void;
+  setCollapsedPosition: (p: Position) => void;
   setCollapsed: (v: boolean) => void;
   setActiveType: (t: string) => void;
 }
@@ -28,9 +36,11 @@ interface AudioWidgetState {
  */
 export const useAudioWidgetStore = create<AudioWidgetState>((set) => ({
   position: null,
+  collapsedPosition: null,
   collapsed: true,
   activeType: null,
   setPosition: (position) => set({ position }),
+  setCollapsedPosition: (collapsedPosition) => set({ collapsedPosition }),
   setCollapsed: (collapsed) => set({ collapsed }),
   setActiveType: (activeType) => set({ activeType }),
 }));

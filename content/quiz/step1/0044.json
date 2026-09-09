@@ -1,0 +1,26 @@
+[
+  {
+    "title": "어휘와 문법 1 — 1",
+    "instruction": "여기는 어디예요? (장소 어휘)",
+    "items": [
+      { "id": "p44-1", "label": "trường học", "kind": "fill", "prompt": "______", "answers": ["학교", "학교예요"] },
+      { "id": "p44-2", "label": "cửa hàng tiện lợi", "kind": "fill", "prompt": "______", "answers": ["편의점", "편의점이에요"] },
+      { "id": "p44-3", "label": "công ty", "kind": "fill", "prompt": "______", "answers": ["회사", "회사예요"] },
+      { "id": "p44-4", "label": "ngân hàng", "kind": "fill", "prompt": "______", "answers": ["은행", "은행이에요"] },
+      { "id": "p44-5", "label": "nhà", "kind": "fill", "prompt": "______", "answers": ["집", "집이에요"] },
+      { "id": "p44-6", "label": "quán ăn, nhà hàng", "kind": "fill", "prompt": "______", "answers": ["식당", "식당이에요"] },
+      { "id": "p44-7", "label": "quán cà phê", "kind": "fill", "prompt": "______", "answers": ["카페", "카페예요"] },
+      { "id": "p44-8", "label": "bệnh viện", "kind": "fill", "prompt": "______", "answers": ["병원", "병원이에요"] },
+      { "id": "p44-9", "label": "hiệu thuốc", "kind": "fill", "prompt": "______", "answers": ["약국", "약국이에요"] },
+      { "id": "p44-10", "label": "chợ", "kind": "fill", "prompt": "______", "answers": ["시장", "시장이에요"] },
+      { "id": "p44-11", "label": "siêu thị (mart)", "kind": "fill", "prompt": "______", "answers": ["마트", "마트예요"] }
+    ]
+  },
+  {
+    "title": "어휘와 문법 1 — 2",
+    "instruction": "여러분 집 근처에 뭐가 있어요? 이야기해 보세요. (보기: 집 근처에 약국이 있어요? → 네, 약국이 있어요.)",
+    "items": [
+      { "id": "p44-2-1", "kind": "free", "multiline": true, "prompt": "집 근처에 뭐가 있어요?", "model": "집 근처에 마트가 있어요. 편의점이 있어요. 하지만 병원이 없어요." }
+    ]
+  }
+]

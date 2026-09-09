@@ -1,0 +1,20 @@
+[
+  {
+    "title": "발음 1",
+    "instruction": "다음을 듣고 따라 읽으세요. (Viết cách đọc)",
+    "items": [
+      { "id": "p51-p1-1", "label": "1)", "kind": "fill", "prompt": "극장에 → [ ______ ]", "answers": ["극짱에"], "explain": "Sau patchim ㄱ, phụ âm đầu ㅈ đọc căng thành ㅉ (경음화)." },
+      { "id": "p51-p1-2", "label": "2)", "kind": "fill", "prompt": "식당에서 → [ ______ ]", "answers": ["식땅에서"], "explain": "Sau patchim ㄱ, ㄷ đọc căng thành ㄸ." },
+      { "id": "p51-p1-3", "label": "3)", "kind": "fill", "prompt": "학교에 → [ ______ ]", "answers": ["학꾜에"], "explain": "Sau patchim ㄱ, ㄱ đọc căng thành ㄲ." }
+    ]
+  },
+  {
+    "title": "발음 2",
+    "instruction": "다음을 듣고 연습해 보세요.",
+    "items": [
+      { "id": "p51-p2-1", "label": "1)", "kind": "free", "prompt": "저는 지금 극장에 가요.", "model": "[저는 지금 극짱에 가요.]" },
+      { "id": "p51-p2-2", "label": "2)", "kind": "free", "prompt": "식당에서 밥을 먹어요.", "model": "[식땅에서 바블 머거요.]" },
+      { "id": "p51-p2-3", "label": "3)", "kind": "free", "prompt": "가: 어디에 가요? / 나: 학교에 가요.", "model": "[어디에 가요?] / [학꾜에 가요.]" }
+    ]
+  }
+]

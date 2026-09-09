@@ -25,15 +25,13 @@ export interface PageViewerHandle {
 interface PageViewerProps {
   bookId: string;
   page: number;
-  /** Thanh công cụ đang hiện — vùng dịch hiện/ẩn cùng nó. */
-  toolbarVisible: boolean;
   onTap: () => void;
   onSwipePrev: () => void;
   onSwipeNext: () => void;
 }
 
 export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function PageViewer(
-  { bookId, page, toolbarVisible, onTap, onSwipePrev, onSwipeNext },
+  { bookId, page, onTap, onSwipePrev, onSwipeNext },
   ref
 ) {
   const transformRef = useRef<ReactZoomPanPinchContentRef>(null);
@@ -173,7 +171,7 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
               draggable={false}
               className="object-contain"
             />
-            {box && <TranslationOverlay regions={regions} visible={toolbarVisible} />}
+            {box && <TranslationOverlay regions={regions} />}
           </div>
         </div>
       </TransformComponent>

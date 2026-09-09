@@ -166,7 +166,6 @@ export function ReaderView({
         ref={viewerRef}
         bookId={book.id}
         page={page}
-        toolbarVisible={toolbarVisible}
         onTap={() => setToolbarVisible((v) => !v)}
         onSwipePrev={() => goTo(page - 1)}
         onSwipeNext={() => goTo(page + 1)}

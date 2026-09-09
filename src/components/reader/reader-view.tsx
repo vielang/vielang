@@ -10,6 +10,15 @@ import { PageViewer, type PageViewerHandle } from "@/components/reader/page-view
 import { ReaderControls } from "@/components/reader/reader-controls";
 import { AdjacentPreload } from "@/components/reader/adjacent-preload";
 import { AudioWidget } from "@/components/reader/audio-widget";
+import { NoteWidget } from "@/components/reader/note-widget";
+import { NoteSheet } from "@/components/reader/note-sheet";
+import { useNoteWidgetStore } from "@/lib/note-widget-store";
+import {
+  focusNoteWindow,
+  isNoteWindowClosed,
+  publishNoteFocus,
+  useNoteStoreSync,
+} from "@/lib/note-window";
 
 const INTERACTIVE_TAGS = new Set(["INPUT", "TEXTAREA", "SELECT"]);
 
@@ -40,7 +49,45 @@ export function ReaderView({
 
   const [toolbarVisible, setToolbarVisible] = useState(true);
   const [jumpOpen, setJumpOpen] = useState(false);
-  const [noteOpen, setNoteOpen] = useState(false);
+
+  const noteMode = useNoteWidgetStore((s) => s.mode);
+  const setNoteMode = useNoteWidgetStore((s) => s.setMode);
+
+  // Sửa bài giảng ở cửa sổ note riêng thì cửa sổ này phải thấy ngay.
+  useNoteStoreSync();
+
+  // Công bố trang đang đọc để cửa sổ note riêng bám theo khi lật trang.
+  useEffect(() => {
+    publishNoteFocus(book.id, page);
+  }, [book.id, page]);
+
+  // Người dùng đóng cửa sổ note bằng nút X của trình duyệt: không có sự kiện
+  // nào báo về, nên hỏi `window.closed` theo nhịp để trả panel về trạng thái
+  // đóng — nếu không nút bài giảng sẽ mãi focus vào 1 cửa sổ đã chết.
+  useEffect(() => {
+    if (noteMode !== "popped") return;
+    const id = setInterval(() => {
+      if (isNoteWindowClosed()) setNoteMode("closed");
+    }, 1000);
+    return () => clearInterval(id);
+  }, [noteMode, setNoteMode]);
+
+  const toggleNote = useCallback(() => {
+    if (noteMode === "popped") {
+      focusNoteWindow(); // đang ở cửa sổ riêng — đưa cửa sổ đó lên trước
+      return;
+    }
+    setNoteMode(noteMode === "closed" ? "floating" : "closed");
+  }, [noteMode, setNoteMode]);
+
+  const noteLabel =
+    noteMode === "popped"
+      ? "Bài giảng đang ở cửa sổ riêng"
+      : noteMode !== "closed"
+        ? "Đóng bài giảng"
+        : noteHasContent
+          ? "Bài giảng trang này"
+          : "Soạn bài giảng cho trang này";
 
   const goTo = useCallback(
     (target: number) => {
@@ -59,11 +106,14 @@ export function ReaderView({
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
-      // Dialog nhảy trang / Sheet bài giảng đang mở (Slider/Input/Esc riêng
-      // của Radix) — nhường toàn bộ phím tắt, tránh vừa đóng vừa chuyển trang.
-      if (jumpOpen || noteOpen) return;
+      // Dialog nhảy trang / sheet bài giảng toàn màn hình đang mở (Slider/
+      // Input/Esc riêng của Radix) — nhường toàn bộ phím tắt, tránh vừa đóng
+      // vừa chuyển trang. Panel nổi thì KHÔNG chặn: mở bài giảng rồi vẫn lật
+      // trang bằng phím mũi tên được, đó mới là điểm lợi của nó.
+      if (jumpOpen || noteMode === "fullscreen") return;
       const target = e.target as HTMLElement | null;
-      if (target && INTERACTIVE_TAGS.has(target.tagName)) return;
+      if (target && (INTERACTIVE_TAGS.has(target.tagName) || target.isContentEditable))
+        return;
 
       switch (e.key) {
         case "ArrowRight":
@@ -87,7 +137,7 @@ export function ReaderView({
           break;
         case "n":
         case "N":
-          setNoteOpen(true);
+          toggleNote();
           break;
         default:
           return;
@@ -104,7 +154,8 @@ export function ReaderView({
     router,
     toggleBookmark,
     jumpOpen,
-    noteOpen,
+    noteMode,
+    toggleNote,
   ]);
 
   return (
@@ -122,6 +173,9 @@ export function ReaderView({
 
       <AudioWidget tracks={audioTracks} />
 
+      <NoteWidget bookId={book.id} page={page} originalContent={noteContent} />
+      <NoteSheet bookId={book.id} page={page} originalContent={noteContent} />
+
       <ReaderControls
         visible={toolbarVisible}
         book={book}
@@ -129,10 +183,9 @@ export function ReaderView({
         isBookmarked={isBookmarked}
         jumpOpen={jumpOpen}
         onJumpOpenChange={setJumpOpen}
-        originalNote={noteContent}
         noteHasContent={noteHasContent}
-        noteOpen={noteOpen}
-        onNoteOpenChange={setNoteOpen}
+        noteLabel={noteLabel}
+        onNoteToggle={toggleNote}
         onPrev={() => goTo(page - 1)}
         onNext={() => goTo(page + 1)}
         onJump={goTo}

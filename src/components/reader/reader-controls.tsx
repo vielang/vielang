@@ -21,7 +21,6 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { NoteSheet } from "@/components/reader/note-sheet";
 import { cn } from "@/lib/utils";
 import type { Book } from "@/lib/books";
 
@@ -32,10 +31,9 @@ export function ReaderControls({
   isBookmarked,
   jumpOpen,
   onJumpOpenChange,
-  originalNote,
   noteHasContent,
-  noteOpen,
-  onNoteOpenChange,
+  noteLabel,
+  onNoteToggle,
   onPrev,
   onNext,
   onJump,
@@ -48,12 +46,11 @@ export function ReaderControls({
   isBookmarked: boolean;
   jumpOpen: boolean;
   onJumpOpenChange: (open: boolean) => void;
-  /** HTML bài giảng gốc; null = trang này chưa biên soạn. */
-  originalNote: string | null;
   /** Có bài giảng để đọc (gốc hoặc do người dùng viết) — chấm báo trên nút. */
   noteHasContent: boolean;
-  noteOpen: boolean;
-  onNoteOpenChange: (open: boolean) => void;
+  /** Chữ trên tooltip — đổi theo trạng thái panel (đóng/mở/ở cửa sổ riêng). */
+  noteLabel: string;
+  onNoteToggle: () => void;
   onPrev: () => void;
   onNext: () => void;
   onJump: (page: number) => void;
@@ -91,8 +88,8 @@ export function ReaderControls({
                 variant="ghost"
                 size="icon"
                 className="relative text-white hover:bg-white/10 hover:text-white"
-                onClick={() => onNoteOpenChange(true)}
-                aria-label="Bài giảng trang này"
+                onClick={onNoteToggle}
+                aria-label={noteLabel}
               >
                 <NotebookText className="size-5" aria-hidden />
                 {/* Chấm báo trang đã có bài giảng — nút không bao giờ bị
@@ -105,9 +102,7 @@ export function ReaderControls({
                 )}
               </Button>
             </TooltipTrigger>
-            <TooltipContent>
-              {noteHasContent ? "Bài giảng trang này" : "Soạn bài giảng cho trang này"}
-            </TooltipContent>
+            <TooltipContent>{noteLabel}</TooltipContent>
           </Tooltip>
 
           <Button
@@ -125,14 +120,6 @@ export function ReaderControls({
           </Button>
         </div>
       </div>
-
-      <NoteSheet
-        open={noteOpen}
-        onOpenChange={onNoteOpenChange}
-        originalContent={originalNote}
-        bookId={book.id}
-        page={page}
-      />
 
       {/* Bottom bar */}
       <div

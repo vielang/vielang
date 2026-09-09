@@ -1,0 +1,29 @@
+[
+  {
+    "title": "어휘와 문법 1 — 1",
+    "instruction": "무슨 음식이 있어요? (식당 종류별 음식)",
+    "items": [
+      { "id": "p74-1-han", "label": "한식집 — kể 6 món trong sách", "kind": "free", "prompt": "한식집에 무슨 음식이 있어요?", "model": "삼계탕, 불고기, 삼겹살, 김치찌개, 비빔밥, 된장찌개가 있어요." },
+      { "id": "p74-1-bun", "label": "분식집 — kể 4 món", "kind": "free", "prompt": "분식집에 무슨 음식이 있어요?", "model": "김밥, 순대, 떡볶이, 라면이 있어요." },
+      { "id": "p74-1-jung", "label": "중국집 — kể 4 món", "kind": "free", "prompt": "중국집에 무슨 음식이 있어요?", "model": "짜장면, 짬뽕, 만두, 탕수육이 있어요." },
+      { "id": "p74-1-il", "label": "일식집 — kể 4 món", "kind": "free", "prompt": "일식집에 무슨 음식이 있어요?", "model": "생선회, 우동, 초밥, 돈가스가 있어요." },
+      { "id": "p74-1-ita", "label": "이탈리아 식당 — kể 4 món", "kind": "free", "prompt": "이탈리아 식당에 무슨 음식이 있어요?", "model": "피자, 스파게티, 햄버거, 샐러드가 있어요." },
+      { "id": "p74-w-1", "label": "gà hầm sâm", "kind": "fill", "prompt": "______", "answers": ["삼계탕"] },
+      { "id": "p74-w-2", "label": "cơm trộn", "kind": "fill", "prompt": "______", "answers": ["비빔밥"] },
+      { "id": "p74-w-3", "label": "canh đậu tương", "kind": "fill", "prompt": "______", "answers": ["된장찌개"] },
+      { "id": "p74-w-4", "label": "bánh gạo cay", "kind": "fill", "prompt": "______", "answers": ["떡볶이"] },
+      { "id": "p74-w-5", "label": "mì tương đen", "kind": "fill", "prompt": "______", "answers": ["짜장면"] },
+      { "id": "p74-w-6", "label": "gỏi cá sống", "kind": "fill", "prompt": "______", "answers": ["생선회"] },
+      { "id": "p74-w-7", "label": "sushi", "kind": "fill", "prompt": "______", "answers": ["초밥"] }
+    ]
+  },
+  {
+    "title": "어휘와 문법 1 — 2",
+    "instruction": "여러분은 무슨 음식을 좋아해요? 무슨 음식을 안 좋아해요? 친구와 이야기해 보세요. (보기: 무슨 음식을 좋아해요? → 저는 떡볶이를 좋아해요.)",
+    "items": [
+      { "id": "p74-2-1", "label": "나 — 무슨 음식을 좋아해요?", "kind": "free", "prompt": "______" },
+      { "id": "p74-2-2", "label": "나 — 무슨 음식을 안 좋아해요?", "kind": "free", "prompt": "______" },
+      { "id": "p74-2-3", "label": "친구 1 / 친구 2", "kind": "free", "multiline": true, "prompt": "친구들의 대답을 써 보세요." }
+    ]
+  }
+]

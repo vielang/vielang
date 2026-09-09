@@ -73,6 +73,12 @@ export function AudioWidget({ tracks }: { tracks: AudioTrack[] }) {
   const width = collapsed ? SIZE : PANEL_WIDTH;
 
   function onPointerDown(e: React.PointerEvent) {
+    // Nút "Thu nhỏ" nằm ngay trong thanh kéo: bấm vào nó thì đừng bắt đầu
+    // kéo. setPointerCapture ở đây sẽ chuyển hết pointer event về thanh kéo,
+    // nút không nhận được `pointerup` nên `click` không bao giờ bắn.
+    // (Nút tròn lúc thu nhỏ thì ngược lại — chính nó là vùng kéo, và nó tự
+    // xử lý "nhấn mà không kéo" ở onPointerUp bên dưới.)
+    if (!collapsed && (e.target as HTMLElement).closest("button")) return;
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
     drag.current = {
       pointerId: e.pointerId,

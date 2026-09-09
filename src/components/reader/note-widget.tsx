@@ -107,6 +107,11 @@ export function NoteWidget({
   const size = storedSize;
 
   function onDragDown(e: React.PointerEvent) {
+    // Bấm vào nút NẰM TRONG thanh tiêu đề thì không bắt đầu kéo. Nếu vẫn
+    // setPointerCapture ở đây, mọi pointer event sau đó bị chuyển hết về
+    // thanh tiêu đề — nút không bao giờ nhận `pointerup` nên `click` không
+    // bao giờ bắn, và các nút mở cửa sổ/phóng to/đóng thành vô tác dụng.
+    if ((e.target as HTMLElement).closest("button")) return;
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
     drag.current = {
       pointerId: e.pointerId,
@@ -155,9 +160,12 @@ export function NoteWidget({
     if (drag.current?.pointerId === e.pointerId) drag.current = null;
   }
 
+  // z-[60]: phải nằm trên cả tooltip (z-50). Tooltip của nút bài giảng trên
+  // thanh công cụ hiện ra đúng chỗ panel mọc lên, để thấp hơn là nó vừa che
+  // vừa chặn click xuống thanh tiêu đề panel.
   return (
     <div
-      className="fixed z-40 flex flex-col overflow-hidden rounded-xl border border-border bg-popover text-popover-foreground shadow-2xl"
+      className="fixed z-[60] flex flex-col overflow-hidden rounded-xl border border-border bg-popover text-popover-foreground shadow-2xl"
       style={{ left: pos.x, top: pos.y, width: size.width, height: size.height }}
     >
       {/* Thanh kéo — chỉ vùng này chịu trách nhiệm drag, để không cấn vào

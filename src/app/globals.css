@@ -175,3 +175,18 @@
     @apply border-t-foreground;
   }
 }
+
+/*
+ * Tooltip (Radix) không bao giờ được chặn con trỏ. `pointer-events-none` đặt
+ * ở TooltipContent chưa đủ: Radix bọc content trong 1 div định vị riêng
+ * (`data-radix-popper-content-wrapper`), và chính div bọc đó mới là thứ nhận
+ * click. Đã gặp thật: hover nút bài giảng -> tooltip hiện -> mở panel nổi,
+ * panel mọc ngay dưới tooltip và các nút trên thanh tiêu đề panel bị div bọc
+ * này nuốt hết click.
+ *
+ * Chỉ nhắm tooltip, không đụng popper của Popover/Dropdown — những thứ đó
+ * bắt buộc phải bấm được.
+ */
+[data-radix-popper-content-wrapper]:has(> [data-slot="tooltip-content"]) {
+  pointer-events: none;
+}

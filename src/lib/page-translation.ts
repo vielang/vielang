@@ -5,6 +5,11 @@
  * bản dịch đã dịch sẵn. Người dùng bấm vào vùng nào thì hiện bản dịch của
  * vùng đó — KHÔNG có OCR hay dịch máy lúc chạy, mọi thứ tĩnh.
  *
+ * PHẠM VI: CHỈ đặt vùng cho BÀI ĐỌC (읽기) và HỘI THOẠI (말하기). Câu đề bài,
+ * câu hỏi, dòng thay từ, gợi ý... đều là câu ngắn lặp đi lặp lại, người học
+ * quen rất nhanh — dịch hết thì trang nào cũng chi chít vùng bấm mà chẳng
+ * giúp được gì thêm.
+ *
  * Toạ độ lưu theo TỈ LỆ 0–1 của ảnh gốc (1200x1562), không phải pixel: ảnh
  * hiển thị co giãn theo màn hình và theo mức zoom, chỉ tỉ lệ mới bất biến.
  *

@@ -103,16 +103,35 @@ export function getQuizPages(bookId: string): number[] {
 }
 
 /**
- * Chuẩn hoá đáp án tự luận trước khi so sánh: gộp khoảng trắng và bỏ dấu câu
- * cuối. Cố ý KHÔNG so khớp mờ (fuzzy) — sai chính tả tiếng Hàn là sai thật,
- * báo đúng mới giúp người học sửa được.
+ * Dấu câu bị bỏ qua khi so đáp án — gồm cả dạng nửa chiều rộng lẫn toàn chiều
+ * rộng (bàn phím tiếng Hàn/Nhật hay sinh ra dạng toàn chiều rộng).
+ */
+const IGNORED_PUNCTUATION =
+  /[.,!?;:'"()[\]{}·…\-–—~/\\。、，！？；：「」『』（）〈〉《》""'']/g;
+
+/**
+ * Chuẩn hoá đáp án trước khi so sánh. Bỏ qua những khác biệt KHÔNG phải lỗi
+ * kiến thức:
+ *
+ * - Khoảng trắng: thiếu/thừa/đặt sai chỗ đều bỏ qua ("베트남 사람이에요" =
+ *   "베트남사람이에요", "안 해요" = "안해요"). Quy tắc cách chữ tiếng Hàn khó
+ *   và không phải trọng tâm bài tập ở trình độ này.
+ * - Dấu câu: dấu chấm, dấu phẩy, dấu hỏi, gạch nối, dấu ngoặc... ("네, 있어요."
+ *   = "네 있어요"; "02-2711-5348" = "0227115348").
+ * - Chuẩn Unicode: NFC. Bàn phím tiếng Hàn trên macOS gõ ra dạng NFD (tách
+ *   jamo) trông y hệt NFC nhưng khác byte — không chuẩn hoá là người dùng gõ
+ *   đúng vẫn bị báo sai.
+ * - Hoa/thường cho phần chữ Latin.
+ *
+ * Vẫn KHÔNG so khớp mờ (fuzzy): sai chính tả tiếng Hàn là sai thật, báo đúng
+ * mới giúp người học sửa được.
  */
 export function normalizeAnswer(text: string): string {
   return text
-    .replace(/\s+/g, " ")
-    .trim()
-    .replace(/[.?!,。？！]+$/u, "")
-    .trim();
+    .normalize("NFC")
+    .replace(IGNORED_PUNCTUATION, "")
+    .replace(/\s+/g, "")
+    .toLowerCase();
 }
 
 export function isCorrect(item: QuizItem, value: string | number): boolean {

@@ -58,8 +58,10 @@ export function TranslationOverlay({ regions }: { regions: TranslationRegion[] }
       })}
 
       {active && (
+        // key gồm cả toạ độ bấm: mở lại cùng một vùng ở chỗ khác thì bong bóng
+        // dựng mới, xoá vị trí người dùng đã kéo lần trước.
         <TranslationBubble
-          key={active.region.id}
+          key={`${active.region.id}:${active.x}:${active.y}`}
           text={active.region.vi}
           x={active.x}
           y={active.y}
@@ -70,8 +72,28 @@ export function TranslationOverlay({ regions }: { regions: TranslationRegion[] }
   );
 }
 
+/** Kéo dưới ngưỡng này thì coi là bấm nhầm, không tính là di chuyển. */
+const DRAG_THRESHOLD = 4;
+
+function clampToViewport(
+  left: number,
+  top: number,
+  width: number,
+  height: number
+): { left: number; top: number } {
+  return {
+    left: Math.min(Math.max(left, MARGIN), window.innerWidth - width - MARGIN),
+    top: Math.min(Math.max(top, MARGIN), window.innerHeight - height - MARGIN),
+  };
+}
+
 /**
- * Bong bóng bản dịch, hiện ngay dưới chỗ bấm.
+ * Bong bóng bản dịch, hiện ngay dưới chỗ bấm và KÉO ĐI ĐƯỢC — che mất đúng
+ * đoạn đang cần đối chiếu là chuyện thường xảy ra, kéo sang chỗ khác là xong.
+ *
+ * Cả bong bóng là vùng kéo, không có thanh tiêu đề hay tay cầm riêng: thêm
+ * thanh vào thì mất luôn cái gọn gàng, mà nội dung ở đây cũng chẳng có gì để
+ * bấm bên trong.
  *
  * Dựng qua portal ra `document.body` chứ KHÔNG render tại chỗ: lớp phủ nằm
  * trong cây đã bị `react-zoom-pan-pinch` gắn `transform`, mà phần tử tổ tiên
@@ -92,12 +114,23 @@ function TranslationBubble({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [pos, setPos] = useState<{ left: number; top: number } | null>(null);
+  const [dragged, setDragged] = useState(false);
+
+  const drag = useRef<{
+    pointerId: number;
+    startX: number;
+    startY: number;
+    originLeft: number;
+    originTop: number;
+    moved: boolean;
+  } | null>(null);
 
   // Canh giữa theo điểm bấm rồi kéo vào trong nếu tràn mép; không đủ chỗ phía
   // dưới thì lật lên trên. Đo sau khi render vì chiều cao phụ thuộc độ dài chữ.
+  // Bỏ qua khi người dùng đã tự kéo — vị trí họ chọn phải thắng.
   useLayoutEffect(() => {
     const el = ref.current;
-    if (!el) return;
+    if (!el || dragged) return;
     const { width, height } = el.getBoundingClientRect();
 
     const left = Math.min(
@@ -111,7 +144,43 @@ function TranslationBubble({
         : below;
 
     setPos({ left, top });
-  }, [x, y, text]);
+  }, [x, y, text, dragged]);
+
+  function onPointerDown(e: React.PointerEvent) {
+    const el = ref.current;
+    if (!el) return;
+    el.setPointerCapture(e.pointerId);
+    const rect = el.getBoundingClientRect();
+    drag.current = {
+      pointerId: e.pointerId,
+      startX: e.clientX,
+      startY: e.clientY,
+      originLeft: rect.left,
+      originTop: rect.top,
+      moved: false,
+    };
+  }
+
+  function onPointerMove(e: React.PointerEvent) {
+    const d = drag.current;
+    const el = ref.current;
+    if (!d || !el || d.pointerId !== e.pointerId) return;
+
+    const dx = e.clientX - d.startX;
+    const dy = e.clientY - d.startY;
+    if (!d.moved && Math.abs(dx) < DRAG_THRESHOLD && Math.abs(dy) < DRAG_THRESHOLD) {
+      return;
+    }
+    d.moved = true;
+
+    const { width, height } = el.getBoundingClientRect();
+    setPos(clampToViewport(d.originLeft + dx, d.originTop + dy, width, height));
+    setDragged(true);
+  }
+
+  function onPointerUp(e: React.PointerEvent) {
+    if (drag.current?.pointerId === e.pointerId) drag.current = null;
+  }
 
   // Bấm ra ngoài hoặc Esc thì đóng. Dùng pointerdown ở pha capture để cùng một
   // cú bấm vừa đóng bong bóng hiện tại vừa mở được vùng khác, không phải bấm
@@ -135,7 +204,11 @@ function TranslationBubble({
     <div
       ref={ref}
       role="tooltip"
-      className="fixed z-50 max-w-[min(24rem,calc(100vw-1rem))] rounded-lg bg-black/75 px-3 py-2 text-sm leading-snug whitespace-pre-line text-white shadow-lg backdrop-blur-sm"
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerCancel={onPointerUp}
+      className="fixed z-50 max-w-[min(24rem,calc(100vw-1rem))] cursor-grab touch-none rounded-lg bg-black/75 px-3 py-2 text-sm leading-snug whitespace-pre-line text-white shadow-lg backdrop-blur-sm select-none active:cursor-grabbing"
       style={
         pos
           ? { left: pos.left, top: pos.top }

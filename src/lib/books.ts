@@ -47,6 +47,18 @@ export const BOOKS: readonly Book[] = [
   },
 ] as const;
 
+/**
+ * Kích thước ảnh trang sau khi xử lý (xem scripts/prepare-images.ts) — đã đo
+ * và xác nhận GIỐNG NHAU ở cả 4 cuốn.
+ *
+ * Cần hằng số này để đặt vùng bấm xem bản dịch: ảnh hiển thị bằng
+ * `object-contain` nên không lấp đầy khung, phải tự tính khung ảnh thật thì
+ * toạ độ vùng (lưu theo tỉ lệ 0–1 của ẢNH) mới khớp.
+ */
+export const PAGE_IMAGE_WIDTH = 1200;
+export const PAGE_IMAGE_HEIGHT = 1562;
+export const PAGE_ASPECT_RATIO = PAGE_IMAGE_WIDTH / PAGE_IMAGE_HEIGHT;
+
 export function getBook(id: string): Book | undefined {
   return BOOKS.find((b) => b.id === id);
 }

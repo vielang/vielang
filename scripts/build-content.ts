@@ -25,10 +25,12 @@ import path from "node:path";
 import { Marked } from "marked";
 import { BOOKS } from "../src/lib/books";
 import type { QuizItem, QuizSection } from "../src/lib/quiz";
+import type { TranslationRegion } from "../src/lib/page-translation";
 
 const CONTENT_ROOT = path.resolve(process.cwd(), "content");
 const NOTES_ROOT = path.join(CONTENT_ROOT, "notes");
 const QUIZ_ROOT = path.join(CONTENT_ROOT, "quiz");
+const TRANSLATE_ROOT = path.join(CONTENT_ROOT, "translate");
 
 /**
  * `gfm` (bảng, ~~gạch ngang~~) bật sẵn; `breaks: false` để xuống dòng đơn
@@ -164,11 +166,78 @@ async function buildQuiz(bookId: string): Promise<number> {
   );
 }
 
+/**
+ * Vùng bấm xem bản dịch — toạ độ theo tỉ lệ 0–1 của ảnh trang. Kiểm ngay ở
+ * đây vì soạn tay bằng mắt rất dễ gõ nhầm số: vùng tràn ra ngoài ảnh hay
+ * rộng/cao âm thì trên máy chỉ hiện ra một ô vô hình đặt sai chỗ, không có
+ * lỗi nào cả — rất khó lần ra.
+ */
+function validateTranslations(source: string, data: unknown): TranslationRegion[] {
+  if (!Array.isArray(data)) {
+    throw new Error(`${source}: phải là 1 mảng vùng dịch`);
+  }
+
+  const seen = new Set<string>();
+  for (const region of data as TranslationRegion[]) {
+    const at = `${source} (id=${region?.id ?? "?"})`;
+    if (!region?.id) throw new Error(`${at}: thiếu "id"`);
+    if (seen.has(region.id)) throw new Error(`${at}: trùng "id" trong cùng trang`);
+    seen.add(region.id);
+    if (!region.vi?.trim()) throw new Error(`${at}: thiếu bản dịch "vi"`);
+
+    const rect = region.rect;
+    if (!Array.isArray(rect) || rect.length !== 4) {
+      throw new Error(`${at}: "rect" phải là [x, y, rộng, cao]`);
+    }
+    if (rect.some((n) => typeof n !== "number" || !Number.isFinite(n))) {
+      throw new Error(`${at}: "rect" chứa giá trị không phải số`);
+    }
+    const [x, y, w, h] = rect;
+    if (w <= 0 || h <= 0) {
+      throw new Error(`${at}: "rect" có rộng/cao <= 0 (${w}, ${h})`);
+    }
+    if (x < 0 || y < 0 || x + w > 1.0001 || y + h > 1.0001) {
+      throw new Error(
+        `${at}: "rect" nằm ngoài ảnh — x+rộng=${(x + w).toFixed(3)}, ` +
+          `y+cao=${(y + h).toFixed(3)} (phải <= 1)`
+      );
+    }
+  }
+
+  return data as TranslationRegion[];
+}
+
+async function buildTranslations(bookId: string): Promise<number> {
+  const dir = path.join(TRANSLATE_ROOT, bookId);
+  const pages: Record<string, TranslationRegion[]> = {};
+
+  for (const file of await listFiles(dir, ".json")) {
+    const raw = await readFile(path.join(dir, file), "utf8");
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(raw);
+    } catch (err) {
+      throw new Error(`${bookId}/${file}: JSON hỏng — ${(err as Error).message}`);
+    }
+    pages[pageKey(file)] = validateTranslations(`${bookId}/${file}`, parsed);
+  }
+
+  await writeFile(
+    path.join(TRANSLATE_ROOT, `${bookId}.json`),
+    JSON.stringify(pages, null, 2) + "\n",
+    "utf8"
+  );
+  return Object.values(pages).reduce((n, regions) => n + regions.length, 0);
+}
+
 async function main() {
   for (const book of BOOKS) {
     const notes = await buildNotes(book.id);
     const questions = await buildQuiz(book.id);
-    console.log(`  ${book.id}: ${notes} note, ${questions} câu hỏi`);
+    const regions = await buildTranslations(book.id);
+    console.log(
+      `  ${book.id}: ${notes} note, ${questions} câu hỏi, ${regions} vùng dịch`
+    );
   }
 }
 

@@ -41,6 +41,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# notes: build-notes.ts sinh ra từ content/notes/<bookId>/*.md, luôn chạy
-# lại qua predev/prebuild — không commit file .json này
+# nội dung: build-content.ts sinh ra từ content/notes/<bookId>/*.md và
+# content/quiz/<bookId>/*.json, luôn chạy lại qua predev/prebuild —
+# không commit các file .json gộp này
 /content/notes/*.json
+/content/quiz/*.json

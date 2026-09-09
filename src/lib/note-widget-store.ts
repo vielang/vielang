@@ -21,6 +21,9 @@ export interface Size {
  */
 export type NoteMode = "closed" | "floating" | "fullscreen" | "popped";
 
+/** Tab trong panel: bài giảng (văn xuôi) hay luyện tập (câu hỏi). */
+export type NoteTab = "note" | "quiz";
+
 interface NoteWidgetState {
   mode: NoteMode;
   /** null = chưa từng kéo, dùng vị trí mặc định (mép phải, dưới thanh trên). */
@@ -29,7 +32,11 @@ interface NoteWidgetState {
   size: Size | null;
   /** Đang soạn thảo (thay vì chỉ đọc) — giữ nguyên khi đổi mode/lật trang. */
   editing: boolean;
+  /** Tab đang xem trong panel. Giữ nguyên khi lật trang: đang luyện tập mà
+   *  lật trang thì vẫn ở tab luyện tập, không bị đá về bài giảng. */
+  tab: NoteTab;
   setMode: (m: NoteMode) => void;
+  setTab: (t: NoteTab) => void;
   setPosition: (p: Position) => void;
   setSize: (s: Size) => void;
   setEditing: (v: boolean) => void;
@@ -50,7 +57,9 @@ export const useNoteWidgetStore = create<NoteWidgetState>((set) => ({
   position: null,
   size: null,
   editing: false,
+  tab: "note",
   setMode: (mode) => set({ mode }),
+  setTab: (tab) => set({ tab }),
   setPosition: (position) => set({ position }),
   setSize: (size) => set({ size }),
   setEditing: (editing) => set({ editing }),

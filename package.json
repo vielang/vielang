@@ -3,16 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "predev": "npm run build-notes",
+    "predev": "npm run build-content",
     "dev": "next dev",
-    "prebuild": "npm run build-notes",
+    "prebuild": "npm run build-content",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
     "prepare-images": "tsx scripts/prepare-images.ts",
     "prepare-audio": "tsx scripts/prepare-audio.ts",
-    "build-notes": "tsx scripts/build-notes.ts",
+    "build-content": "tsx scripts/build-content.ts",
     "crawl-orgs": "tsx scripts/crawl-kiip-orgs.ts"
   },
   "dependencies": {

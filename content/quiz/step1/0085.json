@@ -1,0 +1,27 @@
+[
+  {
+    "title": "문법 — 명하고 명",
+    "instruction": "두 개를 '하고'로 연결해 보세요. (책의 예: 빵, 우유 → 빵하고 우유 / 커피, 케이크 → 커피하고 케이크)",
+    "items": [
+      { "id": "p85-g-1", "label": "빵, 우유", "kind": "fill", "prompt": "______", "answers": ["빵하고 우유"], "explain": "하고 nối hai danh từ, không phân biệt patchim." },
+      { "id": "p85-g-2", "label": "커피, 케이크", "kind": "fill", "prompt": "______", "answers": ["커피하고 케이크"] },
+      { "id": "p85-g-3", "label": "과일, 채소 — 냉장고에 ______가 있어요.", "kind": "fill", "prompt": "______", "answers": ["과일하고 채소"] }
+    ]
+  },
+  {
+    "title": "1",
+    "instruction": "무엇을 몇 개 사요? 이야기해 보세요. (보기: 무엇을 사요? → 콜라 한 병하고 라면 두 개를 사요.)",
+    "items": [
+      { "id": "p85-1-1", "label": "1) 사과, 배", "kind": "free", "prompt": "무엇을 몇 개 사요? (그림을 보고 답하세요)", "model": "사과 세 개하고 배 두 개를 사요." },
+      { "id": "p85-1-2", "label": "2) 주스, 케이크", "kind": "free", "prompt": "무엇을 몇 개 사요?", "model": "주스 네 병하고 케이크 한 개를 사요." },
+      { "id": "p85-1-3", "label": "3) 공책, 가위", "kind": "free", "prompt": "무엇을 몇 개 사요?", "model": "공책 한 권하고 가위 한 개를 사요." }
+    ]
+  },
+  {
+    "title": "2",
+    "instruction": "여러분은 마트에서 무엇을 사고 싶어요? 이야기해 보세요.",
+    "items": [
+      { "id": "p85-2-1", "kind": "free", "multiline": true, "prompt": "마트에서 무엇을 사고 싶어요?", "model": "우유 한 개하고 빵 두 개를 사고 싶어요." }
+    ]
+  }
+]

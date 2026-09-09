@@ -1,0 +1,21 @@
+[
+  {
+    "title": "발음 1",
+    "instruction": "다음을 듣고 따라 읽으세요. (Viết cách đọc)",
+    "items": [
+      { "id": "p91-p1-1", "label": "1)", "kind": "fill", "prompt": "칫솔 → [ ______ ]", "answers": ["칟쏠"], "explain": "Patchim ㅅ đọc thành [ㄷ], phụ âm sau căng hoá thành ㅆ." },
+      { "id": "p91-p1-2", "label": "2)", "kind": "fill", "prompt": "다섯 개 → [ ______ ]", "answers": ["다섣 깨"], "explain": "ㅅ cuối đọc [ㄷ], ㄱ sau đó căng thành ㄲ." },
+      { "id": "p91-p1-3", "label": "3)", "kind": "fill", "prompt": "닭 → [ ______ ]", "answers": ["닥"], "explain": "Patchim đôi ㄺ đứng cuối chỉ đọc ㄱ." },
+      { "id": "p91-p1-4", "label": "4)", "kind": "fill", "prompt": "닭고기 → [ ______ ]", "answers": ["닥꼬기"], "explain": "ㄺ → [ㄱ], ㄱ tiếp theo căng thành ㄲ." }
+    ]
+  },
+  {
+    "title": "발음 2",
+    "instruction": "다음을 듣고 연습해 보세요.",
+    "items": [
+      { "id": "p91-p2-1", "label": "1)", "kind": "free", "prompt": "가: 닭 한 마리에 얼마입니까? / 나: 육천오백 원입니다.", "model": "[다칸 마리에 얼마임니까?] / [육처노백 워님니다.]" },
+      { "id": "p91-p2-2", "label": "2)", "kind": "free", "prompt": "가: 칫솔 다섯 개하고 봉투 하나 주세요. / 나: 네, 여기 있습니다.", "model": "[칟쏠 다섣 깨하고 봉투 하나 주세요.] / [네, 여기 읻씀니다.]" },
+      { "id": "p91-p2-3", "label": "3)", "kind": "free", "prompt": "가: 닭고기를 좋아해요? / 나: 네, 닭고기를 자주 먹어요.", "model": "[닥꼬기를 조아해요?] / [네, 닥꼬기를 자주 머거요.]" }
+    ]
+  }
+]

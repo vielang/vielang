@@ -1,0 +1,10 @@
+[
+  {
+    "title": "단원 도입",
+    "instruction": "그림을 보고 이야기해 보세요.",
+    "items": [
+      { "id": "p93-1", "kind": "free", "multiline": true, "prompt": "이 사람들은 주말에 뭐 해요?", "model": "산에 갔어요. 사진을 찍어요. 친구들을 만나요. 공원에서 산책해요. 자전거를 타요." },
+      { "id": "p93-2", "kind": "free", "multiline": true, "prompt": "여러분은 주말에 뭐 해요?" }
+    ]
+  }
+]

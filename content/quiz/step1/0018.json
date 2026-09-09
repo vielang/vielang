@@ -1,0 +1,24 @@
+[
+  {
+    "title": "말하기 1",
+    "instruction": "교실에서 후엔 씨와 안젤라 씨가 인사해요. 다음과 같이 이야기해 보세요.",
+    "items": [
+      { "id": "p18-s1-2", "label": "2) 이링 | 중국", "kind": "free", "multiline": true, "prompt": "Thay 안젤라 → 이링, 필리핀 → 중국 rồi nói lại cả đoạn hội thoại.", "model": "후엔: 안녕하세요? 저는 후엔이에요.\n이링: 네, 안녕하세요? 저는 이링이에요.\n후엔: 이링 씨는 어느 나라에서 왔어요?\n이링: 중국에서 왔어요.\n후엔: 이링 씨, 만나서 반가워요." }
+    ]
+  },
+  {
+    "title": "말하기 2",
+    "instruction": "여러분도 친구와 인사해 보세요. (이름이 뭐예요? / 직업이 뭐예요? / 어느 나라에서 왔어요?)",
+    "items": [
+      { "id": "p18-s2-1", "kind": "free", "multiline": true, "prompt": "Chào hỏi và làm quen với bạn.", "model": "가: 안녕하세요? 이름이 뭐예요?\n나: 저는 후엔이에요. 직업이 뭐예요?\n가: 저는 회사원이에요. 어느 나라에서 왔어요?\n나: 베트남에서 왔어요. 만나서 반가워요." }
+    ]
+  },
+  {
+    "title": "듣기",
+    "instruction": "라흐만 씨와 이링 씨가 이야기해요. 잘 듣고 답해 보세요.",
+    "items": [
+      { "id": "p18-l-1", "label": "1)", "kind": "choice", "prompt": "이링 씨는 중국에서 왔어요?", "options": ["네", "아니요"], "answer": 0, "explain": "이링 là người Trung Quốc (중국 사람)." },
+      { "id": "p18-l-2", "label": "2)", "kind": "choice", "prompt": "라흐만 씨는 어느 나라에서 왔어요?", "options": ["필리핀", "방글라데시"], "answer": 1, "explain": "라흐만 đến từ Bangladesh; 필리핀 là quê của 안젤라." }
+    ]
+  }
+]

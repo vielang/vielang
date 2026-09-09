@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Check, Lightbulb, Puzzle, RotateCcw, Undo2, X } from "lucide-react";
+import { Check, Lightbulb, Puzzle, RotateCcw, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -15,6 +15,9 @@ import {
   type QuizSection,
 } from "@/lib/quiz";
 import { usePageAnswers, useQuizStore } from "@/lib/quiz-store";
+
+/** Đề dạng "______" thì không cần in ra — ô nhập bên dưới CHÍNH LÀ chỗ trống. */
+const BLANK_ONLY = /^[_\s]+$/;
 
 /**
  * Chỗ nộp đáp án cho BÀI TẬP IN TRONG SÁCH của trang đang mở — người dùng
@@ -49,32 +52,35 @@ export function QuizPanel({
 
   return (
     <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-6">
-      <div className="mb-3 flex items-center justify-between gap-2 text-xs text-muted-foreground">
+      <div className="mb-4 flex h-6 items-center justify-between gap-2 text-xs text-muted-foreground">
         <span className="tabular-nums">
           {gradable.length > 0
-            ? `Đã chấm ${done.length}/${gradable.length}` +
+            ? `${done.length}/${gradable.length} câu` +
               (done.length > 0 ? ` · đúng ${correct}` : "")
             : `${countItems(sections)} bài tập`}
         </span>
         {touched && (
           <Button
             variant="ghost"
-            size="sm"
-            className="h-7"
+            size="icon-sm"
             onClick={() => resetPage(bookId, page)}
+            aria-label="Làm lại từ đầu"
+            title="Làm lại từ đầu"
           >
-            <RotateCcw className="size-3.5" aria-hidden /> Làm lại
+            <RotateCcw className="size-3.5" aria-hidden />
           </Button>
         )}
       </div>
 
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-7">
         {sections.map((section) => (
-          <section key={section.title} className="flex flex-col gap-3">
-            <div>
-              <h3 className="text-sm font-semibold">{section.title}</h3>
+          <section key={section.title} className="flex flex-col gap-4">
+            <div className="flex flex-col gap-1">
+              <h3 className="text-xs font-semibold tracking-wide text-foreground/70 uppercase">
+                {section.title}
+              </h3>
               {section.instruction && (
-                <p className="mt-0.5 text-xs text-muted-foreground">
+                <p className="text-xs leading-relaxed text-muted-foreground">
                   {section.instruction}
                 </p>
               )}
@@ -117,7 +123,7 @@ function QuizItemView({
   // Gợi ý ghép câu: cắt đáp án chuẩn thành các mảnh rồi xáo. Chỉ có nghĩa với
   // câu điền có từ 2 mảnh trở lên — 1 mảnh thì bấm gợi ý là ra thẳng đáp án.
   const [hintOpen, setHintOpen] = useState(false);
-  const [usedChunks, setUsedChunks] = useState<number[]>([]);
+  const [picked, setPicked] = useState<number[]>([]);
   const chunks = useMemo(
     () =>
       item.kind === "fill"
@@ -127,29 +133,31 @@ function QuizItemView({
   );
   const canHint = chunks.length >= 2 && !checked;
 
-  function appendChunk(index: number) {
-    const current = typeof value === "string" ? value : "";
-    onAnswer(current ? `${current} ${chunks[index]}` : chunks[index]);
-    setUsedChunks((used) => [...used, index]);
+  /** Bấm mảnh chưa dùng thì thêm vào cuối, bấm mảnh đã dùng thì gỡ ra. Nhờ vậy
+   *  không cần nút hoàn tác riêng — ghép sai thì bấm lại đúng mảnh đó. */
+  function toggleChunk(index: number) {
+    const next = picked.includes(index)
+      ? picked.filter((i) => i !== index)
+      : [...picked, index];
+    setPicked(next);
+    onAnswer(next.map((i) => chunks[i]).join(" "));
   }
 
-  function undoChunk() {
-    const used = usedChunks.slice(0, -1);
-    setUsedChunks(used);
-    onAnswer(used.map((i) => chunks[i]).join(" "));
-  }
+  const showPrompt = !BLANK_ONLY.test(item.prompt);
 
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-sm">
-        {item.label && (
-          <span className="mr-1.5 font-medium text-muted-foreground">{item.label}</span>
-        )}
-        {item.prompt}
-      </p>
+      {(item.label || showPrompt) && (
+        <p className="text-sm leading-relaxed">
+          {item.label && (
+            <span className="text-muted-foreground">{item.label} </span>
+          )}
+          {showPrompt && item.prompt}
+        </p>
+      )}
 
       {item.kind === "choice" && (
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-1">
           {item.options.map((option, i) => {
             const selected = value === i;
             // Chỉ tô màu sau khi chấm, và chỉ tô phương án ĐÃ CHỌN cùng
@@ -163,24 +171,16 @@ function QuizItemView({
                 onClick={() => onAnswer(i)}
                 aria-pressed={selected}
                 className={cn(
-                  "flex items-center gap-2 rounded-lg border px-3 py-2 text-left text-sm transition-colors",
+                  "rounded-md border px-3 py-1.5 text-left text-sm transition-colors",
                   asCorrect
-                    ? "border-emerald-500 bg-emerald-500/10"
+                    ? "border-emerald-500/70 bg-emerald-500/10"
                     : asWrong
-                      ? "border-destructive bg-destructive/10"
+                      ? "border-destructive/70 bg-destructive/10"
                       : selected
                         ? "border-primary bg-primary/10"
-                        : "border-border hover:bg-muted"
+                        : "border-transparent bg-muted/50 hover:bg-muted"
                 )}
               >
-                <span
-                  className={cn(
-                    "flex size-5 shrink-0 items-center justify-center rounded-full border text-[11px] tabular-nums",
-                    selected ? "border-current" : "border-border text-muted-foreground"
-                  )}
-                >
-                  {i + 1}
-                </span>
                 {option}
               </button>
             );
@@ -191,13 +191,16 @@ function QuizItemView({
       {item.kind === "fill" && (
         <Input
           value={typeof value === "string" ? value : ""}
-          onChange={(e) => onAnswer(e.target.value)}
+          onChange={(e) => {
+            setPicked([]); // gõ tay thì bỏ liên kết với các mảnh gợi ý
+            onAnswer(e.target.value);
+          }}
           onKeyDown={(e) => {
             if (e.key === "Enter" && answered) onCheck();
           }}
-          placeholder="Nhập đáp án…"
-          aria-label={item.prompt}
+          aria-label={item.label ?? item.prompt}
           className={cn(
+            "h-9",
             checked && (correct ? "border-emerald-500" : "border-destructive")
           )}
         />
@@ -209,59 +212,42 @@ function QuizItemView({
             value={typeof value === "string" ? value : ""}
             onChange={(e) => onAnswer(e.target.value)}
             rows={4}
-            placeholder="Viết câu trả lời của bạn…"
-            aria-label={item.prompt}
-            className="w-full rounded-lg border border-input bg-transparent px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+            aria-label={item.label ?? item.prompt}
+            className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
           />
         ) : (
           <Input
             value={typeof value === "string" ? value : ""}
             onChange={(e) => onAnswer(e.target.value)}
-            placeholder="Viết câu trả lời của bạn…"
-            aria-label={item.prompt}
+            aria-label={item.label ?? item.prompt}
+            className="h-9"
           />
         ))}
 
       {hintOpen && chunks.length > 0 && (
-        <div className="flex flex-col gap-2 rounded-lg border border-dashed border-border bg-muted/40 p-2">
-          <p className="text-[11px] text-muted-foreground">
-            Bấm các mảnh theo đúng thứ tự để ghép thành câu trả lời.
-          </p>
-          <div className="flex flex-wrap gap-1.5">
-            {chunks.map((chunk, i) => {
-              const used = usedChunks.includes(i);
-              return (
-                <button
-                  key={`${chunk}-${i}`}
-                  type="button"
-                  disabled={used}
-                  onClick={() => appendChunk(i)}
-                  className={cn(
-                    "rounded-md border px-2 py-1 text-sm transition-colors",
-                    used
-                      ? "border-dashed border-border text-muted-foreground/40"
-                      : "border-border bg-background hover:bg-muted"
-                  )}
-                >
-                  {chunk}
-                </button>
-              );
-            })}
-          </div>
-          {usedChunks.length > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 self-start"
-              onClick={undoChunk}
-            >
-              <Undo2 className="size-3.5" aria-hidden /> Bỏ mảnh vừa chọn
-            </Button>
-          )}
+        <div className="flex flex-wrap gap-1.5">
+          {chunks.map((chunk, i) => {
+            const used = picked.includes(i);
+            return (
+              <button
+                key={`${chunk}-${i}`}
+                type="button"
+                onClick={() => toggleChunk(i)}
+                className={cn(
+                  "rounded-md border px-2 py-0.5 text-sm transition-colors",
+                  used
+                    ? "border-dashed border-border text-muted-foreground/40"
+                    : "border-border/70 hover:bg-muted"
+                )}
+              >
+                {chunk}
+              </button>
+            );
+          })}
         </div>
       )}
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1.5">
         {isGradable(item) && !checked && (
           <Button size="sm" className="h-7" disabled={!answered} onClick={onCheck}>
             Kiểm tra
@@ -269,9 +255,9 @@ function QuizItemView({
         )}
         {canHint && (
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
-            className="h-7"
+            className="h-7 text-muted-foreground"
             onClick={() => setHintOpen((v) => !v)}
           >
             <Puzzle className="size-3.5" aria-hidden />
@@ -292,7 +278,7 @@ function QuizItemView({
             ) : (
               <>
                 <X className="size-3.5" aria-hidden /> Chưa đúng
-                {item.kind === "fill" && ` — đáp án: ${item.answers[0]}`}
+                {item.kind === "fill" && ` — ${item.answers[0]}`}
               </>
             )}
           </span>
@@ -301,24 +287,23 @@ function QuizItemView({
           <Button
             variant="ghost"
             size="sm"
-            className="h-7"
+            className="h-7 text-muted-foreground"
             onClick={() => setShowModel((v) => !v)}
           >
             <Lightbulb className="size-3.5" aria-hidden />
-            {showModel ? "Ẩn câu mẫu" : "Xem câu mẫu"}
+            {showModel ? "Ẩn câu mẫu" : "Câu mẫu"}
           </Button>
         )}
       </div>
 
       {item.kind === "free" && item.model && showModel && (
-        <p className="rounded-lg bg-muted/60 px-3 py-2 text-xs">
-          <span className="text-muted-foreground">Câu mẫu: </span>
+        <p className="border-l-2 border-border pl-2.5 text-xs leading-relaxed whitespace-pre-line text-muted-foreground">
           {item.model}
         </p>
       )}
 
       {checked && item.explain && (
-        <p className="rounded-lg bg-muted/60 px-3 py-2 text-xs text-muted-foreground">
+        <p className="border-l-2 border-border pl-2.5 text-xs leading-relaxed text-muted-foreground">
           {item.explain}
         </p>
       )}

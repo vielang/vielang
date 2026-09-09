@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Check, Lightbulb, RotateCcw, X } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Check, Lightbulb, Puzzle, RotateCcw, Undo2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -9,6 +9,8 @@ import {
   countItems,
   isCorrect,
   isGradable,
+  shuffleWithSeed,
+  splitAnswerChunks,
   type QuizItem,
   type QuizSection,
 } from "@/lib/quiz";
@@ -112,6 +114,31 @@ function QuizItemView({
   const answered = value !== undefined && value !== "";
   const correct = checked && isCorrect(item, value as string | number);
 
+  // Gợi ý ghép câu: cắt đáp án chuẩn thành các mảnh rồi xáo. Chỉ có nghĩa với
+  // câu điền có từ 2 mảnh trở lên — 1 mảnh thì bấm gợi ý là ra thẳng đáp án.
+  const [hintOpen, setHintOpen] = useState(false);
+  const [usedChunks, setUsedChunks] = useState<number[]>([]);
+  const chunks = useMemo(
+    () =>
+      item.kind === "fill"
+        ? shuffleWithSeed(splitAnswerChunks(item.answers[0]), item.id)
+        : [],
+    [item]
+  );
+  const canHint = chunks.length >= 2 && !checked;
+
+  function appendChunk(index: number) {
+    const current = typeof value === "string" ? value : "";
+    onAnswer(current ? `${current} ${chunks[index]}` : chunks[index]);
+    setUsedChunks((used) => [...used, index]);
+  }
+
+  function undoChunk() {
+    const used = usedChunks.slice(0, -1);
+    setUsedChunks(used);
+    onAnswer(used.map((i) => chunks[i]).join(" "));
+  }
+
   return (
     <div className="flex flex-col gap-2">
       <p className="text-sm">
@@ -195,10 +222,60 @@ function QuizItemView({
           />
         ))}
 
+      {hintOpen && chunks.length > 0 && (
+        <div className="flex flex-col gap-2 rounded-lg border border-dashed border-border bg-muted/40 p-2">
+          <p className="text-[11px] text-muted-foreground">
+            Bấm các mảnh theo đúng thứ tự để ghép thành câu trả lời.
+          </p>
+          <div className="flex flex-wrap gap-1.5">
+            {chunks.map((chunk, i) => {
+              const used = usedChunks.includes(i);
+              return (
+                <button
+                  key={`${chunk}-${i}`}
+                  type="button"
+                  disabled={used}
+                  onClick={() => appendChunk(i)}
+                  className={cn(
+                    "rounded-md border px-2 py-1 text-sm transition-colors",
+                    used
+                      ? "border-dashed border-border text-muted-foreground/40"
+                      : "border-border bg-background hover:bg-muted"
+                  )}
+                >
+                  {chunk}
+                </button>
+              );
+            })}
+          </div>
+          {usedChunks.length > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 self-start"
+              onClick={undoChunk}
+            >
+              <Undo2 className="size-3.5" aria-hidden /> Bỏ mảnh vừa chọn
+            </Button>
+          )}
+        </div>
+      )}
+
       <div className="flex items-center gap-2">
         {isGradable(item) && !checked && (
           <Button size="sm" className="h-7" disabled={!answered} onClick={onCheck}>
             Kiểm tra
+          </Button>
+        )}
+        {canHint && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-7"
+            onClick={() => setHintOpen((v) => !v)}
+          >
+            <Puzzle className="size-3.5" aria-hidden />
+            {hintOpen ? "Ẩn gợi ý" : "Gợi ý"}
           </Button>
         )}
         {isGradable(item) && checked && (

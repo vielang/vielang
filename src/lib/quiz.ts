@@ -134,6 +134,56 @@ export function normalizeAnswer(text: string): string {
     .toLowerCase();
 }
 
+/**
+ * Cắt đáp án thành các mảnh để làm gợi ý ghép câu — cắt theo KHOẢNG TRẮNG,
+ * tức theo 어절, đúng đơn vị mà sách dạy tách câu. Cắt nhỏ hơn (từng âm tiết)
+ * thì mảnh vụn quá, người học ghép mò cũng ra.
+ */
+export function splitAnswerChunks(answer: string): string[] {
+  return answer.trim().split(/\s+/).filter(Boolean);
+}
+
+function seedFrom(text: string): number {
+  let h = 2166136261;
+  for (let i = 0; i < text.length; i++) {
+    h ^= text.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+
+/**
+ * Xáo trộn ổn định theo `seed`: cùng seed luôn cho ra cùng thứ tự. Cần "ổn
+ * định" chứ không phải ngẫu nhiên thật — xáo lại sau mỗi lần React render thì
+ * các mảnh nhảy loạn ngay dưới tay người dùng.
+ *
+ * Với từ 2 mảnh trở lên, kết quả được đảm bảo KHÁC thứ tự gốc: xáo ra đúng
+ * thứ tự đáp án thì hoá ra cho không đáp án.
+ */
+export function shuffleWithSeed<T>(items: readonly T[], seed: string): T[] {
+  const out = [...items];
+  if (out.length < 2) return out;
+
+  let state = seedFrom(seed) || 1;
+  const next = () => {
+    // mulberry32
+    state = (state + 0x6d2b79f5) >>> 0;
+    let t = state;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(next() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+
+  const unchanged = out.every((v, i) => v === items[i]);
+  if (unchanged) [out[0], out[out.length - 1]] = [out[out.length - 1], out[0]];
+  return out;
+}
+
 export function isCorrect(item: QuizItem, value: string | number): boolean {
   if (item.kind === "choice") return value === item.answer;
   if (item.kind === "free") return false; // không chấm

@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { isCorrect, normalizeAnswer, type FillItem, type ChoiceItem } from "./quiz";
+import {
+  isCorrect,
+  normalizeAnswer,
+  shuffleWithSeed,
+  splitAnswerChunks,
+  type FillItem,
+  type ChoiceItem,
+} from "./quiz";
 
 function fill(...answers: string[]): FillItem {
   return { id: "q", kind: "fill", prompt: "", answers };
@@ -66,5 +73,47 @@ describe("isCorrect — choice và free", () => {
 
   it("free không bao giờ được chấm là đúng", () => {
     expect(isCorrect({ id: "q", kind: "free", prompt: "" }, "bất kỳ")).toBe(false);
+  });
+});
+
+describe("splitAnswerChunks", () => {
+  it("cắt theo khoảng trắng (어절)", () => {
+    expect(splitAnswerChunks("저는 후엔이에요")).toEqual(["저는", "후엔이에요"]);
+    expect(splitAnswerChunks("  공원에서   운동을 해요  ")).toEqual([
+      "공원에서",
+      "운동을",
+      "해요",
+    ]);
+  });
+
+  it("đáp án 1 từ chỉ ra 1 mảnh (panel sẽ không hiện gợi ý)", () => {
+    expect(splitAnswerChunks("직업")).toEqual(["직업"]);
+  });
+});
+
+describe("shuffleWithSeed", () => {
+  const chunks = ["저는", "베트남", "사람이에요"];
+
+  it("cùng seed cho ra cùng thứ tự", () => {
+    expect(shuffleWithSeed(chunks, "p18-q1")).toEqual(
+      shuffleWithSeed(chunks, "p18-q1")
+    );
+  });
+
+  it("giữ nguyên đủ các mảnh, không thêm không bớt", () => {
+    expect([...shuffleWithSeed(chunks, "abc")].sort()).toEqual([...chunks].sort());
+  });
+
+  it("không bao giờ trả về đúng thứ tự gốc khi có từ 2 mảnh", () => {
+    // Quét nhiều seed: nếu có seed nào cho ra thứ tự gốc là lộ đáp án.
+    for (let i = 0; i < 300; i++) {
+      expect(shuffleWithSeed(chunks, `seed-${i}`)).not.toEqual(chunks);
+      expect(shuffleWithSeed(["가", "나"], `seed-${i}`)).not.toEqual(["가", "나"]);
+    }
+  });
+
+  it("mảng 0 hoặc 1 phần tử thì giữ nguyên", () => {
+    expect(shuffleWithSeed([], "x")).toEqual([]);
+    expect(shuffleWithSeed(["하나"], "x")).toEqual(["하나"]);
   });
 });

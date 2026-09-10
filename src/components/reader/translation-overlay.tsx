@@ -146,7 +146,17 @@ function TranslationBubble({
     setPos({ left, top });
   }, [x, y, text, dragged]);
 
+  /**
+   * CHẶN NỔI BỌT ở mọi handler pointer — bắt buộc, không phải cho chắc.
+   *
+   * Bong bóng dựng qua portal nên nằm ở `document.body`, NHƯNG portal của
+   * React vẫn cho sự kiện nổi bọt theo CÂY COMPONENT chứ không theo cây DOM.
+   * Không chặn thì `pointerdown`/`pointerup` khi kéo bong bóng vẫn chạy tới
+   * handler cử chỉ của `page-viewer`, bị tính là vuốt ngang và lật sang trang
+   * kế tiếp ngay giữa lúc người dùng đang kéo.
+   */
   function onPointerDown(e: React.PointerEvent) {
+    e.stopPropagation();
     const el = ref.current;
     if (!el) return;
     el.setPointerCapture(e.pointerId);
@@ -162,6 +172,7 @@ function TranslationBubble({
   }
 
   function onPointerMove(e: React.PointerEvent) {
+    e.stopPropagation();
     const d = drag.current;
     const el = ref.current;
     if (!d || !el || d.pointerId !== e.pointerId) return;
@@ -179,6 +190,7 @@ function TranslationBubble({
   }
 
   function onPointerUp(e: React.PointerEvent) {
+    e.stopPropagation();
     if (drag.current?.pointerId === e.pointerId) drag.current = null;
   }
 

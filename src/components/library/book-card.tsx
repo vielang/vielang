@@ -16,7 +16,19 @@ import {
   useProgressStore,
 } from "@/lib/progress-store";
 
-export function BookCard({ book }: { book: Book }) {
+const KIND_LABEL: Record<Book["kind"], string> = {
+  textbook: "Giáo trình",
+  workbook: "Sách bài tập",
+};
+
+export function BookCard({
+  book,
+  compact = false,
+}: {
+  book: Book;
+  /** Ẩn phần tiêu đề lặp lại (dùng khi đã có heading nhóm cấp độ ở ngoài) */
+  compact?: boolean;
+}) {
   const books = useProgressStore((s) => s.books);
   const hasHydrated = useProgressStore((s) => s.hasHydrated);
   const progress = getBookProgress(books, book.id);
@@ -25,7 +37,7 @@ export function BookCard({ book }: { book: Book }) {
   const target = startedReading ? resumePage(progress) : 1;
 
   return (
-    <div className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-shadow hover:shadow-md">
+    <div className="group flex min-w-0 flex-col overflow-hidden rounded-xl border border-border bg-card transition-shadow hover:shadow-md">
       <Link
         href={`/books/${book.id}`}
         className="focus-visible:ring-ring relative aspect-[192/250] block w-full overflow-hidden bg-muted focus-visible:outline-none focus-visible:ring-2"
@@ -37,14 +49,19 @@ export function BookCard({ book }: { book: Book }) {
           sizes="(min-width: 768px) 220px, 45vw"
           className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
         />
-        <Badge className="absolute top-2 left-2 shadow-sm" variant="secondary">
-          Cấp {book.level}
+        <Badge
+          className="absolute top-2 left-2 shadow-sm"
+          variant={book.kind === "textbook" ? "secondary" : "default"}
+        >
+          {KIND_LABEL[book.kind]}
         </Badge>
       </Link>
 
       <div className="flex flex-1 flex-col gap-2 p-3">
         <Link href={`/books/${book.id}`} className="hover:underline">
-          <h3 className="text-sm leading-tight font-medium">{book.titleVi}</h3>
+          <h3 className="text-sm leading-tight font-medium">
+            {compact ? KIND_LABEL[book.kind] : book.titleVi}
+          </h3>
         </Link>
         <p className="font-korean -mt-1 text-xs text-muted-foreground">
           {book.titleKo}

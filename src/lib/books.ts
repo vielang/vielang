@@ -17,6 +17,10 @@ export interface Book {
   sourceDir: string;
   /** Cấp độ (1 = sơ cấp nhất) */
   level: number;
+  /** Tên cấp độ tiếng Hàn in trên bìa (초급1/초급2/중급1/중급2), dùng làm tiêu đề nhóm ở trang chủ */
+  levelLabelKo: string;
+  /** textbook = giáo trình chính, workbook = sách bài tập (익힘책, không có audio riêng) */
+  kind: "textbook" | "workbook";
   titleVi: string;
   titleKo: string;
   totalPages: number;
@@ -27,6 +31,8 @@ export const BOOKS: readonly Book[] = [
     id: "step1",
     sourceDir: "SB_step1",
     level: 1,
+    levelLabelKo: "초급1",
+    kind: "textbook",
     titleVi: "Văn hóa – Xã hội Hàn Quốc, Tập 1",
     titleKo: "사회통합프로그램 문화 1",
     totalPages: 228,
@@ -35,6 +41,8 @@ export const BOOKS: readonly Book[] = [
     id: "step2",
     sourceDir: "SB_step2",
     level: 2,
+    levelLabelKo: "초급2",
+    kind: "textbook",
     titleVi: "Văn hóa – Xã hội Hàn Quốc, Tập 2",
     titleKo: "사회통합프로그램 문화 2",
     totalPages: 228,
@@ -43,6 +51,8 @@ export const BOOKS: readonly Book[] = [
     id: "step3",
     sourceDir: "SB_step3",
     level: 3,
+    levelLabelKo: "중급1",
+    kind: "textbook",
     titleVi: "Văn hóa – Xã hội Hàn Quốc, Tập 3",
     titleKo: "사회통합프로그램 문화 3",
     totalPages: 244,
@@ -51,6 +61,8 @@ export const BOOKS: readonly Book[] = [
     id: "step4",
     sourceDir: "SB_step4",
     level: 4,
+    levelLabelKo: "중급2",
+    kind: "textbook",
     titleVi: "Văn hóa – Xã hội Hàn Quốc, Tập 4",
     titleKo: "사회통합프로그램 문화 4",
     totalPages: 248,
@@ -59,6 +71,8 @@ export const BOOKS: readonly Book[] = [
     id: "wb-step1",
     sourceDir: "WB_step1",
     level: 1,
+    levelLabelKo: "초급1",
+    kind: "workbook",
     titleVi: "Sách bài tập – Văn hóa Xã hội Hàn Quốc, Tập 1",
     titleKo: "사회통합프로그램 문화 1 익힘책",
     totalPages: 136,
@@ -67,6 +81,8 @@ export const BOOKS: readonly Book[] = [
     id: "wb-step2",
     sourceDir: "WB_step2",
     level: 2,
+    levelLabelKo: "초급2",
+    kind: "workbook",
     titleVi: "Sách bài tập – Văn hóa Xã hội Hàn Quốc, Tập 2",
     titleKo: "사회통합프로그램 문화 2 익힘책",
     totalPages: 136,
@@ -75,6 +91,8 @@ export const BOOKS: readonly Book[] = [
     id: "wb-step3",
     sourceDir: "WB_step3",
     level: 3,
+    levelLabelKo: "중급1",
+    kind: "workbook",
     titleVi: "Sách bài tập – Văn hóa Xã hội Hàn Quốc, Tập 3",
     titleKo: "사회통합프로그램 문화 3 익힘책",
     totalPages: 160,
@@ -83,6 +101,8 @@ export const BOOKS: readonly Book[] = [
     id: "wb-step4",
     sourceDir: "WB_step4",
     level: 4,
+    levelLabelKo: "중급2",
+    kind: "workbook",
     titleVi: "Sách bài tập – Văn hóa Xã hội Hàn Quốc, Tập 4",
     titleKo: "사회통합프로그램 문화 4 익힘책",
     totalPages: 160,

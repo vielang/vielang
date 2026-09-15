@@ -131,6 +131,14 @@
   html {
     @apply font-sans;
   }
+  /* Bấm chip "Bài N" (anchor #bai-N ở trang chi tiết sách) cuộn mượt thay
+     vì nhảy cục — tôn trọng prefers-reduced-motion cho người dùng nhạy
+     cảm với chuyển động. */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
 }
 /*
  * Tiptap/ProseMirror — vùng soạn bài giảng (components/reader/note-editor).

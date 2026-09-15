@@ -29,6 +29,17 @@ function ChapterNav({ chapters }: { chapters: Chapter[] }) {
         <a
           key={ch.lesson}
           href={`#${chapterAnchor(ch.lesson)}`}
+          onClick={(e) => {
+            // Cuộn mượt CHỈ cho thao tác bấm chip trong cùng trang này — cố
+            // ý không dùng CSS scroll-behavior:smooth toàn cục, vì nó cũng
+            // áp cho lúc mới điều hướng tới đây kèm hash (vd đóng trang đọc
+            // trả về đúng bài đang đọc dở), lúc đó phải tới thẳng vị trí
+            // ngay, không cuộn từ đầu trang xuống.
+            e.preventDefault();
+            const el = document.getElementById(chapterAnchor(ch.lesson));
+            el?.scrollIntoView({ behavior: "smooth", block: "start" });
+            history.pushState(null, "", `#${chapterAnchor(ch.lesson)}`);
+          }}
           className="shrink-0 rounded-full border border-border px-2.5 py-1 text-xs font-medium tabular-nums text-muted-foreground transition-colors hover:border-primary hover:text-foreground"
         >
           Bài {ch.lesson}

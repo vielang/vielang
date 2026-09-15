@@ -6,6 +6,7 @@ import type { Book } from "@/lib/books";
 import { useProgressStore } from "@/lib/progress-store";
 import { useEffectiveNote, useNoteStore } from "@/lib/note-store";
 import { getPageAudio } from "@/lib/audio";
+import { getChapters } from "@/lib/chapters";
 import { PageViewer, type PageViewerHandle } from "@/components/reader/page-viewer";
 import { ReaderControls } from "@/components/reader/reader-controls";
 import { AdjacentPreload } from "@/components/reader/adjacent-preload";
@@ -35,6 +36,10 @@ export function ReaderView({
   const router = useRouter();
   const viewerRef = useRef<PageViewerHandle>(null);
   const audioTracks = getPageAudio(book.id, page);
+  const chapters = getChapters(book.id, book.totalPages);
+  const currentChapter = chapters.find(
+    (ch) => page >= ch.startPage && page <= ch.endPage
+  );
 
   // Bài giảng có thể đã được người dùng sửa/tự viết rồi lưu ở localStorage —
   // chờ rehydrate xong mới hiện chấm báo, tránh lệch với HTML server render.
@@ -180,6 +185,8 @@ export function ReaderView({
         visible={toolbarVisible}
         book={book}
         page={page}
+        chapters={chapters}
+        currentLesson={currentChapter?.lesson ?? null}
         isBookmarked={isBookmarked}
         jumpOpen={jumpOpen}
         onJumpOpenChange={setJumpOpen}

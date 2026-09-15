@@ -23,11 +23,14 @@ import { Input } from "@/components/ui/input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import type { Book } from "@/lib/books";
+import type { Chapter } from "@/lib/chapters";
 
 export function ReaderControls({
   visible,
   book,
   page,
+  chapters,
+  currentLesson,
   isBookmarked,
   jumpOpen,
   onJumpOpenChange,
@@ -43,6 +46,10 @@ export function ReaderControls({
   visible: boolean;
   book: Book;
   page: number;
+  /** Ranh giới bài học (xem lib/chapters.ts) — [] nếu sách không xác định được */
+  chapters: Chapter[];
+  /** Bài học chứa trang hiện tại — null nếu trang thuộc phần mở đầu (chưa vào bài nào) */
+  currentLesson: number | null;
   isBookmarked: boolean;
   jumpOpen: boolean;
   onJumpOpenChange: (open: boolean) => void;
@@ -144,6 +151,9 @@ export function ReaderControls({
           className="text-white hover:bg-white/10 hover:text-white tabular-nums"
           onClick={openJumpDialog}
         >
+          {currentLesson && (
+            <span className="text-white/70">Bài {currentLesson} ·</span>
+          )}
           Trang {page}/{book.totalPages}
         </Button>
 
@@ -175,6 +185,29 @@ export function ReaderControls({
             <DialogTitle>Nhảy tới trang</DialogTitle>
           </DialogHeader>
           <div className="flex flex-col gap-4 py-2">
+            {chapters.length > 0 && (
+              <div className="flex flex-col gap-1.5">
+                <span className="text-xs text-muted-foreground">Theo bài học</span>
+                <div className="flex flex-wrap gap-1.5">
+                  {chapters.map((ch) => (
+                    <Button
+                      key={ch.lesson}
+                      type="button"
+                      size="sm"
+                      variant={ch.lesson === currentLesson ? "default" : "outline"}
+                      className="h-7 rounded-full px-2.5 text-xs"
+                      onClick={() => {
+                        onJump(ch.startPage);
+                        onJumpOpenChange(false);
+                      }}
+                    >
+                      Bài {ch.lesson}
+                    </Button>
+                  ))}
+                </div>
+                <span className="text-xs text-muted-foreground">Theo số trang</span>
+              </div>
+            )}
             <Slider
               min={1}
               max={book.totalPages}

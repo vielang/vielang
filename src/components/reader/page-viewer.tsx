@@ -145,6 +145,14 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
       limitToBounds
       centerOnInit
       doubleClick={{ mode: "toggle", step: 1.8 }}
+      // Trackpad 2 ngón vuốt (không giữ Ctrl) = di chuyển vùng xem khi đã
+      // phóng to, giống các trình đọc ảnh/PDF thông thường — Ctrl+vuốt (pinch
+      // thật, trình duyệt tự gắn ctrlKey) vẫn zoom như cũ. Mặc định thư viện
+      // coi MỌI wheel event là zoom nên 2 ngón chỉ zoom chứ không di chuyển
+      // được; wheelDisabled tắt nhánh zoom cho wheel không giữ Ctrl,
+      // trackPadPanning bật nhánh di chuyển cho đúng nhánh đó.
+      wheel={{ wheelDisabled: true }}
+      trackPadPanning={{ disabled: false }}
       onTransform={(_ref, state) => {
         scaleRef.current = state.scale;
       }}

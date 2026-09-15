@@ -104,3 +104,68 @@ export function getAudioPages(bookId: string): number[] {
   });
   return Array.from(pages).sort((a, b) => a - b);
 }
+
+/**
+ * Audio cho sách bài tập (익힘책) — khác cấu trúc textbook hoàn toàn: không
+ * có mapping "bài học -> nhiều loại track" mà chỉ có 1 trang "듣기" duy nhất
+ * mỗi bài, gắn đúng 2 track SỐ THỨ TỰ liên tục (track01, track02, ...),
+ * KHÔNG có track intro (0.mp3) như textbook.
+ *
+ * Nguồn: https://hawoopub01.cafe24.com/satongebook/WB/STEP<N>/track<NN>.mp3
+ * (cùng NXB Hawoo với audio textbook, khác domain path). Phát hiện + xác
+ * minh bằng cách giải mã QR in trên từng trang (không suy đoán tự động —
+ * xem `download_wb_audio.py` ở thư mục gốc `kiip/`), sau đó nhận ra khoảng
+ * cách giữa các trang có audio ĐỀU NHAU (không như textbook), nên rút gọn
+ * thành công thức để dễ bảo trì. Tổng số track đã verify qua HTTP HEAD
+ * (track N+1 kế tiếp → 404): step1/2 = 36, step3/4 = 32.
+ */
+interface WorkbookAudioLayout {
+  /** Số bài học trong sách. */
+  lessonCount: number;
+  /** Trang có audio của bài 1. */
+  firstPage: number;
+  /** Khoảng cách trang giữa 2 bài liên tiếp (đều nhau). */
+  pageStep: number;
+}
+
+const WORKBOOK_1_2_LAYOUT: WorkbookAudioLayout = {
+  lessonCount: 18,
+  firstPage: 14,
+  pageStep: 6,
+};
+
+const WORKBOOK_3_4_LAYOUT: WorkbookAudioLayout = {
+  lessonCount: 16,
+  firstPage: 15,
+  pageStep: 8,
+};
+
+export const WORKBOOK_AUDIO_LAYOUTS: Record<string, WorkbookAudioLayout> = {
+  "wb-step1": WORKBOOK_1_2_LAYOUT,
+  "wb-step2": WORKBOOK_1_2_LAYOUT,
+  "wb-step3": WORKBOOK_3_4_LAYOUT,
+  "wb-step4": WORKBOOK_3_4_LAYOUT,
+};
+
+/** Với 1 trang sách bài tập, trả về số thứ tự track (1-based) gắn ở trang đó (0, 1 hoặc 2 track). */
+export function resolveWorkbookPageAudio(bookId: string, page: number): number[] {
+  const layout = WORKBOOK_AUDIO_LAYOUTS[bookId];
+  if (!layout) return [];
+
+  for (let lesson = 1; lesson <= layout.lessonCount; lesson++) {
+    const audioPage = layout.firstPage + layout.pageStep * (lesson - 1);
+    if (audioPage === page) return [2 * lesson - 1, 2 * lesson];
+    if (audioPage > page) break; // trang tăng dần theo bài, qua rồi thì dừng
+  }
+  return [];
+}
+
+/** Danh sách số trang có audio của 1 sách bài tập, đã sắp xếp tăng dần. */
+export function getWorkbookAudioPages(bookId: string): number[] {
+  const layout = WORKBOOK_AUDIO_LAYOUTS[bookId];
+  if (!layout) return [];
+  return Array.from(
+    { length: layout.lessonCount },
+    (_, i) => layout.firstPage + layout.pageStep * i
+  );
+}

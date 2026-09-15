@@ -1,9 +1,15 @@
-import { resolvePageAudio, getTrackLabel, type AudioTrackType } from "@/lib/audio-config";
-
-export { getAudioPages } from "@/lib/audio-config";
+import {
+  resolvePageAudio,
+  getTrackLabel,
+  getAudioPages as getTextbookAudioPages,
+  resolveWorkbookPageAudio,
+  getWorkbookAudioPages,
+  type AudioTrackType,
+} from "@/lib/audio-config";
 
 export interface AudioTrack {
-  type: AudioTrackType;
+  /** Định danh duy nhất trong danh sách track của 1 trang — dùng làm key + chọn track đang phát. */
+  type: string;
   label: string;
   url: string;
 }
@@ -30,15 +36,29 @@ function fileNameFor(lesson: number | null, type: AudioTrackType): string {
   return `${lesson}-${type}.mp3`;
 }
 
-/** Danh sách track audio (0-2) gắn với 1 trang cụ thể. */
+/** Danh sách track audio gắn với 1 trang cụ thể — gộp cả textbook và workbook. */
 export function getPageAudio(bookId: string, page: number): AudioTrack[] {
-  return resolvePageAudio(bookId, page).map(({ lesson, type }) => ({
+  const textbookTracks = resolvePageAudio(bookId, page).map(({ lesson, type }) => ({
     type,
     label: getTrackLabel(type),
     url: `${audioBaseUrl()}/books/${bookId}/audio/${fileNameFor(lesson, type)}`,
+  }));
+  if (textbookTracks.length > 0) return textbookTracks;
+
+  return resolveWorkbookPageAudio(bookId, page).map((trackNum, i) => ({
+    type: `workbook-${i + 1}`,
+    label: `Bài nghe ${i + 1}`,
+    url: `${audioBaseUrl()}/books/${bookId}/audio/track${String(trackNum).padStart(2, "0")}.mp3`,
   }));
 }
 
 export function hasAudio(bookId: string, page: number): boolean {
   return getPageAudio(bookId, page).length > 0;
+}
+
+/** Danh sách số trang có audio của 1 sách (textbook hoặc workbook). */
+export function getAudioPages(bookId: string): number[] {
+  const textbookPages = getTextbookAudioPages(bookId);
+  if (textbookPages.length > 0) return textbookPages;
+  return getWorkbookAudioPages(bookId);
 }

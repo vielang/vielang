@@ -2,9 +2,10 @@
 /**
  * Upload audio (mp3) từng sách lên Cloudflare R2.
  *
- * Đầu vào : ../<sourceDir>_audio/*.mp3 (đã giải nén sẵn từ zip tải về — xem
- *           README mục "Audio"), nằm ở thư mục gốc `kiip/`. Chỉ chạy cho
- *           sách có trong AUDIO_LAYOUTS (sách bài tập không có audio riêng).
+ * Đầu vào : ../<sourceDir>_audio/*.mp3 (đã tải sẵn — textbook qua
+ *           prepare-audio cũ, workbook qua ../download_wb_audio.py), nằm ở
+ *           thư mục gốc `kiip/`. Chỉ chạy cho sách có trong AUDIO_LAYOUTS
+ *           (textbook) hoặc WORKBOOK_AUDIO_LAYOUTS (workbook).
  * Đầu ra  : R2 bucket, key `books/<id>/audio/<file>.mp3` — không convert
  *           (đã là mp3 sẵn), chỉ copy nguyên vẹn.
  *
@@ -25,7 +26,7 @@ import {
   HeadObjectCommand,
 } from "@aws-sdk/client-s3";
 import { BOOKS, type Book } from "../src/lib/books";
-import { AUDIO_LAYOUTS } from "../src/lib/audio-config";
+import { AUDIO_LAYOUTS, WORKBOOK_AUDIO_LAYOUTS } from "../src/lib/audio-config";
 
 loadEnv({ path: path.resolve(process.cwd(), ".env.local"), quiet: true });
 
@@ -152,7 +153,7 @@ async function processBook(book: Book) {
 async function main() {
   const books = bookFilter
     ? BOOKS.filter((b) => b.id === bookFilter)
-    : BOOKS.filter((b) => b.id in AUDIO_LAYOUTS); // sách bài tập không có audio riêng
+    : BOOKS.filter((b) => b.id in AUDIO_LAYOUTS || b.id in WORKBOOK_AUDIO_LAYOUTS);
   if (books.length === 0) {
     console.error(`Không tìm thấy sách với id "${bookFilter}". Có: ${BOOKS.map((b) => b.id).join(", ")}`);
     process.exit(1);

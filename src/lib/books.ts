@@ -7,8 +7,14 @@
  * BOOKS, rồi chạy `npm run prepare-images -- --book <id>`.
  */
 export interface Book {
-  /** Khớp với tên thư mục nguồn `SB_<id>_images` và R2 key `books/<id>/...` */
+  /** Khớp với R2 key `books/<id>/...` — dùng trong URL (`/books/<id>`) */
   id: string;
+  /**
+   * Tên thư mục nguồn ảnh (và audio nếu có), dạng `<sourceDir>_images/pages/`
+   * và `<sourceDir>_audio/` — khớp với slug ebook gốc trên kcenter.korean.go.kr
+   * (vd `SB_step1`, `WB_step1`).
+   */
+  sourceDir: string;
   /** Cấp độ (1 = sơ cấp nhất) */
   level: number;
   titleVi: string;
@@ -19,6 +25,7 @@ export interface Book {
 export const BOOKS: readonly Book[] = [
   {
     id: "step1",
+    sourceDir: "SB_step1",
     level: 1,
     titleVi: "Văn hóa – Xã hội Hàn Quốc, Tập 1",
     titleKo: "사회통합프로그램 문화 1",
@@ -26,6 +33,7 @@ export const BOOKS: readonly Book[] = [
   },
   {
     id: "step2",
+    sourceDir: "SB_step2",
     level: 2,
     titleVi: "Văn hóa – Xã hội Hàn Quốc, Tập 2",
     titleKo: "사회통합프로그램 문화 2",
@@ -33,6 +41,7 @@ export const BOOKS: readonly Book[] = [
   },
   {
     id: "step3",
+    sourceDir: "SB_step3",
     level: 3,
     titleVi: "Văn hóa – Xã hội Hàn Quốc, Tập 3",
     titleKo: "사회통합프로그램 문화 3",
@@ -40,10 +49,43 @@ export const BOOKS: readonly Book[] = [
   },
   {
     id: "step4",
+    sourceDir: "SB_step4",
     level: 4,
     titleVi: "Văn hóa – Xã hội Hàn Quốc, Tập 4",
     titleKo: "사회통합프로그램 문화 4",
     totalPages: 248,
+  },
+  {
+    id: "wb-step1",
+    sourceDir: "WB_step1",
+    level: 1,
+    titleVi: "Sách bài tập – Văn hóa Xã hội Hàn Quốc, Tập 1",
+    titleKo: "사회통합프로그램 문화 1 익힘책",
+    totalPages: 136,
+  },
+  {
+    id: "wb-step2",
+    sourceDir: "WB_step2",
+    level: 2,
+    titleVi: "Sách bài tập – Văn hóa Xã hội Hàn Quốc, Tập 2",
+    titleKo: "사회통합프로그램 문화 2 익힘책",
+    totalPages: 136,
+  },
+  {
+    id: "wb-step3",
+    sourceDir: "WB_step3",
+    level: 3,
+    titleVi: "Sách bài tập – Văn hóa Xã hội Hàn Quốc, Tập 3",
+    titleKo: "사회통합프로그램 문화 3 익힘책",
+    totalPages: 160,
+  },
+  {
+    id: "wb-step4",
+    sourceDir: "WB_step4",
+    level: 4,
+    titleVi: "Sách bài tập – Văn hóa Xã hội Hàn Quốc, Tập 4",
+    titleKo: "사회통합프로그램 문화 4 익힘책",
+    totalPages: 160,
   },
 ] as const;
 

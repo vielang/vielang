@@ -3,9 +3,11 @@
  * Pipeline chuyển ảnh trang sách (JPG gốc từ download_ebook.py) sang WebP
  * tối ưu rồi upload lên Cloudflare R2.
  *
- * Đầu vào : ../<BOOK_ID>_images/pages/page-0001.jpg ... (nằm ở thư mục gốc
+ * Đầu vào : ../<sourceDir>_images/pages/page-0001.jpg ... (nằm ở thư mục gốc
  *           `kiip/`, một cấp trên thư mục `web/` — chạy script bằng
- *           `npm run prepare-images` để cwd luôn là `web/`).
+ *           `npm run prepare-images` để cwd luôn là `web/`). `sourceDir`
+ *           lấy từ `src/lib/books.ts` (khác `id` với sách bài tập, vd
+ *           `WB_step1` cho id `wb-step1`).
  * Đầu ra  : R2 bucket, key `books/<id>/pages/0001.webp` và
  *           `books/<id>/thumbs/0001.webp`.
  *
@@ -114,7 +116,7 @@ async function processPage(book: Book, page: number): Promise<PageResult> {
   const srcPath = path.resolve(
     process.cwd(),
     "..",
-    `SB_${book.id}_images`,
+    `${book.sourceDir}_images`,
     "pages",
     `page-${padPage(page)}.jpg`
   );

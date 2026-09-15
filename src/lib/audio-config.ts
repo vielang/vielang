@@ -4,9 +4,8 @@
  * sách) — KHÔNG suy diễn bằng công thức, vì độ dài phần 복습 (ôn tập)
  * không đều nhau giữa các sách nên công thức tuyến tính đơn giản sẽ sai.
  *
- * step4: layout nội bộ 1 bài (đâu là trang 말하기/듣기/발음) được giả định
- * giống step3 (cùng seri, cùng số file audio/bài) — CHƯA xem ảnh step4
- * thật để xác nhận. Cần spot-check khi verify (xem kế hoạch).
+ * step4 đã verify bằng ảnh trang thật (trang 12, 17, 18, 120, 204): layout
+ * giống hệt step3 (cùng seri, cùng số file audio/bài).
  */
 
 export type AudioTrackType = "S" | "L" | "P" | "intro";
@@ -39,7 +38,7 @@ const STEP_3_LAYOUT: AudioLayout = {
 
 const STEP_4_LAYOUT: AudioLayout = {
   lessonStartPages: [12, 24, 36, 48, 60, 72, 84, 96, 120, 132, 144, 156, 168, 180, 192, 204],
-  offsets: STEP_3_LAYOUT.offsets, // giả định giống step3 — spot-check khi verify
+  offsets: STEP_3_LAYOUT.offsets, // đã verify giống step3 bằng ảnh trang thật
 };
 
 export const AUDIO_LAYOUTS: Record<string, AudioLayout> = {
@@ -69,11 +68,11 @@ export function resolvePageAudio(
   bookId: string,
   page: number
 ): { lesson: number | null; type: AudioTrackType }[] {
+  const layout = AUDIO_LAYOUTS[bookId];
+  if (!layout) return [];
+
   const results: { lesson: number | null; type: AudioTrackType }[] = [];
   if (page === 1) results.push({ lesson: null, type: "intro" });
-
-  const layout = AUDIO_LAYOUTS[bookId];
-  if (!layout) return results;
 
   for (let i = 0; i < layout.lessonStartPages.length; i++) {
     const start = layout.lessonStartPages[i];
@@ -95,13 +94,13 @@ export function resolvePageAudio(
 /** Danh sách số trang có audio của 1 sách, đã sắp xếp tăng dần. */
 export function getAudioPages(bookId: string): number[] {
   const layout = AUDIO_LAYOUTS[bookId];
+  if (!layout) return [];
+
   const pages = new Set<number>([1]); // trang 1 luôn có intro
-  if (layout) {
-    layout.lessonStartPages.forEach((start) => {
-      Object.keys(layout.offsets).forEach((offsetKey) => {
-        pages.add(start + Number(offsetKey));
-      });
+  layout.lessonStartPages.forEach((start) => {
+    Object.keys(layout.offsets).forEach((offsetKey) => {
+      pages.add(start + Number(offsetKey));
     });
-  }
+  });
   return Array.from(pages).sort((a, b) => a - b);
 }

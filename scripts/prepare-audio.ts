@@ -2,8 +2,9 @@
 /**
  * Upload audio (mp3) từng sách lên Cloudflare R2.
  *
- * Đầu vào : ../SB_<BOOK_ID>_audio/*.mp3 (đã giải nén sẵn từ zip tải về —
- *           xem README mục "Audio"), nằm ở thư mục gốc `kiip/`.
+ * Đầu vào : ../<sourceDir>_audio/*.mp3 (đã giải nén sẵn từ zip tải về — xem
+ *           README mục "Audio"), nằm ở thư mục gốc `kiip/`. Chỉ chạy cho
+ *           sách có trong AUDIO_LAYOUTS (sách bài tập không có audio riêng).
  * Đầu ra  : R2 bucket, key `books/<id>/audio/<file>.mp3` — không convert
  *           (đã là mp3 sẵn), chỉ copy nguyên vẹn.
  *
@@ -24,6 +25,7 @@ import {
   HeadObjectCommand,
 } from "@aws-sdk/client-s3";
 import { BOOKS, type Book } from "../src/lib/books";
+import { AUDIO_LAYOUTS } from "../src/lib/audio-config";
 
 loadEnv({ path: path.resolve(process.cwd(), ".env.local"), quiet: true });
 
@@ -110,7 +112,7 @@ async function processFile(book: Book, srcDir: string, file: string): Promise<Fi
 }
 
 async function processBook(book: Book) {
-  const srcDir = path.resolve(process.cwd(), "..", `SB_${book.id}_audio`);
+  const srcDir = path.resolve(process.cwd(), "..", `${book.sourceDir}_audio`);
   let files: string[];
   try {
     files = (await readdir(srcDir)).filter((f) => f.endsWith(".mp3"));
@@ -148,7 +150,9 @@ async function processBook(book: Book) {
 }
 
 async function main() {
-  const books = bookFilter ? BOOKS.filter((b) => b.id === bookFilter) : BOOKS;
+  const books = bookFilter
+    ? BOOKS.filter((b) => b.id === bookFilter)
+    : BOOKS.filter((b) => b.id in AUDIO_LAYOUTS); // sách bài tập không có audio riêng
   if (books.length === 0) {
     console.error(`Không tìm thấy sách với id "${bookFilter}". Có: ${BOOKS.map((b) => b.id).join(", ")}`);
     process.exit(1);

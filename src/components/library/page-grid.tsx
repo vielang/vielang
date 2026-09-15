@@ -1,20 +1,54 @@
 "use client";
 
+import { Fragment } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Bookmark, Check, NotebookText, Volume2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getThumbUrl } from "@/lib/books";
 import { useProgressStore } from "@/lib/progress-store";
+import type { Chapter } from "@/lib/chapters";
+
+function chapterAnchor(lesson: number): string {
+  return `bai-${lesson}`;
+}
+
+/**
+ * Thanh nhảy nhanh tới từng bài — sticky ngay dưới header, cần thiết khi
+ * sách có 130-250 trang (16-18 bài) nên cuộn tay để tìm 1 bài cụ thể rất
+ * chậm. Ẩn hẳn nếu sách không có dữ liệu bài học (chapters rỗng).
+ */
+function ChapterNav({ chapters }: { chapters: Chapter[] }) {
+  if (chapters.length === 0) return null;
+  return (
+    <nav
+      aria-label="Nhảy nhanh tới bài học"
+      className="sticky top-14 z-30 -mx-4 flex gap-1.5 overflow-x-auto border-b border-border bg-background/95 px-4 py-2 backdrop-blur supports-[backdrop-filter]:bg-background/80"
+    >
+      {chapters.map((ch) => (
+        <a
+          key={ch.lesson}
+          href={`#${chapterAnchor(ch.lesson)}`}
+          className="shrink-0 rounded-full border border-border px-2.5 py-1 text-xs font-medium tabular-nums text-muted-foreground transition-colors hover:border-primary hover:text-foreground"
+        >
+          Bài {ch.lesson}
+        </a>
+      ))}
+    </nav>
+  );
+}
 
 export function PageGrid({
   bookId,
   totalPages,
+  chapters,
   notePages,
   audioPages,
 }: {
   bookId: string;
   totalPages: number;
+  /** Ranh giới bài học (xem lib/chapters.ts) — [] nếu sách không xác định được */
+  chapters: Chapter[];
   /** Số trang có sẵn bài giảng (xem lib/notes.ts) */
   notePages: number[];
   /** Số trang có sẵn audio (xem lib/audio.ts) */
@@ -26,85 +60,108 @@ export function PageGrid({
   const bookmarks = new Set(books[bookId]?.bookmarks ?? []);
   const notedPages = new Set(notePages);
   const audioedPages = new Set(audioPages);
+  const chapterByStartPage = new Map(chapters.map((ch) => [ch.startPage, ch]));
 
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
   return (
-    <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6">
-      {pages.map((page) => {
-        const isRead = readPages.has(page);
-        const isBookmarked = bookmarks.has(page);
-        const hasNote = notedPages.has(page);
-        const hasAudio = audioedPages.has(page);
-        return (
-          <div key={page} className="group relative">
-            <Link
-              href={`/read/${bookId}/${page}`}
-              className="focus-visible:ring-ring block overflow-hidden rounded-lg border border-border bg-muted transition-shadow hover:shadow-md focus-visible:ring-2 focus-visible:outline-none"
-            >
-              <div className="relative aspect-[192/250] w-full">
-                <Image
-                  src={getThumbUrl(bookId, page)}
-                  alt={`Trang ${page}`}
-                  fill
-                  sizes="(min-width: 1024px) 15vw, (min-width: 640px) 22vw, 30vw"
-                  className={cn(
-                    "object-cover transition-opacity",
-                    isRead && "opacity-70"
-                  )}
-                  loading={page <= 12 ? "eager" : "lazy"}
-                />
-                {isRead && (
-                  <span className="absolute right-1 bottom-1 rounded-full bg-primary p-0.5 text-primary-foreground shadow">
-                    <Check className="size-3" aria-hidden />
-                  </span>
-                )}
-                {(hasNote || hasAudio) && (
-                  <div className="absolute top-1 left-1 flex gap-1">
-                    {hasNote && (
-                      <span
-                        className="rounded-full bg-background/90 p-0.5 text-primary shadow"
-                        title="Có bài giảng"
-                      >
-                        <NotebookText className="size-3" aria-hidden />
-                      </span>
-                    )}
-                    {hasAudio && (
-                      <span
-                        className="rounded-full bg-background/90 p-0.5 text-primary shadow"
-                        title="Có audio"
-                      >
-                        <Volume2 className="size-3" aria-hidden />
-                      </span>
-                    )}
-                  </div>
-                )}
-                <span className="absolute bottom-1 left-1.5 rounded bg-background/80 px-1 text-[10px] tabular-nums text-foreground">
-                  {page}
-                </span>
-              </div>
-            </Link>
+    <div className="flex flex-col gap-4">
+      <ChapterNav chapters={chapters} />
 
-            <button
-              type="button"
-              aria-label={isBookmarked ? "Bỏ đánh dấu trang" : "Đánh dấu trang"}
-              onClick={() => toggleBookmark(bookId, page)}
-              className={cn(
-                "absolute top-1 right-1 rounded-full bg-background/90 p-1 shadow transition-colors",
-                isBookmarked
-                  ? "text-primary"
-                  : "text-muted-foreground opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
+      <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6">
+        {pages.map((page) => {
+          const isRead = readPages.has(page);
+          const isBookmarked = bookmarks.has(page);
+          const hasNote = notedPages.has(page);
+          const hasAudio = audioedPages.has(page);
+          const chapter = chapterByStartPage.get(page);
+
+          return (
+            <Fragment key={page}>
+              {chapter && (
+                <div
+                  id={chapterAnchor(chapter.lesson)}
+                  className="col-span-full flex items-baseline gap-2 pt-3 pb-0.5 scroll-mt-28 first:pt-0"
+                >
+                  <span className="text-sm font-semibold tracking-tight">
+                    Bài {chapter.lesson}
+                  </span>
+                  <span className="text-xs text-muted-foreground tabular-nums">
+                    trang {chapter.startPage}–{chapter.endPage}
+                  </span>
+                  <span className="h-px flex-1 bg-border" aria-hidden />
+                </div>
               )}
-            >
-              <Bookmark
-                className="size-3.5"
-                fill={isBookmarked ? "currentColor" : "none"}
-                aria-hidden
-              />
-            </button>
-          </div>
-        );
-      })}
+              <div className="group relative">
+                <Link
+                  href={`/read/${bookId}/${page}`}
+                  className="focus-visible:ring-ring block overflow-hidden rounded-lg border border-border bg-muted transition-shadow hover:shadow-md focus-visible:ring-2 focus-visible:outline-none"
+                >
+                  <div className="relative aspect-[192/250] w-full">
+                    <Image
+                      src={getThumbUrl(bookId, page)}
+                      alt={`Trang ${page}`}
+                      fill
+                      sizes="(min-width: 1024px) 15vw, (min-width: 640px) 22vw, 30vw"
+                      className={cn(
+                        "object-cover transition-opacity",
+                        isRead && "opacity-70"
+                      )}
+                      loading={page <= 12 ? "eager" : "lazy"}
+                    />
+                    {isRead && (
+                      <span className="absolute right-1 bottom-1 rounded-full bg-primary p-0.5 text-primary-foreground shadow">
+                        <Check className="size-3" aria-hidden />
+                      </span>
+                    )}
+                    {(hasNote || hasAudio) && (
+                      <div className="absolute top-1 left-1 flex gap-1">
+                        {hasNote && (
+                          <span
+                            className="rounded-full bg-background/95 p-1 text-primary shadow ring-1 ring-border"
+                            title="Có bài giảng"
+                          >
+                            <NotebookText className="size-3" aria-hidden />
+                          </span>
+                        )}
+                        {hasAudio && (
+                          <span
+                            className="rounded-full bg-background/95 p-1 text-primary shadow ring-1 ring-border"
+                            title="Có audio"
+                          >
+                            <Volume2 className="size-3" aria-hidden />
+                          </span>
+                        )}
+                      </div>
+                    )}
+                    <span className="absolute bottom-1 left-1.5 rounded bg-background/80 px-1 text-[10px] tabular-nums text-foreground">
+                      {page}
+                    </span>
+                  </div>
+                </Link>
+
+                <button
+                  type="button"
+                  aria-label={isBookmarked ? "Bỏ đánh dấu trang" : "Đánh dấu trang"}
+                  onClick={() => toggleBookmark(bookId, page)}
+                  className={cn(
+                    "absolute top-1 right-1 rounded-full bg-background/90 p-1 shadow transition-colors",
+                    isBookmarked
+                      ? "text-primary"
+                      : "text-muted-foreground opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
+                  )}
+                >
+                  <Bookmark
+                    className="size-3.5"
+                    fill={isBookmarked ? "currentColor" : "none"}
+                    aria-hidden
+                  />
+                </button>
+              </div>
+            </Fragment>
+          );
+        })}
+      </div>
     </div>
   );
 }

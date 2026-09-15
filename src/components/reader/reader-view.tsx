@@ -134,7 +134,11 @@ export function ReaderView({
           goTo(book.totalPages);
           break;
         case "Escape":
-          router.push(`/books/${book.id}`);
+          router.push(
+            currentChapter
+              ? `/books/${book.id}#bai-${currentChapter.lesson}`
+              : `/books/${book.id}`
+          );
           break;
         case "b":
         case "B":
@@ -157,6 +161,7 @@ export function ReaderView({
     book.id,
     book.totalPages,
     router,
+    currentChapter,
     toggleBookmark,
     jumpOpen,
     noteMode,

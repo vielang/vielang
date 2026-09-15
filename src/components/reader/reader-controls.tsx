@@ -81,7 +81,14 @@ export function ReaderControls({
         )}
       >
         <Button asChild variant="ghost" size="icon" className="text-white hover:bg-white/10 hover:text-white">
-          <Link href={`/books/${book.id}`} aria-label="Về danh sách trang">
+          <Link
+            href={
+              currentLesson
+                ? `/books/${book.id}#bai-${currentLesson}`
+                : `/books/${book.id}`
+            }
+            aria-label="Về danh sách trang"
+          >
             <X className="size-5" aria-hidden />
           </Link>
         </Button>

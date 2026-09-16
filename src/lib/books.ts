@@ -26,7 +26,8 @@ export interface Book {
   /** textbook = giáo trình chính, workbook = sách bài tập (익힘책, không có audio riêng) */
   kind: "textbook" | "workbook";
   titleVi: string;
-  titleKo: string;
+  /** Tiêu đề bản ngữ hiển thị dưới titleVi (vd tiếng Hàn) — bỏ trống nếu không áp dụng (vd sách tiếng Anh) */
+  titleKo?: string;
   totalPages: number;
 }
 
@@ -118,6 +119,69 @@ export const BOOKS: readonly Book[] = [
     titleVi: "Sách bài tập – Văn hóa Xã hội Hàn Quốc, Tập 4",
     titleKo: "사회통합프로그램 문화 4 익힘책",
     totalPages: 160,
+  },
+  {
+    id: "en-beginner",
+    sourceDir: "SB_EN_beginner",
+    lang: "en",
+    level: 1,
+    kind: "textbook",
+    titleVi: "English File – Beginner",
+    totalPages: 137,
+  },
+  {
+    id: "en-elementary",
+    sourceDir: "SB_EN_elementary",
+    lang: "en",
+    level: 2,
+    kind: "textbook",
+    titleVi: "English File – Elementary",
+    totalPages: 169,
+  },
+  {
+    id: "en-pre-intermediate",
+    sourceDir: "SB_EN_pre_intermediate",
+    lang: "en",
+    level: 3,
+    kind: "textbook",
+    titleVi: "English File – Pre-Intermediate",
+    totalPages: 167,
+  },
+  {
+    id: "en-intermediate",
+    sourceDir: "SB_EN_intermediate",
+    lang: "en",
+    level: 4,
+    kind: "textbook",
+    titleVi: "English File – Intermediate",
+    totalPages: 169,
+  },
+  {
+    id: "en-intermediate-plus",
+    sourceDir: "SB_EN_intermediate_plus",
+    lang: "en",
+    level: 5,
+    kind: "textbook",
+    titleVi: "English File – Intermediate Plus",
+    totalPages: 169,
+  },
+  {
+    id: "en-upper-intermediate",
+    sourceDir: "SB_EN_upper_intermediate",
+    lang: "en",
+    level: 6,
+    kind: "textbook",
+    titleVi: "English File – Upper-Intermediate",
+    totalPages: 170,
+  },
+  {
+    id: "en-advanced",
+    sourceDir: "SB_EN_advanced",
+    lang: "en",
+    level: 7,
+    kind: "textbook",
+    titleVi: "English File – Advanced",
+    totalPages: 178,
   },
 ] as const;
 

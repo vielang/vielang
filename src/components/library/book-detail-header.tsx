@@ -31,9 +31,11 @@ export function BookDetailHeader({ book }: { book: Book }) {
           <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
             {book.titleVi}
           </h1>
-          <p className="font-korean mt-1 text-sm text-muted-foreground">
-            {book.titleKo}
-          </p>
+          {book.titleKo && (
+            <p className="font-korean mt-1 text-sm text-muted-foreground">
+              {book.titleKo}
+            </p>
+          )}
         </div>
       </div>
 

@@ -63,9 +63,11 @@ export function BookCard({
             {compact ? KIND_LABEL[book.kind] : book.titleVi}
           </h3>
         </Link>
-        <p className="font-korean -mt-1 text-xs text-muted-foreground">
-          {book.titleKo}
-        </p>
+        {book.titleKo && (
+          <p className="font-korean -mt-1 text-xs text-muted-foreground">
+            {book.titleKo}
+          </p>
+        )}
 
         <div className="mt-auto flex flex-col gap-2 pt-2">
           {hasHydrated ? (

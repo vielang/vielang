@@ -69,12 +69,13 @@ function clampSize(size: Size): Size {
  */
 export function NoteWidget({
   bookId,
-  page,
-  originalContent,
+  pages,
+  noteContentByPage,
 }: {
   bookId: string;
-  page: number;
-  originalContent: string | null;
+  /** 1 hoặc 2 trang tuỳ chế độ xem — xem NotePanel. */
+  pages: number[];
+  noteContentByPage: Record<number, string | null>;
 }) {
   const mode = useNoteWidgetStore((s) => s.mode);
   const setMode = useNoteWidgetStore((s) => s.setMode);
@@ -180,12 +181,14 @@ export function NoteWidget({
       >
         <GripVertical className="size-4 shrink-0 text-muted-foreground" aria-hidden />
         <span className="min-w-0 flex-1 truncate text-xs font-medium">
-          Bài giảng — Trang {page}
+          Bài giảng — Trang {pages.length === 2 ? `${pages[0]}–${pages[1]}` : pages[0]}
         </span>
         <button
           type="button"
           onClick={() => {
-            if (openNoteWindow(bookId, page)) setMode("popped");
+            // Cửa sổ riêng chỉ xem 1 trang (khung hẹp, không hợp 2 trang) —
+            // luôn mở trang trái/anchor.
+            if (openNoteWindow(bookId, pages[0])) setMode("popped");
           }}
           aria-label="Mở ra cửa sổ riêng"
           title="Mở ra cửa sổ riêng"
@@ -212,7 +215,7 @@ export function NoteWidget({
         </button>
       </div>
 
-      <NotePanel bookId={bookId} page={page} originalContent={originalContent} />
+      <NotePanel bookId={bookId} pages={pages} noteContentByPage={noteContentByPage} />
 
       {/* Tay cầm đổi cỡ ở góc dưới phải. */}
       <div

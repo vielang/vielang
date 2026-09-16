@@ -22,17 +22,25 @@ import { openNoteWindow } from "@/lib/note-window";
  */
 export function NoteSheet({
   bookId,
-  page,
-  originalContent,
+  pages,
+  noteContentByPage,
 }: {
   bookId: string;
-  page: number;
-  /** HTML bài giảng gốc (content/notes); null = trang này chưa biên soạn. */
-  originalContent: string | null;
+  /** 1 hoặc 2 trang tuỳ chế độ xem — xem NotePanel. */
+  pages: number[];
+  noteContentByPage: Record<number, string | null>;
 }) {
   const mode = useNoteWidgetStore((s) => s.mode);
   const setMode = useNoteWidgetStore((s) => s.setMode);
-  const { isEdited } = useEffectiveNote(bookId, page, originalContent);
+  const side = useNoteWidgetStore((s) => s.side);
+  // Chấm "Đã sửa" bám theo trang đang xem trong panel (trái/phải) — cùng
+  // logic chọn trang với NotePanel, xem note-panel.tsx.
+  const activePage = pages.length === 2 && side === "right" ? pages[1] : pages[0];
+  const { isEdited } = useEffectiveNote(
+    bookId,
+    activePage,
+    noteContentByPage[activePage] ?? null
+  );
 
   return (
     <Sheet
@@ -50,7 +58,8 @@ export function NoteSheet({
       >
         <SheetHeader className="pb-2">
           <SheetTitle className="flex items-center gap-2">
-            Bài giảng — Trang {page}
+            Bài giảng — Trang{" "}
+            {pages.length === 2 ? `${pages[0]}–${pages[1]}` : pages[0]}
             {isEdited && (
               <Badge variant="secondary" className="font-normal">
                 Đã sửa
@@ -67,7 +76,9 @@ export function NoteSheet({
               variant="ghost"
               size="icon-sm"
               onClick={() => {
-                if (openNoteWindow(bookId, page)) setMode("popped");
+                // Cửa sổ riêng chỉ xem 1 trang (khung hẹp, không hợp 2 trang)
+                // — luôn mở trang trái/anchor.
+                if (openNoteWindow(bookId, pages[0])) setMode("popped");
               }}
               aria-label="Mở ra cửa sổ riêng"
               title="Mở ra cửa sổ riêng"
@@ -86,7 +97,7 @@ export function NoteSheet({
           </div>
         </SheetHeader>
 
-        <NotePanel bookId={bookId} page={page} originalContent={originalContent} />
+        <NotePanel bookId={bookId} pages={pages} noteContentByPage={noteContentByPage} />
       </SheetContent>
     </Sheet>
   );

@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import { Eye, Pencil, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NOTE_PROSE_CLASS, useEffectiveNote, useNoteStore } from "@/lib/note-store";
-import { useNoteWidgetStore } from "@/lib/note-widget-store";
+import { useNoteWidgetStore, type NoteSide } from "@/lib/note-widget-store";
 import { countItems, getPageQuiz } from "@/lib/quiz";
 import { QuizPanel } from "@/components/reader/quiz-panel";
 import { cn } from "@/lib/utils";
@@ -32,32 +32,51 @@ const NoteEditor = dynamic(
  *
  * Trạng thái `editing` lấy từ store module-scope nên giữ nguyên khi đổi chế
  * độ hay lật trang — đang soạn mà lật trang thì vẫn ở chế độ soạn.
+ *
+ * `pages` có 1 phần tử (chế độ 1 trang / cửa sổ riêng) hoặc 2 phần tử [trái,
+ * phải] (chế độ 2 trang) — có 2 trang thì thêm 1 dải chọn "Trang N" phía
+ * trên, mỗi trang lại có tối đa 2 tab con (Bài giảng/Bài tập) như cũ, nên
+ * tổng cộng tối đa 4 tổ hợp chọn được khi trang nào cũng có bài tập.
  */
 export function NotePanel({
   bookId,
-  page,
-  originalContent,
+  pages,
+  noteContentByPage,
 }: {
   bookId: string;
-  page: number;
-  /** HTML bài giảng gốc (content/notes); null = trang này chưa biên soạn. */
-  originalContent: string | null;
+  pages: number[];
+  /** HTML bài giảng gốc theo từng trang trong `pages`; null = trang chưa biên soạn. */
+  noteContentByPage: Record<number, string | null>;
 }) {
-  const { html, isEdited, hasOriginal, hasContent } = useEffectiveNote(
+  const leftPage = pages[0];
+  const rightPage = pages[1] ?? pages[0];
+
+  const leftNote = useEffectiveNote(bookId, leftPage, noteContentByPage[leftPage] ?? null);
+  const rightNote = useEffectiveNote(
     bookId,
-    page,
-    originalContent
+    rightPage,
+    noteContentByPage[rightPage] ?? null
   );
+  const leftQuiz = getPageQuiz(bookId, leftPage);
+  const rightQuiz = pages.length === 2 ? getPageQuiz(bookId, rightPage) : [];
+
   const resetNote = useNoteStore((s) => s.resetNote);
   const editing = useNoteWidgetStore((s) => s.editing);
   const setEditing = useNoteWidgetStore((s) => s.setEditing);
   const storedTab = useNoteWidgetStore((s) => s.tab);
   const setTab = useNoteWidgetStore((s) => s.setTab);
+  const storedSide = useNoteWidgetStore((s) => s.side);
+  const setSide = useNoteWidgetStore((s) => s.setSide);
 
-  const sections = getPageQuiz(bookId, page);
-  // Trang không có bài tập thì không hiện tab nào cả — đỡ bày ra 1 tab rỗng.
-  // Nếu đang đứng ở tab bài tập mà lật sang trang như vậy thì rơi về bài
-  // giảng, không kẹt ở màn trống.
+  const side: NoteSide = pages.length === 2 ? storedSide : "left";
+  const page = side === "right" ? rightPage : leftPage;
+  const { html, isEdited, hasOriginal, hasContent } =
+    side === "right" ? rightNote : leftNote;
+  const sections = side === "right" ? rightQuiz : leftQuiz;
+
+  // Trang không có bài tập thì không hiện tab đó — đỡ bày ra 1 tab rỗng. Nếu
+  // đang đứng ở tab bài tập mà đổi sang trang/side không có bài tập thì rơi
+  // về bài giảng, không kẹt ở màn trống.
   const hasQuiz = sections.length > 0;
   const tab = hasQuiz ? storedTab : "note";
 
@@ -72,6 +91,23 @@ export function NotePanel({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
+      {pages.length === 2 && (
+        <div role="tablist" className="flex gap-1 border-b border-border px-3 pt-2">
+          <PageTabButton
+            selected={side === "left"}
+            onSelect={() => setSide("left")}
+            page={leftPage}
+            hasContent={leftNote.hasContent || leftQuiz.length > 0}
+          />
+          <PageTabButton
+            selected={side === "right"}
+            onSelect={() => setSide("right")}
+            page={rightPage}
+            hasContent={rightNote.hasContent || rightQuiz.length > 0}
+          />
+        </div>
+      )}
+
       {hasQuiz && (
         <div role="tablist" className="flex gap-1 border-b border-border px-3">
           <TabButton
@@ -91,9 +127,9 @@ export function NotePanel({
       {tab === "quiz" ? (
         <QuizPanel bookId={bookId} page={page} sections={sections} />
       ) : (
-        // Đổi tab thì editor unmount — an toàn vì phần gõ dở được ghi nốt ở
-        // cleanup của nó (xem note-editor), và lúc quay lại nó nạp đúng bản
-        // vừa lưu.
+        // Đổi tab/trang thì editor unmount — an toàn vì phần gõ dở được ghi
+        // nốt ở cleanup của nó (xem note-editor), và lúc quay lại nó nạp
+        // đúng bản vừa lưu.
         <>
           <div className="flex items-center gap-2 px-3 py-2">
             <Button
@@ -121,9 +157,9 @@ export function NotePanel({
 
           {editing ? (
             <div className="flex min-h-0 flex-1 flex-col px-3 pb-3">
-              {/* key gồm cả trang: lật trang lúc đang soạn thì editor nạp lại
-                  nội dung trang mới, và bản đang gõ dở của trang cũ được ghi
-                  nốt ở cleanup của editor cũ (xem note-editor). */}
+              {/* key gồm cả trang: lật trang/đổi side lúc đang soạn thì editor
+                  nạp lại nội dung trang mới, và bản đang gõ dở của trang cũ
+                  được ghi nốt ở cleanup của editor cũ (xem note-editor). */}
               <NoteEditor
                 key={`${bookId}:${page}:${editorNonce}`}
                 bookId={bookId}
@@ -151,6 +187,44 @@ export function NotePanel({
         </>
       )}
     </div>
+  );
+}
+
+function PageTabButton({
+  selected,
+  onSelect,
+  page,
+  hasContent,
+}: {
+  selected: boolean;
+  onSelect: () => void;
+  page: number;
+  hasContent: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      role="tab"
+      aria-selected={selected}
+      onClick={onSelect}
+      className={cn(
+        "relative rounded-full px-2.5 py-1 text-xs font-medium transition-colors",
+        selected
+          ? "bg-primary text-primary-foreground"
+          : "bg-muted text-muted-foreground hover:text-foreground"
+      )}
+    >
+      Trang {page}
+      {hasContent && (
+        <span
+          className={cn(
+            "absolute -right-0.5 -top-0.5 size-1.5 rounded-full",
+            selected ? "bg-primary-foreground" : "bg-sky-400"
+          )}
+          aria-hidden
+        />
+      )}
+    </button>
   );
 }
 

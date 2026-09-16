@@ -31,9 +31,22 @@ export default async function ReadPage({ params }: { params: Promise<Params> }) 
   const resolved = resolve(await params);
   if (!resolved) notFound();
   const { book, page } = resolved;
-  const noteContent = getNoteContent(book.id, page);
+  // Chuẩn bị sẵn note của CẢ 2 trang có thể hiện (trang này + trang kế) —
+  // `page` luôn là trang trái/anchor khi ở chế độ 2 trang (xem
+  // reader-view.tsx), nên không cần biết trước client đang xem 1 hay 2 trang.
+  // `getNoteContent` chỉ là tra cứu JSON tĩnh trong bộ nhớ, gọi thêm 1 lần
+  // không đáng kể.
+  const noteContentByPage: Record<number, string | null> = {
+    [page]: getNoteContent(book.id, page),
+    [page + 1]: getNoteContent(book.id, page + 1),
+  };
 
   return (
-    <ReaderView key={page} book={book} page={page} noteContent={noteContent} />
+    <ReaderView
+      key={page}
+      book={book}
+      page={page}
+      noteContentByPage={noteContentByPage}
+    />
   );
 }

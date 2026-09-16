@@ -33,12 +33,12 @@ const INTERACTIVE_TAGS = new Set(["INPUT", "TEXTAREA", "SELECT"]);
 export function ReaderView({
   book,
   page,
-  noteContent,
+  noteContentByPage,
 }: {
   book: Book;
   page: number;
-  /** HTML bài giảng gốc; null = trang này chưa biên soạn. */
-  noteContent: string | null;
+  /** HTML bài giảng gốc của trang này VÀ trang kế (trang phải khi ở chế độ 2 trang); null = trang chưa biên soạn. */
+  noteContentByPage: Record<number, string | null>;
 }) {
   const router = useRouter();
   const viewerRef = useRef<PageViewerHandle>(null);
@@ -65,9 +65,23 @@ export function ReaderView({
 
   // Bài giảng có thể đã được người dùng sửa/tự viết rồi lưu ở localStorage —
   // chờ rehydrate xong mới hiện chấm báo, tránh lệch với HTML server render.
+  // Gọi useEffectiveNote cố định cho CẢ 2 trang (page, page+1) dù đang ở chế
+  // độ 1 trang — số lần gọi hook phải cố định giữa các lượt render, không
+  // được rẽ nhánh theo effectiveDouble.
   const notesHydrated = useNoteStore((s) => s.hasHydrated);
-  const { hasContent } = useEffectiveNote(book.id, page, noteContent);
-  const noteHasContent = notesHydrated && hasContent;
+  const { hasContent: hasContentLeft } = useEffectiveNote(
+    book.id,
+    page,
+    noteContentByPage[page] ?? null
+  );
+  const { hasContent: hasContentRight } = useEffectiveNote(
+    book.id,
+    page + 1,
+    noteContentByPage[page + 1] ?? null
+  );
+  const noteHasContent =
+    notesHydrated &&
+    (hasContentLeft || (pages.length === 2 && hasContentRight));
 
   const markPageRead = useProgressStore((s) => s.markPageRead);
   const toggleBookmark = useProgressStore((s) => s.toggleBookmark);
@@ -241,8 +255,8 @@ export function ReaderView({
 
       <AudioWidget tracks={audioTracks} />
 
-      <NoteWidget bookId={book.id} page={page} originalContent={noteContent} />
-      <NoteSheet bookId={book.id} page={page} originalContent={noteContent} />
+      <NoteWidget bookId={book.id} pages={pages} noteContentByPage={noteContentByPage} />
+      <NoteSheet bookId={book.id} pages={pages} noteContentByPage={noteContentByPage} />
 
       <ReaderControls
         visible={toolbarVisible}

@@ -67,7 +67,11 @@ export function NoteWindowView({
         )}
       </header>
 
-      <NotePanel bookId={book.id} page={page} originalContent={originalContent} />
+      <NotePanel
+        bookId={book.id}
+        pages={[page]}
+        noteContentByPage={{ [page]: originalContent }}
+      />
     </div>
   );
 }

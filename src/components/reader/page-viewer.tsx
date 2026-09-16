@@ -14,7 +14,7 @@ import {
   TransformComponent,
   type ReactZoomPanPinchContentRef,
 } from "react-zoom-pan-pinch";
-import { getPageUrl, PAGE_ASPECT_RATIO } from "@/lib/books";
+import { getPageUrl, getPageAspectRatio, type Book } from "@/lib/books";
 import { getPageTranslations } from "@/lib/page-translation";
 import { TranslationOverlay } from "@/components/reader/translation-overlay";
 
@@ -22,31 +22,67 @@ export interface PageViewerHandle {
   resetZoom: () => void;
 }
 
+/** Khoảng hở giữa 2 trang ở chế độ xem 2 trang, mô phỏng gáy sách. */
+const SPREAD_GAP = 4;
+
 interface PageViewerProps {
-  bookId: string;
-  page: number;
+  book: Book;
+  /** 1 trang (chế độ 1 trang) hoặc 2 trang [trái, phải] (chế độ 2 trang). */
+  pages: number[];
   onTap: () => void;
   onSwipePrev: () => void;
   onSwipeNext: () => void;
 }
 
+/** 1 ảnh trang + vùng dịch của nó, đặt trong khung đã tính đúng kích thước. */
+function PageImage({
+  bookId,
+  page,
+  box,
+}: {
+  bookId: string;
+  page: number;
+  box: { width: number; height: number };
+}) {
+  const regions = getPageTranslations(bookId, page);
+  return (
+    <div className="relative" style={{ width: box.width, height: box.height }}>
+      <Image
+        src={getPageUrl(bookId, page)}
+        alt={`Trang ${page}`}
+        fill
+        sizes="100vw"
+        quality={90}
+        priority
+        draggable={false}
+        className="object-contain"
+      />
+      <TranslationOverlay regions={regions} />
+    </div>
+  );
+}
+
 export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function PageViewer(
-  { bookId, page, onTap, onSwipePrev, onSwipeNext },
+  { book, pages, onTap, onSwipePrev, onSwipeNext },
   ref
 ) {
   const transformRef = useRef<ReactZoomPanPinchContentRef>(null);
   const scaleRef = useRef(1);
-  const regions = getPageTranslations(bookId, page);
+  const aspectRatio = getPageAspectRatio(book);
 
   useImperativeHandle(ref, () => ({
     resetZoom: () => transformRef.current?.resetTransform(),
   }));
 
   /**
-   * Khung ẢNH THẬT bên trong khung chứa. Ảnh hiển thị `object-contain` nên
-   * luôn có viền trống ở hai bên (hoặc trên dưới) tuỳ tỉ lệ màn hình — vùng
-   * bấm xem bản dịch lưu toạ độ theo tỉ lệ của ảnh, đặt theo khung chứa là
-   * lệch. Nên phải tự tính.
+   * Khung ẢNH THẬT bên trong khung chứa, cho MỖI trang trong `pages`. Ảnh
+   * hiển thị `object-contain` nên luôn có viền trống ở hai bên (hoặc trên
+   * dưới) tuỳ tỉ lệ màn hình — vùng bấm xem bản dịch lưu toạ độ theo tỉ lệ
+   * của ảnh, đặt theo khung chứa là lệch. Nên phải tự tính.
+   *
+   * Ở chế độ 2 trang, khung chứa chia đôi theo chiều rộng (trừ khoảng hở
+   * SPREAD_GAP) trước khi áp cùng công thức — 2 trang vẫn giữ đúng tỉ lệ,
+   * không bị méo.
    *
    * Dùng offsetWidth/offsetHeight chứ KHÔNG dùng getBoundingClientRect: rect
    * đã nhân với transform của react-zoom-pan-pinch, đo bằng nó thì cứ zoom là
@@ -54,29 +90,29 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
    */
   const boxRef = useRef<HTMLDivElement>(null);
   const [box, setBox] = useState<{ width: number; height: number } | null>(null);
+  const count = pages.length;
 
   useLayoutEffect(() => {
     const el = boxRef.current;
     if (!el) return;
 
     function measure(target: HTMLElement) {
-      const width = Math.min(
-        target.offsetWidth,
-        target.offsetHeight * PAGE_ASPECT_RATIO
-      );
-      setBox({ width, height: width / PAGE_ASPECT_RATIO });
+      const gapTotal = SPREAD_GAP * (count - 1);
+      const maxWidthPerPage = (target.offsetWidth - gapTotal) / count;
+      const width = Math.min(maxWidthPerPage, target.offsetHeight * aspectRatio);
+      setBox({ width, height: width / aspectRatio });
     }
 
     measure(el);
     const observer = new ResizeObserver(() => measure(el));
     observer.observe(el);
     return () => observer.disconnect();
-  }, []);
+  }, [count, aspectRatio]);
 
   // Theo dõi cử chỉ 1 ngón để phân biệt: tap (bật/tắt toolbar), vuốt ngang
-  // (chuyển trang, chỉ khi chưa zoom), hay pinch (2 ngón — bỏ qua, để thư
-  // viện zoom xử lý). Chỉ *đọc* sự kiện, không preventDefault/stopPropagation
-  // nên không phá cử chỉ pinch/pan gốc của react-zoom-pan-pinch.
+  // (chuyển trang/spread, chỉ khi chưa zoom), hay pinch (2 ngón — bỏ qua, để
+  // thư viện zoom xử lý). Chỉ *đọc* sự kiện, không preventDefault/
+  // stopPropagation nên không phá cử chỉ pinch/pan gốc của react-zoom-pan-pinch.
   const pointers = useRef(new Map<number, { x: number; y: number }>());
   const gesture = useRef<{
     id: number;
@@ -138,7 +174,7 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
   return (
     <TransformWrapper
       ref={transformRef}
-      key={page}
+      key={pages.join("-")}
       initialScale={1}
       minScale={1}
       maxScale={4}
@@ -161,26 +197,15 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
         <div
           ref={boxRef}
           className="flex h-full w-full touch-none items-center justify-center select-none"
+          style={count > 1 ? { gap: SPREAD_GAP } : undefined}
           onPointerDown={onPointerDown}
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerCancel}
         >
-          <div
-            className="relative"
-            style={box ? { width: box.width, height: box.height } : { width: "100%", height: "100%" }}
-          >
-            <Image
-              src={getPageUrl(bookId, page)}
-              alt={`Trang ${page}`}
-              fill
-              sizes="100vw"
-              quality={90}
-              priority
-              draggable={false}
-              className="object-contain"
-            />
-            {box && <TranslationOverlay regions={regions} />}
-          </div>
+          {box &&
+            pages.map((p) => (
+              <PageImage key={p} bookId={book.id} page={p} box={box} />
+            ))}
         </div>
       </TransformComponent>
     </TransformWrapper>

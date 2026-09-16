@@ -29,6 +29,14 @@ export interface Book {
   /** Tiêu đề bản ngữ hiển thị dưới titleVi (vd tiếng Hàn) — bỏ trống nếu không áp dụng (vd sách tiếng Anh) */
   titleKo?: string;
   totalPages: number;
+  /**
+   * Tỉ lệ rộng/cao thật của ảnh trang (đo từ khổ giấy PDF gốc) — bỏ trống thì
+   * dùng `PAGE_ASPECT_RATIO` mặc định (khổ sách tiếng Hàn). Cần chính xác để
+   * tính khung ảnh trong `page-viewer.tsx`, đặc biệt khi ghép 2 trang cạnh
+   * nhau ở chế độ xem 2 trang — khổ giấy lệch (vd Intermediate dùng A4) sẽ
+   * để hở viền nếu dùng tỉ lệ mặc định.
+   */
+  aspectRatio?: number;
 }
 
 export const BOOKS: readonly Book[] = [
@@ -128,6 +136,7 @@ export const BOOKS: readonly Book[] = [
     kind: "textbook",
     titleVi: "English File – Beginner",
     totalPages: 137,
+    aspectRatio: 1152 / 1451.25,
   },
   {
     id: "en-elementary",
@@ -137,6 +146,7 @@ export const BOOKS: readonly Book[] = [
     kind: "textbook",
     titleVi: "English File – Elementary",
     totalPages: 169,
+    aspectRatio: 1152 / 1452,
   },
   {
     id: "en-pre-intermediate",
@@ -146,6 +156,7 @@ export const BOOKS: readonly Book[] = [
     kind: "textbook",
     titleVi: "English File – Pre-Intermediate",
     totalPages: 167,
+    aspectRatio: 1152 / 1451.25,
   },
   {
     id: "en-intermediate",
@@ -155,6 +166,7 @@ export const BOOKS: readonly Book[] = [
     kind: "textbook",
     titleVi: "English File – Intermediate",
     totalPages: 169,
+    aspectRatio: 595.22 / 842,
   },
   {
     id: "en-intermediate-plus",
@@ -164,6 +176,7 @@ export const BOOKS: readonly Book[] = [
     kind: "textbook",
     titleVi: "English File – Intermediate Plus",
     totalPages: 169,
+    aspectRatio: 864 / 1088.44,
   },
   {
     id: "en-upper-intermediate",
@@ -173,6 +186,7 @@ export const BOOKS: readonly Book[] = [
     kind: "textbook",
     titleVi: "English File – Upper-Intermediate",
     totalPages: 170,
+    aspectRatio: 1152 / 1451.25,
   },
   {
     id: "en-advanced",
@@ -182,6 +196,7 @@ export const BOOKS: readonly Book[] = [
     kind: "textbook",
     titleVi: "English File – Advanced",
     totalPages: 178,
+    aspectRatio: 1152 / 1451.25,
   },
 ] as const;
 
@@ -196,6 +211,11 @@ export const BOOKS: readonly Book[] = [
 export const PAGE_IMAGE_WIDTH = 1200;
 export const PAGE_IMAGE_HEIGHT = 1562;
 export const PAGE_ASPECT_RATIO = PAGE_IMAGE_WIDTH / PAGE_IMAGE_HEIGHT;
+
+/** Tỉ lệ rộng/cao ảnh trang của 1 sách cụ thể — dùng cái này thay vì PAGE_ASPECT_RATIO thẳng để khung ảnh chính xác cho từng khổ giấy. */
+export function getPageAspectRatio(book: Book): number {
+  return book.aspectRatio ?? PAGE_ASPECT_RATIO;
+}
 
 export function getBook(id: string): Book | undefined {
   return BOOKS.find((b) => b.id === id);

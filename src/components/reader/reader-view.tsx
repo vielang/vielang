@@ -6,7 +6,14 @@ import type { Book } from "@/lib/books";
 import { useProgressStore } from "@/lib/progress-store";
 import { useEffectiveNote, useNoteStore } from "@/lib/note-store";
 import { getPageAudio } from "@/lib/audio";
-import { getChapters } from "@/lib/chapters";
+import {
+  getAdjacentSpreadAnchor,
+  getChapters,
+  getSpreadAnchor,
+  getSpreadPages,
+} from "@/lib/chapters";
+import { useReaderPrefsStore } from "@/lib/reader-prefs-store";
+import { useIsWideScreen } from "@/lib/use-wide-screen";
 import { PageViewer, type PageViewerHandle } from "@/components/reader/page-viewer";
 import { ReaderControls } from "@/components/reader/reader-controls";
 import { AdjacentPreload } from "@/components/reader/adjacent-preload";
@@ -40,6 +47,21 @@ export function ReaderView({
   const currentChapter = chapters.find(
     (ch) => page >= ch.startPage && page <= ch.endPage
   );
+
+  // Chế độ xem 1/2 trang — tuỳ chọn chung cho mọi sách (persist), nhưng chỉ
+  // thực sự bật khi màn hình đủ rộng để 2 trang còn đọc được. `page` (từ URL)
+  // luôn được coi là trang trái/anchor của spread khi ở chế độ 2 trang — mọi
+  // đường điều hướng trong app (goTo/stepNext/stepPrev/nút đổi chế độ) đều tự
+  // chuẩn hoá về đúng anchor trước khi đổi URL, nên bất biến này luôn đúng
+  // trừ khi người dùng tự sửa tay số trang trên URL (trường hợp hiếm, tự
+  // phục hồi ngay lần điều hướng kế tiếp).
+  const pageLayout = useReaderPrefsStore((s) => s.pageLayout);
+  const setPageLayout = useReaderPrefsStore((s) => s.setPageLayout);
+  const isWideScreen = useIsWideScreen();
+  const effectiveDouble = pageLayout === "double" && isWideScreen;
+  const pages = effectiveDouble
+    ? getSpreadPages(book.id, page, book.totalPages)
+    : [page];
 
   // Bài giảng có thể đã được người dùng sửa/tự viết rồi lưu ở localStorage —
   // chờ rehydrate xong mới hiện chấm báo, tránh lệch với HTML server render.
@@ -97,17 +119,51 @@ export function ReaderView({
   const goTo = useCallback(
     (target: number) => {
       const clamped = Math.min(Math.max(target, 1), book.totalPages);
-      if (clamped !== page) router.push(`/read/${book.id}/${clamped}`);
+      const dest = effectiveDouble ? getSpreadAnchor(book.id, clamped) : clamped;
+      if (dest !== page) router.push(`/read/${book.id}/${dest}`);
     },
-    [book.id, book.totalPages, page, router]
+    [book.id, book.totalPages, page, router, effectiveDouble]
   );
 
-  // Ghi nhận đã đọc trang này. `toolbarVisible` không cần reset thủ công ở
-  // đây — page.tsx render <ReaderView key={page}/>, remount mỗi khi đổi
-  // trang nên state cục bộ (toolbar, dialog...) tự về mặc định.
+  // Lùi/tiến đúng 1 spread ở chế độ 2 trang (bước 1 hoặc 2 trang tuỳ spread
+  // hiện tại dài bao nhiêu), hoặc đúng 1 trang ở chế độ 1 trang.
+  const stepNext = useCallback(() => {
+    goTo(
+      effectiveDouble
+        ? getAdjacentSpreadAnchor(book.id, page, book.totalPages, 1)
+        : page + 1
+    );
+  }, [effectiveDouble, book.id, book.totalPages, page, goTo]);
+
+  const stepPrev = useCallback(() => {
+    goTo(
+      effectiveDouble
+        ? getAdjacentSpreadAnchor(book.id, page, book.totalPages, -1)
+        : page - 1
+    );
+  }, [effectiveDouble, book.id, book.totalPages, page, goTo]);
+
+  const togglePageLayout = useCallback(() => {
+    const next = pageLayout === "double" ? "single" : "double";
+    setPageLayout(next);
+    // Bật 2 trang mà đang đứng ở trang phải: chuẩn hoá URL về trang trái của
+    // spread luôn — không gọi goTo() vì nó còn đóng gói effectiveDouble của
+    // lượt render TRƯỚC khi setPageLayout có hiệu lực (stale closure).
+    if (next === "double" && isWideScreen) {
+      const anchor = getSpreadAnchor(book.id, page);
+      if (anchor !== page) router.push(`/read/${book.id}/${anchor}`);
+    }
+  }, [pageLayout, setPageLayout, isWideScreen, book.id, page, router]);
+
+  // Ghi nhận đã đọc CẢ 2 trang của spread (nếu đang ở chế độ 2 trang).
+  // `toolbarVisible` không cần reset thủ công ở đây — page.tsx render
+  // <ReaderView key={page}/>, remount mỗi khi đổi trang nên state cục bộ
+  // (toolbar, dialog...) tự về mặc định.
+  const pagesKey = pages.join(",");
   useEffect(() => {
-    markPageRead(book.id, page);
-  }, [book.id, page, markPageRead]);
+    pages.forEach((p) => markPageRead(book.id, p));
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- so sánh theo pagesKey (chuỗi) để khỏi chạy lại mỗi lần render do `pages` là array mới mỗi lượt.
+  }, [book.id, pagesKey, markPageRead]);
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
@@ -122,10 +178,10 @@ export function ReaderView({
 
       switch (e.key) {
         case "ArrowRight":
-          goTo(page + 1);
+          stepNext();
           break;
         case "ArrowLeft":
-          goTo(page - 1);
+          stepPrev();
           break;
         case "Home":
           goTo(1);
@@ -157,6 +213,8 @@ export function ReaderView({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [
     goTo,
+    stepNext,
+    stepPrev,
     page,
     book.id,
     book.totalPages,
@@ -170,15 +228,15 @@ export function ReaderView({
 
   return (
     <div className="fixed inset-0 overflow-hidden bg-black">
-      <AdjacentPreload bookId={book.id} page={page} totalPages={book.totalPages} />
+      <AdjacentPreload bookId={book.id} pages={pages} totalPages={book.totalPages} />
 
       <PageViewer
         ref={viewerRef}
-        bookId={book.id}
-        page={page}
+        book={book}
+        pages={pages}
         onTap={() => setToolbarVisible((v) => !v)}
-        onSwipePrev={() => goTo(page - 1)}
-        onSwipeNext={() => goTo(page + 1)}
+        onSwipePrev={stepPrev}
+        onSwipeNext={stepNext}
       />
 
       <AudioWidget tracks={audioTracks} />
@@ -190,6 +248,7 @@ export function ReaderView({
         visible={toolbarVisible}
         book={book}
         page={page}
+        pages={pages}
         chapters={chapters}
         currentLesson={currentChapter?.lesson ?? null}
         isBookmarked={isBookmarked}
@@ -198,11 +257,14 @@ export function ReaderView({
         noteHasContent={noteHasContent}
         noteLabel={noteLabel}
         onNoteToggle={toggleNote}
-        onPrev={() => goTo(page - 1)}
-        onNext={() => goTo(page + 1)}
+        onPrev={stepPrev}
+        onNext={stepNext}
         onJump={goTo}
         onToggleBookmark={() => toggleBookmark(book.id, page)}
         onResetZoom={() => viewerRef.current?.resetZoom()}
+        showLayoutToggle={isWideScreen}
+        pageLayout={pageLayout}
+        onTogglePageLayout={togglePageLayout}
       />
     </div>
   );

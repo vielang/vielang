@@ -2,21 +2,26 @@ import Image from "next/image";
 import { getPageUrl } from "@/lib/books";
 
 /**
- * Preload ảnh trang kế tiếp/trước bằng chính next/image, dùng cùng
- * `sizes="100vw"` như ảnh đang đọc để trình duyệt chọn đúng URL srcset sẽ
- * cần khi chuyển trang (đã nằm sẵn trong cache) — chuyển trang mượt, không
- * giật. Ẩn hoàn toàn khỏi layout & màn hình đọc.
+ * Preload ảnh các trang liền kề spread đang xem bằng chính next/image, dùng
+ * cùng `sizes="100vw"` như ảnh đang đọc để trình duyệt chọn đúng URL srcset
+ * sẽ cần khi chuyển trang (đã nằm sẵn trong cache) — chuyển trang/spread
+ * mượt, không giật. Ẩn hoàn toàn khỏi layout & màn hình đọc.
  */
 export function AdjacentPreload({
   bookId,
-  page,
+  pages,
   totalPages,
 }: {
   bookId: string;
-  page: number;
+  /** Trang (hoặc 2 trang) đang hiện — preload phía trước trang đầu và phía sau trang cuối. */
+  pages: number[];
   totalPages: number;
 }) {
-  const targets = [page - 1, page + 1].filter((p) => p >= 1 && p <= totalPages);
+  const first = Math.min(...pages);
+  const last = Math.max(...pages);
+  const targets = [first - 2, first - 1, last + 1, last + 2].filter(
+    (p) => p >= 1 && p <= totalPages && !pages.includes(p)
+  );
   if (targets.length === 0) return null;
 
   return (

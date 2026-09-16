@@ -111,3 +111,49 @@ export function getChapters(bookId: string, totalPages: number): Chapter[] {
     endPage: (starts[i + 1] ?? totalPages + 1) - 1,
   }));
 }
+
+/**
+ * Chế độ xem 2 trang: ghép 2 TRANG ẢNH đang có thành đúng 1 spread in gốc
+ * (đã xác nhận bằng ảnh trang thật — mỗi Lesson thực sự trải trên 2 trang in
+ * liên tiếp, nội dung tiếp nối nhau, không phải 2 trang độc lập). Trang PDF
+ * ta lưu khác trang in ở mỗi sách theo 1 offset riêng (0/+1/+2, xem
+ * TEXTBOOK_CHAPTERS) — offset lệ (chẵn/lẻ) sẽ đổi trang nào là "trang trái"
+ * của spread trong hệ số trang PDF. Suy ra offset đó từ mốc Bài 1 (luôn là
+ * trang trái thật) thay vì hard-code, để không phải nhớ offset riêng ở đây.
+ */
+function isSpreadLeftPage(bookId: string, page: number): boolean {
+  const starts = getChapterStartPages(bookId);
+  const leftIsOdd = starts.length > 0 && starts[0] % 2 === 1;
+  return leftIsOdd ? page % 2 === 1 : page % 2 === 0;
+}
+
+/**
+ * Trang "trái" (hoặc trang lẻ đứng riêng ở đầu/cuối sách) của spread chứa
+ * `page`. Dùng để chuẩn hoá trang đích khi nhảy trang ở chế độ xem 2 trang —
+ * luôn hiện đúng spread thật, không hiện nửa bên phải trước nửa bên trái.
+ */
+export function getSpreadAnchor(bookId: string, page: number): number {
+  const p = Math.max(1, page);
+  return isSpreadLeftPage(bookId, p) ? p : Math.max(1, p - 1);
+}
+
+/** Danh sách trang hiện trong spread bắt đầu từ `anchor` — 1 trang nếu là trang lẻ cuối sách. */
+export function getSpreadPages(bookId: string, anchor: number, totalPages: number): number[] {
+  const right = anchor + 1;
+  return isSpreadLeftPage(bookId, anchor) && right <= totalPages ? [anchor, right] : [anchor];
+}
+
+/** Spread liền trước/sau spread bắt đầu từ `anchor` (bước đúng 1 hoặc 2 trang tuỳ độ dài spread hiện tại). */
+export function getAdjacentSpreadAnchor(
+  bookId: string,
+  anchor: number,
+  totalPages: number,
+  direction: 1 | -1
+): number {
+  if (direction === 1) {
+    const step = getSpreadPages(bookId, anchor, totalPages).length;
+    return Math.min(anchor + step, totalPages);
+  }
+  const prevRaw = anchor - 1;
+  return prevRaw < 1 ? anchor : getSpreadAnchor(bookId, prevRaw);
+}

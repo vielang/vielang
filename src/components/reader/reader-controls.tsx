@@ -4,8 +4,10 @@ import Link from "next/link";
 import { useState } from "react";
 import {
   Bookmark,
+  BookOpen,
   ChevronLeft,
   ChevronRight,
+  Columns2,
   NotebookText,
   RotateCcw,
   X,
@@ -29,6 +31,7 @@ export function ReaderControls({
   visible,
   book,
   page,
+  pages,
   chapters,
   currentLesson,
   isBookmarked,
@@ -42,10 +45,15 @@ export function ReaderControls({
   onJump,
   onToggleBookmark,
   onResetZoom,
+  showLayoutToggle,
+  pageLayout,
+  onTogglePageLayout,
 }: {
   visible: boolean;
   book: Book;
   page: number;
+  /** Trang đang hiện — 1 hoặc 2 phần tử tuỳ chế độ xem, dùng để hiện nhãn "Trang N" / "Trang N–M". */
+  pages: number[];
   /** Ranh giới bài học (xem lib/chapters.ts) — [] nếu sách không xác định được */
   chapters: Chapter[];
   /** Bài học chứa trang hiện tại — null nếu trang thuộc phần mở đầu (chưa vào bài nào) */
@@ -63,6 +71,10 @@ export function ReaderControls({
   onJump: (page: number) => void;
   onToggleBookmark: () => void;
   onResetZoom: () => void;
+  /** Chỉ hiện nút đổi 1/2 trang khi màn hình đủ rộng — màn hẹp thì 2 trang không đọc được. */
+  showLayoutToggle: boolean;
+  pageLayout: "single" | "double";
+  onTogglePageLayout: () => void;
 }) {
   const [pendingPage, setPendingPage] = useState(page);
 
@@ -132,6 +144,32 @@ export function ReaderControls({
               aria-hidden
             />
           </Button>
+
+          {showLayoutToggle && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-white hover:bg-white/10 hover:text-white"
+                  onClick={onTogglePageLayout}
+                  aria-label={
+                    pageLayout === "double" ? "Xem 1 trang" : "Xem 2 trang"
+                  }
+                  aria-pressed={pageLayout === "double"}
+                >
+                  {pageLayout === "double" ? (
+                    <Columns2 className="size-5" aria-hidden />
+                  ) : (
+                    <BookOpen className="size-5" aria-hidden />
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                {pageLayout === "double" ? "Xem 1 trang" : "Xem 2 trang"}
+              </TooltipContent>
+            </Tooltip>
+          )}
         </div>
       </div>
 
@@ -161,7 +199,8 @@ export function ReaderControls({
           {currentLesson && (
             <span className="text-white/70">Bài {currentLesson} ·</span>
           )}
-          Trang {page}/{book.totalPages}
+          Trang {pages.length === 2 ? `${pages[0]}–${pages[1]}` : pages[0]}/
+          {book.totalPages}
         </Button>
 
         <Button

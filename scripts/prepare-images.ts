@@ -1,13 +1,15 @@
 #!/usr/bin/env tsx
 /**
- * Pipeline chuyển ảnh trang sách (JPG gốc từ download_ebook.py) sang WebP
- * tối ưu rồi upload lên Cloudflare R2.
+ * Pipeline chuyển ảnh trang sách (PNG/JPG gốc) sang WebP tối ưu rồi upload
+ * lên Cloudflare R2.
  *
- * Đầu vào : ../<sourceDir>_images/pages/page-0001.jpg ... (nằm ở thư mục gốc
- *           `kiip/`, một cấp trên thư mục `web/` — chạy script bằng
- *           `npm run prepare-images` để cwd luôn là `web/`). `sourceDir`
- *           lấy từ `src/lib/books.ts` (khác `id` với sách bài tập, vd
- *           `WB_step1` cho id `wb-step1`).
+ * Đầu vào : ../<sourceDir>_images/pages/page-0001.png (ưu tiên — lossless,
+ *           tránh nén lossy 2 lần khi ra WebP) hoặc .jpg (fallback, sách cũ
+ *           tải bằng download_ebook.py) — nằm ở thư mục gốc `kiip/`, một
+ *           cấp trên thư mục `web/` — chạy script bằng `npm run
+ *           prepare-images` để cwd luôn là `web/`). `sourceDir` lấy từ
+ *           `src/lib/books.ts` (khác `id` với sách bài tập, vd `WB_step1`
+ *           cho id `wb-step1`).
  * Đầu ra  : R2 bucket, key `books/<id>/pages/0001.webp` và
  *           `books/<id>/thumbs/0001.webp`.
  *
@@ -112,14 +114,20 @@ interface PageResult {
   error?: string;
 }
 
+/** Ưu tiên PNG (lossless, không nén 2 lần khi ra WebP) — fallback JPG cho sách cũ. */
+async function resolveSrcPath(book: Book, page: number): Promise<string> {
+  const pagesDir = path.resolve(process.cwd(), "..", `${book.sourceDir}_images`, "pages");
+  const pngPath = path.join(pagesDir, `page-${padPage(page)}.png`);
+  try {
+    await stat(pngPath);
+    return pngPath;
+  } catch {
+    return path.join(pagesDir, `page-${padPage(page)}.jpg`);
+  }
+}
+
 async function processPage(book: Book, page: number): Promise<PageResult> {
-  const srcPath = path.resolve(
-    process.cwd(),
-    "..",
-    `${book.sourceDir}_images`,
-    "pages",
-    `page-${padPage(page)}.jpg`
-  );
+  const srcPath = await resolveSrcPath(book, page);
   const pageKey = `books/${book.id}/pages/${padPage(page)}.webp`;
   const thumbKey = `books/${book.id}/thumbs/${padPage(page)}.webp`;
 

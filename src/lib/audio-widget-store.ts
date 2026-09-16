@@ -19,10 +19,13 @@ interface AudioWidgetState {
   collapsedPosition: Position | null;
   collapsed: boolean;
   activeType: string | null;
+  /** Ở chế độ xem 2 trang: audio của trang trái hay phải đang được chọn. */
+  side: "left" | "right";
   setPosition: (p: Position) => void;
   setCollapsedPosition: (p: Position) => void;
   setCollapsed: (v: boolean) => void;
   setActiveType: (t: string) => void;
+  setSide: (s: "left" | "right") => void;
 }
 
 /**
@@ -39,8 +42,10 @@ export const useAudioWidgetStore = create<AudioWidgetState>((set) => ({
   collapsedPosition: null,
   collapsed: true,
   activeType: null,
+  side: "left",
   setPosition: (position) => set({ position }),
   setCollapsedPosition: (collapsedPosition) => set({ collapsedPosition }),
   setCollapsed: (collapsed) => set({ collapsed }),
   setActiveType: (activeType) => set({ activeType }),
+  setSide: (side) => set({ side }),
 }));

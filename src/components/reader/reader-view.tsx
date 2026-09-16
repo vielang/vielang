@@ -42,7 +42,12 @@ export function ReaderView({
 }) {
   const router = useRouter();
   const viewerRef = useRef<PageViewerHandle>(null);
-  const audioTracks = getPageAudio(book.id, page);
+  // Audio của CẢ 2 trang có thể hiện (trang này + trang kế) — AudioWidget tự
+  // chọn trang nào có audio để hiện, giống cách NotePanel xử lý noteContentByPage.
+  const audioTracksByPage = {
+    [page]: getPageAudio(book.id, page),
+    [page + 1]: getPageAudio(book.id, page + 1),
+  };
   const chapters = getChapters(book.id, book.totalPages);
   const currentChapter = chapters.find(
     (ch) => page >= ch.startPage && page <= ch.endPage
@@ -253,7 +258,7 @@ export function ReaderView({
         onSwipeNext={stepNext}
       />
 
-      <AudioWidget tracks={audioTracks} />
+      <AudioWidget pages={pages} tracksByPage={audioTracksByPage} />
 
       <NoteWidget bookId={book.id} pages={pages} noteContentByPage={noteContentByPage} />
       <NoteSheet bookId={book.id} pages={pages} noteContentByPage={noteContentByPage} />

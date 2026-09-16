@@ -10,11 +10,15 @@ const SIZE = 48; // đường kính nút tròn lúc thu nhỏ
 const PANEL_WIDTH = 256;
 /** Chiều cao panel: thanh kéo + thẻ audio. */
 const PANEL_BASE_HEIGHT = 74;
-/** Hàng chọn track chỉ xuất hiện khi trang có nhiều hơn 1 track. */
+/** Hàng chọn track (hoặc hàng chọn trang) cao bằng nhau, chỉ xuất hiện khi cần. */
 const TRACK_ROW_HEIGHT = 28;
 
-function panelHeightFor(trackCount: number): number {
-  return PANEL_BASE_HEIGHT + (trackCount > 1 ? TRACK_ROW_HEIGHT : 0);
+function panelHeightFor(trackCount: number, showPageSelector: boolean): number {
+  return (
+    PANEL_BASE_HEIGHT +
+    (trackCount > 1 ? TRACK_ROW_HEIGHT : 0) +
+    (showPageSelector ? TRACK_ROW_HEIGHT : 0)
+  );
 }
 const MARGIN = 10;
 const DRAG_THRESHOLD = 5;
@@ -75,7 +79,14 @@ function clamp(pos: Pos, width: number, height: number): Pos {
  * vào mới mở rộng ra nghe. Vị trí/trạng thái thu-phóng giữ nguyên khi
  * chuyển trang (xem lib/audio-widget-store.ts).
  */
-export function AudioWidget({ tracks }: { tracks: AudioTrack[] }) {
+export function AudioWidget({
+  pages,
+  tracksByPage,
+}: {
+  /** 1 hoặc 2 trang tuỳ chế độ xem — xem NotePanel (cùng ý tưởng). */
+  pages: number[];
+  tracksByPage: Record<number, AudioTrack[]>;
+}) {
   const panelPosition = useAudioWidgetStore((s) => s.position);
   const setPanelPosition = useAudioWidgetStore((s) => s.setPosition);
   const collapsedPosition = useAudioWidgetStore((s) => s.collapsedPosition);
@@ -84,6 +95,8 @@ export function AudioWidget({ tracks }: { tracks: AudioTrack[] }) {
   const setCollapsed = useAudioWidgetStore((s) => s.setCollapsed);
   const activeType = useAudioWidgetStore((s) => s.activeType);
   const setActiveType = useAudioWidgetStore((s) => s.setActiveType);
+  const storedSide = useAudioWidgetStore((s) => s.side);
+  const setSide = useAudioWidgetStore((s) => s.setSide);
 
   const drag = useRef<{
     pointerId: number;
@@ -104,10 +117,27 @@ export function AudioWidget({ tracks }: { tracks: AudioTrack[] }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const leftPage = pages[0];
+  const rightPage = pages[1];
+  const leftTracks = tracksByPage[leftPage] ?? [];
+  const rightTracks = rightPage !== undefined ? tracksByPage[rightPage] ?? [] : [];
+  const hasLeft = leftTracks.length > 0;
+  const hasRight = rightTracks.length > 0;
+
+  // Chỉ hiện dải chọn "Trang N" khi CẢ 2 trang đều có audio — 1 trang có, 1
+  // trang không thì chả có gì để chọn, hiện thẳng trang có audio luôn.
+  const showPageSelector = hasLeft && hasRight;
+  const side = showPageSelector
+    ? storedSide
+    : hasLeft
+      ? "left"
+      : "right";
+  const tracks = side === "right" ? rightTracks : leftTracks;
+
   const pos =
     (collapsed ? collapsedPosition : panelPosition) ?? { x: MARGIN, y: MARGIN };
   const active = tracks.find((t) => t.type === activeType) ?? tracks[0];
-  const panelHeight = panelHeightFor(tracks.length);
+  const panelHeight = panelHeightFor(tracks.length, showPageSelector);
   const width = collapsed ? SIZE : PANEL_WIDTH;
   const height = collapsed ? SIZE : panelHeight;
   const setPos = collapsed ? setCollapsedPosition : setPanelPosition;
@@ -152,7 +182,7 @@ export function AudioWidget({ tracks }: { tracks: AudioTrack[] }) {
     if (!d.moved && collapsed) expand();
   }
 
-  if (tracks.length === 0) return null;
+  if (!hasLeft && !hasRight) return null;
 
   // z-[55]: trên tooltip (z-50) để panel canh giữa không bị tooltip che, nhưng
   // dưới panel bài giảng (z-[60]) khi cả hai cùng mở.
@@ -201,6 +231,26 @@ export function AudioWidget({ tracks }: { tracks: AudioTrack[] }) {
           </div>
 
           <div className="flex flex-col gap-1.5 px-2.5 pb-2.5">
+            {showPageSelector && (
+              <div className="flex justify-center gap-1.5 drop-shadow-[0_1px_2px_rgb(0_0_0/0.9)]">
+                {pages.map((p, i) => {
+                  const s = i === 0 ? "left" : "right";
+                  return (
+                    <button
+                      key={p}
+                      type="button"
+                      onClick={() => setSide(s)}
+                      className={cn(
+                        "rounded-full px-2 py-0.5 text-[11px] transition-colors",
+                        side === s ? "bg-primary" : "bg-black/70 hover:bg-black/85"
+                      )}
+                    >
+                      Trang {p}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
             {tracks.length > 1 && (
               <div className="flex justify-center gap-1.5">
                 {tracks.map((t) => (

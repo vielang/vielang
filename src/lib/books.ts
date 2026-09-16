@@ -1,3 +1,5 @@
+import type { LanguageCode } from "@/lib/languages";
+
 /**
  * Metadata tĩnh cho các sách đang có trong thư viện.
  *
@@ -15,10 +17,12 @@ export interface Book {
    * (vd `SB_step1`, `WB_step1`).
    */
   sourceDir: string;
+  /** Ngôn ngữ giáo trình — khớp `code` trong lib/languages.ts, dùng để lọc sách theo trang thư viện từng ngôn ngữ */
+  lang: LanguageCode;
   /** Cấp độ (1 = sơ cấp nhất) */
   level: number;
-  /** Tên cấp độ tiếng Hàn in trên bìa (초급1/초급2/중급1/중급2), dùng làm tiêu đề nhóm ở trang chủ */
-  levelLabelKo: string;
+  /** Tên cấp độ in trên bìa bằng ký tự bản ngữ (vd 초급1/초급2 tiếng Hàn), dùng làm tiêu đề nhóm ở trang thư viện — bỏ trống nếu ngôn ngữ không có nhãn bìa kiểu này */
+  levelLabelKo?: string;
   /** textbook = giáo trình chính, workbook = sách bài tập (익힘책, không có audio riêng) */
   kind: "textbook" | "workbook";
   titleVi: string;
@@ -30,6 +34,7 @@ export const BOOKS: readonly Book[] = [
   {
     id: "step1",
     sourceDir: "SB_step1",
+    lang: "ko",
     level: 1,
     levelLabelKo: "초급1",
     kind: "textbook",
@@ -40,6 +45,7 @@ export const BOOKS: readonly Book[] = [
   {
     id: "step2",
     sourceDir: "SB_step2",
+    lang: "ko",
     level: 2,
     levelLabelKo: "초급2",
     kind: "textbook",
@@ -50,6 +56,7 @@ export const BOOKS: readonly Book[] = [
   {
     id: "step3",
     sourceDir: "SB_step3",
+    lang: "ko",
     level: 3,
     levelLabelKo: "중급1",
     kind: "textbook",
@@ -60,6 +67,7 @@ export const BOOKS: readonly Book[] = [
   {
     id: "step4",
     sourceDir: "SB_step4",
+    lang: "ko",
     level: 4,
     levelLabelKo: "중급2",
     kind: "textbook",
@@ -70,6 +78,7 @@ export const BOOKS: readonly Book[] = [
   {
     id: "wb-step1",
     sourceDir: "WB_step1",
+    lang: "ko",
     level: 1,
     levelLabelKo: "초급1",
     kind: "workbook",
@@ -80,6 +89,7 @@ export const BOOKS: readonly Book[] = [
   {
     id: "wb-step2",
     sourceDir: "WB_step2",
+    lang: "ko",
     level: 2,
     levelLabelKo: "초급2",
     kind: "workbook",
@@ -90,6 +100,7 @@ export const BOOKS: readonly Book[] = [
   {
     id: "wb-step3",
     sourceDir: "WB_step3",
+    lang: "ko",
     level: 3,
     levelLabelKo: "중급1",
     kind: "workbook",
@@ -100,6 +111,7 @@ export const BOOKS: readonly Book[] = [
   {
     id: "wb-step4",
     sourceDir: "WB_step4",
+    lang: "ko",
     level: 4,
     levelLabelKo: "중급2",
     kind: "workbook",

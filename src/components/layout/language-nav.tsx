@@ -2,40 +2,43 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { LANGUAGES, languageHref } from "@/lib/languages";
 import { cn } from "@/lib/utils";
 
-const LANGUAGES = [
-  { href: "/", label: "Tiếng Hàn" },
-  { href: "/en", label: "Tiếng Anh" },
-] as const;
-
 /**
- * Chuyển đổi giữa các mảng giáo trình theo ngôn ngữ (hiện tại: KIIP tiếng Hàn
- * và khung tiếng Anh sắp bổ sung). So khớp pathname theo tiền tố vì mỗi mảng
- * có route con riêng (`/books/[id]`, `/en/books/[id]`...).
+ * Chuyển đổi giữa các thư viện theo ngôn ngữ (KIIP tiếng Hàn, tiếng Anh sắp
+ * bổ sung, ...) — đứng cạnh logo trong header như 1 nav chữ thường, không
+ * phải nhóm nút. Nguồn ngôn ngữ lấy từ lib/languages.ts, thêm ngôn ngữ mới
+ * ở đó là nav này tự có thêm mục, khỏi sửa gì ở đây.
  */
 export function LanguageNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex items-center gap-1 rounded-lg bg-muted p-1 text-sm">
-      {LANGUAGES.map(({ href, label }) => {
-        const isActive =
-          href === "/" ? pathname === "/" : pathname.startsWith(href);
+    <nav className="flex items-center gap-3 text-sm">
+      {LANGUAGES.map((language, i) => {
+        const href = languageHref(language.slug);
+        const isActive = href === "/" ? pathname === "/" : pathname.startsWith(href);
         return (
-          <Link
-            key={href}
-            href={href}
-            aria-current={isActive ? "page" : undefined}
-            className={cn(
-              "rounded-md px-3 py-1.5 font-medium transition-colors",
-              isActive
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
+          <span key={language.code} className="flex items-center gap-3">
+            {i > 0 && (
+              <span className="text-border" aria-hidden>
+                /
+              </span>
             )}
-          >
-            {label}
-          </Link>
+            <Link
+              href={href}
+              aria-current={isActive ? "page" : undefined}
+              className={cn(
+                "transition-colors",
+                isActive
+                  ? "font-medium text-foreground"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              {language.label}
+            </Link>
+          </span>
         );
       })}
     </nav>

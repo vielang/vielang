@@ -4,6 +4,8 @@ import {
   getAudioPages as getTextbookAudioPages,
   resolveWorkbookPageAudio,
   getWorkbookAudioPages,
+  resolveEnglishPageAudio,
+  getEnglishAudioPages,
   type AudioTrackType,
 } from "@/lib/audio-config";
 
@@ -45,6 +47,13 @@ export function getPageAudio(bookId: string, page: number): AudioTrack[] {
   }));
   if (textbookTracks.length > 0) return textbookTracks;
 
+  const englishTracks = resolveEnglishPageAudio(bookId, page).map((trackId) => ({
+    type: trackId,
+    label: trackId,
+    url: `${audioBaseUrl()}/books/${bookId}/audio/${trackId}.mp3`,
+  }));
+  if (englishTracks.length > 0) return englishTracks;
+
   return resolveWorkbookPageAudio(bookId, page).map((trackNum, i) => ({
     type: `workbook-${i + 1}`,
     label: `Bài nghe ${i + 1}`,
@@ -60,5 +69,7 @@ export function hasAudio(bookId: string, page: number): boolean {
 export function getAudioPages(bookId: string): number[] {
   const textbookPages = getTextbookAudioPages(bookId);
   if (textbookPages.length > 0) return textbookPages;
+  const englishPages = getEnglishAudioPages(bookId);
+  if (englishPages.length > 0) return englishPages;
   return getWorkbookAudioPages(bookId);
 }

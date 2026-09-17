@@ -26,7 +26,11 @@ import {
   HeadObjectCommand,
 } from "@aws-sdk/client-s3";
 import { BOOKS, type Book } from "../src/lib/books";
-import { AUDIO_LAYOUTS, WORKBOOK_AUDIO_LAYOUTS } from "../src/lib/audio-config";
+import {
+  AUDIO_LAYOUTS,
+  WORKBOOK_AUDIO_LAYOUTS,
+  ENGLISH_AUDIO_LAYOUTS,
+} from "../src/lib/audio-config";
 
 loadEnv({ path: path.resolve(process.cwd(), ".env.local"), quiet: true });
 
@@ -153,7 +157,12 @@ async function processBook(book: Book) {
 async function main() {
   const books = bookFilter
     ? BOOKS.filter((b) => b.id === bookFilter)
-    : BOOKS.filter((b) => b.id in AUDIO_LAYOUTS || b.id in WORKBOOK_AUDIO_LAYOUTS);
+    : BOOKS.filter(
+        (b) =>
+          b.id in AUDIO_LAYOUTS ||
+          b.id in WORKBOOK_AUDIO_LAYOUTS ||
+          b.id in ENGLISH_AUDIO_LAYOUTS
+      );
   if (books.length === 0) {
     console.error(`Không tìm thấy sách với id "${bookFilter}". Có: ${BOOKS.map((b) => b.id).join(", ")}`);
     process.exit(1);

@@ -169,3 +169,71 @@ export function getWorkbookAudioPages(bookId: string): number[] {
     (_, i) => layout.firstPage + layout.pageStep * i
   );
 }
+
+/**
+ * Audio sách giáo trình tiếng Anh (English File) — cấu trúc khác hẳn tiếng
+ * Hàn: số track in ngay trên trang dưới dạng "<File>.<số thứ tự>" (vd "1.5"),
+ * tăng dần liên tục trong toàn bộ File thay vì lặp theo loại S/L/P. Vì vậy
+ * KHÔNG dùng offset công thức mà liệt kê trực tiếp track xuất hiện ở từng
+ * trang, xác minh bằng cách đọc ảnh trang thật (không suy diễn).
+ *
+ * Một phần track của mỗi File (theo số thứ tự) không nằm ở 8 trang bài học
+ * chính mà nằm ở các trang tham chiếu cuối sách (Grammar Bank, Vocabulary
+ * Bank...), và các trang đó gộp chung nội dung nhiều File khác nhau nên
+ * không suy ra được vị trí bằng công thức — các track này CHƯA được gắn vào
+ * trang nào (bỏ qua) cho tới khi khảo sát thêm.
+ *
+ * en-elementary hiện chỉ có dữ liệu cho File 1–4 (khớp số audio đã tải ở
+ * SB-audio/Elementary) — mở rộng thêm khi tải audio File 5–12.
+ */
+export interface EnglishAudioLayout {
+  /** trang thật -> danh sách track (dạng "<File>.<số>") xuất hiện trên trang đó. */
+  pageTracks: Partial<Record<number, string[]>>;
+}
+
+const EN_ELEMENTARY_LAYOUT: EnglishAudioLayout = {
+  pageTracks: {
+    6: ["1.2", "1.3"],
+    7: ["1.5", "1.6", "1.7", "1.8", "1.9", "1.10", "1.14", "1.15", "1.16"],
+    8: ["1.17", "1.20", "1.21", "1.22"],
+    9: ["1.23", "1.26", "1.28", "1.29", "1.30"],
+    10: ["1.31", "1.32", "1.35", "1.36", "1.37", "1.38", "1.39", "1.40"],
+    11: ["1.41", "1.42", "1.44", "1.45"],
+    12: ["1.46", "1.47", "1.48"],
+    13: ["1.49", "1.50", "1.51", "1.52", "1.53"],
+    15: ["2.3", "2.4", "2.5"],
+    16: ["2.6"],
+    17: ["2.9", "2.10", "2.11", "2.12"],
+    18: ["2.13", "2.14", "2.15"],
+    19: ["2.17"],
+    21: ["2.18"],
+    22: ["3.1", "3.3", "3.4", "3.6", "3.7"],
+    24: ["3.8"],
+    25: ["3.12", "3.13", "3.14", "3.15", "3.16"],
+    26: ["3.17", "3.18", "3.19", "3.20"],
+    27: ["3.21", "3.24", "3.25"],
+    28: ["3.27"],
+    29: ["3.28", "3.29", "3.30", "3.31"],
+    30: ["4.1"],
+  },
+};
+
+export const ENGLISH_AUDIO_LAYOUTS: Record<string, EnglishAudioLayout> = {
+  "en-elementary": EN_ELEMENTARY_LAYOUT,
+};
+
+/** Với 1 trang, trả về danh sách track (vd "1.5") xuất hiện trên trang đó. */
+export function resolveEnglishPageAudio(bookId: string, page: number): string[] {
+  const layout = ENGLISH_AUDIO_LAYOUTS[bookId];
+  if (!layout) return [];
+  return layout.pageTracks[page] ?? [];
+}
+
+/** Danh sách số trang có audio của 1 sách tiếng Anh, đã sắp xếp tăng dần. */
+export function getEnglishAudioPages(bookId: string): number[] {
+  const layout = ENGLISH_AUDIO_LAYOUTS[bookId];
+  if (!layout) return [];
+  return Object.keys(layout.pageTracks)
+    .map(Number)
+    .sort((a, b) => a - b);
+}

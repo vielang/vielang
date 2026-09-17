@@ -192,8 +192,9 @@ export function getWorkbookAudioPages(bookId: string): number[] {
  * không suy ra được vị trí bằng công thức — các track này CHƯA được gắn vào
  * trang nào (bỏ qua) cho tới khi khảo sát thêm.
  *
- * en-elementary hiện chỉ có dữ liệu cho File 1–4 (khớp số audio đã tải ở
- * SB-audio/Elementary) — mở rộng thêm khi khảo sát audio File 5–12.
+ * en-elementary đã khảo sát đủ 12 File (toàn bộ 8 trang bài học chính mỗi
+ * File, 96 trang từ trang in "6" đến "101"), khớp bộ audio đầy đủ đã tải ở
+ * SB-audio/Elementary.
  */
 export interface EnglishAudioLayout {
   /** page (số trang app dùng, = thứ tự scan, KHÔNG phải số in trên sách) -> danh sách track (dạng "<File>.<số>") xuất hiện trên trang đó. */
@@ -224,6 +225,63 @@ const EN_ELEMENTARY_LAYOUT: EnglishAudioLayout = {
     29: ["3.27"], // trang in "28"
     30: ["3.28", "3.29", "3.30", "3.31"], // trang in "29"
     31: ["4.1"], // trang in "30"
+    32: ["4.6"], // trang in "31"
+    33: ["4.7", "4.9", "4.10"], // trang in "32"
+    34: ["4.11", "4.12", "4.15"], // trang in "33"
+    35: ["4.16", "4.21", "4.22"], // trang in "34"
+    38: ["4.23"], // trang in "37"
+    39: ["5.2", "5.3", "5.4"], // trang in "38"
+    40: ["5.6", "5.7", "5.8"], // trang in "39"
+    41: ["5.9", "5.10"], // trang in "40"
+    42: ["5.11", "5.13", "5.14", "5.15", "5.16"], // trang in "41"
+    43: ["5.19"], // trang in "42"
+    44: ["5.21"], // trang in "43"
+    45: ["5.22", "5.23", "5.24", "5.25"], // trang in "44"
+    46: ["5.26", "5.27", "5.28"], // trang in "45"
+    47: ["6.1"], // trang in "46"
+    48: ["6.3", "6.4", "6.5", "6.6", "6.7", "6.8", "6.9"], // trang in "47"
+    49: ["6.11", "6.12", "6.13", "6.14"], // trang in "48"
+    51: ["6.16", "6.17", "6.18"], // trang in "50"
+    52: ["6.22", "6.23", "6.24"], // trang in "51"
+    54: ["6.25"], // trang in "53"
+    55: ["7.1", "7.3", "7.4"], // trang in "54"
+    56: ["7.5"], // trang in "55"
+    58: ["7.8", "7.10", "7.11", "7.12", "7.13"], // trang in "57"
+    60: ["7.14", "7.17", "7.18"], // trang in "59"
+    61: ["7.19", "7.20", "7.21"], // trang in "60"
+    62: ["7.22", "7.23", "7.24"], // trang in "61"
+    63: ["8.1"], // trang in "62"
+    64: ["8.4", "8.5", "8.6", "8.7", "8.8"], // trang in "63"
+    65: ["8.11"], // trang in "64"
+    66: ["8.13", "8.14", "8.16", "8.17", "8.18"], // trang in "65"
+    67: ["8.19"], // trang in "66"
+    68: ["8.20", "8.24"], // trang in "67"
+    70: ["8.25"], // trang in "69"
+    71: ["9.3", "9.4", "9.5"], // trang in "70"
+    72: ["9.6", "9.7", "9.9", "9.10", "9.11"], // trang in "71"
+    73: ["9.12"], // trang in "72"
+    75: ["9.13", "9.15"], // trang in "74"
+    76: ["9.19", "9.20"], // trang in "75"
+    77: ["9.21", "9.22", "9.23"], // trang in "76"
+    78: ["9.25", "9.26", "9.27", "9.28"], // trang in "77"
+    79: ["10.3"], // trang in "78"
+    80: ["10.6", "10.7"], // trang in "79"
+    81: ["10.8"], // trang in "80"
+    82: ["10.11", "10.12"], // trang in "81"
+    84: ["10.13"], // trang in "83"
+    85: ["10.14", "10.15", "10.16", "10.17", "10.18", "10.19"], // trang in "84"
+    86: ["10.21"], // trang in "85"
+    87: ["11.3", "11.4", "11.5"], // trang in "86"
+    89: ["11.7", "11.8"], // trang in "88"
+    91: ["11.9", "11.10"], // trang in "90"
+    92: ["11.13"], // trang in "91"
+    93: ["11.14", "11.15", "11.16"], // trang in "92"
+    94: ["11.17", "11.18", "11.19"], // trang in "93"
+    95: ["12.1"], // trang in "94"
+    96: ["12.3", "12.4", "12.5", "12.6"], // trang in "95"
+    98: ["12.10", "12.11", "12.12"], // trang in "97"
+    99: ["12.13"], // trang in "98"
+    100: ["12.14"], // trang in "99"
   },
 };
 

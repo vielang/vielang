@@ -177,6 +177,15 @@ export function getWorkbookAudioPages(bookId: string): number[] {
  * KHÔNG dùng offset công thức mà liệt kê trực tiếp track xuất hiện ở từng
  * trang, xác minh bằng cách đọc ảnh trang thật (không suy diễn).
  *
+ * QUAN TRỌNG — 2 hệ đánh số trang khác nhau, dễ nhầm:
+ *   - Số trang IN TRÊN SÁCH (ảnh chụp, mục lục) — bắt đầu từ "6" (bài 1A).
+ *   - Số `page` app dùng (URL, tên file ảnh page-XXXX.png/webp) — chính là
+ *     THỨ TỰ TRANG SCAN, lệch +1 so với số in trên sách vì có trang bìa/lời
+ *     mở đầu không đánh số ở đầu sách (đã verify: page-0007.png mới là bài
+ *     "1A" tức trang in "6"). `pageTracks` dưới đây dùng số `page` của app
+ *     (ĐÃ +1), không phải số in trên sách — comment cuối mỗi dòng ghi số in
+ *     trên sách để đối chiếu khi khảo sát thêm.
+ *
  * Một phần track của mỗi File (theo số thứ tự) không nằm ở 8 trang bài học
  * chính mà nằm ở các trang tham chiếu cuối sách (Grammar Bank, Vocabulary
  * Bank...), và các trang đó gộp chung nội dung nhiều File khác nhau nên
@@ -184,37 +193,37 @@ export function getWorkbookAudioPages(bookId: string): number[] {
  * trang nào (bỏ qua) cho tới khi khảo sát thêm.
  *
  * en-elementary hiện chỉ có dữ liệu cho File 1–4 (khớp số audio đã tải ở
- * SB-audio/Elementary) — mở rộng thêm khi tải audio File 5–12.
+ * SB-audio/Elementary) — mở rộng thêm khi khảo sát audio File 5–12.
  */
 export interface EnglishAudioLayout {
-  /** trang thật -> danh sách track (dạng "<File>.<số>") xuất hiện trên trang đó. */
+  /** page (số trang app dùng, = thứ tự scan, KHÔNG phải số in trên sách) -> danh sách track (dạng "<File>.<số>") xuất hiện trên trang đó. */
   pageTracks: Partial<Record<number, string[]>>;
 }
 
 const EN_ELEMENTARY_LAYOUT: EnglishAudioLayout = {
   pageTracks: {
-    6: ["1.2", "1.3"],
-    7: ["1.5", "1.6", "1.7", "1.8", "1.9", "1.10", "1.14", "1.15", "1.16"],
-    8: ["1.17", "1.20", "1.21", "1.22"],
-    9: ["1.23", "1.26", "1.28", "1.29", "1.30"],
-    10: ["1.31", "1.32", "1.35", "1.36", "1.37", "1.38", "1.39", "1.40"],
-    11: ["1.41", "1.42", "1.44", "1.45"],
-    12: ["1.46", "1.47", "1.48"],
-    13: ["1.49", "1.50", "1.51", "1.52", "1.53"],
-    15: ["2.3", "2.4", "2.5"],
-    16: ["2.6"],
-    17: ["2.9", "2.10", "2.11", "2.12"],
-    18: ["2.13", "2.14", "2.15"],
-    19: ["2.17"],
-    21: ["2.18"],
-    22: ["3.1", "3.3", "3.4", "3.6", "3.7"],
-    24: ["3.8"],
-    25: ["3.12", "3.13", "3.14", "3.15", "3.16"],
-    26: ["3.17", "3.18", "3.19", "3.20"],
-    27: ["3.21", "3.24", "3.25"],
-    28: ["3.27"],
-    29: ["3.28", "3.29", "3.30", "3.31"],
-    30: ["4.1"],
+    7: ["1.2", "1.3"], // trang in "6"
+    8: ["1.5", "1.6", "1.7", "1.8", "1.9", "1.10", "1.14", "1.15", "1.16"], // trang in "7"
+    9: ["1.17", "1.20", "1.21", "1.22"], // trang in "8"
+    10: ["1.23", "1.26", "1.28", "1.29", "1.30"], // trang in "9"
+    11: ["1.31", "1.32", "1.35", "1.36", "1.37", "1.38", "1.39", "1.40"], // trang in "10"
+    12: ["1.41", "1.42", "1.44", "1.45"], // trang in "11"
+    13: ["1.46", "1.47", "1.48"], // trang in "12"
+    14: ["1.49", "1.50", "1.51", "1.52", "1.53"], // trang in "13"
+    16: ["2.3", "2.4", "2.5"], // trang in "15"
+    17: ["2.6"], // trang in "16"
+    18: ["2.9", "2.10", "2.11", "2.12"], // trang in "17"
+    19: ["2.13", "2.14", "2.15"], // trang in "18"
+    20: ["2.17"], // trang in "19"
+    22: ["2.18"], // trang in "21"
+    23: ["3.1", "3.3", "3.4", "3.6", "3.7"], // trang in "22"
+    25: ["3.8"], // trang in "24"
+    26: ["3.12", "3.13", "3.14", "3.15", "3.16"], // trang in "25"
+    27: ["3.17", "3.18", "3.19", "3.20"], // trang in "26"
+    28: ["3.21", "3.24", "3.25"], // trang in "27"
+    29: ["3.27"], // trang in "28"
+    30: ["3.28", "3.29", "3.30", "3.31"], // trang in "29"
+    31: ["4.1"], // trang in "30"
   },
 };
 

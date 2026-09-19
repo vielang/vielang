@@ -44,10 +44,14 @@ function bar(): HTMLElement {
   return screen.getByTestId("annotation-toolbar-bar");
 }
 
+/**
+ * Bấm xuống trên `el` rồi kéo. Các sự kiện sau đó bắn trên `window` vì thanh
+ * nghe ở đó — nhờ vậy kéo ra khỏi thanh vẫn theo được (xem `onPointerDown`).
+ */
 function drag(el: HTMLElement, dx: number, dy: number) {
   fireEvent.pointerDown(el, { pointerId: 1, clientX: 200, clientY: 500 });
-  fireEvent.pointerMove(el, { pointerId: 1, clientX: 200 + dx, clientY: 500 + dy });
-  fireEvent.pointerUp(el, { pointerId: 1, clientX: 200 + dx, clientY: 500 + dy });
+  fireEvent.pointerMove(window, { pointerId: 1, clientX: 200 + dx, clientY: 500 + dy });
+  fireEvent.pointerUp(window, { pointerId: 1, clientX: 200 + dx, clientY: 500 + dy });
 }
 
 const pos = () => useAnnotationStore.getState().toolbarPos!;
@@ -87,15 +91,42 @@ describe("kéo thanh công cụ", () => {
     expect(pos()).toEqual({ x: 40, y: 280 });
   });
 
-  it("bấm nút trong thanh thì không kéo theo", () => {
+  it("kéo từ ngay TRÊN một cái nút cũng dời được thanh", () => {
+    // Cột dọc gần như toàn là nút — bắt phải nhắm trúng tay nắm 16px mới kéo
+    // được thì coi như không kéo được.
+    toolbar();
+    drag(screen.getByLabelText(/Hoàn tác/), -60, -120);
+
+    expect(pos()).toEqual({ x: 40, y: 280 });
+  });
+
+  it("chạm nhẹ lên nút thì nút vẫn ăn, thanh đứng yên", () => {
+    useAnnotationStore.setState({
+      strokes: { "step1:10": [{ id: "a", tool: "pen", color: "#000", width: 0.004, points: [0, 0] }] },
+    });
     toolbar();
     const before = pos();
     const undo = screen.getByLabelText(/Hoàn tác/);
 
+    // Nhúc nhích 2px — dưới ngưỡng, vẫn tính là bấm.
     fireEvent.pointerDown(undo, { pointerId: 1, clientX: 200, clientY: 500 });
-    fireEvent.pointerMove(bar(), { pointerId: 1, clientX: 320, clientY: 500 });
+    fireEvent.pointerMove(window, { pointerId: 1, clientX: 202, clientY: 500 });
+    fireEvent.pointerUp(window, { pointerId: 1, clientX: 202, clientY: 500 });
+    fireEvent.click(undo);
 
     expect(pos()).toEqual(before);
+    expect(useAnnotationStore.getState().strokes["step1:10"]).toBeUndefined();
+  });
+
+  it("kéo rồi nhả trên một cái nút thì KHÔNG kích hoạt nút đó", () => {
+    toolbar();
+    const exit = screen.getByLabelText(/Thoát chế độ vẽ/);
+
+    drag(exit, 0, -100);
+    fireEvent.click(exit);
+
+    // Kéo xong mà vô tình thoát luôn chế độ vẽ thì rất khó chịu.
+    expect(useAnnotationStore.getState().active).toBe(true);
   });
 
   it("không cho kéo thanh ra ngoài mép màn hình", () => {
@@ -111,9 +142,18 @@ describe("kéo thanh công cụ", () => {
     const before = pos();
 
     fireEvent.pointerDown(bar(), { pointerId: 1, clientX: 200, clientY: 500 });
-    fireEvent.pointerMove(bar(), { pointerId: 2, clientX: 400, clientY: 500 });
+    fireEvent.pointerMove(window, { pointerId: 2, clientX: 400, clientY: 500 });
 
     expect(pos()).toEqual(before);
+  });
+
+  it("kéo ra khỏi thanh vẫn theo được tay", () => {
+    toolbar();
+    fireEvent.pointerDown(bar(), { pointerId: 1, clientX: 200, clientY: 500 });
+    // Con trỏ đã rời hẳn thanh — sự kiện chỉ còn tới `window`.
+    fireEvent.pointerMove(window, { pointerId: 1, clientX: 600, clientY: 300 });
+
+    expect(pos()).toEqual({ x: 500, y: 200 });
   });
 });
 

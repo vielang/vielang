@@ -142,13 +142,8 @@ export function AnnotationToolbar({ bookId, pages }: { bookId: string; pages: nu
   const ToolIcon = activeTool.Icon;
 
   const ref = useRef<HTMLDivElement>(null);
-  const drag = useRef<{
-    pointerId: number;
-    startX: number;
-    startY: number;
-    origin: Pos;
-    moved: boolean;
-  } | null>(null);
+  /** Vừa kéo xong: nuốt cú `click` sắp tới, xem `onClickCapture`. */
+  const suppressClick = useRef(false);
 
   /**
    * Đặt vị trí mặc định ở lần mở đầu, rồi kẹp lại mỗi khi thanh đổi cỡ (thu
@@ -183,67 +178,80 @@ export function AnnotationToolbar({ bookId, pages }: { bookId: string; pages: nu
     };
   }, [active]);
 
+  /**
+   * Đặt tay vào BẤT KỲ ĐÂU trên thanh rồi kéo — kể cả ngay trên một cái nút.
+   *
+   * Cột dọc gần như toàn là nút, chừa ra đúng cái tay nắm 16px; bắt người
+   * dùng nhắm trúng chỗ đó mới kéo được thì coi như không kéo được.
+   *
+   * Nên bấm và kéo chỉ phân biệt được SAU khi tay nhúc nhích: dưới ngưỡng
+   * thì cứ để `click` chạy như thường, vượt ngưỡng mới bắt đầu dời thanh và
+   * nuốt cú `click` ở cuối.
+   *
+   * Nghe `pointermove`/`pointerup` trên `window` chứ không dùng
+   * `setPointerCapture`: bắt con trỏ ngay từ `pointerdown` thì nút không bao
+   * giờ nhận được `pointerup` nên `click` không bắn (đúng cái bẫy mà
+   * `audio-widget` đã dính), còn bắt muộn thì có lúc con trỏ đã rời khỏi
+   * thanh và mất luôn các sự kiện ở giữa.
+   */
   const onPointerDown = useCallback(
     (e: React.PointerEvent) => {
-      // Bấm vào nút thì đừng bắt đầu kéo: setPointerCapture ở đây sẽ dồn mọi
-      // pointer event về thân thanh, nút không nhận được `pointerup` nên
-      // `click` không bao giờ bắn. Lúc thu nhỏ thì cả nút là vùng kéo, và nó
-      // tự phân biệt bấm/kéo ở `onPointerUp`.
-      if (!collapsed && (e.target as HTMLElement).closest("button")) return;
-      e.currentTarget.setPointerCapture(e.pointerId);
-      drag.current = {
-        pointerId: e.pointerId,
-        startX: e.clientX,
-        startY: e.clientY,
-        origin: pos ?? { x: MARGIN, y: MARGIN },
-        moved: false,
-      };
-    },
-    [collapsed, pos]
-  );
+      const pointerId = e.pointerId;
+      const startX = e.clientX;
+      const startY = e.clientY;
+      const origin = pos ?? { x: MARGIN, y: MARGIN };
+      let moved = false;
 
-  const onPointerMove = useCallback(
-    (e: React.PointerEvent) => {
-      const d = drag.current;
-      if (!d || d.pointerId !== e.pointerId || !ref.current) return;
-      const dx = e.clientX - d.startX;
-      const dy = e.clientY - d.startY;
-      if (Math.abs(dx) > DRAG_THRESHOLD || Math.abs(dy) > DRAG_THRESHOLD) {
-        d.moved = true;
-        // Kéo thanh đi thì đóng popover — để mở thì nó nhảy theo thanh từng
-        // khung hình, nhìn rất giật.
-        setPanel("none");
+      function onMove(ev: PointerEvent) {
+        if (ev.pointerId !== pointerId) return;
+        const dx = ev.clientX - startX;
+        const dy = ev.clientY - startY;
+        if (!moved) {
+          if (Math.abs(dx) <= DRAG_THRESHOLD && Math.abs(dy) <= DRAG_THRESHOLD) return;
+          moved = true;
+          // Kéo thanh đi thì đóng popover — để mở thì nó nhảy theo thanh từng
+          // khung hình, nhìn rất giật.
+          setPanel("none");
+        }
+        const el = ref.current;
+        if (!el) return;
+        setPos(
+          clamp({ x: origin.x + dx, y: origin.y + dy }, el.offsetWidth, el.offsetHeight)
+        );
       }
-      setPos(
-        clamp(
-          { x: d.origin.x + dx, y: d.origin.y + dy },
-          ref.current.offsetWidth,
-          ref.current.offsetHeight
-        )
-      );
+
+      function onUp(ev: PointerEvent) {
+        if (ev.pointerId !== pointerId) return;
+        window.removeEventListener("pointermove", onMove);
+        window.removeEventListener("pointerup", onUp);
+        window.removeEventListener("pointercancel", onUp);
+        if (moved) suppressClick.current = true;
+        // Nhấn (không kéo) lên nút đã thu nhỏ -> bung ra tại chỗ.
+        else if (collapsed) setCollapsed(false);
+      }
+
+      window.addEventListener("pointermove", onMove);
+      window.addEventListener("pointerup", onUp);
+      window.addEventListener("pointercancel", onUp);
     },
-    [setPos]
+    [pos, setPos, collapsed, setCollapsed]
   );
 
-  const onPointerUp = useCallback(
-    (e: React.PointerEvent) => {
-      const d = drag.current;
-      if (!d || d.pointerId !== e.pointerId) return;
-      drag.current = null;
-      // Nhấn (không kéo) lên nút đã thu nhỏ -> bung ra tại chỗ.
-      if (!d.moved && collapsed) setCollapsed(false);
-    },
-    [collapsed, setCollapsed]
-  );
+  /**
+   * Nhả tay sau khi kéo vẫn sinh ra một cú `click` trên cái nút nằm dưới
+   * ngón — nuốt nó ở pha bắt, nếu không kéo thanh đi là vô tình bấm luôn
+   * "thoát" hay "hoàn tác".
+   */
+  const onClickCapture = useCallback((e: React.MouseEvent) => {
+    if (!suppressClick.current) return;
+    suppressClick.current = false;
+    e.preventDefault();
+    e.stopPropagation();
+  }, []);
 
   if (!active) return null;
 
-  const dragHandlers = {
-    onPointerDown,
-    onPointerMove,
-    onPointerUp,
-    onPointerCancel: onPointerUp,
-  };
+  const dragHandlers = { onPointerDown, onClickCapture };
 
   return (
     <>

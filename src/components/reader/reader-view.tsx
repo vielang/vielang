@@ -20,7 +20,13 @@ import { AdjacentPreload } from "@/components/reader/adjacent-preload";
 import { AudioWidget } from "@/components/reader/audio-widget";
 import { NoteWidget } from "@/components/reader/note-widget";
 import { NoteSheet } from "@/components/reader/note-sheet";
+import { AnnotationToolbar } from "@/components/reader/annotation-toolbar";
 import { useNoteWidgetStore } from "@/lib/note-widget-store";
+import {
+  useAnnotationHydration,
+  useAnnotationStore,
+  useHasAnnotations,
+} from "@/lib/annotation-store";
 import {
   focusNoteWindow,
   isNoteWindowClosed,
@@ -98,6 +104,19 @@ export function ReaderView({
 
   const noteMode = useNoteWidgetStore((s) => s.mode);
   const setNoteMode = useNoteWidgetStore((s) => s.setMode);
+
+  // Nét vẽ tay trên ảnh trang — nạp từ localStorage sau lần render đầu.
+  useAnnotationHydration();
+  const drawActive = useAnnotationStore((s) => s.active);
+  const setDrawActive = useAnnotationStore((s) => s.setActive);
+  const drawHasContent = useHasAnnotations(book.id, pages);
+
+  const toggleDraw = useCallback(() => {
+    // Bật chế độ vẽ mà thanh công cụ đang ẩn thì không còn đường tắt lại:
+    // trong chế độ vẽ, chạm lên trang là vẽ chứ không hiện thanh nữa.
+    setDrawActive(!drawActive);
+    if (!drawActive) setToolbarVisible(true);
+  }, [drawActive, setDrawActive]);
 
   // Sửa bài giảng ở cửa sổ note riêng thì cửa sổ này phải thấy ngay.
   useNoteStoreSync();
@@ -209,6 +228,12 @@ export function ReaderView({
           goTo(book.totalPages);
           break;
         case "Escape":
+          // Đang vẽ thì Esc là "bỏ cây bút xuống", chưa phải "đóng sách" —
+          // thoát hẳn khỏi trang đọc thì bấm Esc lần nữa.
+          if (drawActive) {
+            setDrawActive(false);
+            break;
+          }
           router.push(
             currentChapter
               ? `/books/${book.id}#bai-${currentChapter.lesson}`
@@ -222,6 +247,10 @@ export function ReaderView({
         case "n":
         case "N":
           toggleNote();
+          break;
+        case "d":
+        case "D":
+          toggleDraw();
           break;
         default:
           return;
@@ -243,6 +272,9 @@ export function ReaderView({
     jumpOpen,
     noteMode,
     toggleNote,
+    drawActive,
+    setDrawActive,
+    toggleDraw,
   ]);
 
   return (
@@ -263,6 +295,8 @@ export function ReaderView({
       <NoteWidget bookId={book.id} pages={pages} noteContentByPage={noteContentByPage} />
       <NoteSheet bookId={book.id} pages={pages} noteContentByPage={noteContentByPage} />
 
+      <AnnotationToolbar bookId={book.id} pages={pages} />
+
       <ReaderControls
         visible={toolbarVisible}
         book={book}
@@ -276,6 +310,9 @@ export function ReaderView({
         noteHasContent={noteHasContent}
         noteLabel={noteLabel}
         onNoteToggle={toggleNote}
+        drawActive={drawActive}
+        drawHasContent={drawHasContent}
+        onDrawToggle={toggleDraw}
         onPrev={stepPrev}
         onNext={stepNext}
         onJump={goTo}

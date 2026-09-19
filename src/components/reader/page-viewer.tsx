@@ -17,6 +17,8 @@ import {
 import { getPageUrl, getPageAspectRatio, type Book } from "@/lib/books";
 import { getPageTranslations } from "@/lib/page-translation";
 import { TranslationOverlay } from "@/components/reader/translation-overlay";
+import { AnnotationLayer } from "@/components/reader/annotation-layer";
+import { useAnnotationStore } from "@/lib/annotation-store";
 
 export interface PageViewerHandle {
   resetZoom: () => void;
@@ -34,15 +36,17 @@ interface PageViewerProps {
   onSwipeNext: () => void;
 }
 
-/** 1 ảnh trang + vùng dịch của nó, đặt trong khung đã tính đúng kích thước. */
+/** 1 ảnh trang + vùng dịch + nét vẽ tay của nó, trong khung đã tính đúng cỡ. */
 function PageImage({
   bookId,
   page,
   box,
+  aspectRatio,
 }: {
   bookId: string;
   page: number;
   box: { width: number; height: number };
+  aspectRatio: number;
 }) {
   const regions = getPageTranslations(bookId, page);
   return (
@@ -58,6 +62,11 @@ function PageImage({
         className="object-contain"
       />
       <TranslationOverlay regions={regions} />
+      {/* Nằm SAU vùng dịch: đang bật chế độ vẽ thì nét vẽ phải nhận được
+          chạm trước, nếu không bấm trúng vùng dịch là bật bản dịch thay vì
+          vẽ. Tắt chế độ vẽ thì lớp này `pointer-events: none` nên vùng dịch
+          bên dưới lại nhận chạm như cũ. */}
+      <AnnotationLayer bookId={bookId} page={page} aspectRatio={aspectRatio} />
     </div>
   );
 }
@@ -69,6 +78,9 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
   const transformRef = useRef<ReactZoomPanPinchContentRef>(null);
   const scaleRef = useRef(1);
   const aspectRatio = getPageAspectRatio(book);
+  // Đang vẽ lên trang: một ngón/chuột thuộc về cây bút, không còn là chạm để
+  // ẩn thanh công cụ, vuốt lật trang hay kéo di chuyển trang nữa.
+  const drawing = useAnnotationStore((s) => s.active);
 
   useImperativeHandle(ref, () => ({
     resetZoom: () => transformRef.current?.resetTransform(),
@@ -123,6 +135,7 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
   } | null>(null);
 
   const onPointerDown = useCallback((e: React.PointerEvent) => {
+    if (drawing) return;
     pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
     if (pointers.current.size === 1) {
       gesture.current = {
@@ -139,7 +152,7 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
     } else if (gesture.current) {
       gesture.current.cancelled = true;
     }
-  }, []);
+  }, [drawing]);
 
   const onPointerUp = useCallback(
     (e: React.PointerEvent) => {
@@ -180,7 +193,11 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
       maxScale={4}
       limitToBounds
       centerOnInit
-      doubleClick={{ mode: "toggle", step: 1.8 }}
+      // Chế độ vẽ: khoá kéo-thả và bấm đúp (chúng nuốt mất nét bút), nhưng
+      // CỐ Ý để nguyên pinch 2 ngón và cuộn trackpad — phóng to rồi khoanh
+      // chú thích vào chữ nhỏ là chuyện thường xuyên nhất ở đây.
+      panning={{ disabled: drawing }}
+      doubleClick={{ mode: "toggle", step: 1.8, disabled: drawing }}
       // Trackpad 2 ngón vuốt (không giữ Ctrl) = di chuyển vùng xem khi đã
       // phóng to, giống các trình đọc ảnh/PDF thông thường — Ctrl+vuốt (pinch
       // thật, trình duyệt tự gắn ctrlKey) vẫn zoom như cũ. Mặc định thư viện
@@ -204,7 +221,13 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
         >
           {box &&
             pages.map((p) => (
-              <PageImage key={p} bookId={book.id} page={p} box={box} />
+              <PageImage
+                key={p}
+                bookId={book.id}
+                page={p}
+                box={box}
+                aspectRatio={aspectRatio}
+              />
             ))}
         </div>
       </TransformComponent>

@@ -9,6 +9,7 @@ import {
   ChevronRight,
   Columns2,
   NotebookText,
+  Pen,
   RotateCcw,
   X,
 } from "lucide-react";
@@ -40,6 +41,9 @@ export function ReaderControls({
   noteHasContent,
   noteLabel,
   onNoteToggle,
+  drawActive,
+  drawHasContent,
+  onDrawToggle,
   onPrev,
   onNext,
   onJump,
@@ -66,6 +70,11 @@ export function ReaderControls({
   /** Chữ trên tooltip — đổi theo trạng thái panel (đóng/mở/ở cửa sổ riêng). */
   noteLabel: string;
   onNoteToggle: () => void;
+  /** Đang bật chế độ vẽ tay lên ảnh trang. */
+  drawActive: boolean;
+  /** Trang đang hiện đã có nét vẽ — chấm báo trên nút bút. */
+  drawHasContent: boolean;
+  onDrawToggle: () => void;
   onPrev: () => void;
   onNext: () => void;
   onJump: (page: number) => void;
@@ -129,6 +138,36 @@ export function ReaderControls({
               </Button>
             </TooltipTrigger>
             <TooltipContent>{noteLabel}</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className={cn(
+                  "relative text-white hover:bg-white/10 hover:text-white",
+                  // Đang vẽ thì nút sáng hẳn lên: thanh công cụ vẽ nằm mãi
+                  // dưới đáy màn, cần một dấu hiệu ngay chỗ vừa bấm để biết
+                  // chế độ đang bật.
+                  drawActive && "bg-white text-neutral-900 hover:bg-white hover:text-neutral-900"
+                )}
+                onClick={onDrawToggle}
+                aria-label={drawActive ? "Tắt chế độ vẽ" : "Vẽ lên trang này"}
+                aria-pressed={drawActive}
+              >
+                <Pen className="size-5" aria-hidden />
+                {drawHasContent && !drawActive && (
+                  <span
+                    className="absolute right-1.5 top-1.5 size-1.5 rounded-full bg-sky-400"
+                    aria-hidden
+                  />
+                )}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              {drawActive ? "Tắt chế độ vẽ" : "Vẽ lên trang này"}
+            </TooltipContent>
           </Tooltip>
 
           <Button

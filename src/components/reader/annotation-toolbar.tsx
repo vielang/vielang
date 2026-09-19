@@ -1,7 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { AlertTriangle, Eraser, Highlighter, Pen, Trash2, Undo2, X } from "lucide-react";
+import {
+  AlertTriangle,
+  Eraser,
+  Eye,
+  EyeOff,
+  Highlighter,
+  Pen,
+  RotateCcw,
+  Undo2,
+  X,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -46,6 +56,8 @@ export function AnnotationToolbar({ bookId, pages }: { bookId: string; pages: nu
   const penColor = useAnnotationStore((s) => s.penColor);
   const highlighterColor = useAnnotationStore((s) => s.highlighterColor);
   const setColor = useAnnotationStore((s) => s.setColor);
+  const peeking = useAnnotationStore((s) => s.peeking);
+  const setPeeking = useAnnotationStore((s) => s.setPeeking);
   const undo = useAnnotationStore((s) => s.undo);
   const clearPage = useAnnotationStore((s) => s.clearPage);
   const lastPage = useAnnotationStore((s) => s.lastPage);
@@ -141,15 +153,35 @@ export function AnnotationToolbar({ bookId, pages }: { bookId: string; pages: nu
           >
             <Undo2 className="size-4.5" aria-hidden />
           </button>
+          {/* Hé xem ảnh gốc: giấu tạm hết nét để đối chiếu với trang sạch.
+              Đứng ngay cạnh nút khôi phục vì hai nút là một cặp — xem thử
+              trước, rồi mới quyết định có xoá thật hay không. */}
+          <button
+            type="button"
+            onClick={() => setPeeking(!peeking)}
+            aria-label={peeking ? "Hiện lại nét vẽ" : "Xem ảnh gốc, giấu tạm nét vẽ"}
+            aria-pressed={peeking}
+            title={peeking ? "Hiện lại nét vẽ" : "Xem ảnh gốc"}
+            className={cn(
+              "flex size-9 shrink-0 items-center justify-center rounded-full transition-colors",
+              peeking ? "bg-white text-neutral-900" : "hover:bg-white/10"
+            )}
+          >
+            {peeking ? (
+              <EyeOff className="size-4.5" aria-hidden />
+            ) : (
+              <Eye className="size-4.5" aria-hidden />
+            )}
+          </button>
           <button
             type="button"
             onClick={() => setConfirmClear(true)}
             disabled={count === 0}
-            aria-label={`Xoá hết nét trên trang ${target}`}
-            title={`Xoá hết nét (trang ${target})`}
+            aria-label={`Khôi phục ảnh gốc trang ${target}`}
+            title={`Khôi phục ảnh gốc (trang ${target})`}
             className="flex size-9 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent"
           >
-            <Trash2 className="size-4.5" aria-hidden />
+            <RotateCcw className="size-4.5" aria-hidden />
           </button>
 
           <Divider />
@@ -178,10 +210,10 @@ export function AnnotationToolbar({ bookId, pages }: { bookId: string; pages: nu
       <Dialog open={confirmClear} onOpenChange={setConfirmClear}>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
-            <DialogTitle>Xoá hết nét vẽ trang {target}?</DialogTitle>
+            <DialogTitle>Khôi phục ảnh gốc trang {target}?</DialogTitle>
             <DialogDescription>
-              {count} nét trên trang này sẽ bị xoá và không lấy lại được. Ảnh trang
-              sách thì không đụng tới.
+              Trang sẽ trở lại đúng như lúc chưa vẽ gì. {count} nét bị xoá và không
+              lấy lại được — muốn xem thử trang sạch thôi thì dùng nút “Xem ảnh gốc”.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -195,7 +227,7 @@ export function AnnotationToolbar({ bookId, pages }: { bookId: string; pages: nu
                 setConfirmClear(false);
               }}
             >
-              Xoá hết
+              Khôi phục ảnh gốc
             </Button>
           </DialogFooter>
         </DialogContent>

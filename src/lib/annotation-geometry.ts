@@ -1,3 +1,4 @@
+import { getStroke } from "perfect-freehand";
 import type { Stroke } from "@/lib/annotation-store";
 
 /**
@@ -13,6 +14,75 @@ import type { Stroke } from "@/lib/annotation-store";
 /** Giữ 4 chữ số thập phân — đủ mịn hơn 1 pixel trên màn 4K, mà JSON ngắn đi quá nửa. */
 export function quantize(points: number[]): number[] {
   return points.map((v) => Math.round(v * 1e4) / 1e4);
+}
+
+/** Lực bút chỉ cần 2 chữ số — 0.01 lực không ai nhìn ra, mà lưu thì tốn gấp đôi. */
+export function quantizePressure(pressures: number[]): number[] {
+  return pressures.map((v) => Math.round(v * 100) / 100);
+}
+
+/**
+ * Tham số dựng nét bút mực. `thinning` là mức lực bút ăn vào bề dày — 0.55
+ * cho nét đầu mảnh cuối đậm rõ ràng mà chưa tới mức đứt đoạn khi viết nhanh.
+ * `streamline` làm mượt rung tay, quan trọng nhất lúc vẽ bằng ngón.
+ */
+const PEN_STROKE_OPTIONS = {
+  thinning: 0.55,
+  smoothing: 0.5,
+  streamline: 0.4,
+  last: true,
+} as const;
+
+/**
+ * Viền ngoài của nét bút mực, dạng đa giác khép kín để TÔ chứ không phải kẻ.
+ *
+ * Vì sao không dùng `strokePath` như bút dạ quang: nét kẻ có bề dày cố định,
+ * còn bút thật thì đầu nét mảnh, giữa nét đậm, nhấn mạnh thì phình ra. Muốn
+ * bề dày đổi dọc theo nét thì phải tự dựng viền — đó đúng là việc của
+ * `perfect-freehand` (cũng là thư viện Excalidraw dùng bên trong).
+ *
+ * `pressures` chỉ có khi người dùng vẽ bằng bút cảm ứng thật. Vẽ bằng chuột
+ * hay ngón tay thì không có lực, để thư viện suy ra bề dày theo tốc độ —
+ * viết nhanh thì mảnh, chậm thì đậm, vẫn ra dáng chữ viết tay.
+ */
+export function penOutlinePath(
+  points: number[],
+  pressures: number[] | undefined,
+  sx: number,
+  sy: number,
+  size: number
+): string {
+  const n = Math.floor(points.length / 2);
+  if (n === 0) return "";
+
+  const input: number[][] = [];
+  for (let i = 0; i < n; i++) {
+    input.push([points[i * 2] * sx, points[i * 2 + 1] * sy, pressures?.[i] ?? 0.5]);
+  }
+
+  return outlineToPath(
+    getStroke(input, {
+      ...PEN_STROKE_OPTIONS,
+      size,
+      simulatePressure: pressures === undefined || pressures.length !== n,
+    })
+  );
+}
+
+/**
+ * Đa giác viền -> lệnh `d`, nối các đỉnh bằng đường bậc hai đi qua trung
+ * điểm để viền không thành hình đa giác gãy góc.
+ */
+export function outlineToPath(outline: number[][]): string {
+  if (outline.length === 0) return "";
+  const parts: (string | number)[] = ["M", outline[0][0], outline[0][1], "Q"];
+  for (let i = 0; i < outline.length; i++) {
+    const [x0, y0] = outline[i];
+    const [x1, y1] = outline[(i + 1) % outline.length];
+    parts.push(x0, y0, (x0 + x1) / 2, (y0 + y1) / 2);
+  }
+  parts.push("Z");
+  return parts.join(" ");
 }
 
 /**

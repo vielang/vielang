@@ -23,6 +23,15 @@ export interface Stroke {
   width: number;
   /** [x0,y0,x1,y1,…] — mảng phẳng cho gọn khi lưu xuống localStorage. */
   points: number[];
+  /**
+   * Lực bút tại từng điểm (0–1), một phần tử cho mỗi điểm trong `points`.
+   *
+   * CHỈ có khi vẽ bằng bút cảm ứng thật (`pointerType === "pen"`). Vẽ bằng
+   * chuột hay ngón tay thì trình duyệt báo lực giả (thường đúng 0.5), lưu
+   * lại là tốn gấp đôi chỗ mà không thêm thông tin gì — để trống rồi suy bề
+   * dày theo tốc độ viết, xem `penOutlinePath`.
+   */
+  pressures?: number[];
 }
 
 /** Bút: mảnh / vừa / đậm, theo phần chiều rộng trang. */
@@ -45,6 +54,11 @@ interface AnnotationState {
 
   /** Đang bật chế độ vẽ lên trang sách (không lưu — mỗi phiên tự bật lại). */
   active: boolean;
+  /**
+   * Đang tạm giấu hết nét để nhìn ảnh trang sạch. KHÔNG đụng tới dữ liệu —
+   * đây là "hé xem bên dưới", đối lập với `clearPage` vốn xoá thật.
+   */
+  peeking: boolean;
   tool: AnnotationTool;
   penColor: string;
   highlighterColor: string;
@@ -59,6 +73,7 @@ interface AnnotationState {
 
   setHasHydrated: (v: boolean) => void;
   setActive: (v: boolean) => void;
+  setPeeking: (v: boolean) => void;
   setTool: (t: AnnotationTool) => void;
   setColor: (c: string) => void;
   setSize: (i: number) => void;
@@ -142,6 +157,7 @@ export const useAnnotationStore = create<AnnotationState>()(
       quotaExceeded: false,
 
       active: false,
+      peeking: false,
       tool: "pen",
       penColor: PEN_COLORS[0],
       highlighterColor: HIGHLIGHTER_COLORS[0],
@@ -149,7 +165,10 @@ export const useAnnotationStore = create<AnnotationState>()(
       lastPage: null,
 
       setHasHydrated: (v) => set({ hasHydrated: v }),
-      setActive: (active) => set({ active }),
+      // Tắt chế độ vẽ thì bỏ luôn trạng thái hé xem — nếu không, lần sau bật
+      // bút lên là trang trống trơn mà không rõ vì sao.
+      setActive: (active) => set(active ? { active } : { active, peeking: false }),
+      setPeeking: (peeking) => set({ peeking }),
       setTool: (tool) => set({ tool }),
       setColor: (c) =>
         set((state) =>

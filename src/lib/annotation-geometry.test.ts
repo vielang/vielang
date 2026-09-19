@@ -1,6 +1,14 @@
 import { describe, expect, it } from "vitest";
 import type { Stroke } from "./annotation-store";
-import { farEnough, quantize, strokeHit, strokePath } from "./annotation-geometry";
+import {
+  farEnough,
+  outlineToPath,
+  penOutlinePath,
+  quantize,
+  quantizePressure,
+  strokeHit,
+  strokePath,
+} from "./annotation-geometry";
 
 /** Trang sách trong app cao hơn rộng — dùng tỉ lệ này để bắt lỗi nhầm trục. */
 const AR = 0.7;
@@ -39,7 +47,63 @@ describe("quantize", () => {
   it("giữ 4 chữ số thập phân", () => {
     expect(quantize([0.123456, 0.999999])).toEqual([0.1235, 1]);
   });
+
+  it("lực bút chỉ giữ 2 chữ số", () => {
+    expect(quantizePressure([0.123456, 0.5, 0.987])).toEqual([0.12, 0.5, 0.99]);
+  });
 });
+
+describe("outlineToPath", () => {
+  it("không vẽ gì khi viền rỗng", () => {
+    expect(outlineToPath([])).toBe("");
+  });
+
+  it("khép kín đường viền", () => {
+    const d = outlineToPath([
+      [0, 0],
+      [10, 0],
+      [10, 10],
+    ]);
+    expect(d.startsWith("M 0 0 Q")).toBe(true);
+    expect(d.endsWith("Z")).toBe(true);
+  });
+});
+
+describe("penOutlinePath", () => {
+  it("không vẽ gì khi chưa có điểm nào", () => {
+    expect(penOutlinePath([], undefined, 1000, 1400, 4)).toBe("");
+  });
+
+  it("chạm rồi nhả tại chỗ vẫn ra một chấm khép kín", () => {
+    const d = penOutlinePath([0.5, 0.25], undefined, 1000, 1400, 8);
+    expect(d).toMatch(/^M .+ Z$/);
+    expect(d.length).toBeGreaterThan(50);
+  });
+
+  it("lực bút mạnh cho nét dày hơn lực bút nhẹ", () => {
+    const pts = [0.2, 0.5, 0.4, 0.5, 0.6, 0.5];
+    const light = penOutlinePath(pts, [0.05, 0.05, 0.05], 1000, 1400, 20);
+    const heavy = penOutlinePath(pts, [1, 1, 1], 1000, 1400, 20);
+    expect(spanY(light)).toBeLessThan(spanY(heavy));
+  });
+
+  it("nét dài ra thì viền dài theo", () => {
+    const short = penOutlinePath([0.2, 0.5, 0.3, 0.5], undefined, 1000, 1400, 8);
+    const long = penOutlinePath([0.2, 0.5, 0.8, 0.5], undefined, 1000, 1400, 8);
+    expect(spanX(long)).toBeGreaterThan(spanX(short));
+  });
+});
+
+/** Bề rộng/bề cao thật của một chuỗi `d`, đọc ngược từ các số trong đó. */
+function bounds(d: string): { x: number[]; y: number[] } {
+  const nums = d.match(/-?\d+(\.\d+)?/g)?.map(Number) ?? [];
+  const x: number[] = [];
+  const y: number[] = [];
+  nums.forEach((n, i) => (i % 2 === 0 ? x : y).push(n));
+  return { x, y };
+}
+const spanX = (d: string) => Math.max(...bounds(d).x) - Math.min(...bounds(d).x);
+const spanY = (d: string) => Math.max(...bounds(d).y) - Math.min(...bounds(d).y);
 
 describe("farEnough", () => {
   it("luôn nhận điểm đầu tiên", () => {

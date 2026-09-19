@@ -7,7 +7,14 @@ import {
   useAnnotationStore,
   type Stroke,
 } from "@/lib/annotation-store";
-import { farEnough, quantize, strokeHit, strokePath } from "@/lib/annotation-geometry";
+import {
+  farEnough,
+  penOutlinePath,
+  quantize,
+  quantizePressure,
+  strokeHit,
+  strokePath,
+} from "@/lib/annotation-geometry";
 
 /**
  * Bề rộng viewBox. Toạ độ lưu theo tỉ lệ [0,1] (xem `annotation-store`), nhân
@@ -48,6 +55,7 @@ export function AnnotationLayer({
 }) {
   const strokes = useAnnotationStore((s) => s.strokes[`${bookId}:${page}`]);
   const active = useAnnotationStore((s) => s.active);
+  const peeking = useAnnotationStore((s) => s.peeking);
   const tool = useAnnotationStore((s) => s.tool);
   const size = useAnnotationStore((s) => s.size);
   const penColor = useAnnotationStore((s) => s.penColor);
@@ -66,7 +74,12 @@ export function AnnotationLayer({
   // Nét đang vẽ ghi thẳng vào thuộc tính `d` thay vì qua state: pointermove
   // bắn rất dày, render lại cây React ở mỗi điểm là giật tay.
   const liveRef = useRef<SVGPathElement>(null);
-  const gesture = useRef<{ pointerId: number; points: number[] } | null>(null);
+  const gesture = useRef<{
+    pointerId: number;
+    points: number[];
+    /** Chỉ ghi khi vẽ bằng bút cảm ứng thật — xem `Stroke.pressures`. */
+    pressures: number[] | null;
+  } | null>(null);
 
   // Bút dạ quang phải nằm dưới bút mực, nếu không tô vàng sau là nuốt mất
   // vòng khoanh vẽ trước.
@@ -76,6 +89,25 @@ export function AnnotationLayer({
     for (const s of strokes ?? []) (s.tool === "highlighter" ? hl : pen).push(s);
     return [hl, pen];
   }, [strokes]);
+
+  /**
+   * Chuỗi `d` cho nét đang vẽ. Bút mực dựng viền ngoài để bề dày đổi theo
+   * lực/tốc độ, bút dạ quang thì kẻ một đường dày cố định — đầu bút dạ quang
+   * thật không hề thon lại, làm nó thon là trông giả.
+   */
+  const livePath = useCallback(
+    (points: number[], pressures: number[] | null) =>
+      tool === "highlighter"
+        ? strokePath(points, VIEWBOX_WIDTH, vbHeight)
+        : penOutlinePath(
+            points,
+            pressures ?? undefined,
+            VIEWBOX_WIDTH,
+            vbHeight,
+            width * VIEWBOX_WIDTH
+          ),
+    [tool, vbHeight, width]
+  );
 
   /** clientX/clientY -> toạ độ tỉ lệ trong khung ảnh. `rect` đã tính cả zoom. */
   const toLocal = useCallback((e: React.PointerEvent): [number, number] | null => {
@@ -127,14 +159,17 @@ export function AnnotationLayer({
       touchPage(page);
 
       if (tool === "eraser") {
-        gesture.current = { pointerId: e.pointerId, points: [] };
+        gesture.current = { pointerId: e.pointerId, points: [], pressures: null };
         eraseAt(local[0], local[1]);
         return;
       }
-      gesture.current = { pointerId: e.pointerId, points: local };
-      liveRef.current?.setAttribute("d", strokePath(local, VIEWBOX_WIDTH, vbHeight));
+      // Chốt một lần ở đầu nét: giữa chừng không đổi từ bút sang ngón được,
+      // và `pressures` phải khớp 1-1 với `points` nên không thể ghi nửa chừng.
+      const pressures = e.pointerType === "pen" ? [e.pressure] : null;
+      gesture.current = { pointerId: e.pointerId, points: local, pressures };
+      liveRef.current?.setAttribute("d", livePath(local, pressures));
     },
-    [active, tool, toLocal, eraseAt, endGesture, vbHeight, touchPage, page]
+    [active, tool, toLocal, eraseAt, endGesture, livePath, touchPage, page]
   );
 
   const onPointerMove = useCallback(
@@ -150,16 +185,17 @@ export function AnnotationLayer({
       }
       if (!farEnough(g.points, local[0], local[1], MIN_POINT_DISTANCE)) return;
       g.points.push(local[0], local[1]);
-      liveRef.current?.setAttribute("d", strokePath(g.points, VIEWBOX_WIDTH, vbHeight));
+      g.pressures?.push(e.pressure);
+      liveRef.current?.setAttribute("d", livePath(g.points, g.pressures));
     },
-    [tool, toLocal, eraseAt, vbHeight]
+    [tool, toLocal, eraseAt, livePath]
   );
 
   const onPointerUp = useCallback(
     (e: React.PointerEvent) => {
       const g = gesture.current;
       if (!g || g.pointerId !== e.pointerId) return;
-      const points = g.points;
+      const { points, pressures } = g;
       endGesture();
       if (tool === "eraser" || points.length === 0) return;
 
@@ -169,11 +205,19 @@ export function AnnotationLayer({
         color,
         width,
         points: quantize(points),
+        // Bút dạ quang bề dày cố định nên lực bút vô nghĩa — đừng lưu.
+        ...(tool === "pen" && pressures
+          ? { pressures: quantizePressure(pressures) }
+          : {}),
       });
     },
     [tool, color, width, addStroke, bookId, page, endGesture]
   );
 
+  // Hé xem ảnh gốc: giấu sạch lớp này, kể cả đang bật chế độ vẽ. Không nhận
+  // chạm luôn — đang xem trang sạch mà lỡ tay vạch thêm một nét thì hỏng đúng
+  // cái đang muốn xem.
+  if (peeking) return null;
   if (!active && highlights.length === 0 && pens.length === 0) return null;
 
   return (
@@ -201,30 +245,56 @@ export function AnnotationLayer({
         <StrokePath key={s.id} stroke={s} vbHeight={vbHeight} />
       ))}
 
-      <path
-        ref={liveRef}
-        d=""
-        fill="none"
-        stroke={color}
-        strokeWidth={width * VIEWBOX_WIDTH}
-        strokeOpacity={tool === "highlighter" ? HIGHLIGHTER_OPACITY : 1}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      {tool === "highlighter" ? (
+        <path
+          ref={liveRef}
+          d=""
+          fill="none"
+          stroke={color}
+          strokeWidth={width * VIEWBOX_WIDTH}
+          strokeOpacity={HIGHLIGHTER_OPACITY}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      ) : (
+        // Bút mực: `d` là viền ngoài khép kín nên TÔ, không kẻ. Đổi công cụ
+        // là React dựng lại đúng thẻ <path> cần dùng — chỉ xảy ra giữa hai
+        // nét, không bao giờ giữa chừng một nét.
+        <path ref={liveRef} d="" fill={color} stroke="none" />
+      )}
     </svg>
   );
 }
 
 function StrokePath({ stroke, vbHeight }: { stroke: Stroke; vbHeight: number }) {
-  return (
-    <path
-      d={strokePath(stroke.points, VIEWBOX_WIDTH, vbHeight)}
-      fill="none"
-      stroke={stroke.color}
-      strokeWidth={stroke.width * VIEWBOX_WIDTH}
-      strokeOpacity={stroke.tool === "highlighter" ? HIGHLIGHTER_OPACITY : 1}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
+  // Dựng viền bút mực tốn hơn hẳn một chuỗi `d` thường — nhớ lại theo từng
+  // nét, nếu không mỗi lần vẽ thêm là tính lại toàn bộ nét cũ trên trang.
+  const d = useMemo(
+    () =>
+      stroke.tool === "highlighter"
+        ? strokePath(stroke.points, VIEWBOX_WIDTH, vbHeight)
+        : penOutlinePath(
+            stroke.points,
+            stroke.pressures,
+            VIEWBOX_WIDTH,
+            vbHeight,
+            stroke.width * VIEWBOX_WIDTH
+          ),
+    [stroke, vbHeight]
   );
+
+  if (stroke.tool === "highlighter") {
+    return (
+      <path
+        d={d}
+        fill="none"
+        stroke={stroke.color}
+        strokeWidth={stroke.width * VIEWBOX_WIDTH}
+        strokeOpacity={HIGHLIGHTER_OPACITY}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    );
+  }
+  return <path d={d} fill={stroke.color} stroke="none" />;
 }

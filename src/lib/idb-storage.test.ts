@@ -81,6 +81,68 @@ describe("chuyển dữ liệu cũ từ localStorage", () => {
   });
 });
 
+describe("kho blob", () => {
+  async function freshBlobs() {
+    vi.resetModules();
+    globalThis.indexedDB = new IDBFactory();
+    return import("./idb-storage");
+  }
+
+  it("ghi rồi đọc lại đúng tiếng đã thu", async () => {
+    const { putBlob, getBlob } = await freshBlobs();
+    const blob = new Blob(["tiếng nói"], { type: "audio/webm" });
+
+    expect(await putBlob("rec-1", blob)).toBe(true);
+    const back = await getBlob("rec-1", "audio/webm");
+
+    expect(back).not.toBeNull();
+    expect(await back!.text()).toBe("tiếng nói");
+    expect(back!.type).toBe("audio/webm");
+  });
+
+  it("chưa có thì trả null chứ không nổ", async () => {
+    const { getBlob } = await freshBlobs();
+    expect(await getBlob("khong-co", "audio/webm")).toBeNull();
+  });
+
+  it("xoá rồi thì không đọc ra nữa", async () => {
+    const { putBlob, getBlob, deleteBlob } = await freshBlobs();
+    await putBlob("rec-1", new Blob(["x"]));
+    await deleteBlob("rec-1");
+
+    expect(await getBlob("rec-1", "audio/webm")).toBeNull();
+  });
+
+  it("mỗi bản ghi một khoá, không đè lên nhau", async () => {
+    const { putBlob, getBlob } = await freshBlobs();
+    await putBlob("rec-1", new Blob(["một"]));
+    await putBlob("rec-2", new Blob(["hai"]));
+
+    expect(await (await getBlob("rec-1", "audio/webm"))!.text()).toBe("một");
+    expect(await (await getBlob("rec-2", "audio/webm"))!.text()).toBe("hai");
+  });
+
+  it("báo false khi không ghi được, để UI nói lại cho người dùng", async () => {
+    vi.resetModules();
+    // @ts-expect-error — dựng lại tình huống trình duyệt chặn IndexedDB.
+    delete globalThis.indexedDB;
+    const { putBlob } = await import("./idb-storage");
+
+    // Tưởng đã ghi xong rồi mất mới là điều tệ nhất ở đây.
+    expect(await putBlob("rec-1", new Blob(["x"]))).toBe(false);
+  });
+
+  it("dùng chung DB với kho khoá-giá trị mà không giẫm lên nhau", async () => {
+    const mod = await freshBlobs();
+    const storage = mod.createIdbStorage(() => {});
+    await storage.setItem("kiip-recordings-v1", '{"recordings":{}}');
+    await mod.putBlob("rec-1", new Blob(["tiếng"]));
+
+    expect(await storage.getItem("kiip-recordings-v1")).toBe('{"recordings":{}}');
+    expect(await (await mod.getBlob("rec-1", "audio/webm"))!.text()).toBe("tiếng");
+  });
+});
+
 describe("khi IndexedDB không dùng được", () => {
   it("đọc ra null thay vì ném lỗi", async () => {
     vi.resetModules();

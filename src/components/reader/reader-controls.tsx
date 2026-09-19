@@ -8,6 +8,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Columns2,
+  Mic,
   NotebookText,
   Pen,
   RotateCcw,
@@ -44,6 +45,9 @@ export function ReaderControls({
   drawActive,
   drawHasContent,
   onDrawToggle,
+  recordOpen,
+  recordHasContent,
+  onRecordToggle,
   onPrev,
   onNext,
   onJump,
@@ -75,6 +79,11 @@ export function ReaderControls({
   /** Trang đang hiện đã có nét vẽ — chấm báo trên nút bút. */
   drawHasContent: boolean;
   onDrawToggle: () => void;
+  /** Bảng ghi âm đang mở. */
+  recordOpen: boolean;
+  /** Trang đang hiện đã có bản ghi — chấm báo trên nút micro. */
+  recordHasContent: boolean;
+  onRecordToggle: () => void;
   onPrev: () => void;
   onNext: () => void;
   onJump: (page: number) => void;
@@ -167,6 +176,34 @@ export function ReaderControls({
             </TooltipTrigger>
             <TooltipContent>
               {drawActive ? "Tắt chế độ vẽ" : "Vẽ lên trang này"}
+            </TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className={cn(
+                  "relative text-white hover:bg-white/10 hover:text-white",
+                  recordOpen &&
+                    "bg-white text-neutral-900 hover:bg-white hover:text-neutral-900"
+                )}
+                onClick={onRecordToggle}
+                aria-label={recordOpen ? "Đóng bảng ghi âm" : "Ghi âm trang này"}
+                aria-pressed={recordOpen}
+              >
+                <Mic className="size-5" aria-hidden />
+                {recordHasContent && !recordOpen && (
+                  <span
+                    className="absolute right-1.5 top-1.5 size-1.5 rounded-full bg-sky-400"
+                    aria-hidden
+                  />
+                )}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              {recordOpen ? "Đóng bảng ghi âm" : "Ghi âm trang này"}
             </TooltipContent>
           </Tooltip>
 

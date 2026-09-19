@@ -21,12 +21,18 @@ import { AudioWidget } from "@/components/reader/audio-widget";
 import { NoteWidget } from "@/components/reader/note-widget";
 import { NoteSheet } from "@/components/reader/note-sheet";
 import { AnnotationToolbar } from "@/components/reader/annotation-toolbar";
+import { RecorderWidget } from "@/components/reader/recorder-widget";
 import { useNoteWidgetStore } from "@/lib/note-widget-store";
 import {
   useAnnotationHydration,
   useAnnotationStore,
   useHasAnnotations,
 } from "@/lib/annotation-store";
+import {
+  useHasRecordings,
+  useRecordingHydration,
+  useRecordingStore,
+} from "@/lib/recording-store";
 import {
   focusNoteWindow,
   isNoteWindowClosed,
@@ -110,6 +116,12 @@ export function ReaderView({
   const drawActive = useAnnotationStore((s) => s.active);
   const setDrawActive = useAnnotationStore((s) => s.setActive);
   const drawHasContent = useHasAnnotations(book.id, pages);
+
+  // Ghi âm giọng người dùng theo từng trang — cùng cách nạp với nét vẽ.
+  useRecordingHydration();
+  const recordOpen = useRecordingStore((s) => s.open);
+  const setRecordOpen = useRecordingStore((s) => s.setOpen);
+  const recordHasContent = useHasRecordings(book.id, pages);
 
   const toggleDraw = useCallback(() => {
     // Bật chế độ vẽ mà thanh công cụ đang ẩn thì không còn đường tắt lại:
@@ -296,6 +308,9 @@ export function ReaderView({
       <NoteSheet bookId={book.id} pages={pages} noteContentByPage={noteContentByPage} />
 
       <AnnotationToolbar bookId={book.id} pages={pages} />
+      {/* Ghi âm bám theo trang trái/anchor: một bản ghi thuộc về một trang,
+          chứ không thuộc về cả spread. */}
+      <RecorderWidget bookId={book.id} page={page} />
 
       <ReaderControls
         visible={toolbarVisible}
@@ -313,6 +328,9 @@ export function ReaderView({
         drawActive={drawActive}
         drawHasContent={drawHasContent}
         onDrawToggle={toggleDraw}
+        recordOpen={recordOpen}
+        recordHasContent={recordHasContent}
+        onRecordToggle={() => setRecordOpen(!recordOpen)}
         onPrev={stepPrev}
         onNext={stepNext}
         onJump={goTo}

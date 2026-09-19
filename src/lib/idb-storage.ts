@@ -21,8 +21,17 @@ import type { StateStorage } from "zustand/middleware";
  * phép làm vỡ trang đọc.
  */
 const DB_NAME = "kiip-reader";
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const STORE = "keyval";
+/**
+ * Bảng riêng cho dữ liệu nhị phân (hiện là bản ghi âm giọng người dùng).
+ *
+ * Tách khỏi `keyval` vì `keyval` đi qua JSON của zustand persist, mà nhét một
+ * đoạn ghi âm vài trăm KB vào JSON thì phải base64 hoá — phình thêm 33% và
+ * phải nạp toàn bộ mỗi lần đọc bất cứ thứ gì. IndexedDB chứa thẳng Blob
+ * được, nên bản ghi nằm riêng từng cái, đọc cái nào lấy cái đó.
+ */
+const BLOB_STORE = "blobs";
 
 let dbPromise: Promise<IDBDatabase | null> | null = null;
 
@@ -36,8 +45,12 @@ function openDb(): Promise<IDBDatabase | null> {
     try {
       const request = indexedDB.open(DB_NAME, DB_VERSION);
       request.onupgradeneeded = () => {
-        if (!request.result.objectStoreNames.contains(STORE)) {
-          request.result.createObjectStore(STORE);
+        // Kiểm tra từng bảng thay vì làm theo số hiệu phiên bản: người dùng
+        // có thể đang ở bất kỳ phiên bản cũ nào, cách này đúng cho mọi lối.
+        for (const name of [STORE, BLOB_STORE]) {
+          if (!request.result.objectStoreNames.contains(name)) {
+            request.result.createObjectStore(name);
+          }
         }
       };
       request.onsuccess = () => resolve(request.result);
@@ -53,7 +66,8 @@ function openDb(): Promise<IDBDatabase | null> {
 
 function run<T>(
   mode: IDBTransactionMode,
-  body: (store: IDBObjectStore) => IDBRequest<T>
+  body: (store: IDBObjectStore) => IDBRequest<T>,
+  storeName: string = STORE
 ): Promise<T | null> {
   return openDb().then(
     (db) =>
@@ -63,8 +77,8 @@ function run<T>(
           return;
         }
         try {
-          const tx = db.transaction(STORE, mode);
-          const request = body(tx.objectStore(STORE));
+          const tx = db.transaction(storeName, mode);
+          const request = body(tx.objectStore(storeName));
           request.onsuccess = () => resolve(request.result);
           request.onerror = () => resolve(null);
           tx.onabort = () => resolve(null);
@@ -100,6 +114,37 @@ async function migrateFromLocalStorage(name: string): Promise<string | null> {
     /* xoá không được thì thôi, lần sau `getItem` đã thấy bản IndexedDB nên không chép lại */
   }
   return legacy;
+}
+
+/**
+ * Đọc/ghi/xoá dữ liệu nhị phân theo khoá — xem `BLOB_STORE`.
+ *
+ * Lưu dạng `ArrayBuffer` chứ không lưu thẳng `Blob`: Safari đời cũ có lỗi
+ * với Blob trong IndexedDB, và ArrayBuffer thì cấu trúc sao chép nào cũng
+ * hiểu. Kiểu tệp không mất đi đâu — nó nằm sẵn trong mô tả bản ghi (xem
+ * `Recording.mimeType`) và được trả lại lúc đọc.
+ *
+ * `putBlob` trả về `false` khi không ghi được (IndexedDB bị chặn hoặc hết
+ * dung lượng): bản ghi âm nào không lưu nổi thì phải báo cho người dùng biết
+ * ngay lúc đó, chứ để họ tưởng đã ghi xong rồi mất thì tệ hơn nhiều.
+ */
+export async function putBlob(key: string, blob: Blob): Promise<boolean> {
+  const buffer = await blob.arrayBuffer();
+  const ok = await run("readwrite", (store) => store.put(buffer, key), BLOB_STORE);
+  return ok !== null;
+}
+
+export async function getBlob(key: string, mimeType: string): Promise<Blob | null> {
+  const buffer = await run<ArrayBuffer | undefined>(
+    "readonly",
+    (store) => store.get(key),
+    BLOB_STORE
+  );
+  return buffer ? new Blob([buffer], { type: mimeType }) : null;
+}
+
+export async function deleteBlob(key: string): Promise<void> {
+  await run("readwrite", (store) => store.delete(key), BLOB_STORE);
 }
 
 /**

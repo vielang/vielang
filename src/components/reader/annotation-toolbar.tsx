@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import {
   AlertTriangle,
   ArrowUpRight,
@@ -41,6 +41,12 @@ import {
   AUDIO_WIDGET_BOTTOM_OFFSET,
   AUDIO_WIDGET_SIZE,
 } from "@/lib/audio-widget-store";
+import {
+  DRAG_MARGIN,
+  clampToViewport,
+  useDraggable,
+  type DragPos,
+} from "@/lib/use-draggable";
 import { cn } from "@/lib/utils";
 
 const TOOLS: { value: AnnotationTool; label: string; Icon: typeof Pen }[] = [
@@ -56,27 +62,8 @@ const TOOLS: { value: AnnotationTool; label: string; Icon: typeof Pen }[] = [
 /** Chấm chọn cỡ nét — đường kính chỉ để gợi ý, không theo tỉ lệ thật. */
 const SIZE_DOTS = [3, 5, 8];
 
-const MARGIN = 8;
 /** Khoảng hở giữa thanh vẽ và nút audio ngay bên dưới. */
 const GAP_ABOVE_AUDIO = 10;
-/** Xê dịch dưới ngưỡng này thì coi là bấm chứ không phải kéo. */
-const DRAG_THRESHOLD = 5;
-
-interface Pos {
-  x: number;
-  y: number;
-}
-
-/** Kẹp trong màn hình theo đúng kích thước hiện tại của thanh. */
-function clamp(pos: Pos, width: number, height: number): Pos {
-  if (typeof window === "undefined") return pos;
-  const maxX = window.innerWidth - width - MARGIN;
-  const maxY = window.innerHeight - height - MARGIN;
-  return {
-    x: Math.min(Math.max(pos.x, MARGIN), Math.max(maxX, MARGIN)),
-    y: Math.min(Math.max(pos.y, MARGIN), Math.max(maxY, MARGIN)),
-  };
-}
 
 /**
  * Chỗ đứng mặc định: dựng dọc sát mép phải, ngay TRÊN nút audio.
@@ -85,10 +72,10 @@ function clamp(pos: Pos, width: number, height: number): Pos {
  * một cột dọc bên hông chỉ ăn mất chừng 45px bề ngang, còn thanh ngang dưới
  * đáy thì cắt mất một khoảng chiều cao, đúng chiều đang thiếu.
  */
-function defaultPosition(width: number, height: number): Pos {
+function defaultPosition(width: number, height: number): DragPos {
   const audioTop = window.innerHeight - AUDIO_WIDGET_SIZE - AUDIO_WIDGET_BOTTOM_OFFSET;
   return {
-    x: window.innerWidth - width - MARGIN,
+    x: window.innerWidth - width - DRAG_MARGIN,
     y: audioTop - GAP_ABOVE_AUDIO - height,
   };
 }
@@ -142,8 +129,6 @@ export function AnnotationToolbar({ bookId, pages }: { bookId: string; pages: nu
   const ToolIcon = activeTool.Icon;
 
   const ref = useRef<HTMLDivElement>(null);
-  /** Vừa kéo xong: nuốt cú `click` sắp tới, xem `onClickCapture`. */
-  const suppressClick = useRef(false);
 
   /**
    * Đặt vị trí mặc định ở lần mở đầu, rồi kẹp lại mỗi khi thanh đổi cỡ (thu
@@ -162,7 +147,7 @@ export function AnnotationToolbar({ bookId, pages }: { bookId: string; pages: nu
       const { offsetWidth: w, offsetHeight: h } = el;
       if (w === 0) return;
       const store = useAnnotationStore.getState();
-      const next = clamp(store.toolbarPos ?? defaultPosition(w, h), w, h);
+      const next = clampToViewport(store.toolbarPos ?? defaultPosition(w, h), w, h);
       if (next.x !== store.toolbarPos?.x || next.y !== store.toolbarPos?.y) {
         store.setToolbarPos(next);
       }
@@ -178,80 +163,21 @@ export function AnnotationToolbar({ bookId, pages }: { bookId: string; pages: nu
     };
   }, [active]);
 
-  /**
-   * Đặt tay vào BẤT KỲ ĐÂU trên thanh rồi kéo — kể cả ngay trên một cái nút.
-   *
-   * Cột dọc gần như toàn là nút, chừa ra đúng cái tay nắm 16px; bắt người
-   * dùng nhắm trúng chỗ đó mới kéo được thì coi như không kéo được.
-   *
-   * Nên bấm và kéo chỉ phân biệt được SAU khi tay nhúc nhích: dưới ngưỡng
-   * thì cứ để `click` chạy như thường, vượt ngưỡng mới bắt đầu dời thanh và
-   * nuốt cú `click` ở cuối.
-   *
-   * Nghe `pointermove`/`pointerup` trên `window` chứ không dùng
-   * `setPointerCapture`: bắt con trỏ ngay từ `pointerdown` thì nút không bao
-   * giờ nhận được `pointerup` nên `click` không bắn (đúng cái bẫy mà
-   * `audio-widget` đã dính), còn bắt muộn thì có lúc con trỏ đã rời khỏi
-   * thanh và mất luôn các sự kiện ở giữa.
-   */
-  const onPointerDown = useCallback(
-    (e: React.PointerEvent) => {
-      const pointerId = e.pointerId;
-      const startX = e.clientX;
-      const startY = e.clientY;
-      const origin = pos ?? { x: MARGIN, y: MARGIN };
-      let moved = false;
-
-      function onMove(ev: PointerEvent) {
-        if (ev.pointerId !== pointerId) return;
-        const dx = ev.clientX - startX;
-        const dy = ev.clientY - startY;
-        if (!moved) {
-          if (Math.abs(dx) <= DRAG_THRESHOLD && Math.abs(dy) <= DRAG_THRESHOLD) return;
-          moved = true;
-          // Kéo thanh đi thì đóng popover — để mở thì nó nhảy theo thanh từng
-          // khung hình, nhìn rất giật.
-          setPanel("none");
-        }
-        const el = ref.current;
-        if (!el) return;
-        setPos(
-          clamp({ x: origin.x + dx, y: origin.y + dy }, el.offsetWidth, el.offsetHeight)
-        );
-      }
-
-      function onUp(ev: PointerEvent) {
-        if (ev.pointerId !== pointerId) return;
-        window.removeEventListener("pointermove", onMove);
-        window.removeEventListener("pointerup", onUp);
-        window.removeEventListener("pointercancel", onUp);
-        if (moved) suppressClick.current = true;
-        // Nhấn (không kéo) lên nút đã thu nhỏ -> bung ra tại chỗ.
-        else if (collapsed) setCollapsed(false);
-      }
-
-      window.addEventListener("pointermove", onMove);
-      window.addEventListener("pointerup", onUp);
-      window.addEventListener("pointercancel", onUp);
+  // Kéo thả: đặt tay vào bất kỳ đâu trên thanh, kể cả trên nút — xem
+  // `use-draggable`. Chạm mà không kéo thì bung lại thanh đang thu nhỏ.
+  const dragHandlers = useDraggable({
+    ref,
+    pos,
+    setPos,
+    onTap: () => {
+      if (collapsed) setCollapsed(false);
     },
-    [pos, setPos, collapsed, setCollapsed]
-  );
-
-  /**
-   * Nhả tay sau khi kéo vẫn sinh ra một cú `click` trên cái nút nằm dưới
-   * ngón — nuốt nó ở pha bắt, nếu không kéo thanh đi là vô tình bấm luôn
-   * "thoát" hay "hoàn tác".
-   */
-  const onClickCapture = useCallback((e: React.MouseEvent) => {
-    if (!suppressClick.current) return;
-    suppressClick.current = false;
-    e.preventDefault();
-    e.stopPropagation();
-  }, []);
+    // Kéo thanh đi thì đóng popover — để mở thì nó nhảy theo thanh từng khung
+    // hình, nhìn rất giật.
+    onDragStart: () => setPanel("none"),
+  });
 
   if (!active) return null;
-
-  const dragHandlers = { onPointerDown, onClickCapture };
 
   return (
     <>

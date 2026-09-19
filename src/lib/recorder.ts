@@ -1,0 +1,105 @@
+"use client";
+
+/**
+ * Bọc `MediaRecorder` cho gọn: mở micro, thu, rồi trả về một Blob.
+ *
+ * Tách khỏi component vì đây là chỗ mỗi trình duyệt một kiểu, và vì việc
+ * NHẢ MICRO sau khi thu xong rất dễ quên — quên là đèn "đang ghi âm" của
+ * trình duyệt sáng mãi, người dùng tưởng app nghe lén.
+ */
+
+/**
+ * Kiểu tệp thu, xếp theo thứ tự ưu tiên.
+ *
+ * Opus trong WebM là thứ Chrome/Firefox/Edge cho ra, nhẹ và chất lượng tốt
+ * cho giọng nói. Safari không nhận WebM mà chỉ có MP4/AAC — nên phải hỏi
+ * `isTypeSupported` chứ không đoán, và phải NHỚ LẠI kiểu thật sự dùng để sau
+ * này phát đúng.
+ */
+const PREFERRED_TYPES = [
+  "audio/webm;codecs=opus",
+  "audio/webm",
+  "audio/mp4",
+  "audio/ogg;codecs=opus",
+];
+
+export function pickMimeType(
+  isSupported: (type: string) => boolean = (t) =>
+    typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported(t)
+): string | undefined {
+  // `undefined` = để trình duyệt tự chọn. Vẫn tốt hơn ép một kiểu nó không
+  // nhận, vì ép sai thì `new MediaRecorder` ném lỗi luôn.
+  return PREFERRED_TYPES.find(isSupported);
+}
+
+export type RecorderError = "denied" | "unsupported" | "failed";
+
+/** Dịch lỗi của `getUserMedia` sang lý do mà UI nói lại được cho người dùng. */
+export function toRecorderError(err: unknown): RecorderError {
+  const name = (err as { name?: string } | null)?.name;
+  if (name === "NotAllowedError" || name === "SecurityError") return "denied";
+  if (name === "NotFoundError" || name === "NotSupportedError") return "unsupported";
+  return "failed";
+}
+
+export const RECORDER_ERROR_MESSAGE: Record<RecorderError, string> = {
+  denied: "Trình duyệt chưa cho phép dùng micro. Hãy bật quyền rồi thử lại.",
+  unsupported: "Không tìm thấy micro nào trên thiết bị này.",
+  failed: "Không bật được micro. Thử tải lại trang.",
+};
+
+export interface ActiveRecording {
+  /** Dừng thu và trả về tiếng đã ghi. Gọi lần thứ hai thì trả về cùng kết quả. */
+  stop: () => Promise<{ blob: Blob; mimeType: string }>;
+  /** Bỏ hẳn, không lấy kết quả — vẫn nhả micro. */
+  cancel: () => void;
+}
+
+/**
+ * Bật micro và bắt đầu thu. Ném lỗi nếu người dùng từ chối quyền — bên gọi
+ * bắt rồi dịch qua `toRecorderError`.
+ */
+export async function startRecording(): Promise<ActiveRecording> {
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  const mimeType = pickMimeType();
+  const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+  const chunks: Blob[] = [];
+  recorder.addEventListener("dataavailable", (e) => {
+    if (e.data.size > 0) chunks.push(e.data);
+  });
+  recorder.start();
+
+  /** Nhả micro. Bỏ qua là đèn "đang ghi âm" của trình duyệt sáng mãi. */
+  function release() {
+    for (const track of stream.getTracks()) track.stop();
+  }
+
+  let result: Promise<{ blob: Blob; mimeType: string }> | null = null;
+
+  return {
+    stop() {
+      // Nhớ lại lời hứa: bấm "dừng" hai lần (hoặc dừng rồi component unmount
+      // gọi lại) thì vẫn ra cùng một bản ghi, không treo mãi ở lần thứ hai.
+      result ??= new Promise((resolve) => {
+        recorder.addEventListener(
+          "stop",
+          () => {
+            release();
+            // `recorder.mimeType` là kiểu THẬT trình duyệt dùng, có thể khác
+            // cái mình xin — lấy nó để sau này phát lại cho đúng.
+            const type = recorder.mimeType || mimeType || "audio/webm";
+            resolve({ blob: new Blob(chunks, { type }), mimeType: type });
+          },
+          { once: true }
+        );
+        if (recorder.state !== "inactive") recorder.stop();
+        else release();
+      });
+      return result;
+    },
+    cancel() {
+      if (recorder.state !== "inactive") recorder.stop();
+      release();
+    },
+  };
+}

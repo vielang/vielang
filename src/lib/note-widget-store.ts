@@ -21,8 +21,8 @@ export interface Size {
  */
 export type NoteMode = "closed" | "floating" | "fullscreen" | "popped";
 
-/** Tab trong panel: bài giảng (văn xuôi) hay luyện tập (câu hỏi). */
-export type NoteTab = "note" | "quiz";
+/** Tab trong panel: bài giảng (văn xuôi), luyện tập (câu hỏi) hay bảng vẽ. */
+export type NoteTab = "note" | "quiz" | "draw";
 
 /** Ở chế độ xem 2 trang: bài giảng/bài tập đang xem của trang trái hay phải. */
 export type NoteSide = "left" | "right";

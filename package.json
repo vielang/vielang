@@ -16,6 +16,7 @@
     "crawl-orgs": "tsx scripts/crawl-kiip-orgs.ts"
   },
   "dependencies": {
+    "@excalidraw/excalidraw": "^0.18.1",
     "@tiptap/extension-highlight": "^3.31.3",
     "@tiptap/extension-table": "^3.31.3",
     "@tiptap/extension-text-align": "^3.31.3",

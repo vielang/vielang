@@ -6,6 +6,7 @@ import { Eye, Pencil, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NOTE_PROSE_CLASS, useEffectiveNote, useNoteStore } from "@/lib/note-store";
 import { useNoteWidgetStore, type NoteSide } from "@/lib/note-widget-store";
+import { useDrawHydration, useHasDrawing } from "@/lib/draw-store";
 import { countItems, getPageQuiz } from "@/lib/quiz";
 import { QuizPanel } from "@/components/reader/quiz-panel";
 import { cn } from "@/lib/utils";
@@ -25,6 +26,19 @@ const NoteEditor = dynamic(
 );
 
 /**
+ * Excalidraw còn nặng hơn Tiptap và bắt buộc phải có `window` — nạp động,
+ * chỉ khi người dùng mở tab "Vẽ". Xem `note-draw` để biết vì sao component
+ * này phải remount theo trang.
+ */
+const NoteDraw = dynamic(
+  () => import("@/components/reader/note-draw").then((m) => m.NoteDraw),
+  {
+    ssr: false,
+    loading: () => <div className="min-h-0 flex-1 animate-pulse bg-muted/40" />,
+  }
+);
+
+/**
  * Thân bài giảng — dùng chung cho cả 3 nơi hiển thị: panel nổi
  * (note-widget), sheet toàn màn hình (note-sheet) và cửa sổ riêng
  * (app/read/.../note). Nhờ vậy đổi chế độ hiển thị không làm lệch hành vi
@@ -35,8 +49,8 @@ const NoteEditor = dynamic(
  *
  * `pages` có 1 phần tử (chế độ 1 trang / cửa sổ riêng) hoặc 2 phần tử [trái,
  * phải] (chế độ 2 trang) — có 2 trang thì thêm 1 dải chọn "Trang N" phía
- * trên, mỗi trang lại có tối đa 2 tab con (Bài giảng/Bài tập) như cũ, nên
- * tổng cộng tối đa 4 tổ hợp chọn được khi trang nào cũng có bài tập.
+ * trên, mỗi trang lại có tối đa 3 tab con (Bài giảng/Bài tập/Vẽ), nên tổng
+ * cộng tối đa 6 tổ hợp chọn được khi trang nào cũng có bài tập.
  */
 export function NotePanel({
   bookId,
@@ -60,6 +74,13 @@ export function NotePanel({
   const leftQuiz = getPageQuiz(bookId, leftPage);
   const rightQuiz = pages.length === 2 ? getPageQuiz(bookId, rightPage) : [];
 
+  // Bảng vẽ nằm trong localStorage và cố tình hoãn nạp tới sau lần render
+  // đầu — xem `draw-store`. Gọi ở đây vì NotePanel là cửa duy nhất vào tab
+  // Vẽ, dùng chung cho panel nổi / sheet / cửa sổ riêng.
+  const drawReady = useDrawHydration();
+  const leftHasDrawing = useHasDrawing(bookId, leftPage);
+  const rightHasDrawing = useHasDrawing(bookId, rightPage);
+
   const resetNote = useNoteStore((s) => s.resetNote);
   const editing = useNoteWidgetStore((s) => s.editing);
   const setEditing = useNoteWidgetStore((s) => s.setEditing);
@@ -73,12 +94,14 @@ export function NotePanel({
   const { html, isEdited, hasOriginal, hasContent } =
     side === "right" ? rightNote : leftNote;
   const sections = side === "right" ? rightQuiz : leftQuiz;
+  const hasDrawing = side === "right" ? rightHasDrawing : leftHasDrawing;
 
   // Trang không có bài tập thì không hiện tab đó — đỡ bày ra 1 tab rỗng. Nếu
   // đang đứng ở tab bài tập mà đổi sang trang/side không có bài tập thì rơi
-  // về bài giảng, không kẹt ở màn trống.
+  // về bài giảng, không kẹt ở màn trống. Tab Vẽ thì trang nào cũng có: bảng
+  // vẽ trống vẫn là chỗ để bắt đầu, không phải màn trống.
   const hasQuiz = sections.length > 0;
-  const tab = hasQuiz ? storedTab : "note";
+  const tab = !hasQuiz && storedTab === "quiz" ? "note" : storedTab;
 
   // Bấm "Khôi phục bản gốc" lúc đang sửa: remount editor để nó nạp lại nội
   // dung gốc — Tiptap không tự theo dõi prop `content` sau khi khởi tạo.
@@ -97,34 +120,52 @@ export function NotePanel({
             selected={side === "left"}
             onSelect={() => setSide("left")}
             page={leftPage}
-            hasContent={leftNote.hasContent || leftQuiz.length > 0}
+            hasContent={leftNote.hasContent || leftQuiz.length > 0 || leftHasDrawing}
           />
           <PageTabButton
             selected={side === "right"}
             onSelect={() => setSide("right")}
             page={rightPage}
-            hasContent={rightNote.hasContent || rightQuiz.length > 0}
+            hasContent={rightNote.hasContent || rightQuiz.length > 0 || rightHasDrawing}
           />
         </div>
       )}
 
-      {hasQuiz && (
-        <div role="tablist" className="flex gap-1 border-b border-border px-3">
-          <TabButton
-            selected={tab === "note"}
-            onSelect={() => setTab("note")}
-            label="Bài giảng"
-          />
+      <div role="tablist" className="flex gap-1 border-b border-border px-3">
+        <TabButton
+          selected={tab === "note"}
+          onSelect={() => setTab("note")}
+          label="Bài giảng"
+        />
+        {hasQuiz && (
           <TabButton
             selected={tab === "quiz"}
             onSelect={() => setTab("quiz")}
             label="Bài tập"
             badge={countItems(sections)}
           />
-        </div>
-      )}
+        )}
+        <TabButton
+          selected={tab === "draw"}
+          onSelect={() => setTab("draw")}
+          label="Vẽ"
+          dot={hasDrawing}
+        />
+      </div>
 
-      {tab === "quiz" ? (
+      {tab === "draw" ? (
+        // Chỉ mount khi bản vẽ đã nạp xong từ localStorage: Excalidraw chốt
+        // nội dung ngay lúc render đầu (xem `note-draw`), mount sớm là mở ra
+        // canvas trắng rồi nét vẽ tiếp theo ghi đè mất bài cũ.
+        //
+        // `key` gồm cả trang vì cùng lý do — phải remount thì lật trang/đổi
+        // side mới ra đúng bản vẽ.
+        drawReady ? (
+          <NoteDraw key={`${bookId}:${page}`} bookId={bookId} page={page} />
+        ) : (
+          <div className="min-h-0 flex-1 animate-pulse bg-muted/40" />
+        )
+      ) : tab === "quiz" ? (
         <QuizPanel bookId={bookId} page={page} sections={sections} />
       ) : (
         // Đổi tab/trang thì editor unmount — an toàn vì phần gõ dở được ghi
@@ -233,11 +274,14 @@ function TabButton({
   onSelect,
   label,
   badge,
+  dot,
 }: {
   selected: boolean;
   onSelect: () => void;
   label: string;
   badge?: number;
+  /** Chấm báo "đã có nội dung" — dùng cho tab Vẽ, nơi không đếm được số mục. */
+  dot?: boolean;
 }) {
   return (
     <button
@@ -258,6 +302,7 @@ function TabButton({
           {badge}
         </span>
       )}
+      {dot && <span className="size-1.5 rounded-full bg-sky-400" aria-hidden />}
     </button>
   );
 }

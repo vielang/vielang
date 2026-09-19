@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useNoteStore } from "@/lib/note-store";
+import { DRAW_STORAGE_KEY, useDrawStore } from "@/lib/draw-store";
 
 /**
  * Cửa sổ bài giảng riêng — mở bằng `window.open` tới route
@@ -63,12 +64,22 @@ export function publishNoteFocus(bookId: string, page: number): void {
 }
 
 /**
- * Nghe sửa đổi note từ cửa sổ còn lại. `persist.rehydrate()` đọc lại
- * localStorage và nạp vào store, nên view mode ở cửa sổ kia cập nhật ngay.
+ * Nghe sửa đổi bài giảng và bảng vẽ từ cửa sổ còn lại. `persist.rehydrate()`
+ * đọc lại localStorage và nạp vào store, nên view mode ở cửa sổ kia cập nhật
+ * ngay.
+ *
+ * Riêng bảng vẽ: nạp lại store KHÔNG làm canvas đang mở nhảy theo —
+ * Excalidraw chỉ đọc `initialData` lúc khởi tạo (xem `note-draw`). Đúng ý:
+ * hai cửa sổ cùng vẽ một trang thì bên nào lưu sau thắng, chứ không giật
+ * nét vẽ khỏi tay người đang vẽ.
  */
 export function useNoteStoreSync(): void {
   useEffect(() => {
     function onStorage(e: StorageEvent) {
+      if (e.key === DRAW_STORAGE_KEY) {
+        void useDrawStore.persist.rehydrate();
+        return;
+      }
       if (e.key !== "kiip-notes-v1") return;
       void useNoteStore.persist.rehydrate();
     }

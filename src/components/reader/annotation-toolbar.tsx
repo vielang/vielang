@@ -1,13 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import {
   AlertTriangle,
   ArrowUpRight,
   Eraser,
   Eye,
   EyeOff,
-  GripVertical,
+  GripHorizontal,
   Highlighter,
   Minus,
   MoreHorizontal,
@@ -19,6 +19,10 @@ import {
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
   Dialog,
   DialogContent,
@@ -33,6 +37,10 @@ import {
   useAnnotationStore,
   type AnnotationTool,
 } from "@/lib/annotation-store";
+import {
+  AUDIO_WIDGET_BOTTOM_OFFSET,
+  AUDIO_WIDGET_SIZE,
+} from "@/lib/audio-widget-store";
 import { cn } from "@/lib/utils";
 
 const TOOLS: { value: AnnotationTool; label: string; Icon: typeof Pen }[] = [
@@ -49,12 +57,10 @@ const TOOLS: { value: AnnotationTool; label: string; Icon: typeof Pen }[] = [
 const SIZE_DOTS = [3, 5, 8];
 
 const MARGIN = 8;
-/** Chừa chỗ cho thanh điều hướng trang ở đáy khi đặt vị trí mặc định. */
-const BOTTOM_BAR_HEIGHT = 76;
+/** Khoảng hở giữa thanh vẽ và nút audio ngay bên dưới. */
+const GAP_ABOVE_AUDIO = 10;
 /** Xê dịch dưới ngưỡng này thì coi là bấm chứ không phải kéo. */
 const DRAG_THRESHOLD = 5;
-/** Còn ít hơn chừng này chỗ phía trên thì mở bảng chọn xuống dưới. */
-const PANEL_SPACE = 260;
 
 interface Pos {
   x: number;
@@ -73,16 +79,28 @@ function clamp(pos: Pos, width: number, height: number): Pos {
 }
 
 /**
- * Thanh công cụ vẽ: một hàng duy nhất, kéo thả được, thu lại được.
+ * Chỗ đứng mặc định: dựng dọc sát mép phải, ngay TRÊN nút audio.
  *
- * Chỉ 6 nút nằm ngoài — công cụ đang cầm, hoàn tác, thêm, thu nhỏ, thoát,
- * cùng tay nắm. Bảng chọn công cụ/màu/cỡ và hai việc với ảnh gốc nằm trong
- * hai bảng bung ra. Trước đây bày hết ~20 nút ra ngoài, trên màn điện thoại
- * nó xuống 2–3 dòng che gần hết chỗ đọc, mà nút thu nhỏ thì lọt tít cuối
- * hàng nên không ai tìm thấy.
+ * Nằm dọc ở mép chứ không nằm ngang dưới đáy vì trang sách cao hơn rộng —
+ * một cột dọc bên hông chỉ ăn mất chừng 45px bề ngang, còn thanh ngang dưới
+ * đáy thì cắt mất một khoảng chiều cao, đúng chiều đang thiếu.
+ */
+function defaultPosition(width: number, height: number): Pos {
+  const audioTop = window.innerHeight - AUDIO_WIDGET_SIZE - AUDIO_WIDGET_BOTTOM_OFFSET;
+  return {
+    x: window.innerWidth - width - MARGIN,
+    y: audioTop - GAP_ABOVE_AUDIO - height,
+  };
+}
+
+/**
+ * Thanh công cụ vẽ: một cột dọc ở mép phải, kéo thả được, thu lại được.
  *
- * CẢ THÂN THANH là vùng kéo, không riêng tay nắm: tay nắm chỉ rộng chừng
- * 20px, người dùng theo phản xạ sẽ túm vào giữa thanh mà kéo. Tay nắm giữ
+ * Chỉ 5 nút nằm ngoài — công cụ đang cầm, hoàn tác, thêm, thu nhỏ, thoát.
+ * Bảng chọn công cụ/màu/cỡ và hai việc với ảnh gốc nằm trong hai popover.
+ *
+ * CẢ THÂN THANH là vùng kéo, không riêng tay nắm: tay nắm chỉ cao chừng
+ * 16px, người dùng theo phản xạ sẽ túm vào giữa thanh mà kéo. Tay nắm giữ
  * lại chỉ để làm dấu hiệu "cái này kéo được".
  *
  * Luôn hiện khi còn đang vẽ — khác thanh công cụ đọc vốn ẩn/hiện theo chạm,
@@ -120,7 +138,8 @@ export function AnnotationToolbar({ bookId, pages }: { bookId: string; pages: nu
   const [panel, setPanel] = useState<"none" | "tools" | "more">("none");
   const [confirmClear, setConfirmClear] = useState(false);
   const color = tool === "highlighter" ? highlighterColor : penColor;
-  const ToolIcon = TOOLS.find((t) => t.value === tool)?.Icon ?? Pen;
+  const activeTool = TOOLS.find((t) => t.value === tool) ?? TOOLS[0];
+  const ToolIcon = activeTool.Icon;
 
   const ref = useRef<HTMLDivElement>(null);
   const drag = useRef<{
@@ -148,11 +167,7 @@ export function AnnotationToolbar({ bookId, pages }: { bookId: string; pages: nu
       const { offsetWidth: w, offsetHeight: h } = el;
       if (w === 0) return;
       const store = useAnnotationStore.getState();
-      const current: Pos = store.toolbarPos ?? {
-        x: (window.innerWidth - w) / 2,
-        y: window.innerHeight - h - BOTTOM_BAR_HEIGHT,
-      };
-      const next = clamp(current, w, h);
+      const next = clamp(store.toolbarPos ?? defaultPosition(w, h), w, h);
       if (next.x !== store.toolbarPos?.x || next.y !== store.toolbarPos?.y) {
         store.setToolbarPos(next);
       }
@@ -167,28 +182,6 @@ export function AnnotationToolbar({ bookId, pages }: { bookId: string; pages: nu
       window.removeEventListener("resize", fit);
     };
   }, [active]);
-
-  // Bấm ra ngoài hay bấm Esc thì đóng bảng chọn. Dùng pha bắt (capture) trên
-  // `pointerdown`: nếu chờ tới lượt nổi bọt thì cú chạm đó đã rơi xuống lớp
-  // vẽ và thành một nét trên trang.
-  useEffect(() => {
-    if (panel === "none") return;
-    function onDown(e: PointerEvent) {
-      if (!ref.current?.contains(e.target as Node)) setPanel("none");
-    }
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") {
-        e.stopPropagation();
-        setPanel("none");
-      }
-    }
-    document.addEventListener("pointerdown", onDown, true);
-    document.addEventListener("keydown", onKey, true);
-    return () => {
-      document.removeEventListener("pointerdown", onDown, true);
-      document.removeEventListener("keydown", onKey, true);
-    };
-  }, [panel]);
 
   const onPointerDown = useCallback(
     (e: React.PointerEvent) => {
@@ -217,8 +210,8 @@ export function AnnotationToolbar({ bookId, pages }: { bookId: string; pages: nu
       const dy = e.clientY - d.startY;
       if (Math.abs(dx) > DRAG_THRESHOLD || Math.abs(dy) > DRAG_THRESHOLD) {
         d.moved = true;
-        // Kéo thanh đi thì đóng bảng chọn — để mở thì nó lật lên lật xuống
-        // theo vị trí, nhìn rất giật.
+        // Kéo thanh đi thì đóng popover — để mở thì nó nhảy theo thanh từng
+        // khung hình, nhìn rất giật.
         setPanel("none");
       }
       setPos(
@@ -251,9 +244,6 @@ export function AnnotationToolbar({ bookId, pages }: { bookId: string; pages: nu
     onPointerUp,
     onPointerCancel: onPointerUp,
   };
-  // Thanh nằm sát mép trên thì bảng chọn phải bung xuống dưới, không thì nó
-  // tràn ra ngoài màn.
-  const panelBelow = (pos?.y ?? 0) < PANEL_SPACE;
 
   return (
     <>
@@ -270,93 +260,126 @@ export function AnnotationToolbar({ bookId, pages }: { bookId: string; pages: nu
             {...dragHandlers}
             aria-label="Mở lại thanh công cụ vẽ"
             title="Mở lại thanh công cụ vẽ"
-            className="flex size-11 items-center justify-center rounded-full border border-white/15 bg-neutral-900/90 text-white shadow-2xl backdrop-blur"
+            className="flex size-11 items-center justify-center rounded-full bg-neutral-900/80 text-white ring-1 ring-white/15 shadow-lg backdrop-blur-md transition-transform active:scale-95"
           >
             <ToolIcon className="size-5" style={{ color }} aria-hidden />
           </button>
         ) : (
-          <div className="relative">
-            {panel !== "none" && (
-              <div
-                className={cn(
-                  "absolute left-0 w-64 max-w-[calc(100vw-1rem)] rounded-2xl border border-white/15 bg-neutral-900/95 p-2 text-white shadow-2xl backdrop-blur",
-                  panelBelow ? "top-full mt-2" : "bottom-full mb-2"
-                )}
-              >
-                {panel === "tools" ? (
-                  <ToolPanel
-                    tool={tool}
-                    color={color}
-                    size={size}
-                    onPickTool={(t) => {
-                      setTool(t);
-                      // Chọn xong công cụ là muốn vẽ ngay — đóng luôn. Còn
-                      // màu và cỡ thì để mở, thường chỉnh cả hai một lượt.
-                      setPanel("none");
-                    }}
-                    onPickColor={setColor}
-                    onPickSize={setSize}
+          <div
+            {...dragHandlers}
+            data-testid="annotation-toolbar-bar"
+            className="flex cursor-grab flex-col items-center gap-0.5 rounded-full bg-neutral-900/80 p-1 text-white ring-1 ring-white/15 shadow-lg backdrop-blur-md active:cursor-grabbing"
+          >
+            <GripHorizontal className="my-0.5 size-4 shrink-0 text-white/40" aria-hidden />
+
+            <Popover
+              open={panel === "tools"}
+              onOpenChange={(open) => setPanel(open ? "tools" : "none")}
+            >
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <PopoverTrigger asChild>
+                    <BarButton
+                      label={`Công cụ: ${activeTool.label}`}
+                      pressed={panel === "tools"}
+                    >
+                      <ToolIcon
+                        className="size-4.5"
+                        style={{ color: panel === "tools" ? undefined : color }}
+                        aria-hidden
+                      />
+                    </BarButton>
+                  </PopoverTrigger>
+                </TooltipTrigger>
+                <TooltipContent side="left">{activeTool.label}</TooltipContent>
+              </Tooltip>
+              <PopoverContent side="left" align="start" className="w-60">
+                <ToolPanel
+                  tool={tool}
+                  color={color}
+                  size={size}
+                  onPickTool={(t) => {
+                    setTool(t);
+                    // Chọn xong công cụ là muốn vẽ ngay — đóng luôn. Còn màu
+                    // và cỡ thì để mở, thường chỉnh cả hai một lượt.
+                    setPanel("none");
+                  }}
+                  onPickColor={setColor}
+                  onPickSize={setSize}
+                />
+              </PopoverContent>
+            </Popover>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <BarButton
+                  label={`Hoàn tác nét cuối (trang ${target})`}
+                  disabled={count === 0}
+                  onClick={() => undo(bookId, target)}
+                >
+                  <Undo2 className="size-4.5" aria-hidden />
+                </BarButton>
+              </TooltipTrigger>
+              <TooltipContent side="left">Hoàn tác nét cuối</TooltipContent>
+            </Tooltip>
+
+            <Popover
+              open={panel === "more"}
+              onOpenChange={(open) => setPanel(open ? "more" : "none")}
+            >
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <PopoverTrigger asChild>
+                    <BarButton
+                      label="Ảnh gốc và khôi phục"
+                      pressed={panel === "more" || peeking}
+                    >
+                      <MoreHorizontal className="size-4.5" aria-hidden />
+                    </BarButton>
+                  </PopoverTrigger>
+                </TooltipTrigger>
+                <TooltipContent side="left">Ảnh gốc</TooltipContent>
+              </Tooltip>
+              <PopoverContent side="left" align="start" className="w-56">
+                <div className="flex flex-col gap-0.5">
+                  <PanelRow
+                    onClick={() => setPeeking(!peeking)}
+                    pressed={peeking}
+                    Icon={peeking ? EyeOff : Eye}
+                    label={peeking ? "Hiện lại nét vẽ" : "Xem ảnh gốc"}
                   />
-                ) : (
-                  <MorePanel
-                    peeking={peeking}
-                    count={count}
-                    target={target}
-                    onTogglePeek={() => setPeeking(!peeking)}
-                    onRestore={() => {
+                  <PanelRow
+                    onClick={() => {
                       setPanel("none");
                       setConfirmClear(true);
                     }}
+                    disabled={count === 0}
+                    Icon={RotateCcw}
+                    label={`Khôi phục ảnh gốc trang ${target}`}
                   />
-                )}
-              </div>
-            )}
+                </div>
+              </PopoverContent>
+            </Popover>
 
-            <div
-              {...dragHandlers}
-              data-testid="annotation-toolbar-bar"
-              className="flex cursor-grab items-center gap-0.5 rounded-full border border-white/15 bg-neutral-900/90 p-1 pl-0.5 text-white shadow-2xl backdrop-blur active:cursor-grabbing"
-            >
-              <GripVertical className="size-4 shrink-0 text-white/40" aria-hidden />
+            <Separator className="my-0.5 w-5 bg-white/15" />
 
-              <BarButton
-                label={`Công cụ: ${TOOLS.find((t) => t.value === tool)?.label}`}
-                pressed={panel === "tools"}
-                onClick={() => setPanel(panel === "tools" ? "none" : "tools")}
-              >
-                <ToolIcon
-                  className="size-4.5"
-                  style={{ color: panel === "tools" ? undefined : color }}
-                  aria-hidden
-                />
-              </BarButton>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <BarButton label="Thu nhỏ thanh công cụ" onClick={() => setCollapsed(true)}>
+                  <Minus className="size-4.5" aria-hidden />
+                </BarButton>
+              </TooltipTrigger>
+              <TooltipContent side="left">Thu nhỏ</TooltipContent>
+            </Tooltip>
 
-              <BarButton
-                label={`Hoàn tác nét cuối (trang ${target})`}
-                disabled={count === 0}
-                onClick={() => undo(bookId, target)}
-              >
-                <Undo2 className="size-4.5" aria-hidden />
-              </BarButton>
-
-              <BarButton
-                label="Ảnh gốc và khôi phục"
-                pressed={panel === "more" || peeking}
-                onClick={() => setPanel(panel === "more" ? "none" : "more")}
-              >
-                <MoreHorizontal className="size-4.5" aria-hidden />
-              </BarButton>
-
-              <span className="mx-0.5 h-5 w-px shrink-0 bg-white/15" aria-hidden />
-
-              <BarButton label="Thu nhỏ thanh công cụ" onClick={() => setCollapsed(true)}>
-                <Minus className="size-4.5" aria-hidden />
-              </BarButton>
-
-              <BarButton label="Thoát chế độ vẽ (Esc)" onClick={() => setActive(false)}>
-                <X className="size-4.5" aria-hidden />
-              </BarButton>
-            </div>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <BarButton label="Thoát chế độ vẽ (Esc)" onClick={() => setActive(false)}>
+                  <X className="size-4.5" aria-hidden />
+                </BarButton>
+              </TooltipTrigger>
+              <TooltipContent side="left">Thoát chế độ vẽ</TooltipContent>
+            </Tooltip>
           </div>
         )}
       </div>
@@ -401,36 +424,36 @@ export function AnnotationToolbar({ bookId, pages }: { bookId: string; pages: nu
   );
 }
 
-/** Nút tròn trên thanh — cùng một cỡ cho mọi nút để hàng không so le. */
+/**
+ * Nút trên thanh. Nhận và chuyển tiếp mọi prop còn lại để
+ * `PopoverTrigger asChild` / `TooltipTrigger asChild` gắn được ref và các
+ * thuộc tính điều khiển của chúng vào đúng thẻ <button> bên dưới.
+ */
 function BarButton({
   label,
-  onClick,
   children,
   pressed,
-  disabled,
+  ...props
 }: {
   label: string;
-  onClick: () => void;
   children: React.ReactNode;
   pressed?: boolean;
-  disabled?: boolean;
-}) {
+} & React.ComponentProps<typeof Button>) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
+    <Button
+      variant="ghost"
+      size="icon"
       aria-label={label}
       aria-pressed={pressed}
-      title={label}
       className={cn(
-        "flex size-9 shrink-0 items-center justify-center rounded-full transition-colors",
-        pressed ? "bg-white text-neutral-900" : "hover:bg-white/10",
-        "disabled:opacity-30 disabled:hover:bg-transparent"
+        "size-9 rounded-full text-white hover:bg-white/15 hover:text-white",
+        pressed && "bg-white text-neutral-900 hover:bg-white hover:text-neutral-900",
+        "disabled:opacity-30"
       )}
+      {...props}
     >
       {children}
-    </button>
+    </Button>
   );
 }
 
@@ -451,28 +474,24 @@ function ToolPanel({
 }) {
   return (
     <div className="flex flex-col gap-2">
-      <div className="grid grid-cols-4 gap-1">
+      <ToggleGroup
+        type="single"
+        value={tool}
+        onValueChange={(v) => v && onPickTool(v as AnnotationTool)}
+        variant="outline"
+        className="grid grid-cols-4"
+      >
         {TOOLS.map(({ value, label, Icon }) => (
-          <button
-            key={value}
-            type="button"
-            onClick={() => onPickTool(value)}
-            aria-label={label}
-            aria-pressed={tool === value}
-            title={label}
-            className={cn(
-              "flex h-10 items-center justify-center rounded-lg transition-colors",
-              tool === value ? "bg-white text-neutral-900" : "hover:bg-white/10"
-            )}
-          >
+          <ToggleGroupItem key={value} value={value} aria-label={label} title={label}>
             <Icon className="size-4.5" aria-hidden />
-          </button>
+          </ToggleGroupItem>
         ))}
-      </div>
+      </ToggleGroup>
 
       {/* Tẩy không có màu hay cỡ nét để chọn — bày ra là bày cái vô dụng. */}
       {tool !== "eraser" && (
         <>
+          <Separator />
           <div className="flex items-center justify-between px-1">
             {paletteFor(tool).map((c) => (
               <button
@@ -483,8 +502,8 @@ function ToolPanel({
                 aria-pressed={color === c}
                 title={`Màu ${c}`}
                 className={cn(
-                  "size-7 rounded-full border-2 transition-transform",
-                  color === c ? "scale-110 border-white" : "border-white/25"
+                  "size-7 rounded-full ring-offset-2 ring-offset-popover transition-transform",
+                  color === c ? "scale-110 ring-2 ring-foreground" : "ring-1 ring-border"
                 )}
                 style={{ backgroundColor: c }}
               />
@@ -500,11 +519,11 @@ function ToolPanel({
                 aria-pressed={size === i}
                 className={cn(
                   "flex size-8 items-center justify-center rounded-full transition-colors",
-                  size === i ? "bg-white/20" : "hover:bg-white/10"
+                  size === i ? "bg-accent" : "hover:bg-accent/50"
                 )}
               >
                 <span
-                  className="rounded-full bg-white"
+                  className="rounded-full bg-foreground"
                   style={{ width: diameter, height: diameter }}
                   aria-hidden
                 />
@@ -513,37 +532,6 @@ function ToolPanel({
           </div>
         </>
       )}
-    </div>
-  );
-}
-
-function MorePanel({
-  peeking,
-  count,
-  target,
-  onTogglePeek,
-  onRestore,
-}: {
-  peeking: boolean;
-  count: number;
-  target: number;
-  onTogglePeek: () => void;
-  onRestore: () => void;
-}) {
-  return (
-    <div className="flex flex-col gap-0.5">
-      <PanelRow
-        onClick={onTogglePeek}
-        pressed={peeking}
-        Icon={peeking ? EyeOff : Eye}
-        label={peeking ? "Hiện lại nét vẽ" : "Xem ảnh gốc"}
-      />
-      <PanelRow
-        onClick={onRestore}
-        disabled={count === 0}
-        Icon={RotateCcw}
-        label={`Khôi phục ảnh gốc trang ${target}`}
-      />
     </div>
   );
 }
@@ -562,19 +550,15 @@ function PanelRow({
   disabled?: boolean;
 }) {
   return (
-    <button
-      type="button"
+    <Button
+      variant={pressed ? "secondary" : "ghost"}
       onClick={onClick}
       disabled={disabled}
       aria-pressed={pressed}
-      className={cn(
-        "flex items-center gap-2 rounded-lg px-2 py-2 text-left text-sm transition-colors",
-        pressed ? "bg-white text-neutral-900" : "hover:bg-white/10",
-        "disabled:opacity-30 disabled:hover:bg-transparent"
-      )}
+      className="h-9 w-full justify-start gap-2 px-2 font-normal"
     >
       <Icon className="size-4 shrink-0" aria-hidden />
       {label}
-    </button>
+    </Button>
   );
 }

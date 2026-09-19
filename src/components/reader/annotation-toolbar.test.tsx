@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { AnnotationToolbar } from "./annotation-toolbar";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { PEN_COLORS, useAnnotationStore } from "@/lib/annotation-store";
 
 /**
@@ -29,8 +30,13 @@ function reset() {
   });
 }
 
+/** `TooltipProvider` thật nằm ở app/layout.tsx — dựng lại ở đây cho khớp. */
 function toolbar() {
-  render(<AnnotationToolbar bookId={BOOK} pages={[10]} />);
+  render(
+    <TooltipProvider>
+      <AnnotationToolbar bookId={BOOK} pages={[10]} />
+    </TooltipProvider>
+  );
 }
 
 /** Thân thanh — vùng kéo chính, nhận diện qua tay nắm nằm trong nó. */
@@ -46,7 +52,32 @@ function drag(el: HTMLElement, dx: number, dy: number) {
 
 const pos = () => useAnnotationStore.getState().toolbarPos!;
 
+/** Nhường một nhịp cho hiệu ứng/timer của Radix chạy xong. */
+const tick = () => new Promise((resolve) => setTimeout(resolve, 10));
+
 beforeEach(reset);
+
+describe("chỗ đứng mặc định", () => {
+  it("dựng dọc sát mép phải, ngay trên nút audio", () => {
+    useAnnotationStore.setState({ toolbarPos: null });
+    toolbar();
+
+    // jsdom: màn 1024×768; thanh đo được 300×44 (xem test-setup).
+    // Nút audio: cao 48, cách đáy 84 -> mép trên của nó ở 768-48-84 = 636.
+    expect(pos()).toEqual({
+      x: 1024 - 300 - 8, // sát mép phải, chừa lề 8
+      y: 636 - 10 - 44, // cách nút audio 10, rồi lùi lên đúng chiều cao thanh
+    });
+  });
+
+  it("không đè lên nút audio", () => {
+    useAnnotationStore.setState({ toolbarPos: null });
+    toolbar();
+
+    const audioTop = 768 - 48 - 84;
+    expect(pos().y + 44).toBeLessThanOrEqual(audioTop);
+  });
+});
 
 describe("kéo thanh công cụ", () => {
   it("kéo THÂN thanh thì thanh đi theo", () => {
@@ -135,10 +166,16 @@ describe("bảng chọn", () => {
     expect(screen.getByLabelText("Cỡ 3")).toBeTruthy();
   });
 
-  it("bấm ra ngoài thì đóng bảng", () => {
+  it("bấm ra ngoài thì đóng bảng", async () => {
     toolbar();
     fireEvent.click(screen.getByLabelText(/^Công cụ:/));
+    // Radix chỉ gắn listener "bấm ra ngoài" ở tick sau khi mở, để chính cú
+    // nhấn vừa mở popover không đóng luôn nó. Và nó chốt ở `click` chứ không
+    // ở `pointerdown`, để không đóng nhầm khi người dùng đang bôi chọn chữ.
+    await tick();
     fireEvent.pointerDown(document.body);
+    fireEvent.click(document.body);
+    await tick();
 
     expect(screen.queryByLabelText("Tẩy")).toBeNull();
   });

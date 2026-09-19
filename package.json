@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "predev": "npm run build-content",
+    "predev": "npm run copy-excalidraw-fonts && npm run build-content",
     "dev": "next dev",
-    "prebuild": "npm run build-content",
+    "prebuild": "npm run copy-excalidraw-fonts && npm run build-content",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
@@ -13,6 +13,7 @@
     "prepare-images": "tsx scripts/prepare-images.ts",
     "prepare-audio": "tsx scripts/prepare-audio.ts",
     "build-content": "tsx scripts/build-content.ts",
+    "copy-excalidraw-fonts": "tsx scripts/copy-excalidraw-fonts.ts",
     "crawl-orgs": "tsx scripts/crawl-kiip-orgs.ts"
   },
   "dependencies": {

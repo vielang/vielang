@@ -92,6 +92,17 @@ interface AnnotationState {
    * nhất, và thanh công cụ ghi rõ số trang lên nút nên không đoán mò.
    */
   lastPage: number | null;
+  /**
+   * Góc trên trái của thanh công cụ vẽ, theo px màn hình. `null` = chưa từng
+   * kéo, dùng vị trí mặc định (căn giữa, ngay trên thanh điều hướng trang).
+   *
+   * Không lưu xuống kho, giống `note-widget-store`: vị trí này phụ thuộc cỡ
+   * màn hình, nhớ lại từ phiên trước rồi mở ở máy khác là nó nằm ngoài màn.
+   * Module-scope là đủ để sống sót qua mỗi lần lật trang.
+   */
+  toolbarPos: { x: number; y: number } | null;
+  /** Thanh công cụ đang thu lại thành một nút nhỏ để nhường chỗ cho trang sách. */
+  toolbarCollapsed: boolean;
 
   setHasHydrated: (v: boolean) => void;
   setActive: (v: boolean) => void;
@@ -100,6 +111,8 @@ interface AnnotationState {
   setColor: (c: string) => void;
   setSize: (i: number) => void;
   touchPage: (page: number) => void;
+  setToolbarPos: (p: { x: number; y: number }) => void;
+  setToolbarCollapsed: (v: boolean) => void;
 
   addStroke: (bookId: string, page: number, stroke: Stroke) => void;
   /** Xoá theo id — tẩy gom cả cụm nét chạm phải rồi xoá một lượt. */
@@ -163,6 +176,8 @@ export const useAnnotationStore = create<AnnotationState>()(
       highlighterColor: HIGHLIGHTER_COLORS[0],
       size: 1,
       lastPage: null,
+      toolbarPos: null,
+      toolbarCollapsed: false,
 
       setHasHydrated: (v) => set({ hasHydrated: v }),
       // Tắt chế độ vẽ thì bỏ luôn trạng thái hé xem — nếu không, lần sau bật
@@ -176,6 +191,8 @@ export const useAnnotationStore = create<AnnotationState>()(
         ),
       setSize: (size) => set({ size }),
       touchPage: (lastPage) => set({ lastPage }),
+      setToolbarPos: (toolbarPos) => set({ toolbarPos }),
+      setToolbarCollapsed: (toolbarCollapsed) => set({ toolbarCollapsed }),
 
       addStroke: (bookId, page, stroke) =>
         set((state) => {

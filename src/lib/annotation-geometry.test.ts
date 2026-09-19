@@ -2,12 +2,15 @@ import { describe, expect, it } from "vitest";
 import type { Stroke } from "./annotation-store";
 import {
   farEnough,
+  hitPolyline,
   outlineToPath,
   penOutlinePath,
   quantize,
   quantizePressure,
+  shapePath,
   strokeHit,
   strokePath,
+  textBounds,
 } from "./annotation-geometry";
 
 /** Trang sách trong app cao hơn rộng — dùng tỉ lệ này để bắt lỗi nhầm trục. */
@@ -91,6 +94,123 @@ describe("penOutlinePath", () => {
     const short = penOutlinePath([0.2, 0.5, 0.3, 0.5], undefined, 1000, 1400, 8);
     const long = penOutlinePath([0.2, 0.5, 0.8, 0.5], undefined, 1000, 1400, 8);
     expect(spanX(long)).toBeGreaterThan(spanX(short));
+  });
+});
+
+describe("shapePath", () => {
+  it("chưa đủ 2 điểm thì chưa thành hình", () => {
+    expect(shapePath("line", [0.2, 0.5], 1000, 1400, 4)).toBeNull();
+  });
+
+  it("đường thẳng nối đúng 2 điểm", () => {
+    expect(shapePath("line", [0, 0, 1, 1], 1000, 1400, 4)).toBe("M 0 0 L 1000 1400");
+  });
+
+  it("khung khép kín 4 góc chứ không phải đường chéo", () => {
+    expect(shapePath("rect", [0, 0, 1, 1], 1000, 1400, 4)).toBe(
+      "M 0 0 L 1000 0 L 1000 1400 L 0 1400 Z"
+    );
+  });
+
+  it("mũi tên có thêm đầu nhọn ở điểm cuối", () => {
+    const line = shapePath("line", [0.2, 0.5, 0.8, 0.5], 1000, 1400, 4)!;
+    const arrow = shapePath("arrow", [0.2, 0.5, 0.8, 0.5], 1000, 1400, 4)!;
+    expect(arrow.startsWith(line)).toBe(true);
+    expect(arrow.length).toBeGreaterThan(line.length);
+  });
+
+  it("nét dày thì đầu mũi tên to theo, không phụ thuộc chiều dài", () => {
+    const thin = shapePath("arrow", [0.2, 0.5, 0.8, 0.5], 1000, 1400, 2)!;
+    const thick = shapePath("arrow", [0.2, 0.5, 0.8, 0.5], 1000, 1400, 20)!;
+    expect(spanY(thick)).toBeGreaterThan(spanY(thin));
+  });
+
+  it("mũi tên dài 0 thì không dựng đầu nhọn, chỉ còn đoạn rỗng", () => {
+    expect(shapePath("arrow", [0.5, 0.5, 0.5, 0.5], 1000, 1400, 4)).toBe(
+      "M 500 700 L 500 700"
+    );
+  });
+});
+
+describe("textBounds", () => {
+  const text = (s: string): Stroke => ({
+    id: "t",
+    tool: "text",
+    color: "#000",
+    width: 0.02,
+    points: [0.1, 0.2],
+    text: s,
+  });
+
+  it("không có chữ thì không có khung", () => {
+    expect(textBounds({ ...text(""), text: undefined }, AR)).toBeNull();
+  });
+
+  it("khung bắt đầu đúng tại điểm neo", () => {
+    const [x0, y0] = textBounds(text("abc"), AR)!;
+    expect(x0).toBe(0.1);
+    expect(y0).toBe(0.2);
+  });
+
+  it("chữ dài hơn thì khung rộng hơn", () => {
+    const short = textBounds(text("a"), AR)!;
+    const long = textBounds(text("aaaaaaaaaa"), AR)!;
+    expect(long[2]).toBeGreaterThan(short[2]);
+  });
+
+  it("thêm dòng thì khung cao hơn", () => {
+    const one = textBounds(text("a"), AR)!;
+    const three = textBounds(text("a\nb\nc"), AR)!;
+    expect(three[3]).toBeGreaterThan(one[3]);
+  });
+});
+
+describe("hitPolyline", () => {
+  it("khung được quy về 4 cạnh khép kín", () => {
+    const rect: Stroke = {
+      id: "r",
+      tool: "rect",
+      color: "#000",
+      width: 0.004,
+      points: [0.2, 0.3, 0.8, 0.7],
+    };
+    expect(hitPolyline(rect, AR)).toEqual([0.2, 0.3, 0.8, 0.3, 0.8, 0.7, 0.2, 0.7, 0.2, 0.3]);
+  });
+
+  it("nét tay giữ nguyên đường đi của nó", () => {
+    expect(hitPolyline(stroke([0.1, 0.2, 0.3, 0.4]), AR)).toEqual([0.1, 0.2, 0.3, 0.4]);
+  });
+});
+
+describe("strokeHit với hình và chữ", () => {
+  const rect: Stroke = {
+    id: "r",
+    tool: "rect",
+    color: "#000",
+    width: 0.004,
+    points: [0.2, 0.3, 0.8, 0.7],
+  };
+
+  it("tẩy bắt được cạnh dưới của khung, không chỉ đường chéo", () => {
+    // Giữa cạnh dưới: nằm trên khung nhưng cách xa đường chéo hai góc.
+    expect(strokeHit(rect, 0.5, 0.7, AR, 0.01)).toBe(true);
+  });
+
+  it("không bắt phần rỗng giữa khung", () => {
+    expect(strokeHit(rect, 0.5, 0.5, AR, 0.01)).toBe(false);
+  });
+
+  it("tẩy bắt được chữ ở giữa dòng, không chỉ ở điểm neo", () => {
+    const note: Stroke = {
+      id: "t",
+      tool: "text",
+      color: "#000",
+      width: 0.03,
+      points: [0.1, 0.2],
+      text: "chú thích dài",
+    };
+    expect(strokeHit(note, 0.2, 0.2, AR, 0.005)).toBe(true);
+    expect(strokeHit(note, 0.9, 0.2, AR, 0.005)).toBe(false);
   });
 });
 

@@ -3,12 +3,16 @@
 import { useState } from "react";
 import {
   AlertTriangle,
+  ArrowUpRight,
   Eraser,
   Eye,
   EyeOff,
   Highlighter,
+  Minus,
   Pen,
   RotateCcw,
+  Square,
+  Type,
   Undo2,
   X,
 } from "lucide-react";
@@ -32,6 +36,10 @@ import { cn } from "@/lib/utils";
 const TOOLS: { value: AnnotationTool; label: string; Icon: typeof Pen }[] = [
   { value: "pen", label: "Bút", Icon: Pen },
   { value: "highlighter", label: "Bút dạ quang", Icon: Highlighter },
+  { value: "arrow", label: "Mũi tên", Icon: ArrowUpRight },
+  { value: "line", label: "Đường thẳng", Icon: Minus },
+  { value: "rect", label: "Khung", Icon: Square },
+  { value: "text", label: "Chữ", Icon: Type },
   { value: "eraser", label: "Tẩy", Icon: Eraser },
 ];
 
@@ -80,7 +88,11 @@ export function AnnotationToolbar({ bookId, pages }: { bookId: string; pages: nu
       {/* z-30: trên thanh đọc (z-20) nhưng dưới panel bài giảng (z-[60]), để
           mở bài giảng ra vẫn kéo panel đè lên được. */}
       <div className="pointer-events-none fixed inset-x-0 bottom-16 z-30 flex justify-center px-3">
-        <div className="pointer-events-auto flex max-w-full items-center gap-1 overflow-x-auto rounded-full border border-white/15 bg-neutral-900/90 p-1.5 text-white shadow-2xl backdrop-blur">
+        {/* `flex-wrap` chứ không phải cuộn ngang: 7 công cụ + màu + cỡ + các
+            nút hành động là quá rộng cho màn điện thoại, mà giấu nút sau một
+            thanh cuộn thì người dùng không biết là còn nữa. Xuống dòng thì
+            nút nào cũng thấy. */}
+        <div className="pointer-events-auto flex max-w-[34rem] flex-wrap items-center justify-center gap-1 rounded-2xl border border-white/15 bg-neutral-900/90 p-1.5 text-white shadow-2xl backdrop-blur">
           {TOOLS.map(({ value, label, Icon }) => (
             <button
               key={value}

@@ -5,8 +5,19 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { createIdbStorage } from "@/lib/idb-storage";
 
-/** Bút mực, bút dạ quang, hay tẩy. Tẩy xoá nguyên nét chứ không gặm từng đoạn. */
-export type AnnotationTool = "pen" | "highlighter" | "eraser";
+/**
+ * Công cụ trên thanh vẽ. Tẩy xoá nguyên nét chứ không gặm từng đoạn.
+ *
+ * `MarkTool` là phần thật sự sinh ra dấu vẽ trên trang — tẩy thì không, nên
+ * nó không bao giờ nằm trong `Stroke.tool`.
+ */
+export type MarkTool = "pen" | "highlighter" | "arrow" | "line" | "rect" | "text";
+export type AnnotationTool = MarkTool | "eraser";
+
+/** Công cụ kéo từ điểm A tới điểm B — `points` chỉ có đúng 2 điểm. */
+export function isShapeTool(tool: AnnotationTool): boolean {
+  return tool === "arrow" || tool === "line" || tool === "rect";
+}
 
 /**
  * Một nét vẽ trên ảnh trang sách.
@@ -19,10 +30,16 @@ export type AnnotationTool = "pen" | "highlighter" | "eraser";
  */
 export interface Stroke {
   id: string;
-  tool: "pen" | "highlighter";
+  tool: MarkTool;
   color: string;
+  /** Bề rộng nét; với `tool: "text"` thì đây là cỡ chữ. */
   width: number;
-  /** [x0,y0,x1,y1,…] — mảng phẳng cho gọn khi lưu xuống localStorage. */
+  /**
+   * Hình học của dấu vẽ, mảng phẳng [x0,y0,x1,y1,…] cho gọn khi lưu:
+   * - `pen`/`highlighter`: cả đường đi, bao nhiêu điểm cũng được.
+   * - `arrow`/`line`/`rect`: đúng 2 điểm — đầu và cuối lúc kéo.
+   * - `text`: đúng 1 điểm — góc trên trái của dòng đầu.
+   */
   points: number[];
   /**
    * Lực bút tại từng điểm (0–1), một phần tử cho mỗi điểm trong `points`.
@@ -33,12 +50,16 @@ export interface Stroke {
    * dày theo tốc độ viết, xem `penOutlinePath`.
    */
   pressures?: number[];
+  /** Chỉ với `tool: "text"`. Xuống dòng bằng `\n`. */
+  text?: string;
 }
 
 /** Bút: mảnh / vừa / đậm, theo phần chiều rộng trang. */
 export const PEN_WIDTHS = [0.0022, 0.0038, 0.0065];
 /** Bút dạ quang dày hơn hẳn — đủ phủ kín một dòng chữ Hàn cỡ thường. */
 export const HIGHLIGHTER_WIDTHS = [0.014, 0.024, 0.04];
+/** Cỡ chữ chú thích, cũng theo phần chiều rộng trang. */
+export const TEXT_SIZES = [0.018, 0.026, 0.038];
 
 export const PEN_COLORS = ["#ef4444", "#2563eb", "#16a34a", "#111827"];
 export const HIGHLIGHTER_COLORS = ["#fde047", "#86efac", "#93c5fd", "#fda4af"];
@@ -214,9 +235,17 @@ export function useAnnotationHydration(): boolean {
   return hasHydrated;
 }
 
-/** Bề rộng nét của công cụ hiện tại, theo phần chiều rộng trang. */
+/**
+ * Bề rộng nét (hoặc cỡ chữ) của công cụ hiện tại, theo phần chiều rộng trang.
+ * Mũi tên/đường/khung dùng chung thang với bút mực — chúng đều là nét kẻ.
+ */
 export function activeWidth(tool: AnnotationTool, size: number): number {
-  const widths = tool === "highlighter" ? HIGHLIGHTER_WIDTHS : PEN_WIDTHS;
+  const widths =
+    tool === "highlighter"
+      ? HIGHLIGHTER_WIDTHS
+      : tool === "text"
+        ? TEXT_SIZES
+        : PEN_WIDTHS;
   return widths[size] ?? widths[1];
 }
 

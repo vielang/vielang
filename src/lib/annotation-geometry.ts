@@ -110,6 +110,97 @@ export function strokePath(points: number[], sx: number, sy: number): string {
   return `${d} L ${px(n - 1)} ${py(n - 1)}`;
 }
 
+/** Nửa góc và độ dài đầu mũi tên, tính theo bề rộng nét. */
+const ARROWHEAD_LENGTH = 7;
+const ARROWHEAD_ANGLE = 0.45;
+
+/**
+ * Chuỗi `d` cho mũi tên / đường thẳng / khung, dựng từ đúng 2 điểm (đầu và
+ * cuối lúc kéo). Trả về `null` khi chưa đủ dữ liệu.
+ *
+ * Đầu mũi tên tính theo bề rộng nét chứ không theo chiều dài mũi tên: kéo
+ * một mũi tên ngắn xíu để chỉ vào một chữ vẫn phải thấy rõ đầu nhọn.
+ */
+export function shapePath(
+  tool: string,
+  points: number[],
+  sx: number,
+  sy: number,
+  width: number
+): string | null {
+  if (points.length < 4) return null;
+  const x0 = points[0] * sx;
+  const y0 = points[1] * sy;
+  const x1 = points[2] * sx;
+  const y1 = points[3] * sy;
+
+  if (tool === "rect") {
+    return `M ${x0} ${y0} L ${x1} ${y0} L ${x1} ${y1} L ${x0} ${y1} Z`;
+  }
+
+  const line = `M ${x0} ${y0} L ${x1} ${y1}`;
+  if (tool !== "arrow") return line;
+
+  const angle = Math.atan2(y1 - y0, x1 - x0);
+  const len = Math.min(ARROWHEAD_LENGTH * width, Math.hypot(x1 - x0, y1 - y0));
+  if (len === 0) return line;
+  const left = angle + Math.PI - ARROWHEAD_ANGLE;
+  const right = angle + Math.PI + ARROWHEAD_ANGLE;
+  return (
+    `${line} M ${x1 + Math.cos(left) * len} ${y1 + Math.sin(left) * len} L ${x1} ${y1}` +
+    ` L ${x1 + Math.cos(right) * len} ${y1 + Math.sin(right) * len}`
+  );
+}
+
+/**
+ * Đường gấp khúc dùng để tẩy chạm vào một dấu vẽ.
+ *
+ * Nét tay thì chính là đường đi của nó. Khung thì là 4 cạnh — tẩy phải bắt
+ * được cả cạnh dưới, không chỉ đường chéo từ góc này sang góc kia. Chữ thì
+ * là khung bao quanh, ước lượng theo số ký tự (xem `textBounds`).
+ */
+export function hitPolyline(stroke: Stroke, aspectRatio: number): number[] {
+  const box =
+    stroke.tool === "rect" && stroke.points.length >= 4
+      ? (stroke.points.slice(0, 4) as [number, number, number, number])
+      : stroke.tool === "text"
+        ? textBounds(stroke, aspectRatio)
+        : null;
+  if (!box) return stroke.points;
+  const [x0, y0, x1, y1] = box;
+  return [x0, y0, x1, y0, x1, y1, x0, y1, x0, y0];
+}
+
+/** Bề rộng trung bình của một ký tự so với cỡ chữ — đủ dùng để ước lượng khung. */
+const CHAR_WIDTH_RATIO = 0.55;
+/** Khoảng cách dòng của chữ chú thích. */
+export const TEXT_LINE_HEIGHT = 1.25;
+
+/**
+ * Khung bao quanh một dấu chữ, dạng [x0,y0,x1,y1] theo tỉ lệ trang.
+ *
+ * Ước lượng từ số ký tự chứ không đo thật: đo thật phải gọi tới DOM, mà chỗ
+ * duy nhất cần khung này là tẩy — lệch vài phần trăm không ai nhận ra.
+ * `aspectRatio` cần vì cỡ chữ tính theo bề RỘNG trang còn chiều cao dòng lại
+ * đi theo trục y.
+ */
+export function textBounds(
+  stroke: Stroke,
+  aspectRatio: number
+): [number, number, number, number] | null {
+  if (stroke.points.length < 2 || !stroke.text) return null;
+  const lines = stroke.text.split("\n");
+  const longest = lines.reduce((n, l) => Math.max(n, l.length), 0);
+  const x = stroke.points[0];
+  const y = stroke.points[1];
+  return [
+    x,
+    y,
+    x + longest * stroke.width * CHAR_WIDTH_RATIO,
+    y + lines.length * stroke.width * TEXT_LINE_HEIGHT * aspectRatio,
+  ];
+}
+
 /** Bình phương khoảng cách từ P tới đoạn AB. Bình phương để khỏi gọi sqrt. */
 function distanceToSegmentSq(
   px: number,
@@ -141,7 +232,9 @@ export function strokeHit(
   aspectRatio: number,
   radius: number
 ): boolean {
-  const pts = stroke.points;
+  // Khung và chữ được quy về đường bao của chúng, nếu không tẩy chỉ ăn được
+  // đường chéo giữa 2 điểm đã lưu — xem `hitPolyline`.
+  const pts = hitPolyline(stroke, aspectRatio);
   const n = Math.floor(pts.length / 2);
   if (n === 0) return false;
 

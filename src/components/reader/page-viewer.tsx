@@ -66,7 +66,12 @@ function PageImage({
           chạm trước, nếu không bấm trúng vùng dịch là bật bản dịch thay vì
           vẽ. Tắt chế độ vẽ thì lớp này `pointer-events: none` nên vùng dịch
           bên dưới lại nhận chạm như cũ. */}
-      <AnnotationLayer bookId={bookId} page={page} aspectRatio={aspectRatio} />
+      <AnnotationLayer
+        bookId={bookId}
+        page={page}
+        aspectRatio={aspectRatio}
+        boxWidth={box.width}
+      />
     </div>
   );
 }

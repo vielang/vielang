@@ -1,9 +1,60 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   RECORDER_ERROR_MESSAGE,
   pickMimeType,
+  startRecording,
   toRecorderError,
 } from "./recorder";
+
+/**
+ * Dựng tối thiểu `getUserMedia` + `MediaRecorder` — jsdom không có cả hai.
+ * Trả về các spy để kiểm chứng điều quan trọng nhất: MICRO CÓ ĐƯỢC NHẢ
+ * KHÔNG. Quên nhả là đèn "đang ghi âm" của trình duyệt sáng mãi.
+ */
+function mockMediaStack() {
+  const trackStop = vi.fn();
+  const stream = { getTracks: () => [{ stop: trackStop }, { stop: trackStop }] };
+  const getUserMedia = vi.fn().mockResolvedValue(stream);
+  let options: MediaRecorderOptions | undefined;
+  let constraints: MediaStreamConstraints | undefined;
+
+  getUserMedia.mockImplementation((c: MediaStreamConstraints) => {
+    constraints = c;
+    return Promise.resolve(stream);
+  });
+
+  class FakeRecorder {
+    /** `pickMimeType` hỏi tới hàm này ngay khi dựng recorder. */
+    static isTypeSupported = (t: string) => t === "audio/webm;codecs=opus";
+    state = "recording";
+    mimeType = "audio/webm;codecs=opus";
+    private listeners: Record<string, ((e: unknown) => void)[]> = {};
+    constructor(_stream: unknown, opts?: MediaRecorderOptions) {
+      options = opts;
+    }
+    addEventListener(type: string, fn: (e: unknown) => void) {
+      (this.listeners[type] ??= []).push(fn);
+    }
+    start() {}
+    stop() {
+      this.state = "inactive";
+      for (const fn of this.listeners.dataavailable ?? []) {
+        fn({ data: new Blob(["âm"], { type: this.mimeType }) });
+      }
+      for (const fn of this.listeners.stop ?? []) fn({});
+    }
+  }
+
+  vi.stubGlobal("navigator", { mediaDevices: { getUserMedia } });
+  vi.stubGlobal("MediaRecorder", FakeRecorder);
+  return {
+    trackStop,
+    getOptions: () => options,
+    getConstraints: () => constraints,
+  };
+}
+
+afterEach(() => vi.unstubAllGlobals());
 
 describe("pickMimeType", () => {
   it("ưu tiên opus trong webm khi trình duyệt nhận", () => {
@@ -40,5 +91,53 @@ describe("toRecorderError", () => {
     for (const reason of ["denied", "unsupported", "failed"] as const) {
       expect(RECORDER_ERROR_MESSAGE[reason]).toBeTruthy();
     }
+  });
+});
+
+describe("startRecording", () => {
+  it("thu 1 kênh và bật sẵn bộ lọc của trình duyệt", async () => {
+    const m = mockMediaStack();
+    await startRecording();
+
+    const audio = m.getConstraints()!.audio as MediaTrackConstraints;
+    expect(audio.channelCount).toEqual({ ideal: 1 });
+    expect(audio.noiseSuppression).toEqual({ ideal: true });
+  });
+
+  it("đặt bitrate ngay lúc thu, không để mặc định 128 kbps", () => {
+    // Chỉnh ở đây thì không phải nén lại về sau — mà nén lại một luồng đã
+    // nén là mất mát thêm một lần nữa.
+    const m = mockMediaStack();
+    return startRecording().then(() => {
+      expect(m.getOptions()?.audioBitsPerSecond).toBe(32_000);
+    });
+  });
+
+  it("dừng thu thì trả về tiếng VÀ nhả micro", async () => {
+    const m = mockMediaStack();
+    const session = await startRecording();
+    const { blob, mimeType } = await session.stop();
+
+    expect(await blob.text()).toBe("âm");
+    // Kiểu THẬT trình duyệt cho ra, không phải kiểu mình xin.
+    expect(mimeType).toBe("audio/webm;codecs=opus");
+    expect(m.trackStop).toHaveBeenCalledTimes(2);
+  });
+
+  it("dừng hai lần vẫn ra cùng một bản ghi, không treo", async () => {
+    mockMediaStack();
+    const session = await startRecording();
+    const first = await session.stop();
+    const second = await session.stop();
+
+    expect(second).toBe(first);
+  });
+
+  it("huỷ giữa chừng cũng nhả micro", async () => {
+    const m = mockMediaStack();
+    const session = await startRecording();
+    session.cancel();
+
+    expect(m.trackStop).toHaveBeenCalledTimes(2);
   });
 });

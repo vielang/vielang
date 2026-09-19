@@ -32,6 +32,33 @@ export function pickMimeType(
   return PREFERRED_TYPES.find(isSupported);
 }
 
+/**
+ * Ràng buộc lúc MỞ micro. Đây mới là chỗ quyết định chất lượng — xử lý sau
+ * khi đã nén thì chỉ làm hỏng thêm, vì mọi lần nén lại một luồng đã nén là
+ * một lần mất mát nữa.
+ *
+ * Giọng đọc là một người, một micro: thu 1 kênh là đủ, thu 2 kênh chỉ nhân
+ * đôi dung lượng cho hai bản giống hệt nhau.
+ *
+ * Ba bộ lọc của trình duyệt đều bật. Đổi lại, chúng có thể gọt bớt các âm
+ * xát (ㅅ, ㅆ, ㅊ, ㅎ) — nhưng người học thu bằng điện thoại ở chỗ ồn thì
+ * được lợi nhiều hơn mất, và đây cũng là mặc định của Chrome lẫn Safari.
+ * Dùng `ideal` để máy nào không làm được thì vẫn thu, không bật lỗi.
+ */
+const AUDIO_CONSTRAINTS: MediaTrackConstraints = {
+  channelCount: { ideal: 1 },
+  echoCancellation: { ideal: true },
+  noiseSuppression: { ideal: true },
+  autoGainControl: { ideal: true },
+};
+
+/**
+ * Opus ở 32 kbps đã quá đủ cho một giọng nói — nó vốn được thiết kế cho
+ * đúng việc đó. Không đặt thì Chrome dùng 128 kbps, tức tốn gấp 4 lần chỗ
+ * mà tai không nghe ra khác biệt.
+ */
+const AUDIO_BITS_PER_SECOND = 32_000;
+
 export type RecorderError = "denied" | "unsupported" | "failed";
 
 /** Dịch lỗi của `getUserMedia` sang lý do mà UI nói lại được cho người dùng. */
@@ -60,9 +87,12 @@ export interface ActiveRecording {
  * bắt rồi dịch qua `toRecorderError`.
  */
 export async function startRecording(): Promise<ActiveRecording> {
-  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: AUDIO_CONSTRAINTS });
   const mimeType = pickMimeType();
-  const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+  const recorder = new MediaRecorder(stream, {
+    ...(mimeType ? { mimeType } : {}),
+    audioBitsPerSecond: AUDIO_BITS_PER_SECOND,
+  });
   const chunks: Blob[] = [];
   recorder.addEventListener("dataavailable", (e) => {
     if (e.data.size > 0) chunks.push(e.data);

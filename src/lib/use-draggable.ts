@@ -61,6 +61,9 @@ export function useDraggable({
 
   const onPointerDown = useCallback(
     (e: React.PointerEvent) => {
+      // Cử chỉ mới bắt đầu thì mọi thứ còn treo của cử chỉ trước là rác —
+      // xoá đi, bảo đảm cú chạm này luôn tới được cái nút bên dưới.
+      suppressClick.current = false;
       const pointerId = e.pointerId;
       const startX = e.clientX;
       const startY = e.clientY;
@@ -92,8 +95,21 @@ export function useDraggable({
         window.removeEventListener("pointermove", onMove);
         window.removeEventListener("pointerup", onUp);
         window.removeEventListener("pointercancel", onUp);
-        if (moved) suppressClick.current = true;
-        else onTap?.();
+        if (moved) {
+          suppressClick.current = true;
+          // Chuột kéo xong VẪN sinh ra một cú `click`, còn ngón tay kéo xong
+          // thì KHÔNG — trình duyệt chỉ bắn `click` khi coi cú chạm là một
+          // cái chạm, không phải một cú vuốt. Không hẹn giờ dọn thì trên
+          // điện thoại cờ này nằm lại mãi và nuốt mất lần chạm kế tiếp: đúng
+          // cái cảnh "kéo xong phải bấm hai lần nút mới ăn".
+          //
+          // Hẹn 0ms là đủ và an toàn: `click` đi cùng một lượt xử lý với
+          // `pointerup`, nên bộ đếm giờ luôn chạy SAU nó, mà cũng không sống
+          // đủ lâu để đụng vào lần chạm sau.
+          setTimeout(() => {
+            suppressClick.current = false;
+          }, 0);
+        } else onTap?.();
       }
 
       window.addEventListener("pointermove", onMove);

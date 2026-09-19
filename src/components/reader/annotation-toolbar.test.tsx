@@ -118,6 +118,24 @@ describe("kéo thanh công cụ", () => {
     expect(useAnnotationStore.getState().strokes["step1:10"]).toBeUndefined();
   });
 
+  it("trên điện thoại: kéo xong thì lần chạm NGAY SAU phải ăn luôn", async () => {
+    // Chuột kéo xong vẫn sinh ra một cú `click`, ngón tay thì không — nên cờ
+    // "nuốt click" từng nằm lại và ăn mất lần chạm kế tiếp. Dựng đúng cảnh
+    // cảm ứng: kéo mà KHÔNG có `click` ở cuối.
+    toolbar();
+    fireEvent.pointerDown(bar(), { pointerId: 1, pointerType: "touch", clientX: 200, clientY: 500 });
+    fireEvent.pointerMove(window, { pointerId: 1, pointerType: "touch", clientX: 260, clientY: 560 });
+    fireEvent.pointerUp(window, { pointerId: 1, pointerType: "touch", clientX: 260, clientY: 560 });
+    await tick();
+
+    const exit = screen.getByLabelText(/Thoát chế độ vẽ/);
+    fireEvent.pointerDown(exit, { pointerId: 2, pointerType: "touch", clientX: 260, clientY: 560 });
+    fireEvent.pointerUp(window, { pointerId: 2, pointerType: "touch", clientX: 260, clientY: 560 });
+    fireEvent.click(exit);
+
+    expect(useAnnotationStore.getState().active).toBe(false);
+  });
+
   it("kéo rồi nhả trên một cái nút thì KHÔNG kích hoạt nút đó", () => {
     toolbar();
     const exit = screen.getByLabelText(/Thoát chế độ vẽ/);

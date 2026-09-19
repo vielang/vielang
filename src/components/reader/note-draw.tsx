@@ -184,8 +184,8 @@ export function NoteDraw({ bookId, page }: { bookId: string; page: number }) {
         {quotaExceeded ? (
           <span className="flex items-center gap-1.5 text-destructive">
             <AlertTriangle className="size-3.5" aria-hidden />
-            Bộ nhớ trình duyệt đã đầy — bản vẽ chưa lưu được. Hãy xoá bớt ảnh trong
-            bản vẽ.
+            Chưa lưu được bản vẽ — bộ nhớ trình duyệt bị chặn hoặc đã đầy. Thử xoá
+            bớt ảnh trong bản vẽ.
           </span>
         ) : status === "saving" ? (
           <>

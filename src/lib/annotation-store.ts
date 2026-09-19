@@ -2,7 +2,8 @@
 
 import { useEffect } from "react";
 import { create } from "zustand";
-import { createJSONStorage, persist, type StateStorage } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
+import { createIdbStorage } from "@/lib/idb-storage";
 
 /** Bút mực, bút dạ quang, hay tẩy. Tẩy xoá nguyên nét chứ không gặm từng đoạn. */
 export type AnnotationTool = "pen" | "highlighter" | "eraser";
@@ -49,7 +50,7 @@ interface AnnotationState {
   /** key = `${bookId}:${page}` — xem `annotationKey()`. */
   strokes: Record<string, Stroke[]>;
   hasHydrated: boolean;
-  /** localStorage từ chối lần ghi gần nhất — xem `safeStorage`. */
+  /** Lần ghi gần nhất xuống IndexedDB thất bại — xem `idb-storage`. */
   quotaExceeded: boolean;
 
   /** Đang bật chế độ vẽ lên trang sách (không lưu — mỗi phiên tự bật lại). */
@@ -92,33 +93,7 @@ export function annotationKey(bookId: string, page: number): string {
 
 export const ANNOTATION_STORAGE_KEY = "kiip-annotations-v1";
 
-/** Cùng lý do với `draw-store`: hết chỗ thì báo, đừng ném lỗi giữa lúc đang vẽ. */
-const safeStorage: StateStorage = {
-  getItem: (name) => {
-    try {
-      return localStorage.getItem(name);
-    } catch {
-      return null;
-    }
-  },
-  setItem: (name, value) => {
-    try {
-      localStorage.setItem(name, value);
-      markQuota(false);
-    } catch {
-      markQuota(true);
-    }
-  },
-  removeItem: (name) => {
-    try {
-      localStorage.removeItem(name);
-    } catch {
-      /* localStorage bị chặn — không còn gì để dọn */
-    }
-  },
-};
-
-/** So sánh trước khi `set` để không thành vòng lặp ghi/lỗi/ghi — xem `draw-store`. */
+/** So sánh trước khi `set` để không thành vòng lặp ghi/lỗi/ghi — xem `idb-storage`. */
 function markQuota(exceeded: boolean): void {
   if (useAnnotationStore.getState().quotaExceeded === exceeded) return;
   useAnnotationStore.setState({ quotaExceeded: exceeded });
@@ -144,10 +119,14 @@ function withStrokes(
  * `draw-store`): bên kia là khung trắng để vẽ sơ đồ, bên này bám dính vào
  * đúng con chữ trên ảnh scan.
  *
- * Vẫn là localStorage, không backend — giống tiến độ và bài giảng. Dữ liệu
- * nhẹ hơn bảng vẽ nhiều (chỉ là danh sách toạ độ, không có ảnh), nhưng dùng
- * chung cách bọc storage an toàn và `skipHydration` cho nhất quán: chấm báo
- * "trang này có nét vẽ" nằm trên thanh công cụ vốn được server render.
+ * Lưu ở IndexedDB (xem `idb-storage`), không backend. Không dùng
+ * localStorage như tiến độ/bài giảng vì trần ~5MB là rào thật ở đây: 30 nét
+ * mỗi trang × 200 trang đã là ~3.3MB, mà trần đó còn phải chia cho cả
+ * `progress-store`, `note-store` và `draw-store`.
+ *
+ * `skipHydration`: nạp ở effect chứ không lúc dựng store, để lần render đầu
+ * ở client khớp HTML server render — chấm báo "trang này có nét vẽ" nằm trên
+ * thanh công cụ vốn được server render.
  */
 export const useAnnotationStore = create<AnnotationState>()(
   persist(
@@ -207,7 +186,7 @@ export const useAnnotationStore = create<AnnotationState>()(
     }),
     {
       name: ANNOTATION_STORAGE_KEY,
-      storage: createJSONStorage(() => safeStorage),
+      storage: createJSONStorage(() => createIdbStorage(markQuota)),
       // `active` cố tình không lưu: mở sách ra mà rơi ngay vào chế độ vẽ thì
       // chạm vào trang là vẽ bậy lên chứ không lật trang như người ta chờ đợi.
       partialize: (state) => ({

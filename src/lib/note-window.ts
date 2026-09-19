@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useNoteStore } from "@/lib/note-store";
 import { DRAW_STORAGE_KEY, useDrawStore } from "@/lib/draw-store";
+import { subscribeToStoreChanges } from "@/lib/idb-storage";
 
 /**
  * Cửa sổ bài giảng riêng — mở bằng `window.open` tới route
@@ -75,16 +76,21 @@ export function publishNoteFocus(bookId: string, page: number): void {
  */
 export function useNoteStoreSync(): void {
   useEffect(() => {
+    // Bài giảng nằm ở localStorage nên dùng sự kiện `storage` sẵn có; bảng vẽ
+    // đã chuyển sang IndexedDB — kho đó không có sự kiện tương đương nên
+    // `idb-storage` tự phát tin qua BroadcastChannel.
     function onStorage(e: StorageEvent) {
-      if (e.key === DRAW_STORAGE_KEY) {
-        void useDrawStore.persist.rehydrate();
-        return;
-      }
       if (e.key !== "kiip-notes-v1") return;
       void useNoteStore.persist.rehydrate();
     }
     window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
+    const unsubscribe = subscribeToStoreChanges(DRAW_STORAGE_KEY, () => {
+      void useDrawStore.persist.rehydrate();
+    });
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      unsubscribe();
+    };
   }, []);
 }
 

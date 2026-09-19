@@ -202,7 +202,7 @@ export function AnnotationToolbar({ bookId, pages }: { bookId: string; pages: nu
         <div className="pointer-events-none fixed inset-x-0 bottom-28 z-30 flex justify-center px-3">
           <p className="pointer-events-auto flex items-center gap-1.5 rounded-full bg-destructive px-3 py-1.5 text-xs text-white shadow-lg">
             <AlertTriangle className="size-3.5" aria-hidden />
-            Bộ nhớ trình duyệt đã đầy — nét vẽ chưa lưu được.
+            Chưa lưu được nét vẽ — bộ nhớ trình duyệt bị chặn hoặc đã đầy.
           </p>
         </div>
       )}

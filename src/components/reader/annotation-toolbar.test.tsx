@@ -1,0 +1,153 @@
+import { beforeEach, describe, expect, it } from "vitest";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { AnnotationToolbar } from "./annotation-toolbar";
+import { PEN_COLORS, useAnnotationStore } from "@/lib/annotation-store";
+
+/**
+ * Test cho thao tác KÉO và THU NHỎ thanh công cụ vẽ.
+ *
+ * Viết vì đúng hai việc này từng hỏng mà không ai thấy: `dragHandlers` chỉ
+ * được gắn vào cái tay nắm rộng ~20px chứ không gắn vào thân thanh, nên túm
+ * giữa thanh mà kéo thì không có gì xảy ra. Lỗi kiểu đó không có test nào
+ * bắt được — kiểu dữ liệu vẫn đúng, lint vẫn sạch, build vẫn chạy.
+ */
+const BOOK = "step1";
+
+function reset() {
+  useAnnotationStore.setState({
+    strokes: {},
+    hasHydrated: true,
+    quotaExceeded: false,
+    active: true,
+    peeking: false,
+    tool: "pen",
+    penColor: PEN_COLORS[0],
+    size: 1,
+    lastPage: null,
+    toolbarPos: { x: 100, y: 400 },
+    toolbarCollapsed: false,
+  });
+}
+
+function toolbar() {
+  render(<AnnotationToolbar bookId={BOOK} pages={[10]} />);
+}
+
+/** Thân thanh — vùng kéo chính, nhận diện qua tay nắm nằm trong nó. */
+function bar(): HTMLElement {
+  return screen.getByTestId("annotation-toolbar-bar");
+}
+
+function drag(el: HTMLElement, dx: number, dy: number) {
+  fireEvent.pointerDown(el, { pointerId: 1, clientX: 200, clientY: 500 });
+  fireEvent.pointerMove(el, { pointerId: 1, clientX: 200 + dx, clientY: 500 + dy });
+  fireEvent.pointerUp(el, { pointerId: 1, clientX: 200 + dx, clientY: 500 + dy });
+}
+
+const pos = () => useAnnotationStore.getState().toolbarPos!;
+
+beforeEach(reset);
+
+describe("kéo thanh công cụ", () => {
+  it("kéo THÂN thanh thì thanh đi theo", () => {
+    toolbar();
+    drag(bar(), -60, -120);
+
+    expect(pos()).toEqual({ x: 40, y: 280 });
+  });
+
+  it("bấm nút trong thanh thì không kéo theo", () => {
+    toolbar();
+    const before = pos();
+    const undo = screen.getByLabelText(/Hoàn tác/);
+
+    fireEvent.pointerDown(undo, { pointerId: 1, clientX: 200, clientY: 500 });
+    fireEvent.pointerMove(bar(), { pointerId: 1, clientX: 320, clientY: 500 });
+
+    expect(pos()).toEqual(before);
+  });
+
+  it("không cho kéo thanh ra ngoài mép màn hình", () => {
+    toolbar();
+    drag(bar(), -9999, -9999);
+
+    // MARGIN = 8 ở cả hai trục.
+    expect(pos()).toEqual({ x: 8, y: 8 });
+  });
+
+  it("bỏ qua ngón khác đang chạm dở", () => {
+    toolbar();
+    const before = pos();
+
+    fireEvent.pointerDown(bar(), { pointerId: 1, clientX: 200, clientY: 500 });
+    fireEvent.pointerMove(bar(), { pointerId: 2, clientX: 400, clientY: 500 });
+
+    expect(pos()).toEqual(before);
+  });
+});
+
+describe("thu nhỏ", () => {
+  it("bấm nút thu nhỏ thì thanh gọn lại thành một nút", () => {
+    toolbar();
+    fireEvent.click(screen.getByLabelText("Thu nhỏ thanh công cụ"));
+
+    expect(useAnnotationStore.getState().toolbarCollapsed).toBe(true);
+    expect(screen.getByLabelText("Mở lại thanh công cụ vẽ")).toBeTruthy();
+  });
+
+  it("nhấn nút đã thu nhỏ thì bung ra lại", () => {
+    useAnnotationStore.setState({ toolbarCollapsed: true });
+    toolbar();
+    const pill = screen.getByLabelText("Mở lại thanh công cụ vẽ");
+
+    fireEvent.pointerDown(pill, { pointerId: 1, clientX: 200, clientY: 500 });
+    fireEvent.pointerUp(pill, { pointerId: 1, clientX: 200, clientY: 500 });
+
+    expect(useAnnotationStore.getState().toolbarCollapsed).toBe(false);
+  });
+
+  it("KÉO nút đã thu nhỏ thì chỉ đổi chỗ, không bung ra", () => {
+    useAnnotationStore.setState({ toolbarCollapsed: true });
+    toolbar();
+    drag(screen.getByLabelText("Mở lại thanh công cụ vẽ"), 50, 40);
+
+    expect(useAnnotationStore.getState().toolbarCollapsed).toBe(true);
+    expect(pos()).toEqual({ x: 150, y: 440 });
+  });
+});
+
+describe("bảng chọn", () => {
+  it("mở bảng công cụ rồi chọn xong thì tự đóng", () => {
+    toolbar();
+    fireEvent.click(screen.getByLabelText(/^Công cụ:/));
+    fireEvent.click(screen.getByLabelText("Tẩy"));
+
+    expect(useAnnotationStore.getState().tool).toBe("eraser");
+    expect(screen.queryByLabelText("Tẩy")).toBeNull();
+  });
+
+  it("chọn màu thì để bảng mở, còn chỉnh tiếp cỡ nét", () => {
+    toolbar();
+    fireEvent.click(screen.getByLabelText(/^Công cụ:/));
+    fireEvent.click(screen.getByLabelText(`Màu ${PEN_COLORS[2]}`));
+
+    expect(useAnnotationStore.getState().penColor).toBe(PEN_COLORS[2]);
+    expect(screen.getByLabelText("Cỡ 3")).toBeTruthy();
+  });
+
+  it("bấm ra ngoài thì đóng bảng", () => {
+    toolbar();
+    fireEvent.click(screen.getByLabelText(/^Công cụ:/));
+    fireEvent.pointerDown(document.body);
+
+    expect(screen.queryByLabelText("Tẩy")).toBeNull();
+  });
+
+  it("xem ảnh gốc nằm trong bảng thêm", () => {
+    toolbar();
+    fireEvent.click(screen.getByLabelText("Ảnh gốc và khôi phục"));
+    fireEvent.click(screen.getByText("Xem ảnh gốc"));
+
+    expect(useAnnotationStore.getState().peeking).toBe(true);
+  });
+});

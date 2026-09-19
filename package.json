@@ -43,6 +43,8 @@
     "@aws-sdk/client-s3": "^3.1127.0",
     "@tailwindcss/postcss": "^4",
     "@tailwindcss/typography": "^0.5.20",
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/react": "^16.3.3",
     "@types/jsdom": "^30.0.0",
     "@types/node": "^22.20.1",
     "@types/react": "^19",

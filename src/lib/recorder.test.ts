@@ -95,13 +95,31 @@ describe("toRecorderError", () => {
 });
 
 describe("startRecording", () => {
-  it("thu 1 kênh và bật sẵn bộ lọc của trình duyệt", async () => {
+  it("thu 1 kênh", async () => {
     const m = mockMediaStack();
     await startRecording();
 
     const audio = m.getConstraints()!.audio as MediaTrackConstraints;
     expect(audio.channelCount).toEqual({ ideal: 1 });
-    expect(audio.noiseSuppression).toEqual({ ideal: true });
+  });
+
+  it("TẮT khử ồn để giữ nguyên âm xát tiếng Hàn", async () => {
+    // Khác mặc định của Chrome lẫn Safari, nên rất dễ bị ai đó "dọn" lại cho
+    // giống thông thường — chốt lại ở đây kèm lý do.
+    const m = mockMediaStack();
+    await startRecording();
+
+    const audio = m.getConstraints()!.audio as MediaTrackConstraints;
+    expect(audio.noiseSuppression).toEqual({ ideal: false });
+  });
+
+  it("vẫn giữ khử vọng và tự chỉnh âm lượng", async () => {
+    const m = mockMediaStack();
+    await startRecording();
+
+    const audio = m.getConstraints()!.audio as MediaTrackConstraints;
+    expect(audio.echoCancellation).toEqual({ ideal: true });
+    expect(audio.autoGainControl).toEqual({ ideal: true });
   });
 
   it("đặt bitrate ngay lúc thu, không để mặc định 128 kbps", () => {

@@ -40,15 +40,21 @@ export function pickMimeType(
  * Giọng đọc là một người, một micro: thu 1 kênh là đủ, thu 2 kênh chỉ nhân
  * đôi dung lượng cho hai bản giống hệt nhau.
  *
- * Ba bộ lọc của trình duyệt đều bật. Đổi lại, chúng có thể gọt bớt các âm
- * xát (ㅅ, ㅆ, ㅊ, ㅎ) — nhưng người học thu bằng điện thoại ở chỗ ồn thì
- * được lợi nhiều hơn mất, và đây cũng là mặc định của Chrome lẫn Safari.
+ * KHỬ ỒN TẮT, khác mặc định của Chrome lẫn Safari. Bộ khử ồn nhận dạng
+ * tiếng nói rồi gọt phần còn lại, mà các âm xát tiếng Hàn (ㅅ, ㅆ, ㅊ, ㅎ)
+ * về mặt phổ âm thì giống tiếng ồn — nên chúng bị mài mất. Đúng mấy âm
+ * người học cần nghe kỹ nhất khi so lại cách phát âm của mình, nên ở đây
+ * thu trung thực quan trọng hơn thu sạch.
+ *
+ * Khử vọng và tự chỉnh âm lượng vẫn bật: chúng không đụng vào phổ âm theo
+ * kiểu đó, mà lại giúp bản ghi bằng điện thoại nghe đều tiếng hơn.
+ *
  * Dùng `ideal` để máy nào không làm được thì vẫn thu, không bật lỗi.
  */
 const AUDIO_CONSTRAINTS: MediaTrackConstraints = {
   channelCount: { ideal: 1 },
   echoCancellation: { ideal: true },
-  noiseSuppression: { ideal: true },
+  noiseSuppression: { ideal: false },
   autoGainControl: { ideal: true },
 };
 

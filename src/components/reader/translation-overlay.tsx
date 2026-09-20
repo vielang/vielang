@@ -4,7 +4,6 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Languages, X } from "lucide-react";
 import type { TranslationRegion } from "@/lib/page-translation";
-import { cn } from "@/lib/utils";
 
 /** Khoảng cách từ điểm bấm xuống đỉnh bong bóng, và lề tối thiểu với mép màn hình. */
 const GAP = 12;
@@ -79,17 +78,27 @@ export function TranslationOverlay({ regions }: { regions: TranslationRegion[] }
                 Đang mở thì chấm đổi thành dấu X. Bấm ra ngoài vốn đã đóng
                 được (xem hiệu ứng trong TranslationBubble), nhưng không có
                 gì nói ra điều đó — đổi icon là cách rẻ nhất để người dùng
-                thấy có đường đóng, ngay tại chỗ họ vừa bấm để mở. */}
+                thấy có đường đóng, ngay tại chỗ họ vừa bấm để mở.
+
+                KHÔNG nền, chỉ nét mực đen — để trang giữ được dáng bản in.
+                Đổi lại icon phải tự lo tương phản: nó nằm trên đủ thứ nền
+                của ảnh scan, có trang là bảng nền đen (vd trang 189) thì nét
+                đen trơn biến mất hẳn. Viền sáng quanh nét giải quyết việc đó,
+                cùng cách `audio-widget` đang dùng cho chữ của nó.
+
+                Màu cố định chứ KHÔNG dùng token theme: ảnh trang sách lúc
+                nào cũng là giấy in sáng, kể cả khi app đang ở chế độ tối —
+                dùng `text-foreground` thì chế độ tối sẽ lật nét thành trắng
+                và mất hút trên giấy trắng. */}
             <span
-              className={cn(
-                "absolute top-full left-1/2 mt-1 flex size-5 -translate-x-1/2 items-center justify-center rounded-full shadow-sm ring-1 ring-background/70 transition-transform group-hover:scale-110",
-                isOpen
-                  ? "bg-foreground text-background"
-                  : "bg-primary/85 text-primary-foreground"
-              )}
+              className="absolute top-full left-1/2 mt-1 flex size-5 -translate-x-1/2 items-center justify-center text-neutral-900 transition-transform group-hover:scale-110"
+              style={{
+                filter:
+                  "drop-shadow(0 0 1.5px rgb(255 255 255)) drop-shadow(0 0 1.5px rgb(255 255 255))",
+              }}
               aria-hidden
             >
-              {isOpen ? <X className="size-3" /> : <Languages className="size-3" />}
+              {isOpen ? <X className="size-4" /> : <Languages className="size-4" />}
             </span>
           </button>
         );

@@ -1,6 +1,5 @@
 "use client";
 
-import { getImageProps } from "next/image";
 import { getPageUrl, type Book } from "@/lib/books";
 
 /**
@@ -17,11 +16,23 @@ import { getPageUrl, type Book } from "@/lib/books";
 
 const BOOK_CACHE_PREFIX = "kiip-book-";
 
-/** Bề rộng ảnh tải về. Đủ nét để phóng to đọc chữ Hàn mà chưa thành nặng. */
-const IMAGE_WIDTH = 1080;
-
-/** Ước lượng dung lượng mỗi trang, chỉ để báo trước cho người dùng. */
-const BYTES_PER_PAGE = 280 * 1024;
+/**
+ * Ước lượng dung lượng mỗi trang, chỉ để báo trước cho người dùng.
+ *
+ * Đo thật trên R2 (3 trang mẫu mỗi cuốn), sau khi ảnh thôi đi qua bộ tối ưu
+ * và tải thẳng bản gốc:
+ *
+ *   giáo trình tiếng Hàn  113–142 KB
+ *   sách bài tập           ~41 KB  (trang thưa chữ, ít ảnh)
+ *   giáo trình tiếng Anh  ~373 KB  (ảnh màu, nặng hơn hẳn)
+ *
+ * Lấy 180 KB: nhỉnh hơn nhóm tiếng Hàn — nhóm đông người dùng nhất — nên
+ * con số báo ra hơi dư chứ không hụt. Sách tiếng Anh vẫn bị báo thiếu, nhưng
+ * thà vậy còn hơn doạ người học tiếng Hàn bằng một con số gấp đôi sự thật.
+ *
+ * Con số cũ là 280 KB, hợp với thời còn tải bản đã tối ưu ở 1080px.
+ */
+const BYTES_PER_PAGE = 180 * 1024;
 
 /** Tải bao nhiêu trang một lúc. Nhiều hơn thì mạng di động bắt đầu nghẽn. */
 const CONCURRENCY = 4;
@@ -52,21 +63,16 @@ export function formatBytes(bytes: number): string {
 /**
  * Đường dẫn ảnh đúng như trình duyệt sẽ xin khi đọc sách.
  *
- * Đi qua `getImageProps` — API công khai của next/image — thay vì tự ghép
- * chuỗi `/_next/image?...`, để không phụ thuộc vào định dạng bên trong của
- * Next. Lấy nhánh `1x` trong `srcSet`: nhánh `2x` nét hơn nhưng nặng gấp
- * đôi, mà cả cuốn thì gấp đôi là hơn trăm MB.
+ * PHẢI khớp từng ký tự với `getPageUrl` mà `page-viewer.tsx` dùng, vì service
+ * worker tra cache theo nguyên URL. Lệch một ký tự là tải cả cuốn về rồi lúc
+ * mất mạng vẫn trắng trang.
+ *
+ * Trước đây chỗ này phải gọi `getImageProps` để dựng lại chuỗi
+ * `/_next/image?...` cho khớp. Nay ảnh không qua bộ tối ưu nữa nên URL chính
+ * là đường ảnh, gọi thẳng là xong.
  */
 export function pageImageUrl(bookId: string, page: number): string {
-  const { props } = getImageProps({
-    src: getPageUrl(bookId, page),
-    alt: "",
-    width: IMAGE_WIDTH,
-    height: Math.round(IMAGE_WIDTH * 1.3),
-    quality: 90,
-  });
-  const oneX = props.srcSet?.split(",").find((c) => c.trim().endsWith("1x"));
-  return oneX ? oneX.trim().split(/\s+/)[0] : props.src;
+  return getPageUrl(bookId, page);
 }
 
 /** Đường dẫn tài liệu HTML của một trang sách. */
@@ -114,10 +120,44 @@ async function cacheRsc(cache: Cache, bookId: string, page: number, signal?: Abo
 }
 
 /** Các cuốn đang có trên máy. Cache API là nguồn sự thật, không phải store. */
+/**
+ * Cuốn này được tải về từ thời ảnh còn đi qua `/_next/image` phải không?
+ *
+ * Cách nhận: xem thử có khoá nào còn mang dạng URL cũ. Đời cache mới lưu theo
+ * `/img/books/...`, nên chỉ cần thấy một khoá `/_next/image` là biết cả cuốn
+ * thuộc đời cũ.
+ */
+async function isStaleScheme(cache: Cache): Promise<boolean> {
+  const keys = await cache.keys();
+  return keys.some((req) => new URL(req.url).pathname === "/_next/image");
+}
+
+/**
+ * Danh sách sách đã tải, ĐỒNG THỜI dọn những cuốn tải theo đời URL cũ.
+ *
+ * Vì sao phải dọn: đường ảnh đã đổi từ `/_next/image?url=...` sang
+ * `/img/books/...` (xem `next.config.ts`). Service worker tra cache theo
+ * nguyên URL, nên mấy cuốn tải từ trước sẽ không bao giờ khớp nữa. Để nguyên
+ * thì giao diện vẫn khoe "Đã tải offline" mà người dùng mất mạng mở ra lại
+ * trắng trang — kiểu hỏng tệ nhất, vì họ tin là mình đã mang sách theo rồi.
+ *
+ * Xoá đi thì nút quay về "Tải offline", họ tải lại một lần là xong. Mất công
+ * một lần còn hơn tưởng có mà hoá ra không.
+ */
 export async function listOfflineBooks(): Promise<string[]> {
   if (typeof caches === "undefined") return [];
   try {
-    return (await caches.keys()).filter(isBookCache).map(bookIdFromCache);
+    const names = (await caches.keys()).filter(isBookCache);
+    const ids: string[] = [];
+    for (const name of names) {
+      const cache = await caches.open(name);
+      if (await isStaleScheme(cache)) {
+        await caches.delete(name);
+        continue;
+      }
+      ids.push(bookIdFromCache(name));
+    }
+    return ids;
   } catch {
     return [];
   }

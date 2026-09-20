@@ -118,6 +118,7 @@ export function PageGrid({
                       src={getThumbUrl(bookId, page)}
                       alt={`Trang ${page}`}
                       fill
+                      unoptimized
                       sizes="(min-width: 1024px) 15vw, (min-width: 640px) 22vw, 30vw"
                       className={cn(
                         "object-cover transition-opacity",

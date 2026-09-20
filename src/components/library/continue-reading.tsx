@@ -62,6 +62,7 @@ export function ContinueReading({ books }: { books: readonly Book[] }) {
                   src={getThumbUrl(book.id, page)}
                   alt=""
                   fill
+                  unoptimized
                   sizes="48px"
                   className="object-cover"
                 />

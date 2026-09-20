@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { ImageOff, RotateCw } from "lucide-react";
 import {
   forwardRef,
   useCallback,
@@ -9,6 +10,11 @@ import {
   useRef,
   useState,
 } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  useRetryingImage,
+  type ImageLoadStatus,
+} from "@/lib/use-retrying-image";
 import {
   TransformWrapper,
   TransformComponent,
@@ -36,6 +42,53 @@ interface PageViewerProps {
   onSwipeNext: () => void;
 }
 
+/**
+ * Lớp phủ lúc ảnh chưa hiện: đang tải thì là nền giấy mờ, hỏng hẳn thì là
+ * lời nhắn kèm nút thử lại.
+ *
+ * Nằm DƯỚI ảnh trong cây DOM nhưng cùng vị trí, nên ảnh hiện ra là tự che
+ * đi — không cần gỡ ra theo nhịp nào cả.
+ *
+ * Nền sáng chứ không phải nền tối: khung đọc nền đen, mà trang sách thì
+ * luôn là giấy trắng. Để ô chờ màu đen thì lúc ảnh hiện ra sẽ chớp một cái
+ * rất chói.
+ */
+function PageImageFallback({
+  page,
+  status,
+  retrying,
+  onRetry,
+}: {
+  page: number;
+  status: ImageLoadStatus;
+  retrying: boolean;
+  onRetry: () => void;
+}) {
+  if (status !== "failed") {
+    return (
+      <div
+        className="absolute inset-0 animate-pulse bg-neutral-200"
+        aria-hidden
+      />
+    );
+  }
+
+  return (
+    <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-neutral-200 px-6 text-center">
+      <ImageOff className="size-8 text-neutral-500" aria-hidden />
+      <p className="text-sm text-neutral-700">
+        Không tải được trang {page}.
+        <br />
+        Kiểm tra lại mạng giúp mình nhé.
+      </p>
+      <Button size="sm" variant="secondary" onClick={onRetry} disabled={retrying}>
+        <RotateCw className={retrying ? "size-4 animate-spin" : "size-4"} aria-hidden />
+        Tải lại
+      </Button>
+    </div>
+  );
+}
+
 /** 1 ảnh trang + vùng dịch + nét vẽ tay của nó, trong khung đã tính đúng cỡ. */
 function PageImage({
   bookId,
@@ -49,17 +102,31 @@ function PageImage({
   aspectRatio: number;
 }) {
   const regions = getPageTranslations(bookId, page);
+  const { attempt, status, retrying, onLoad, onError, retry } = useRetryingImage();
+
   return (
     <div className="relative" style={{ width: box.width, height: box.height }}>
+      {status !== "ok" && (
+        <PageImageFallback page={page} status={status} retrying={retrying} onRetry={retry} />
+      )}
       <Image
+        // `key` đổi theo số lần thử: phần tử <img> đang ở trạng thái lỗi có
+        // thể bị dùng lại mà không xin lại gì cả, dựng phần tử mới mới chắc
+        // chắn có lượt xin mới. URL thì giữ nguyên — xem chú thích trong
+        // `use-retrying-image.ts` về lý do không phá cache bằng query.
+        key={attempt}
         src={getPageUrl(bookId, page)}
         alt={`Trang ${page}`}
         fill
         sizes="100vw"
-        quality={90}
+        // Ảnh nguồn đã là webp tối ưu sẵn (~130KB) và đi qua rewrite cùng
+        // origin, không qua bộ tối ưu của Vercel — xem `next.config.ts`.
+        unoptimized
         priority
         draggable={false}
         className="object-contain"
+        onLoad={onLoad}
+        onError={onError}
       />
       <TranslationOverlay regions={regions} />
       {/* Nằm SAU vùng dịch: đang bật chế độ vẽ thì nét vẽ phải nhận được

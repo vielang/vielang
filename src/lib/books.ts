@@ -252,10 +252,27 @@ function imageBaseUrl(): string {
   return base.replace(/\/$/, "");
 }
 
+/**
+ * Đường ảnh mà TRÌNH DUYỆT xin — cùng origin với app, không phải URL R2 trần.
+ *
+ * `/img/books/...` được `rewrites()` trong `next.config.ts` chuyển tiếp sang
+ * R2 ở phía máy chủ. Cùng origin là điều kiện bắt buộc, không phải cho đẹp:
+ * `sw.js` bỏ qua mọi request khác origin (xem chốt `url.origin !==
+ * self.location.origin`), nên trỏ thẳng sang r2.dev là mất cả cache ảnh lẫn
+ * tính năng đọc offline.
+ *
+ * Đuôi `.webp` cũng phải giữ: `isPageImage` trong `sw.js` nhận ảnh theo đuôi
+ * tệp.
+ */
 export function getPageUrl(bookId: string, page: number): string {
-  return `${imageBaseUrl()}/books/${bookId}/pages/${padPage(page)}.webp`;
+  return `/img/books/${bookId}/pages/${padPage(page)}.webp`;
 }
 
 export function getThumbUrl(bookId: string, page: number): string {
-  return `${imageBaseUrl()}/books/${bookId}/thumbs/${padPage(page)}.webp`;
+  return `/img/books/${bookId}/thumbs/${padPage(page)}.webp`;
+}
+
+/** URL R2 tuyệt đối — chỉ dùng cho script phía máy chủ, không dùng ở trình duyệt. */
+export function getPageOriginUrl(bookId: string, page: number): string {
+  return `${imageBaseUrl()}/books/${bookId}/pages/${padPage(page)}.webp`;
 }

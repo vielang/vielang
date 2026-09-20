@@ -46,6 +46,7 @@ export function BookCard({
           src={getThumbUrl(book.id, 1)}
           alt={`Bìa sách ${book.titleVi}`}
           fill
+          unoptimized
           sizes="(min-width: 768px) 220px, 45vw"
           className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
         />

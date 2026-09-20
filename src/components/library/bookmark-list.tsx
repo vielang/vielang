@@ -96,6 +96,7 @@ export function BookmarkList({ books }: { books: readonly Book[] }) {
                           src={getThumbUrl(book.id, page)}
                           alt={`Trang ${page}`}
                           fill
+                          unoptimized
                           sizes="(min-width: 1024px) 15vw, (min-width: 640px) 22vw, 30vw"
                           className="object-cover"
                         />

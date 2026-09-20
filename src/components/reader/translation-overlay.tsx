@@ -60,12 +60,17 @@ export function TranslationOverlay({ regions }: { regions: TranslationRegion[] }
                 chấm nhỏ ở góc, đủ để người ta biết mà chạm vào. Không có nó
                 thì cả tính năng này tàng hình.
 
-                Đặt ở CẠNH DƯỚI, CANH GIỮA: người ta đọc hết đoạn rồi mới cần
-                bản dịch, nên chấm nằm ở chỗ mắt vừa dừng lại. Canh giữa thay
-                vì nép vào góc để nó không đụng vào chữ của cột bên cạnh —
-                nhiều trang có hai cột sát nhau. */}
+                Đặt NGAY DƯỚI vùng, canh giữa: người ta đọc hết đoạn rồi mới
+                cần bản dịch, nên chấm nằm ở chỗ mắt vừa dừng lại. Canh giữa
+                thay vì nép vào góc để nó không đụng chữ của cột bên cạnh —
+                nhiều trang có hai cột sát nhau.
+
+                `top-full` chứ không phải `-bottom-*`: lệch âm chỉ đẩy chấm
+                ra một phần, phần còn lại vẫn nằm đè lên dòng cuối của đoạn.
+                Neo mép TRÊN của chấm vào mép DƯỚI của vùng thì nó ra hẳn
+                ngoài, không che chữ nào. */}
             <span
-              className="absolute -bottom-1.5 left-1/2 flex size-5 -translate-x-1/2 items-center justify-center rounded-full bg-primary/85 text-primary-foreground shadow-sm ring-1 ring-background/70 transition-transform group-hover:scale-110"
+              className="absolute top-full left-1/2 mt-1 flex size-5 -translate-x-1/2 items-center justify-center rounded-full bg-primary/85 text-primary-foreground shadow-sm ring-1 ring-background/70 transition-transform group-hover:scale-110"
               aria-hidden
             >
               <Languages className="size-3" />

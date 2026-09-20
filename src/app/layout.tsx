@@ -3,6 +3,7 @@ import { Inter, Noto_Sans_KR } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ServiceWorker } from "@/components/service-worker";
+import { InstallPromptCapture } from "@/components/install-prompt-capture";
 import "./globals.css";
 
 const inter = Inter({
@@ -58,6 +59,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         >
           <TooltipProvider delayDuration={200}>{children}</TooltipProvider>
           <ServiceWorker />
+          <InstallPromptCapture />
         </ThemeProvider>
       </body>
     </html>

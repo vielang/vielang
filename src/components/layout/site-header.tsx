@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Bookmark, BookOpenText } from "lucide-react";
+import { Bookmark, BookOpenText, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LanguageNav } from "@/components/layout/language-nav";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
@@ -20,6 +20,26 @@ export function SiteHeader() {
           <LanguageNav />
         </div>
         <div className="flex items-center gap-1">
+          {/* Chữ ở màn rộng, chỉ icon ở màn hẹp — header còn phải chừa chỗ
+              cho nav ngôn ngữ bên trái. */}
+          <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
+            <Link href="/install">
+              <Download className="size-4" aria-hidden />
+              Tải app
+            </Link>
+          </Button>
+          <Button
+            asChild
+            variant="ghost"
+            size="icon"
+            className="sm:hidden"
+            aria-label="Cài app vào máy"
+            title="Cài app vào máy"
+          >
+            <Link href="/install">
+              <Download className="size-5" aria-hidden />
+            </Link>
+          </Button>
           <Button
             asChild
             variant="ghost"

@@ -2,8 +2,9 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Languages } from "lucide-react";
+import { Languages, X } from "lucide-react";
 import type { TranslationRegion } from "@/lib/page-translation";
+import { cn } from "@/lib/utils";
 
 /** Khoảng cách từ điểm bấm xuống đỉnh bong bóng, và lề tối thiểu với mép màn hình. */
 const GAP = 12;
@@ -40,13 +41,18 @@ export function TranslationOverlay({ regions }: { regions: TranslationRegion[] }
     <>
       {regions.map((region) => {
         const [x, y, w, h] = region.rect;
+        const isOpen = active?.region.id === region.id;
+        const what = region.label ?? "đoạn này";
         return (
           <button
             key={region.id}
             type="button"
             data-translate-region
-            onClick={(e) => setActive({ region, x: e.clientX, y: e.clientY })}
-            aria-label={`Xem bản dịch: ${region.label ?? "đoạn này"}`}
+            onClick={(e) =>
+              setActive(isOpen ? null : { region, x: e.clientX, y: e.clientY })
+            }
+            aria-label={isOpen ? `Đóng bản dịch: ${what}` : `Xem bản dịch: ${what}`}
+            aria-expanded={isOpen}
             className="group absolute cursor-help"
             style={{
               left: `${x * 100}%`,
@@ -68,12 +74,22 @@ export function TranslationOverlay({ regions }: { regions: TranslationRegion[] }
                 `top-full` chứ không phải `-bottom-*`: lệch âm chỉ đẩy chấm
                 ra một phần, phần còn lại vẫn nằm đè lên dòng cuối của đoạn.
                 Neo mép TRÊN của chấm vào mép DƯỚI của vùng thì nó ra hẳn
-                ngoài, không che chữ nào. */}
+                ngoài, không che chữ nào.
+
+                Đang mở thì chấm đổi thành dấu X. Bấm ra ngoài vốn đã đóng
+                được (xem hiệu ứng trong TranslationBubble), nhưng không có
+                gì nói ra điều đó — đổi icon là cách rẻ nhất để người dùng
+                thấy có đường đóng, ngay tại chỗ họ vừa bấm để mở. */}
             <span
-              className="absolute top-full left-1/2 mt-1 flex size-5 -translate-x-1/2 items-center justify-center rounded-full bg-primary/85 text-primary-foreground shadow-sm ring-1 ring-background/70 transition-transform group-hover:scale-110"
+              className={cn(
+                "absolute top-full left-1/2 mt-1 flex size-5 -translate-x-1/2 items-center justify-center rounded-full shadow-sm ring-1 ring-background/70 transition-transform group-hover:scale-110",
+                isOpen
+                  ? "bg-foreground text-background"
+                  : "bg-primary/85 text-primary-foreground"
+              )}
               aria-hidden
             >
-              <Languages className="size-3" />
+              {isOpen ? <X className="size-3" /> : <Languages className="size-3" />}
             </span>
           </button>
         );

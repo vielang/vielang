@@ -11,7 +11,6 @@ import {
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   Dialog,
@@ -58,13 +57,21 @@ export function OfflineDownload({ book }: { book: Book }) {
 
   if (isDownloading) {
     const { done, total } = active.progress;
+    const percent = Math.round((done / total) * 100);
     return (
-      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+      // Chỉ phần trăm, không kèm thanh tiến độ. Cả hàng nút này vừa khít màn
+      // điện thoại; thêm một thanh 80px nữa là nó tụt xuống dòng mới ngay
+      // giữa lúc đang tải, rồi lại nhảy lên khi tải xong. Vả lại ngay phía
+      // trên đã có một thanh tiến độ ĐỌC rồi — hai thanh cạnh nhau chỉ tổ
+      // khiến người ta nhìn nhầm cái này ra cái kia.
+      <div
+        className="flex items-center gap-1.5 text-xs text-muted-foreground"
+        title={`Đang tải ${done}/${total} trang`}
+      >
         <Loader2 className="size-3.5 shrink-0 animate-spin" aria-hidden />
-        <span className="tabular-nums">
-          {done}/{total}
+        <span className="tabular-nums" aria-label={`Đang tải ${percent}%`}>
+          {percent}%
         </span>
-        <Progress value={(done / total) * 100} className="h-1 w-20" />
         <Button
           variant="ghost"
           size="icon"

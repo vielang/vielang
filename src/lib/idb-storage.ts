@@ -20,6 +20,19 @@ import type { StateStorage } from "zustand/middleware";
  * trong một số chế độ riêng tư, mà mất chú thích thì tiếc chứ không được
  * phép làm vỡ trang đọc.
  */
+/**
+ * ĐỪNG đổi theo tên thương hiệu. Đây là KHOÁ TÌM DỮ LIỆU, không phải nhãn
+ * hiển thị: trình duyệt tra cơ sở dữ liệu đúng theo chuỗi này. App từng tên
+ * là "KIIP Reader" và dữ liệu của mọi người đang dùng nằm trong cơ sở dữ
+ * liệu mang tên đó. Đổi sang "vietopik" là mở một cơ sở dữ liệu rỗng hoàn
+ * toàn mới — nét vẽ trên trang, bản ghi âm, đánh dấu, tiến độ đọc, danh sách
+ * sách đã tải offline của họ vẫn nằm nguyên trên máy nhưng app không còn
+ * nhìn thấy, nhìn ra ngoài y hệt như bị xoá sạch.
+ *
+ * Muốn đổi thì phải kèm bước chuyển dữ liệu: mở cả tên cũ lẫn tên mới, chép
+ * sang, và chỉ xoá bên cũ sau khi chép xong (xem phần di trú từ localStorage
+ * ở cuối file — cùng hai quy tắc an toàn đó).
+ */
 const DB_NAME = "kiip-reader";
 const DB_VERSION = 2;
 const STORE = "keyval";

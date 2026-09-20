@@ -1,5 +1,5 @@
 /**
- * Service worker cho KIIP Reader.
+ * Service worker cho VieTopik.
  *
  * Mục tiêu hẹp và cố ý hẹp: đọc lại được những trang sách ĐÃ XEM khi mất
  * mạng. Không đặt ra tham vọng chạy trọn vẹn offline.
@@ -23,6 +23,14 @@
  *   hoặc tới khi CHÍNH NGƯỜI DÙNG bấm cập nhật (xem trình nghe "message").
  *   Tự tráo giữa chừng có thể khiến trang đang mở đi xin chunk của phiên bản
  *   khác; còn người dùng bấm thì trang được tải lại ngay sau đó nên an toàn.
+ */
+/**
+ * Tên cache giữ tiền tố `kiip-` dù app đã đổi tên thành VieTopik: đây là
+ * KHOÁ TRA CACHE chứ không phải nhãn. Đáng ngại nhất là `kiip-book-` — cache
+ * sách người dùng chủ động tải, cố ý không bao giờ bị dọn tự động. Đổi tiền
+ * tố thì những cache cũ vừa không còn được tra, vừa lọt khỏi diện "giữ lại"
+ * lẫn diện "người dùng xoá được", thành rác chiếm chỗ vĩnh viễn trên máy họ,
+ * mà nhìn ra ngoài thì sách đã tải bỗng biến mất.
  */
 const VERSION = "v2";
 const DOC_CACHE = `kiip-doc-${VERSION}`;

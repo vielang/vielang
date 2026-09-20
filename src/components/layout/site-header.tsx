@@ -18,7 +18,7 @@ export function SiteHeader() {
                 phải — chỉ giữ lại logo. Dùng `sr-only` chứ không phải
                 `hidden`: ẩn hẳn thì liên kết này mất luôn tên gọi, vì cái
                 icon đã `aria-hidden`. */}
-            <span className="sr-only sm:not-sr-only">KIIP Reader</span>
+            <span className="sr-only sm:not-sr-only">VieTopik</span>
           </Link>
           <span className="h-4 w-px shrink-0 bg-border" aria-hidden />
           <LanguageNav />

@@ -22,13 +22,13 @@ const notoSansKr = Noto_Sans_KR({
 
 export const metadata: Metadata = {
   title: {
-    default: "KIIP Reader – Đọc sách tiếng Hàn",
-    template: "%s | KIIP Reader",
+    default: "VieTopik – Đọc sách tiếng Hàn",
+    template: "%s | VieTopik",
   },
   description:
     "Đọc sách văn hóa – xã hội Hàn Quốc (chương trình KIIP) dành cho người Việt học tiếng Hàn.",
   // Apple bỏ qua manifest, chỉ đọc thẻ link này khi thêm vào màn hình chính.
-  appleWebApp: { capable: true, title: "KIIP Reader", statusBarStyle: "black-translucent" },
+  appleWebApp: { capable: true, title: "VieTopik", statusBarStyle: "black-translucent" },
   icons: { apple: "/icons/apple-touch-icon.png" },
 };
 

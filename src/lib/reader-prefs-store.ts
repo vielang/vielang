@@ -28,6 +28,10 @@ export const useReaderPrefsStore = create<ReaderPrefsState>()(
       markReaderHelpSeen: () => set({ hasSeenReaderHelp: true }),
     }),
     {
+      // Khoá localStorage, KHÔNG phải nhãn hiển thị — đổi theo tên thương
+      // hiệu mới là mất chế độ xem và cờ "đã xem hướng dẫn" của người đang
+      // dùng (hướng dẫn sẽ bật lại từ đầu). Giữ nguyên tên cũ; xem thêm
+      // `lib/idb-storage.ts`, cùng lý do.
       name: "kiip-reader-prefs-v1",
       storage: createJSONStorage(() => localStorage),
     }

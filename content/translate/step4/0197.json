@@ -1,0 +1,16 @@
+[
+  {
+    "id": "p197-dialog",
+    "rect": [0.14, 0.17, 0.49, 0.37],
+    "label": "Hội thoại",
+    "ko": "애나: 제이슨 씨, 어디를 그렇게 급히 가요?\n제이슨: 친구가 갑자기 병원 응급실에 갔대요. 그래서 가 보려고요.\n애나: 어머나, 빨리 가 보세요. 그런데 제이슨 씨, 오토바이를 탈 때는 헬멧을 꼭 써야 돼요. 안 쓰면 위험하고 범칙금도 내야 되잖아요.\n제이슨: 아, 네. 깜박했네요. 애나 씨도 알다시피 지금 너무 급한 상황이라서요. 저는 원래 교통 법규를 잘 지키는데…….\n애나: 지금 친구가 병원에 있다고 하니까 마음이 급했나 보네요.\n제이슨: 네. 정말 걱정이 돼요.\n애나: 제이슨 씨, 아무리 급해도 교통 법규는 꼭 지켜야 하는 법이잖아요. 운전도 조심하고요.\n제이슨: 네, 알겠어요.",
+    "vi": "Anna: Anh Jason, anh vội đi đâu vậy?\nJason: Bạn tôi đột nhiên phải vào phòng cấp cứu bệnh viện. Nên tôi định đến xem sao.\nAnna: Ôi, anh mau đi đi. Nhưng anh Jason này, đi xe máy thì nhất định phải đội mũ bảo hiểm. Không đội thì vừa nguy hiểm vừa phải nộp phạt mà.\nJason: À, vâng. Tôi quên mất. Chị Anna cũng biết đấy, bây giờ tình hình gấp quá. Bình thường tôi vẫn tuân thủ luật giao thông đàng hoàng……\nAnna: Chắc nghe tin bạn đang nằm viện nên anh sốt ruột.\nJason: Vâng. Tôi lo thật sự.\nAnna: Anh Jason, dù gấp đến mấy thì luật giao thông vẫn là thứ nhất định phải tuân thủ mà. Anh lái xe cẩn thận nữa nhé.\nJason: Vâng, tôi biết rồi."
+  },
+  {
+    "id": "p197-rules",
+    "rect": [0.135, 0.765, 0.65, 0.145],
+    "label": "Quy định và lý do",
+    "ko": "법규\n• 아기는 카 시트에 앉혀야 한다.\n• 어린이 보호 구역에서는 속도를 줄인다.\n\n법규를 지켜야 하는 이유\n• 사고가 났을 때 아기를 지킬 수 있다.\n• 길을 걷는 어린이들을 보호해야 한다.",
+    "vi": "Quy định\n• Phải cho em bé ngồi ghế dành cho trẻ trên ô tô.\n• Phải giảm tốc độ trong khu vực bảo vệ trẻ em.\n\nLý do phải tuân thủ quy định\n• Khi xảy ra tai nạn thì bảo vệ được em bé.\n• Phải bảo vệ những trẻ em đang đi trên đường."
+  }
+]

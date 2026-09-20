@@ -1,0 +1,16 @@
+[
+  {
+    "id": "p187-forecast",
+    "rect": [0.13, 0.155, 0.79, 0.325],
+    "label": "Dự báo kinh tế năm tới",
+    "ko": "내년 경제 상황 전망\n매우 좋아질 것이다 20% / 약간 좋아질 것이다 15% / 지금과 비슷할 것이다 30% / 약간 나빠질 것이다 20% / 매우 나빠질 것이다 15%\n\n그렇게 전망하는 이유\n▲ 물가 안정 / 고용 안정 / 취업률 증가 / 부동산 가격 안정\n▼ 물가 불안정 / 취업률 감소 / 의료비 인상 / 교육비 부담",
+    "vi": "Dự báo tình hình kinh tế năm tới\nSẽ tốt lên rất nhiều 20% / Sẽ tốt lên đôi chút 15% / Sẽ giống như bây giờ 30% / Sẽ xấu đi đôi chút 20% / Sẽ xấu đi rất nhiều 15%\n\nLý do dự báo như vậy\n▲ Giá cả ổn định / Việc làm ổn định / Tỷ lệ có việc làm tăng / Giá bất động sản ổn định\n▼ Giá cả bất ổn / Tỷ lệ có việc làm giảm / Chi phí y tế tăng / Gánh nặng chi phí giáo dục"
+  },
+  {
+    "id": "p187-headlines",
+    "rect": [0.14, 0.545, 0.79, 0.37],
+    "label": "Tiêu đề báo",
+    "ko": "쌀값 잡아라!! 물가 안정 위해 정부가 긴급 수매\n항공료, 비수기에 가면 최대 35% 싸다\n청년 일자리 지원 사업 확대\n“자녀 교육비 부담 줄여 드립니다” 새 학기부터 학생 교복비 지원",
+    "vi": "Kìm giá gạo!! Chính phủ thu mua khẩn cấp để ổn định giá cả\nVé máy bay — đi vào mùa thấp điểm rẻ tới 35%\nMở rộng dự án hỗ trợ việc làm cho thanh niên\n“Chúng tôi giảm gánh nặng học phí cho con em bạn” — hỗ trợ tiền đồng phục học sinh từ học kỳ mới"
+  }
+]

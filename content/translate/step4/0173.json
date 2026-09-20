@@ -1,0 +1,16 @@
+[
+  {
+    "id": "p173-dialog",
+    "rect": [0.14, 0.175, 0.49, 0.29],
+    "label": "Hội thoại",
+    "ko": "이링: 안젤라 씨, 어디에 다녀와요?\n안젤라: 목이 아파서 병원에 갔다 오는 길이에요. 요즘 미세 먼지가 심해서 그런지 병원에 가니까 저랑 비슷한 증상으로 온 사람이 많았어요.\n이링: 목이 더 아프지 않도록 마스크를 쓰고 다니세요.\n안젤라: 그렇게 해도 별로 좋아지지 않아서 걱정이에요.\n이링: 미세 먼지 문제가 해결되지 않는 한 병원을 찾는 사람은 더 늘어날 것 같아요.\n안젤라: 맞아요. 미세 먼지가 심해지면 특히 목이나 눈에 안 좋으니까 이링 씨도 미리 건강 조심하세요.",
+    "vi": "Yi Ling: Chị Angela, chị vừa đi đâu về vậy?\nAngela: Tôi bị đau họng nên vừa đi bệnh viện về. Chắc tại dạo này bụi mịn nặng, đến bệnh viện thấy nhiều người cũng bị triệu chứng giống tôi.\nYi Ling: Chị nhớ đeo khẩu trang để họng đừng đau thêm nhé.\nAngela: Làm vậy mà cũng chẳng đỡ mấy nên tôi lo lắm.\nYi Ling: Chừng nào vấn đề bụi mịn chưa được giải quyết thì người đi bệnh viện chắc còn tăng nữa.\nAngela: Đúng vậy. Bụi mịn nặng lên thì đặc biệt không tốt cho họng và mắt, nên chị Yi Ling cũng giữ gìn sức khoẻ từ trước đi nhé."
+  },
+  {
+    "id": "p173-problems",
+    "rect": [0.16, 0.77, 0.62, 0.135],
+    "label": "Vấn đề do ô nhiễm môi trường",
+    "ko": "환경 오염으로 생긴 문제점\n• 미세 먼지 때문에 기침을 계속해요.\n• 물이 깨끗하지 않아서 피부병이 생겼어요.\n\n나무가 많은 길을 산책해 보세요. 그리고 미세 먼지가 많은 날은 마스크를 꼭 쓰세요.",
+    "vi": "Những vấn đề do ô nhiễm môi trường\n• Tôi ho liên tục vì bụi mịn.\n• Nước không sạch nên tôi bị bệnh ngoài da.\n\nBạn hãy thử đi dạo trên con đường nhiều cây xanh. Và những ngày nhiều bụi mịn thì nhất định phải đeo khẩu trang."
+  }
+]

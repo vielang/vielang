@@ -1,0 +1,16 @@
+[
+  {
+    "id": "p149-dialog",
+    "rect": [0.14, 0.16, 0.78, 0.44],
+    "label": "Hội thoại",
+    "ko": "제이슨: 어제 뉴스를 보니 고3 학생들이 사교육을 받느라고 학업 스트레스가 심하대요. 잠을 못 자거나 머리가 빠지기도 하고 밥조차 못 먹는 경우도 있고요.\n애나: 스트레스를 많이 받으면 병이 나기 마련이지요. 하지만 한국은 워낙 대학 입시 경쟁이 치열하니까 어쩔 수 없는 것 같아요.\n제이슨: 요즘 아이들은 학교와 학원 공부 때문에 힘들게 10대를 보내는 것 같아서 안쓰러워요. 학교 수업이 끝나고도 학원에 가서 밤늦게까지 공부하잖아요.\n애나: 자신의 아이들을 좋은 대학에 보내려면 부모들이 사교육을 많이 시킬 수밖에 없어요.\n제이슨: 그렇다고 해도 학부모들의 교육열이 너무 지나친 거 아니에요?\n애나: 부모들은 자녀들이 좋은 대학에 가길 바라니까요. 그래서 저는 사교육을 시키는 부모의 마음도 이해돼요.\n제이슨: 교육 문제는 쉽게 해결될 수 없겠지만 교육 제도는 꼭 개선해야 돼요. 그러면 사교육이나 부모들의 교육열 문제도 해결될 거라고 생각해요.",
+    "vi": "Jason: Hôm qua xem tin tức thấy nói học sinh lớp 12 căng thẳng học hành ghê lắm vì phải học thêm. Có em mất ngủ, rụng tóc, thậm chí không ăn nổi cơm.\nAnna: Căng thẳng nhiều thì sinh bệnh là chuyện đương nhiên. Nhưng ở Hàn Quốc cạnh tranh thi đại học vốn khốc liệt nên hình như cũng đành chịu.\nJason: Tôi thấy thương bọn trẻ dạo này, tuổi mười mấy trôi qua vất vả vì học ở trường rồi lại học ở trung tâm. Tan học ở trường rồi vẫn đến trung tâm học đến tận khuya mà.\nAnna: Muốn con mình vào được trường đại học tốt thì cha mẹ đành phải cho con học thêm nhiều thôi.\nJason: Dù vậy thì nhiệt huyết học hành của phụ huynh có quá đà không?\nAnna: Vì cha mẹ nào cũng mong con vào được đại học tốt mà. Nên tôi cũng hiểu được lòng những phụ huynh cho con học thêm.\nJason: Vấn đề giáo dục không thể giải quyết dễ dàng, nhưng nhất định phải cải thiện chế độ giáo dục. Tôi nghĩ khi đó thì vấn đề học thêm hay nhiệt huyết giáo dục của phụ huynh cũng sẽ được giải quyết."
+  },
+  {
+    "id": "p149-debate",
+    "rect": [0.135, 0.775, 0.68, 0.14],
+    "label": "Ủng hộ và phản đối học thêm",
+    "ko": "찬성\n• 학교 성적이 좋지 않은 학생들이 사교육을 받으면 성적을 향상시킬 수 있다.\n• 부족한 부분을 보충할 수 있다.\n\n반대\n• 지나친 사교육으로 스트레스를 받아 건강을 해칠 수 있다.\n• 사교육에 의지해서 학교 공부를 소홀히 할 수 있다.",
+    "vi": "Ủng hộ\n• Học sinh có điểm ở trường không tốt nếu học thêm thì có thể nâng cao thành tích.\n• Có thể bù đắp những phần còn thiếu.\n\nPhản đối\n• Học thêm quá mức gây căng thẳng, có thể hại sức khoẻ.\n• Dựa dẫm vào học thêm nên có thể lơ là việc học ở trường."
+  }
+]

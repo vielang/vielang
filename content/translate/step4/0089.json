@@ -1,0 +1,16 @@
+[
+  {
+    "id": "p89-dialog",
+    "rect": [0.14, 0.19, 0.36, 0.33],
+    "label": "Hội thoại",
+    "ko": "애나: 제이슨 씨, 며칠 전에도 그런 것 같은데 아직도 기침이 안 나았어요?\n제이슨: 네. 무리해서 일했더니 약을 먹어도 잘 낫지 않아요. 열도 있고요.\n애나: 기관지염인 것 같은데 병원에는 가 봤어요?\n제이슨: 가기는 했는데 크게 걱정할 정도는 아니라고 하셨어요.\n애나: 요즘 수업이 많은데 괜찮겠어요?\n제이슨: 어쩔 수 없지요. 수업을 하되 무리하지 않도록 해야겠어요.",
+    "vi": "Anna: Anh Jason, mấy hôm trước hình như cũng vậy, đến giờ ho vẫn chưa khỏi à?\nJason: Ừ. Tôi làm việc quá sức nên uống thuốc mà mãi không khỏi. Lại còn sốt nữa.\nAnna: Nghe như viêm phế quản, anh đi bệnh viện chưa?\nJason: Đi rồi, nhưng bác sĩ bảo không đến mức phải lo lắng nhiều.\nAnna: Dạo này anh dạy nhiều tiết, liệu có ổn không?\nJason: Đành chịu thôi. Tôi vẫn dạy nhưng phải cố gắng đừng làm quá sức."
+  },
+  {
+    "id": "p89-advice",
+    "rect": [0.125, 0.79, 0.55, 0.125],
+    "label": "Tình huống và lời khuyên",
+    "ko": "상황: 고열이 나고 목이 부었다. → 조언: 독감인 것 같다. 병원에 가야 한다. 전염될 수 있으므로 조심한다.\n상황: 토하고 계속 설사한다. → 조언: 장염인 것 같다. 병원에 가야 한다. 물을 자주 마셔야 한다.",
+    "vi": "Tình huống: Sốt cao và sưng họng. → Lời khuyên: Hình như bị cúm. Phải đi bệnh viện. Có thể lây nên phải cẩn thận.\nTình huống: Nôn và tiêu chảy liên tục. → Lời khuyên: Hình như bị viêm ruột. Phải đi bệnh viện. Phải uống nước thường xuyên."
+  }
+]

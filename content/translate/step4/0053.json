@@ -1,0 +1,16 @@
+[
+  {
+    "id": "p53-dialog",
+    "rect": [0.135, 0.16, 0.78, 0.34],
+    "label": "Hội thoại",
+    "ko": "이링: 안젤라 씨, 주말에 뭐 했어요?\n안젤라: 지난번에 같이 만난 지민 씨 기억나요? 그 친구 결혼식에 다녀왔어요.\n이링: 아, 네. 지민 씨가 오랫동안 연애를 하더니 드디어 결혼했네요. 결혼식은 어땠어요? 저는 한국에서 결혼식에 아직 못 가 봤어요.\n안젤라: 음, 먼저 하객들은 결혼식장에 들어갈 때 축의금을 냈어요. 그리고 신랑, 신부 어머니들이 촛불을 켜면서 결혼식을 시작했어요.\n이링: 촛불을 켜는 게 신기하네요. 그다음에 신랑, 신부가 입장하고 혼인 서약을 했겠죠?\n안젤라: 네. 그리고 주례사 이후에 신랑이 축가를 불렀고요. 그런데 신랑이 너무 긴장한 나머지 노래 가사를 잊어버렸어요. 하객들은 신랑의 그런 모습에 계속 웃었고요.\n이링: 그랬군요. 다음에 지민 씨를 만나면 축하해 줘야겠네요.",
+    "vi": "Yi Ling: Chị Angela, cuối tuần chị làm gì vậy?\nAngela: Chị còn nhớ chị Ji-min mà lần trước mình gặp chung không? Tôi vừa đi đám cưới bạn ấy về.\nYi Ling: À, vâng. Chị Ji-min yêu lâu vậy rồi cuối cùng cũng cưới nhỉ. Đám cưới thế nào ạ? Tôi thì chưa được đi đám cưới ở Hàn Quốc bao giờ.\nAngela: Ừm, trước hết khách mời đưa tiền mừng khi bước vào hội trường cưới. Rồi mẹ chú rể và mẹ cô dâu thắp nến để bắt đầu lễ cưới.\nYi Ling: Chuyện thắp nến nghe lạ quá. Sau đó thì chú rể, cô dâu vào và đọc lời thề hôn nhân phải không ạ?\nAngela: Đúng vậy. Rồi sau bài phát biểu của chủ hôn thì chú rể hát bài chúc mừng. Nhưng chú rể căng thẳng quá nên quên mất lời bài hát. Khách mời thấy chú rể như vậy thì cười mãi.\nYi Ling: Ra vậy. Lần tới gặp chị Ji-min tôi phải chúc mừng mới được."
+  },
+  {
+    "id": "p53-wedding-order",
+    "rect": [0.41, 0.755, 0.42, 0.165],
+    "label": "Trình tự lễ cưới",
+    "ko": "화촉 점화 → 신랑, 신부 입장 → 혼인 서약 → 주례사 → 축가 → 신랑, 신부 행진\n신랑과 신부가 부모님께 감사의 편지를 읽는 것, 신랑의 부모님께 폐백을 드리는 것",
+    "vi": "Thắp nến hoa → Chú rể, cô dâu tiến vào → Lời thề hôn nhân → Lời phát biểu của chủ hôn → Bài hát chúc mừng → Chú rể, cô dâu diễu hành ra\nCô dâu chú rể đọc thư cảm ơn bố mẹ, và làm lễ pyebaek dâng lên bố mẹ chú rể"
+  }
+]

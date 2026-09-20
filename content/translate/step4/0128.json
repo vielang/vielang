@@ -1,0 +1,16 @@
+[
+  {
+    "id": "p128-article-a",
+    "rect": [0.115, 0.14, 0.375, 0.32],
+    "label": "Bài báo (가)",
+    "ko": "원룸 돌며 휴대 전화만 훔치던 절도범 잡혀\n경찰은 지난 16일 충북 청주의 한 빌라에서 절도 용의자 이 모 씨를 체포해 조사 중이다.\n이 모 씨는 지난 두 달 동안 청주 인근의 원룸을 돌며 원룸 거주자들의 휴대 전화만 골라 훔쳐 온 혐의를 받고 있다.\n이 씨의 행각은 비슷한 신고가 경찰에 잇따라 접수되자 경찰들의 끈질긴 수사 끝에 밝혀지게 되었다.\n휴대 전화만을 훔친 이유에 대해 이 씨는 휴대 전화의 경우 중고로 손쉽게 팔 수 있기 때문이라고 말한 것으로 알려진다.",
+    "vi": "Bắt được kẻ trộm chuyên đi các phòng trọ chỉ lấy điện thoại di động\nNgày 16 vừa qua, cảnh sát đã bắt giữ nghi phạm trộm cắp họ Lee tại một khu villa ở Cheongju, Chungbuk và đang điều tra.\nNgười họ Lee bị tình nghi trong suốt hai tháng qua đã đi khắp các phòng trọ quanh Cheongju và chỉ nhắm vào điện thoại di động của người thuê trọ để lấy trộm.\nHành vi của người này bị phát hiện sau quá trình điều tra dai dẳng của cảnh sát, khi các trình báo tương tự liên tiếp được gửi đến.\nVề lý do chỉ trộm điện thoại, được biết người họ Lee khai rằng vì điện thoại di động có thể bán lại dễ dàng dưới dạng hàng cũ."
+  },
+  {
+    "id": "p128-article-b",
+    "rect": [0.52, 0.14, 0.38, 0.32],
+    "label": "Bài báo (나)",
+    "ko": "인천 오피스텔에 방화로 화재 발생, 주민 20여 명 대피\n어제 밤 10시쯤 인천시에 있는 한 오피스텔에서 방화로 보이는 화재가 발생했다. 이 화재로 오피스텔에 거주하는 주민 20여 명이 대피하는 일이 벌어졌다.\n5층에서 시작된 불은 6층까지 번져 여러 개의 사무실 등을 태우고 40분 만에 꺼졌다. 불은 많은 입주 사무실 직원들이 퇴근한 시간에 발생하였고 주민들의 신속한 대피로 가벼운 부상자만 있는 것으로 알려졌다.\n경찰은 방화 용의자 김 모 씨를 오피스텔 근처에서 체포하여 정확한 방화 원인을 조사하고 있다.",
+    "vi": "Cháy do phóng hoả tại officetel ở Incheon, hơn 20 cư dân phải sơ tán\nKhoảng 10 giờ tối qua, một vụ cháy nghi do phóng hoả đã xảy ra tại một officetel ở thành phố Incheon. Vụ cháy khiến hơn 20 cư dân sống trong toà nhà phải sơ tán.\nNgọn lửa bùng lên từ tầng 5 đã lan lên tầng 6, thiêu rụi nhiều văn phòng và được dập tắt sau 40 phút. Đám cháy xảy ra vào giờ mà phần lớn nhân viên các văn phòng đã tan làm, cộng với việc cư dân sơ tán nhanh chóng, nên được biết chỉ có người bị thương nhẹ.\nCảnh sát đã bắt giữ nghi phạm phóng hoả họ Kim gần toà officetel và đang điều tra nguyên nhân chính xác của vụ phóng hoả."
+  }
+]

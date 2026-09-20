@@ -1,0 +1,16 @@
+[
+  {
+    "id": "p199-misdemeanor",
+    "rect": [0.135, 0.155, 0.79, 0.34],
+    "label": "Vi phạm hành chính",
+    "ko": "경범죄의 종류: 쓰레기 투기 / 음주 소란 / 인근 소란 / 무단 침입\n처벌 받은 경범죄 비율: 쓰레기 투기 36.2% / 음주 소란 17.3% / 인근 소란 10.4% / 기타 36.1% (2019년, 경찰청)",
+    "vi": "Các loại vi phạm nhẹ: vứt rác bừa bãi / gây ồn khi say rượu / gây ồn với hàng xóm / xâm nhập trái phép\nTỷ lệ vi phạm nhẹ bị xử phạt: vứt rác bừa bãi 36,2% / gây ồn khi say rượu 17,3% / gây ồn với hàng xóm 10,4% / khác 36,1% (năm 2019, Cục Cảnh sát)"
+  },
+  {
+    "id": "p199-article",
+    "rect": [0.15, 0.585, 0.76, 0.33],
+    "label": "Bài báo",
+    "ko": "OO신문 | 20XX. 6. 13.\n5대 범죄 줄고 검거율 늘어\n경찰청에 따르면 지난 5년간 5대 범죄는 줄고 검거율은 늘어난 것으로 나타났다. 5대 범죄는 살인, 강도, 강간, 절도, 폭력 등을 말한다. 특히 지난해의 경우 살인과 강도 사건 검거율은 모두 100%를 기록했다.\n과학 기술의 발달로 범인을 잡는 비율이 높아졌으며 이에 따라 시민들의 불안감도 낮아지고 있다.\n[그래프] 5대 범죄 검거율: 57.1 → 61.2 → 66.3 → 78.7 (2015~2019년, 경찰청)",
+    "vi": "Báo OO | 13/6/20XX\n5 loại tội phạm lớn giảm, tỷ lệ bắt giữ tăng\nTheo Cục Cảnh sát, trong 5 năm qua, 5 loại tội phạm lớn đã giảm còn tỷ lệ bắt giữ thì tăng. Năm loại tội phạm lớn gồm giết người, cướp, hiếp dâm, trộm cắp và bạo lực. Đặc biệt trong năm ngoái, tỷ lệ bắt giữ các vụ giết người và cướp đều đạt 100%.\nNhờ khoa học kỹ thuật phát triển, tỷ lệ bắt được thủ phạm đã tăng lên, và theo đó cảm giác bất an của người dân cũng giảm xuống.\n[Biểu đồ] Tỷ lệ bắt giữ 5 loại tội phạm lớn: 57,1 → 61,2 → 66,3 → 78,7 (2015–2019, Cục Cảnh sát)"
+  }
+]

@@ -1,0 +1,23 @@
+[
+  {
+    "id": "p19-contest",
+    "rect": [0.14, 0.145, 0.76, 0.26],
+    "label": "Bài dự thi đoạt giải",
+    "ko": "세계인의 날 | 한국 생활 정착 수기 공모전 당선작\n최우수상: 한국 생활 적응의 지름길\n우수상: 제2의 고향\n장려상: 내 인생의 봄날",
+    "vi": "Ngày Công dân Thế giới | Các bài đoạt giải cuộc thi viết ký sự về quá trình an cư tại Hàn Quốc\nGiải xuất sắc nhất: Con đường tắt để thích nghi với cuộc sống Hàn Quốc\nGiải xuất sắc: Quê hương thứ hai\nGiải khuyến khích: Ngày xuân của đời tôi"
+  },
+  {
+    "id": "p19-excerpts",
+    "rect": [0.17, 0.425, 0.73, 0.145],
+    "label": "Trích đoạn bài viết",
+    "ko": "1) … 이렇게 아내와 함께 새로운 삶을 시작한 이곳은 저에게 또 하나의 고향이 되었습니다.\n2) 먼 나라에 와서 적응하는 것이 쉬운 일은 아니지만 제 경험으로 봤을 때 쉽고 빠른 방법이 있습니다. 그것은 바로 …\n3) 그때는 힘들고 어려운 시간이 영원히 끝나지 않을 것 같아 두려웠습니다. 하지만 긴 겨울이 지나면 …",
+    "vi": "1) … Nơi tôi cùng vợ bắt đầu cuộc sống mới như thế này đã trở thành thêm một quê hương nữa của tôi.\n2) Đến một đất nước xa xôi rồi thích nghi không phải chuyện dễ, nhưng theo kinh nghiệm của tôi thì có một cách vừa dễ vừa nhanh. Đó chính là …\n3) Lúc đó tôi sợ rằng quãng thời gian vất vả và khó khăn sẽ không bao giờ kết thúc. Nhưng hễ mùa đông dài qua đi thì …"
+  },
+  {
+    "id": "p19-feelings",
+    "rect": [0.13, 0.645, 0.79, 0.265],
+    "label": "Cảm xúc khi sống ở nước ngoài",
+    "ko": "곧 좋은 일이 생기겠지. 행복해지겠지. ^^ → 기대감\n친구도 없고… 가족들이 너무 보고 싶어. → 외로움\n이게 뭐지? 궁금하다. → 호기심\n나는 할 수 있어! → 자신감\n이건 처음 보는 건데… 어떻게 사용하는 거지? → 생소함",
+    "vi": "Chắc sắp có chuyện tốt thôi. Rồi sẽ hạnh phúc thôi. ^^ → sự kỳ vọng\nKhông có bạn bè… nhớ gia đình quá. → sự cô đơn\nCái này là gì nhỉ? Tò mò quá. → sự tò mò\nMình làm được! → sự tự tin\nCái này lần đầu mình thấy… dùng thế nào đây? → sự lạ lẫm"
+  }
+]

@@ -1,0 +1,16 @@
+[
+  {
+    "id": "p101-dialog",
+    "rect": [0.14, 0.165, 0.5, 0.37],
+    "label": "Hội thoại",
+    "ko": "라민: 아나이스 씨, 인터넷에서 개인 정보가 유출됐다면서요?\n아나이스: 네, 저도 그 기사 봤어요. 자꾸 그런 일이 생겨서 걱정이에요.\n라민: 저는 인터넷에서 다양한 정보를 얻을 수 있어서 좋다고 생각했는데 요즘 이런 일들을 보면 인터넷 뱅킹과 인터넷 쇼핑을 계속해도 될지 걱정이에요.\n아나이스: 그래서 인터넷을 할 때는 비밀번호도 조금 복잡하게 만들고 자주 바꿀 필요가 있는 것 같아요.\n라민: 사람들이 편리하게 사용하는 인터넷이 이렇게 악용되는 걸 보니까 너무 안타까워요.\n아나이스: 인터넷은 잘 사용하면 유익하지만 좋은 영향만 주는 것은 아닌 것 같아요. 그러니까 인터넷을 이용하는 우리가 조심할 수밖에 없어요.",
+    "vi": "Ramin: Chị Anaïs, nghe nói thông tin cá nhân bị rò rỉ trên mạng à?\nAnaïs: Ừ, tôi cũng xem bài báo đó rồi. Chuyện như vậy cứ xảy ra hoài nên tôi lo lắm.\nRamin: Tôi từng nghĩ Internet tốt vì lấy được nhiều thông tin đa dạng, nhưng dạo này thấy những chuyện như thế này thì lo không biết có nên tiếp tục dùng ngân hàng trực tuyến và mua sắm trên mạng không.\nAnaïs: Vì vậy khi dùng Internet, hình như cần đặt mật khẩu phức tạp hơn một chút và đổi thường xuyên.\nRamin: Thấy Internet mà mọi người dùng tiện lợi như vậy lại bị lợi dụng thế này, tôi thấy tiếc quá.\nAnaïs: Internet nếu dùng tốt thì có ích, nhưng hình như không phải chỉ mang lại ảnh hưởng tốt. Nên những người dùng Internet như chúng ta đành phải cẩn thận thôi."
+  },
+  {
+    "id": "p101-headlines",
+    "rect": [0.13, 0.735, 0.68, 0.16],
+    "label": "Tiêu đề báo",
+    "ko": "악성 댓글에 고통받는 연예인\n운전 중 스마트폰 사용, 교통사고 증가\n스마트폰 사용 시간 증가, 중독 문제 심각",
+    "vi": "Nghệ sĩ khổ sở vì những bình luận ác ý\nDùng điện thoại khi lái xe — tai nạn giao thông tăng\nThời gian dùng điện thoại tăng, vấn đề nghiện trở nên nghiêm trọng"
+  }
+]

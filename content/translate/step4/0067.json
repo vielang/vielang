@@ -1,0 +1,16 @@
+[
+  {
+    "id": "p67-attitudes",
+    "rect": [0.125, 0.14, 0.81, 0.29],
+    "label": "Thái độ với di sản văn hoá",
+    "ko": "문화재를 잘 보존해야 합니다. 문화재는 역사적인 가치가 매우 크기 때문입니다.\n유적지를 탐방하다 / 세계 문화유산으로 지정하다 / 문화재를 보존하다 / 문화유산을 전승하다\n• 역사적인 가치가 크다\n• 조상에게 받은 것을 후손들에게 물려주다\n• 그 시대의 분위기를 생생하게 느끼다\n• 세계적으로 역사적 가치를 인정하다",
+    "vi": "Phải bảo tồn tốt các di tích văn hoá, bởi di tích văn hoá có giá trị lịch sử rất lớn.\ntham quan di tích / được công nhận là di sản văn hoá thế giới / bảo tồn di tích văn hoá / truyền lại di sản văn hoá\n• có giá trị lịch sử lớn\n• truyền lại cho con cháu những gì nhận được từ tổ tiên\n• cảm nhận sống động bầu không khí của thời đại đó\n• giá trị lịch sử được thế giới công nhận"
+  },
+  {
+    "id": "p67-academy",
+    "rect": [0.125, 0.515, 0.81, 0.4],
+    "label": "Thông báo khoá học di sản",
+    "ko": "한국의 문화유산 아카데미\n✓기간: 3~5월, 매주 토요일\n✓대상: 한국의 문화유산에 대해 공부하고 싶은 청소년과 성인\n✓신청: **박물관 홈페이지(선착순 20명)\n✓비용: 무료(입장료, 교통비 개인 부담)\n✓기타: 이론 강의(5회)와 탐방(5회)에 모두 참석하신 분께는 문화유산 아카데미 수료증 발급\n1회 한국의 문화유산 강의 ① | 6회 탐방 ③ - 조선 왕릉\n2회 탐방 ① - 창덕궁 | 7회 한국의 문화유산 강의 ④\n3회 한국의 문화유산 강의 ② | 8회 탐방 ④ - 판소리 공연\n4회 탐방 ② - 종묘 | 9회 한국의 문화유산 강의 ⑤\n5회 한국의 문화유산 강의 ③ | 10회 탐방 ⑤ - 한글 박물관",
+    "vi": "Học viện Di sản Văn hoá Hàn Quốc\n✓Thời gian: tháng 3–5, thứ Bảy hằng tuần\n✓Đối tượng: thanh thiếu niên và người lớn muốn tìm hiểu về di sản văn hoá Hàn Quốc\n✓Đăng ký: trang web Bảo tàng ** (20 người theo thứ tự đăng ký)\n✓Chi phí: miễn phí (vé vào cửa và tiền đi lại tự túc)\n✓Khác: người tham dự đủ cả 5 buổi giảng lý thuyết và 5 buổi tham quan sẽ được cấp chứng nhận hoàn thành khoá học\nBuổi 1: Bài giảng về di sản văn hoá Hàn Quốc ① | Buổi 6: Tham quan ③ – Lăng mộ vua triều Joseon\nBuổi 2: Tham quan ① – Cung Changdeok | Buổi 7: Bài giảng ④\nBuổi 3: Bài giảng ② | Buổi 8: Tham quan ④ – Biểu diễn pansori\nBuổi 4: Tham quan ② – Jongmyo | Buổi 9: Bài giảng ⑤\nBuổi 5: Bài giảng ③ | Buổi 10: Tham quan ⑤ – Bảo tàng Hangeul"
+  }
+]

@@ -1,0 +1,16 @@
+[
+  {
+    "id": "p161-dialog",
+    "rect": [0.14, 0.175, 0.48, 0.33],
+    "label": "Hội thoại",
+    "ko": "정아라: 아, 맞다. 고천 씨, 이번 지방 선거 때 투표하죠?\n고천: 네. 이제 투표권이 생겨서 이번에 처음으로 하게 됐어요.\n정아라: 고천 씨는 어떤 사람이 당선됐으면 좋겠어요?\n고천: 아직 잘 모르겠어요. 저는 지지율이 높은 사람에게 투표하려고요.\n정아라: 그러지 말고 후보자의 공약을 읽어 보세요. 공약이야말로 나에게 필요한 후보자를 찾는 좋은 자료예요.\n고천: 그런가요? 그럼 저는 아이 교육에 관심이 많으니까 교육 관련 내용을 찾아봐야겠어요.\n정아라: 선거 공보물 꼼꼼히 확인하시고 소중한 한 표 꼭 행사하세요.",
+    "vi": "Jeong A-ra: À đúng rồi. Chị Cao Thiên, kỳ bầu cử địa phương lần này chị đi bỏ phiếu chứ?\nCao Thiên: Vâng. Giờ tôi có quyền bầu cử nên lần này là lần đầu tiên tôi đi bỏ phiếu.\nJeong A-ra: Chị Cao Thiên mong ai trúng cử?\nCao Thiên: Tôi vẫn chưa rõ lắm. Tôi định bỏ phiếu cho người có tỷ lệ ủng hộ cao.\nJeong A-ra: Đừng làm vậy, chị hãy đọc cam kết tranh cử của các ứng viên. Chính cam kết tranh cử mới là tài liệu tốt để tìm ra ứng viên mà mình cần.\nCao Thiên: Vậy sao? Thế thì tôi quan tâm nhiều đến chuyện học hành của con nên phải tìm những nội dung liên quan đến giáo dục mới được.\nJeong A-ra: Chị hãy xem kỹ tài liệu tuyên truyền bầu cử và nhớ thực hiện lá phiếu quý giá của mình nhé."
+  },
+  {
+    "id": "p161-issues",
+    "rect": [0.135, 0.79, 0.62, 0.125],
+    "label": "Vấn đề của địa phương và cam kết cần có",
+    "ko": "지역에 부족한 것\n• 운동할 수 있는 시설이 부족하다\n• 좋은 조건의 일자리가 적다\n\n필요한 공약\n• 문화 체육 시설 확대\n• 좋은 조건의 일자리 늘리기",
+    "vi": "Những thứ địa phương còn thiếu\n• Thiếu cơ sở để tập thể dục\n• Ít việc làm có điều kiện tốt\n\nCam kết tranh cử cần có\n• Mở rộng cơ sở văn hoá thể thao\n• Tăng việc làm có điều kiện tốt"
+  }
+]

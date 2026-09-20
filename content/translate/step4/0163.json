@@ -1,0 +1,16 @@
+[
+  {
+    "id": "p163-qualities",
+    "rect": [0.125, 0.145, 0.81, 0.29],
+    "label": "Phẩm chất ứng viên đề cao",
+    "ko": "도덕성 / 소통 능력 / 판단력과 추진력 / 행정 경험과 전문성\n기호 1 김진열 — 시청 공무원 생활 25년, 부시장 4년. OO시에 대해 누구보다 잘 아는 OO시 전문가!\n기호 2 나경희 — 더 기다릴 수 없습니다. 2년 내에 테크노 타운 반드시 실현하겠습니다.\n기호 3 윤덕근 — 깨끗한 OO시, OO시 시장은 깨끗한 윤덕근!\n기호 4 한명주 — 시민의 눈높이에서 보겠습니다. 시민의 목소리에 더 다가가겠습니다.",
+    "vi": "Đạo đức / Năng lực giao tiếp / Óc phán đoán và sức thúc đẩy / Kinh nghiệm hành chính và chuyên môn\nSố 1 Kim Jin-yeol — 25 năm làm công chức toà thị chính, 4 năm làm phó thị trưởng. Chuyên gia hiểu về thành phố OO hơn bất kỳ ai!\nSố 2 Na Gyeong-hui — Không thể chờ thêm được nữa. Tôi nhất định sẽ hiện thực hoá khu Techno Town trong vòng 2 năm.\nSố 3 Yun Deok-geun — Thành phố OO trong sạch, thị trưởng thành phố OO là Yun Deok-geun trong sạch!\nSố 4 Han Myeong-ju — Tôi sẽ nhìn từ tầm mắt của người dân. Tôi sẽ đến gần hơn với tiếng nói của người dân."
+  },
+  {
+    "id": "p163-survey",
+    "rect": [0.125, 0.565, 0.75, 0.35],
+    "label": "Kiểu lãnh đạo người dân mong muốn",
+    "ko": "시민이 원하는 시장의 리더십 유형\n48% — 누구나 의견을 이야기할 수 있고 결정에 참여할 수 있는 민주적 리더십\n24% — 지켜야 할 것은 반드시 지키며 높은 도덕성을 갖춘 합법적 리더십\n16% — 강한 권력을 가지는 강력한 정치적 리더십\n12% — 하나의 목적을 이루기 위하여 서로 의논하는 협상적 리더십",
+    "vi": "Kiểu lãnh đạo mà người dân mong muốn ở thị trưởng\n48% — Lãnh đạo dân chủ: ai cũng được nói lên ý kiến và tham gia vào quyết định\n24% — Lãnh đạo hợp pháp: nhất định giữ những điều phải giữ, có đạo đức cao\n16% — Lãnh đạo chính trị mạnh mẽ, nắm quyền lực lớn\n12% — Lãnh đạo thương lượng: cùng bàn bạc với nhau để đạt một mục tiêu chung"
+  }
+]

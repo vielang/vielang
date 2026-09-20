@@ -246,7 +246,16 @@ function TranslationBubble({
   // hai lần.
   useEffect(() => {
     function onPointerDown(e: PointerEvent) {
-      if (!ref.current?.contains(e.target as Node)) onClose();
+      if (ref.current?.contains(e.target as Node)) return;
+      // Bấm trúng chính chấm dịch thì ĐỪNG đóng ở đây — để cái nút đó tự
+      // quyết (đóng vùng đang mở, hay chuyển sang vùng khác).
+      //
+      // Đóng ở đây là hỏng: pointerdown chạy trước click, nên tới lúc click
+      // bắn thì React đã render lại với trạng thái "đang đóng", và nút lại
+      // mở đúng vùng vừa đóng. Nhìn ra ngoài thì thành bấm dấu X mà không
+      // có gì xảy ra.
+      if ((e.target as HTMLElement).closest?.("[data-translate-region]")) return;
+      onClose();
     }
     function onKeyDown(e: KeyboardEvent) {
       if (e.key === "Escape") onClose();

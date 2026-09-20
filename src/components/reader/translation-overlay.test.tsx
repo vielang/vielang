@@ -48,14 +48,34 @@ describe("chấm dịch", () => {
   });
 });
 
+/**
+ * Trình duyệt thật bắn `pointerdown` TRƯỚC `click`. Bong bóng nghe
+ * `pointerdown` ở pha bắt để đóng khi bấm ra ngoài, nên chỉ bắn mỗi
+ * `click` là bỏ lọt đúng loại lỗi do hai thứ đó giẫm chân nhau.
+ */
+function tap(el: HTMLElement) {
+  fireEvent.pointerDown(el, { bubbles: true });
+  fireEvent.click(el);
+}
+
 describe("bấm lại chính vùng đang mở", () => {
   it("đóng bong bóng thay vì mở lại", () => {
     render(<TranslationOverlay regions={REGIONS} />);
-    fireEvent.click(open("Xem bản dịch: Hội thoại"));
-    fireEvent.click(open("Đóng bản dịch: Hội thoại"));
+    tap(open("Xem bản dịch: Hội thoại"));
+    tap(open("Đóng bản dịch: Hội thoại"));
 
     expect(screen.queryByText("Xin chào?")).toBeNull();
     expect(screen.getByLabelText("Xem bản dịch: Hội thoại")).toBeTruthy();
+  });
+});
+
+describe("bấm ra ngoài", () => {
+  it("vẫn đóng được như cũ", () => {
+    render(<TranslationOverlay regions={REGIONS} />);
+    tap(open("Xem bản dịch: Hội thoại"));
+    fireEvent.pointerDown(document.body, { bubbles: true });
+
+    expect(screen.queryByText("Xin chào?")).toBeNull();
   });
 });
 
@@ -64,8 +84,8 @@ describe("chuyển sang vùng khác", () => {
     // Mỗi trang có nhiều đoạn; đọc xong đoạn này bấm sang đoạn kế là chuyện
     // thường, không nên bắt bấm hai lần.
     render(<TranslationOverlay regions={REGIONS} />);
-    fireEvent.click(open("Xem bản dịch: Hội thoại"));
-    fireEvent.click(open("Xem bản dịch: Bài đọc"));
+    tap(open("Xem bản dịch: Hội thoại"));
+    tap(open("Xem bản dịch: Bài đọc"));
 
     expect(screen.getByText("Tôi là học sinh.")).toBeTruthy();
     expect(screen.queryByText("Xin chào?")).toBeNull();

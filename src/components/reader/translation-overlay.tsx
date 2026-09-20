@@ -58,9 +58,13 @@ export function TranslationOverlay({ regions }: { regions: TranslationRegion[] }
             {/* Dấu hiệu DUY NHẤT cho biết đoạn này có bản dịch. Vùng bấm vẫn
                 trong suốt như cũ để trang giữ nguyên dáng bản in — chỉ một
                 chấm nhỏ ở góc, đủ để người ta biết mà chạm vào. Không có nó
-                thì cả tính năng này tàng hình. */}
+                thì cả tính năng này tàng hình.
+
+                Đặt ở góc PHẢI DƯỚI: người ta đọc hết đoạn rồi mới cần bản
+                dịch, nên chấm nằm ở chỗ mắt vừa dừng lại. Ở góc trên thì nó
+                chen ngay vào lúc mới bắt đầu đọc. */}
             <span
-              className="absolute -top-1.5 -right-1.5 flex size-5 items-center justify-center rounded-full bg-primary/85 text-primary-foreground shadow-sm ring-1 ring-background/70 transition-transform group-hover:scale-110"
+              className="absolute -right-1.5 -bottom-1.5 flex size-5 items-center justify-center rounded-full bg-primary/85 text-primary-foreground shadow-sm ring-1 ring-background/70 transition-transform group-hover:scale-110"
               aria-hidden
             >
               <Languages className="size-3" />

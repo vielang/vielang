@@ -69,14 +69,48 @@ export function pageImageUrl(bookId: string, page: number): string {
   return oneX ? oneX.trim().split(/\s+/)[0] : props.src;
 }
 
-/** Những thứ cần có trên máy để đọc được trang này khi mất mạng. */
-function pageUrls(bookId: string, page: number): string[] {
-  return [
-    pageImageUrl(bookId, page),
-    // Cả tài liệu HTML nữa: không có nó thì mất mạng chỉ mở được đúng những
-    // trang đã xem qua, mà "tải cả cuốn" thì phải mở được mọi trang.
-    `/read/${bookId}/${page}`,
-  ];
+/** Đường dẫn tài liệu HTML của một trang sách. */
+function pageDocUrl(bookId: string, page: number): string {
+  return `/read/${bookId}/${page}`;
+}
+
+/**
+ * Khoá cache tự đặt cho payload RSC của một trang.
+ *
+ * Không dùng thẳng đường dẫn mà Next xin, vì nó kèm tham số `?_rsc=<băm>`
+ * đổi theo trạng thái router — không đoán trước được lúc tải về. Tự đặt một
+ * khoá riêng thì cả hai đầu (bên tải và service worker) cùng tính ra được.
+ *
+ * PHẢI khớp với hàm cùng tên trong `public/sw.js`.
+ */
+export function rscCacheKey(bookId: string, page: number): string {
+  return `${pageDocUrl(bookId, page)}?__offline_rsc=1`;
+}
+
+/**
+ * Tải payload RSC của một trang và cất dưới khoá tự đặt.
+ *
+ * Cần nó vì lật trang trong app là điều hướng phía client: Next xin payload
+ * RSC chứ không tải lại cả tài liệu HTML. Không có payload thì mất mạng bấm
+ * mũi tên lật trang sẽ không ăn, dù gõ thẳng URL vẫn mở được.
+ *
+ * Dựng lại Response sạch thay vì cất nguyên bản: bản gốc mang `Vary` liệt kê
+ * cả `next-router-state-tree`, mà Cache API đem `Vary` ra đối chiếu thì
+ * không bao giờ khớp lại được.
+ */
+async function cacheRsc(cache: Cache, bookId: string, page: number, signal?: AbortSignal) {
+  const response = await fetch(pageDocUrl(bookId, page), {
+    headers: { RSC: "1" },
+    signal,
+  });
+  if (!response.ok) return;
+
+  const headers = new Headers(response.headers);
+  headers.delete("Vary");
+  await cache.put(
+    rscCacheKey(bookId, page),
+    new Response(await response.blob(), { headers })
+  );
 }
 
 /** Các cuốn đang có trên máy. Cache API là nguồn sự thật, không phải store. */
@@ -133,12 +167,15 @@ export async function downloadBook(
       try {
         // `cache.addAll` sẽ vứt cả nhóm nếu một đường hỏng — tự thêm từng
         // cái để giữ được phần đã tải.
-        await Promise.all(
-          pageUrls(book.id, page).map(async (url) => {
-            const response = await fetch(url, { signal });
-            if (response.ok) await cache.put(url, response);
-          })
-        );
+        await Promise.all([
+          ...[pageImageUrl(book.id, page), pageDocUrl(book.id, page)].map(
+            async (url) => {
+              const response = await fetch(url, { signal });
+              if (response.ok) await cache.put(url, response);
+            }
+          ),
+          cacheRsc(cache, book.id, page, signal),
+        ]);
         saved++;
       } catch {
         /* trang này hỏng — đi tiếp, xem chú thích ở trên */

@@ -142,3 +142,72 @@ describe("sách tải chủ động", () => {
     );
   });
 });
+
+describe("payload RSC (lật trang trong app)", () => {
+  const src = () =>
+    readFileSync(path.resolve(process.cwd(), "public", "sw.js"), "utf8");
+
+  function rules() {
+    const stubSelf = { addEventListener: () => {}, location: { origin: "https://x" } };
+    const factory = new Function(
+      "self",
+      "caches",
+      `${src()}\nreturn { isRscRequest, rscCacheKey };`
+    );
+    return factory(stubSelf, {}) as {
+      isRscRequest: (req: { headers: Headers }, url: URL) => boolean;
+      rscCacheKey: (url: URL) => string;
+    };
+  }
+
+  const req = (headers: Record<string, string> = {}) => ({
+    headers: new Headers(headers),
+  });
+
+  it("nhận yêu cầu mang header rsc", () => {
+    expect(rules().isRscRequest(req({ rsc: "1" }), url("/read/step1/11"))).toBe(true);
+  });
+
+  it("nhận cả dạng đã bị 307 sang ?_rsc", () => {
+    // Next trả 307 từ `rsc: 1` sang `?_rsc=<băm>` — tuỳ lúc ta bắt được cái nào.
+    expect(rules().isRscRequest(req(), url("/read/step1/11?_rsc=abc"))).toBe(true);
+  });
+
+  it("không nhận nhầm yêu cầu thường", () => {
+    expect(rules().isRscRequest(req(), url("/read/step1/11"))).toBe(false);
+  });
+
+  it("khoá cache bỏ hết tham số, khớp hai đầu", () => {
+    // Băm `_rsc` đổi theo trạng thái router nên không dùng làm khoá được.
+    const { rscCacheKey } = rules();
+    expect(rscCacheKey(url("/read/step1/11?_rsc=abc"))).toBe(
+      "/read/step1/11?__offline_rsc=1"
+    );
+    expect(rscCacheKey(url("/read/step1/11?_rsc=xyz"))).toBe(
+      rscCacheKey(url("/read/step1/11"))
+    );
+  });
+
+  it("khoá khớp đúng hàm bên tải về", () => {
+    const lib = readFileSync(
+      path.resolve(process.cwd(), "src", "lib", "offline-books.ts"),
+      "utf8"
+    );
+    const suffix = lib.match(/\?__offline_rsc=1/)?.[0];
+
+    expect(suffix).toBe("?__offline_rsc=1");
+    expect(src()).toContain("?__offline_rsc=1");
+  });
+
+  it("đi MẠNG TRƯỚC, cache chỉ là lưới đỡ", () => {
+    // Bản RSC khai `Vary: next-router-state-tree` — nội dung đổi theo chỗ
+    // router đang đứng, nên đem bản cũ ra dùng lúc còn mạng là chuốc lỗi.
+    const body = src();
+    const fn = body.indexOf("async function rscNetworkFirst");
+    const network = body.indexOf("await fetch(request)", fn);
+    const fallback = body.indexOf("matchDownloadedBook", fn);
+
+    expect(network).toBeGreaterThan(fn);
+    expect(network).toBeLessThan(fallback);
+  });
+});

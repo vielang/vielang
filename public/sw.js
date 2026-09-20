@@ -17,6 +17,8 @@
  * - Sách người dùng CHỦ ĐỘNG tải về nằm trong cache riêng `kiip-book-<id>`
  *   (xem `lib/offline-books.ts`) và luôn được tra TRƯỚC. Cache đó không bao
  *   giờ bị dọn tự động: người dùng đã cố ý tải thì chỉ người dùng được xoá.
+ * - Payload RSC (lật trang trong app) đi MẠNG TRƯỚC, chỉ lấy bản cache khi
+ *   mạng hỏng hẳn — xem `rscCacheKey`.
  * - KHÔNG gọi `skipWaiting()`: bản mới chỉ tiếp quản khi mọi tab đã đóng.
  *   Tráo service worker giữa chừng có thể khiến trang đang mở đi xin chunk
  *   của phiên bản khác.
@@ -64,6 +66,42 @@ function isPageImage(url) {
     url.pathname === "/_next/image" ||
     /\.(webp|avif|png|jpe?g)$/i.test(url.pathname)
   );
+}
+
+/**
+ * Next xin payload RSC khi lật trang trong app: header `rsc: 1`, rồi server
+ * 307 sang `?_rsc=<băm>`. Nhận cả hai dạng vì tuỳ lúc ta bắt được cái nào.
+ */
+function isRscRequest(request, url) {
+  return request.headers.get("rsc") !== null || url.searchParams.has("_rsc");
+}
+
+/**
+ * Khoá cache tự đặt cho payload RSC — băm `_rsc` đổi theo trạng thái router
+ * nên không dùng làm khoá được.
+ *
+ * PHẢI khớp `rscCacheKey` trong `lib/offline-books.ts`.
+ */
+function rscCacheKey(url) {
+  return `${url.pathname}?__offline_rsc=1`;
+}
+
+/**
+ * Payload RSC: MẠNG TRƯỚC, cache chỉ là lưới đỡ khi mất mạng.
+ *
+ * Cố ý không cache-trước như ảnh. Bản trả về của RSC khai `Vary` gồm cả
+ * `next-router-state-tree`, tức nội dung đổi theo chỗ router đang đứng —
+ * đem một bản cũ ra dùng khi vẫn còn mạng là chuốc lấy lỗi render khó truy.
+ * Còn khi đã mất mạng thì bản đầy đủ đã tải vẫn hơn là hỏng hẳn.
+ */
+async function rscNetworkFirst(request, url) {
+  try {
+    return await fetch(request);
+  } catch (err) {
+    const hit = await matchDownloadedBook(rscCacheKey(url));
+    if (hit) return hit;
+    throw err;
+  }
 }
 
 /** Chunk/CSS/phông do build sinh ra — tên có băm nội dung nên không đổi ruột. */
@@ -145,6 +183,10 @@ self.addEventListener("fetch", (event) => {
 
   if (request.mode === "navigate") {
     event.respondWith(networkFirst(request));
+    return;
+  }
+  if (isRscRequest(request, url)) {
+    event.respondWith(rscNetworkFirst(request, url));
     return;
   }
   if (isImmutableAsset(url)) {

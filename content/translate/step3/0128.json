@@ -1,0 +1,9 @@
+[
+  {
+    "id": "p128-culture",
+    "rect": [0.11, 0.105, 0.79, 0.27],
+    "label": "Văn hoá và thông tin",
+    "ko": "전자 제품 보증 기간\n전자 제품을 사면 보증서를 받는다. 보증서에는 모델명, 구입 일자, 보증 내용, 보증 기간 등이 있다. 제품 보증 기간이란 제조사나 제품 판매자가 소비자에게 무료 수리를 약속한 기간을 말한다. 이때 보증 기간은 구입 일자를 기준으로 하며, 구입 일자는 제품 보증서나 영수증으로 확인한다.\n보증서가 있다고 해서 보증 기간 내에 언제나 무상으로 수리를 받는 것은 아니다. 보증 기간 내에 정상적인 상태에서 발생한 고장에 대해서는 무상 수리가 가능하지만 사용 설명서의 주의 사항을 지키지 않았거나 고객의 실수로 고장이 난 경우에는 수리 비용을 지불해야 한다.\n보증 기간은 제품에 따라 다른데 보통 스마트폰이나 일반 전자 제품은 1년, 에어컨 등 계절 제품은 2년이다.",
+    "vi": "Thời hạn bảo hành đồ điện tử\nKhi mua đồ điện tử, bạn sẽ nhận được phiếu bảo hành. Trên phiếu có tên model, ngày mua, nội dung bảo hành, thời hạn bảo hành... Thời hạn bảo hành sản phẩm là khoảng thời gian mà nhà sản xuất hoặc người bán cam kết sửa chữa miễn phí cho người tiêu dùng. Thời hạn này tính từ ngày mua, và ngày mua được xác nhận bằng phiếu bảo hành hoặc hoá đơn.\nCó phiếu bảo hành không có nghĩa là lúc nào trong thời hạn bảo hành cũng được sửa miễn phí. Với những hỏng hóc phát sinh trong điều kiện sử dụng bình thường và còn trong thời hạn bảo hành thì được sửa miễn phí, nhưng nếu hỏng do không tuân thủ các lưu ý trong hướng dẫn sử dụng hoặc do lỗi của khách hàng thì phải trả chi phí sửa chữa.\nThời hạn bảo hành khác nhau tuỳ sản phẩm: thông thường điện thoại thông minh hay đồ điện tử phổ thông là 1 năm, còn các sản phẩm theo mùa như máy điều hoà là 2 năm."
+  }
+]

@@ -1,0 +1,16 @@
+[
+  {
+    "id": "p43-posters",
+    "rect": [0.125, 0.16, 0.71, 0.355],
+    "label": "Áp phích dịch vụ phúc lợi",
+    "ko": "겨울철 독감 예방 접종 — 어린이, 임산부, 어르신 무료로 받으세요!\n\n무료 상담 — 외국인 주민들을 위한: 임금 체불, 퇴직금, 산업 재해, 출입국, 근무 조건, 의료 상담 / 통번역 상담 가능 / 온라인 및 전화 신청\n\n외국인 취업 교육 프로그램 — 기간: 7월 2일~7월 19일 / 참가 자격: OO시 거주 외국인 30명, TOPIK 3급 또는 KIIP 3단계 이상 / 프로그램 내용: 비즈니스 한국어, 취업 교육(이력서 작성법, 면접), 선배와의 대화 / 신청 방법: 이메일 접수",
+    "vi": "Tiêm phòng cúm mùa đông — Trẻ em, phụ nữ mang thai, người cao tuổi hãy tiêm miễn phí!\n\nTư vấn miễn phí — dành cho cư dân người nước ngoài: nợ lương, trợ cấp thôi việc, tai nạn lao động, xuất nhập cảnh, điều kiện làm việc, tư vấn y tế / Có hỗ trợ phiên dịch – biên dịch / Đăng ký trực tuyến và qua điện thoại\n\nChương trình đào tạo việc làm cho người nước ngoài — Thời gian: 2/7–19/7 / Điều kiện tham gia: 30 người nước ngoài cư trú tại thành phố OO, TOPIK cấp 3 hoặc KIIP bậc 3 trở lên / Nội dung: tiếng Hàn thương mại, đào tạo việc làm (cách viết sơ yếu lý lịch, phỏng vấn), trò chuyện với người đi trước / Cách đăng ký: nhận hồ sơ qua email"
+  },
+  {
+    "id": "p43-headlines",
+    "rect": [0.13, 0.645, 0.71, 0.215],
+    "label": "Tiêu đề báo",
+    "ko": "찾아가는 방문 상담으로 ‘완전한 정착’ 돕는다\n결혼 이민자 및 외국인을 위한 ‘생활 통역 서비스’ 시작\n복지시 복지 재단, 항공료, 숙박비 등 다문화 가정 친정 방문 지원\n창업을 준비하는 외국인 근로자를 위한 창업 상담 서비스 시작",
+    "vi": "Tư vấn tận nhà giúp người dân “an cư trọn vẹn”\nKhởi động “Dịch vụ phiên dịch đời sống” cho người kết hôn nhập cư và người nước ngoài\nQuỹ phúc lợi thành phố Bokji hỗ trợ tiền vé máy bay, tiền ở... cho gia đình đa văn hoá về thăm quê vợ/chồng\nKhởi động dịch vụ tư vấn khởi nghiệp dành cho người lao động nước ngoài đang chuẩn bị lập nghiệp"
+  }
+]

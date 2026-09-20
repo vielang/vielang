@@ -1,0 +1,16 @@
+[
+  {
+    "id": "p159-dialog",
+    "rect": [0.14, 0.165, 0.5, 0.31],
+    "label": "Hội thoại",
+    "ko": "과장님: 안젤라 씨, 명절 잘 보냈어요?\n안젤라: 네. 잘 보냈어요. 과장님도 연휴 동안 잘 지내셨어요?\n과장님: 고향 부모님 댁에 다녀왔어요. 아무리 바빠도 명절에는 부모님을 뵈러 가니까요. 그런데 안젤라 씨, 설날에 떡국 먹었어요?\n안젤라: 아니요. 설날에 떡국을 먹어야 해요?\n과장님: 그럼요. 안젤라 씨, 한국에서는 해가 바뀔 때 나이가 한 살 많아지잖아요. 그런데 한국 사람들은 설날에 떡국을 먹어야 나이가 한 살 더 많아진다고 생각하거든요.\n안젤라: 그래요? 그래서 생일이 안 지났는데 한국 나이로는 한 살이 더 많은 거군요. 과장님 덕분에 한국 문화를 잘 알게 됐어요.",
+    "vi": "Trưởng phòng: Cô Angela, kỳ lễ vừa rồi cô nghỉ vui chứ?\nAngela: Vâng, em nghỉ vui ạ. Trưởng phòng trong kỳ nghỉ cũng ổn chứ ạ?\nTrưởng phòng: Tôi về nhà bố mẹ ở quê. Vì dù bận đến mấy thì dịp lễ tết cũng phải về thăm bố mẹ mà. À mà cô Angela, Tết cô có ăn canh bánh gạo không?\nAngela: Không ạ. Tết phải ăn canh bánh gạo ạ?\nTrưởng phòng: Đương nhiên rồi. Cô Angela này, ở Hàn Quốc cứ sang năm mới là thêm một tuổi mà. Mà người Hàn thì cho rằng phải ăn canh bánh gạo ngày Tết thì mới thêm được một tuổi.\nAngela: Vậy ạ? Thì ra vì vậy mà chưa qua sinh nhật nhưng tính theo tuổi Hàn thì em lại nhiều hơn một tuổi. Nhờ trưởng phòng mà em hiểu rõ văn hoá Hàn Quốc hơn."
+  },
+  {
+    "id": "p159-table",
+    "rect": [0.14, 0.745, 0.745, 0.11],
+    "label": "Món ăn ngày lễ và ý nghĩa",
+    "ko": "명절 | 먹는 것 | 의미\n동지 | 팥죽 | 팥죽의 붉은색이 나쁜 기운을 쫓는다.\n정월 대보름 | 부럼 | 부럼을 먹으면 일 년 동안 피부병에 걸리지 않는다.",
+    "vi": "Ngày lễ | Món ăn | Ý nghĩa\nĐông chí | Cháo đậu đỏ | Màu đỏ của cháo đậu đỏ xua đuổi tà khí.\nRằm tháng Giêng | Các loại hạt cứng (bureom) | Ăn hạt cứng thì suốt một năm không bị bệnh ngoài da."
+  }
+]

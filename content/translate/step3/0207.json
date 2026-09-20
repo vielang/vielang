@@ -1,0 +1,9 @@
+[
+  {
+    "id": "p207-dialog",
+    "rect": [0.14, 0.165, 0.47, 0.27],
+    "label": "Hội thoại",
+    "ko": "아나이스: 일기 예보 봤어요? 내일 미세 먼지가 심하대요. 기온도 많이 떨어지고요.\n라민: 아, 체육 대회 하기로 한 날에 날씨가 이래서 걱정이에요.\n아나이스: 그러게요. 사람들이 날씨 때문에 힘들어할 텐데 괜찮을까요?\n라민: 아니요. 내일 같은 날에 야외 행사는 무리예요. 체육 대회를 다른 날로 연기하는 게 어때요?\n아나이스: 그게 낫겠죠? 제가 빨리 사람들에게 연락할게요.",
+    "vi": "Anaïs: Anh xem dự báo thời tiết chưa? Nghe nói mai bụi mịn nặng lắm. Nhiệt độ cũng giảm mạnh.\nRamin: Ôi, đúng hôm định tổ chức đại hội thể thao mà thời tiết thế này nên tôi lo quá.\nAnaïs: Đúng vậy. Mọi người sẽ vất vả vì thời tiết, liệu có ổn không nhỉ?\nRamin: Không đâu. Ngày như mai mà tổ chức sự kiện ngoài trời thì quá sức. Hay là hoãn đại hội thể thao sang ngày khác?\nAnaïs: Vậy thì hơn nhỉ? Tôi sẽ mau chóng liên lạc với mọi người."
+  }
+]

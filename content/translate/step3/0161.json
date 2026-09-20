@@ -1,0 +1,16 @@
+[
+  {
+    "id": "p161-greetings",
+    "rect": [0.135, 0.155, 0.75, 0.315],
+    "label": "Lời chúc ngày lễ",
+    "ko": "새해 복 많이 받으십시오. 새해에도 건강하고 평안하시기 바랍니다.\n\n근하신년! 새해에는 뜻한 것 이루시고 가정에 행복이 가득하시길 빕니다.\n\n가족, 친지들과 함께 보름달처럼 넉넉하고 풍성한 한가위 보내십시오.\n\n추석이 다가왔습니다. 감사와 행복이 넘치는 추석 연휴 보내시길 바랍니다.",
+    "vi": "Chúc năm mới nhận được nhiều phúc lộc. Chúc năm mới anh/chị luôn khoẻ mạnh và bình an.\n\nCung chúc tân xuân! Chúc năm mới anh/chị đạt được điều mình mong muốn và gia đình tràn đầy hạnh phúc.\n\nChúc anh/chị đón Tết Trung thu đủ đầy, sung túc như vầng trăng rằm bên gia đình và người thân.\n\nTrung thu đã đến gần. Chúc anh/chị có kỳ nghỉ Trung thu tràn ngập lòng biết ơn và hạnh phúc."
+  },
+  {
+    "id": "p161-newyear-scene",
+    "rect": [0.13, 0.63, 0.76, 0.275],
+    "label": "Khung cảnh ngày Tết",
+    "ko": "올해에도 건강하게 지내고 공부 열심히 해라!\n새해 복 많이 받으세요!\n설빔을 입다 / 덕담을 하다 / 세배하다 / 세뱃돈을 받다",
+    "vi": "Năm nay cháu cũng phải giữ gìn sức khoẻ và học hành chăm chỉ nhé!\nChúc ông bà năm mới nhận nhiều phúc lộc ạ!\nmặc đồ mới ngày Tết / nói lời chúc tốt lành / lạy chúc Tết / nhận tiền mừng tuổi"
+  }
+]

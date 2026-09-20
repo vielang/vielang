@@ -5,10 +5,16 @@
  * bản dịch đã dịch sẵn. Người dùng bấm vào vùng nào thì hiện bản dịch của
  * vùng đó — KHÔNG có OCR hay dịch máy lúc chạy, mọi thứ tĩnh.
  *
- * PHẠM VI: CHỈ đặt vùng cho BÀI ĐỌC (읽기) và HỘI THOẠI (말하기). Câu đề bài,
- * câu hỏi, dòng thay từ, gợi ý... đều là câu ngắn lặp đi lặp lại, người học
- * quen rất nhanh — dịch hết thì trang nào cũng chi chít vùng bấm mà chẳng
- * giúp được gì thêm.
+ * PHẠM VI: CHỈ đặt vùng cho phần VĂN BẢN của bài — bài đọc (읽기), hội thoại
+ * (말하기), và từ Trung cấp trở đi thêm 문화와 정보 (trang này ở Sơ cấp chỉ là
+ * ảnh với vài dòng chú thích, nhưng lên Trung cấp thành một bài văn xuôi viết
+ * bằng 한다체, thuộc loại khó nhất cả bài). Kèm theo là mấy trang in nguyên
+ * văn bản đời thật — đơn từ, thông báo tuyển dụng, quy định đổi trả, áp
+ * phích — vì đó đúng là thứ người học phải đọc được ngoài đời.
+ *
+ * Câu đề bài, câu hỏi, dòng thay từ, gợi ý, bảng từ vựng có hình minh hoạ...
+ * thì KHÔNG: đều là câu ngắn lặp đi lặp lại, người học quen rất nhanh — dịch
+ * hết thì trang nào cũng chi chít vùng bấm mà chẳng giúp được gì thêm.
  *
  * Toạ độ lưu theo TỈ LỆ 0–1 của ảnh gốc (1200x1562), không phải pixel: ảnh
  * hiển thị co giãn theo màn hình và theo mức zoom, chỉ tỉ lệ mới bất biến.

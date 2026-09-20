@@ -1,0 +1,16 @@
+[
+  {
+    "id": "p173-board",
+    "rect": [0.1, 0.15, 0.8, 0.305],
+    "label": "Bảng tin tuyển dụng",
+    "ko": "우리 회사 최고의 주인공을 찾습니다!\n20XX 상반기 ㈜○○전자 모집 공고 — 모집 분야: 사무직 / 모집 인원: ○○명\n20XX 상반기 ㈜○○자동차 모집 공고 — 모집 분야: 생산직 / 모집 인원: ○○명\n20XX 상반기 ㈜○○상사 모집 공고 — 모집 분야: 영업직 / 모집 인원: ○○명\n직종: 사무직, 생산직, 관리직, 영업직, 판매직, 일용직\n급여: 연봉, 월급, 주급, 일당, 시급, 수당(보너스)",
+    "vi": "Chúng tôi đang tìm nhân vật chính xuất sắc nhất cho công ty!\nThông báo tuyển dụng nửa đầu năm 20XX của Công ty Điện tử ○○ — Vị trí: nhân viên văn phòng / Số lượng: ○○ người\nThông báo tuyển dụng nửa đầu năm 20XX của Công ty Ô tô ○○ — Vị trí: công nhân sản xuất / Số lượng: ○○ người\nThông báo tuyển dụng nửa đầu năm 20XX của Công ty Thương mại ○○ — Vị trí: nhân viên kinh doanh / Số lượng: ○○ người\nNgành nghề: văn phòng, sản xuất, quản lý, kinh doanh, bán hàng, lao động thời vụ\nLương: lương năm, lương tháng, lương tuần, lương ngày, lương giờ, phụ cấp (tiền thưởng)"
+  },
+  {
+    "id": "p173-survey",
+    "rect": [0.125, 0.605, 0.8, 0.265],
+    "label": "Kết quả khảo sát",
+    "ko": "Q. 가장 버티기 힘들다고 느끼는 부분은?\n1위 대인 관계에서 스트레스를 받는 것\n2위 야근을 하거나 주말에 출근하는 것\n3위 일에서 좋은 성과를 얻어야 하는 것\n4위 피로가 쌓이는 것\n5위 월급과 연봉이 오르지 않는 것\n\nQ. 직장 생활 지치지 않기 위한 나만의 노하우?\n1위 아무것도 하지 않고 집에서 휴식하기\n2위 취미 생활하기\n3위 쇼핑하면서 돈 쓰기\n4위 퇴근 시간에 정확하게 퇴근하기\n5위 혼밥, 혼술, 혼영 등 자기 시간 갖기\n6위 동호회에서 사람들과 어울리기",
+    "vi": "Q. Điều bạn thấy khó chịu đựng nhất là gì?\nHạng 1: Bị căng thẳng vì quan hệ với người khác\nHạng 2: Phải làm thêm giờ hoặc đi làm cuối tuần\nHạng 3: Phải đạt thành tích tốt trong công việc\nHạng 4: Mệt mỏi tích tụ\nHạng 5: Lương tháng và lương năm không tăng\n\nQ. Bí quyết riêng để không kiệt sức nơi công sở?\nHạng 1: Không làm gì cả, nghỉ ngơi ở nhà\nHạng 2: Sinh hoạt theo sở thích\nHạng 3: Đi mua sắm, tiêu tiền\nHạng 4: Tan làm đúng giờ\nHạng 5: Dành thời gian cho riêng mình như ăn một mình, uống một mình, xem phim một mình\nHạng 6: Giao lưu với mọi người ở câu lạc bộ"
+  }
+]

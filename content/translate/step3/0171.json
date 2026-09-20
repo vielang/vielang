@@ -1,0 +1,9 @@
+[
+  {
+    "id": "p171-dialog",
+    "rect": [0.14, 0.165, 0.47, 0.29],
+    "label": "Hội thoại",
+    "ko": "드미트리: 안젤라 씨, 무슨 안 좋은 일 있었어요?\n안젤라: 얼마 전에 부장님이 저한테 중요한 계약서를 번역하게 하셨거든요. 그런데 어려운 말이 많아서 제대로 하지 못했어요.\n드미트리: 그럼 미리 선배나 동료들한테 물어보지 그랬어요?\n안젤라: 사람들은 제가 잘 적응해 가는 줄 아는데 물어보기가 창피하더라고요. 이럴 때는 어떻게 하는 게 좋을까요?\n드미트리: 그럴 때는 내가 한 게 맞는지 주변 사람들에게 계속 물어보는 게 제일 좋아요.",
+    "vi": "Dmitri: Chị Angela, có chuyện gì không vui à?\nAngela: Cách đây không lâu trưởng phòng bảo tôi dịch một bản hợp đồng quan trọng. Nhưng có nhiều từ khó quá nên tôi làm không ra hồn.\nDmitri: Vậy sao chị không hỏi trước các anh chị đi trước hay đồng nghiệp?\nAngela: Mọi người tưởng tôi đang thích nghi tốt nên tôi thấy ngại hỏi. Những lúc thế này nên làm thế nào ạ?\nDmitri: Những lúc như vậy thì tốt nhất là cứ liên tục hỏi mọi người xung quanh xem mình làm thế có đúng không."
+  }
+]

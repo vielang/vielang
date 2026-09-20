@@ -1,0 +1,16 @@
+[
+  {
+    "id": "p209-health365",
+    "rect": [0.15, 0.145, 0.7, 0.34],
+    "label": "Sức khoẻ 365",
+    "ko": "건강 365\n• 춘곤증, 봄에 온몸이 나른하면?\n• 밤이 되어도 25도를 넘는 열대야로 잠들기 어려우면?\n• 우울한 기분이 드는 등 가을을 탈 때?\n• 고열과 근육통이 심해 독감이 의심되면?",
+    "vi": "Sức khoẻ 365\n• Chứng uể oải mùa xuân — khi cả người rã rời vào mùa xuân?\n• Khi khó ngủ vì đêm nhiệt đới, đêm xuống rồi mà vẫn trên 25 độ?\n• Khi “nhiễm mùa thu”, thấy tâm trạng buồn bã?\n• Khi sốt cao và đau cơ dữ dội, nghi ngờ bị cúm?"
+  },
+  {
+    "id": "p209-symptoms",
+    "rect": [0.13, 0.555, 0.78, 0.36],
+    "label": "Triệu chứng uể oải mùa xuân",
+    "ko": "왜 이렇게 피곤하지? 오늘따라 힘도 없네.\n아… 졸려.\n몸이 나른하다 / 피로를 느끼다 / 기운이 없다 / 졸음이 오다 / 집중력이 떨어지다",
+    "vi": "Sao mình mệt thế nhỉ? Hôm nay chẳng có sức gì cả.\nA… buồn ngủ quá.\ncơ thể rã rời / thấy mệt mỏi / không còn sức lực / buồn ngủ / giảm khả năng tập trung"
+  }
+]

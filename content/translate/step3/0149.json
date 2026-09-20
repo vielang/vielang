@@ -1,0 +1,16 @@
+[
+  {
+    "id": "p149-checklist",
+    "rect": [0.17, 0.155, 0.56, 0.38],
+    "label": "Những điều cần kiểm tra khi xem nhà",
+    "ko": "집 볼 때 확인 사항\n• 햇빛이 잘 들어온다.\n• 층간 소음이 없다.\n• 집 안에서 냄새가 안 난다.\n• 물, 전기, 난방이 잘 나온다.\n• 주변 환경(공원, CCTV)이 안전하고 깨끗하다.\n• 대중교통(버스, 지하철)을 이용하기 편리하다.\n• 집 근처에 편의 시설(시장, 마트, 은행, 병원)이 있다.\n• 집 안의 시설(문, 창문, 싱크대, 세면대, 변기 등)에 고장 난 곳이 없다.",
+    "vi": "Những điều cần kiểm tra khi xem nhà\n• Nắng chiếu vào tốt.\n• Không có tiếng ồn từ tầng trên/tầng dưới.\n• Trong nhà không có mùi.\n• Nước, điện, sưởi chạy tốt.\n• Môi trường xung quanh (công viên, camera an ninh) an toàn và sạch sẽ.\n• Đi lại bằng phương tiện công cộng (xe buýt, tàu điện ngầm) thuận tiện.\n• Gần nhà có các tiện ích (chợ, siêu thị, ngân hàng, bệnh viện).\n• Các thiết bị trong nhà (cửa, cửa sổ, bồn rửa, lavabo, bồn cầu...) không có chỗ nào hỏng."
+  },
+  {
+    "id": "p149-vocab",
+    "rect": [0.245, 0.655, 0.59, 0.065],
+    "label": "Từ khoá về thuê nhà",
+    "ko": "도보 / 등기부 등본 / 부동산 중개소 / 신축 / 역세권 / 잔금 / 전입 신고 / 특약 사항 / 풀 옵션",
+    "vi": "đi bộ / bản sao sổ đăng ký bất động sản / văn phòng môi giới nhà đất / nhà mới xây / khu gần ga tàu điện / tiền còn lại (trả nốt) / khai báo chuyển đến / điều khoản đặc biệt trong hợp đồng / đầy đủ nội thất"
+  }
+]

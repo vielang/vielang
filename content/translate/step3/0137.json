@@ -1,0 +1,16 @@
+[
+  {
+    "id": "p137-job-ad",
+    "rect": [0.14, 0.15, 0.775, 0.475],
+    "label": "Thông báo tuyển dụng",
+    "ko": "신입/경력 사원 모집\n① : 화장품 판매직\n② : 00명\n③ : 고졸\n④ : 이력서\n⑤ : 서울화장품(02-723-1111)\n⑥ : 온라인 접수\n\n모집 분야: 판매직 / 영업직 / 생산직 / 기술직 / 연구직\n모집 인원: 0명 / 약간 명\n지원 자격: 고졸 / 대졸 / 경력 2년 이상\n제출 서류: 이력서 / 자격증 사본 / 운전면허증 사본\n문의: 전화 / 이메일\n지원 방법: 방문 접수 / 온라인 접수",
+    "vi": "Tuyển nhân viên mới / có kinh nghiệm\n① : Nhân viên bán mỹ phẩm\n② : 00 người\n③ : Tốt nghiệp THPT\n④ : Sơ yếu lý lịch\n⑤ : Mỹ phẩm Seoul (02-723-1111)\n⑥ : Nộp hồ sơ trực tuyến\n\nVị trí tuyển: bán hàng / kinh doanh / sản xuất / kỹ thuật / nghiên cứu\nSố lượng tuyển: 0 người / một vài người\nĐiều kiện ứng tuyển: tốt nghiệp THPT / tốt nghiệp đại học / kinh nghiệm từ 2 năm trở lên\nHồ sơ nộp: sơ yếu lý lịch / bản sao chứng chỉ / bản sao bằng lái xe\nLiên hệ: điện thoại / email\nCách ứng tuyển: nộp trực tiếp / nộp trực tuyến"
+  },
+  {
+    "id": "p137-documents",
+    "rect": [0.155, 0.755, 0.745, 0.15],
+    "label": "Giấy tờ cần nộp",
+    "ko": "〈서류〉 지원서, 이력서, 자기소개서\n〈각종 증명서〉 성적 증명서, 졸업 증명서, 경력 증명서, 가족 관계 증명서\n〈신분증 사본〉 여권 사본, 외국인 등록증 사본\n〈자격증〉 컴퓨터 자격증, 운전면허증",
+    "vi": "〈Giấy tờ〉 đơn ứng tuyển, sơ yếu lý lịch, bản tự giới thiệu\n〈Các loại giấy chứng nhận〉 bảng điểm, giấy chứng nhận tốt nghiệp, giấy xác nhận kinh nghiệm làm việc, giấy chứng nhận quan hệ gia đình\n〈Bản sao giấy tờ tuỳ thân〉 bản sao hộ chiếu, bản sao thẻ đăng ký người nước ngoài\n〈Chứng chỉ〉 chứng chỉ tin học, bằng lái xe"
+  }
+]

@@ -1,0 +1,16 @@
+[
+  {
+    "id": "p67-questions",
+    "rect": [0.13, 0.235, 0.78, 0.13],
+    "label": "Nỗi băn khoăn về chi phí",
+    "ko": "Q1 가족 여행을 가고 싶은데 비용이 많이 들 것 같아서 고민이에요.\nQ2 집을 수리해야 하는 데 전셋집이라서 비용이 부담돼요.\nQ3 외국어를 배우고 싶은데 비용이 조금 부담스러워요. 어떻게 하면 비용을 줄일 수 있을까요?",
+    "vi": "Q1 Tôi muốn đi du lịch cùng gia đình nhưng lo vì hình như tốn nhiều chi phí.\nQ2 Tôi cần sửa nhà nhưng vì là nhà thuê theo kiểu jeonse nên thấy nặng gánh chi phí.\nQ3 Tôi muốn học ngoại ngữ nhưng chi phí hơi nặng. Làm thế nào để giảm được chi phí đây?"
+  },
+  {
+    "id": "p67-checklist",
+    "rect": [0.25, 0.585, 0.56, 0.35],
+    "label": "Cách mua đồ tốt với giá rẻ",
+    "ko": "좋은 물건 싸게 사는 법 (CHECK LIST)\n- 인터넷에서 가격 비교를 한다.\n- 공동 구매를 이용한다.\n- 새 상품이 아닌 중고 용품을 이용한다.\n- 집 주변의 벼룩시장에서 자신에게 필요한 물건을 고른다.\n- 주변 사람에게 필요한 물건을 물려받는다.\n- 정반대 계절의 이월 상품을 이용한다.\n- 가구나 가전제품은 전시 상품이나 흠집(스크래치)이 난 상품을 구입한다.\n- 마트나 편의점에서 2+1 행사 상품을 산다.",
+    "vi": "Cách mua đồ tốt với giá rẻ (DANH SÁCH KIỂM TRA)\n- So sánh giá trên mạng.\n- Tận dụng hình thức mua chung.\n- Dùng đồ cũ thay vì hàng mới.\n- Chọn món mình cần ở chợ đồ cũ gần nhà.\n- Xin lại đồ mình cần từ người quen.\n- Mua hàng tồn của mùa ngược lại.\n- Với đồ nội thất hay đồ điện gia dụng thì mua hàng trưng bày hoặc hàng bị xước.\n- Mua hàng khuyến mãi 2+1 ở siêu thị hoặc cửa hàng tiện lợi."
+  }
+]

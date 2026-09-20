@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Noto_Sans_KR } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { ServiceWorker } from "@/components/service-worker";
 import "./globals.css";
 
 const inter = Inter({
@@ -25,6 +26,9 @@ export const metadata: Metadata = {
   },
   description:
     "Đọc sách văn hóa – xã hội Hàn Quốc (chương trình KIIP) dành cho người Việt học tiếng Hàn.",
+  // Apple bỏ qua manifest, chỉ đọc thẻ link này khi thêm vào màn hình chính.
+  appleWebApp: { capable: true, title: "KIIP Reader", statusBarStyle: "black-translucent" },
+  icons: { apple: "/icons/apple-touch-icon.png" },
 };
 
 export const viewport: Viewport = {
@@ -53,6 +57,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           disableTransitionOnChange
         >
           <TooltipProvider delayDuration={200}>{children}</TooltipProvider>
+          <ServiceWorker />
         </ThemeProvider>
       </body>
     </html>

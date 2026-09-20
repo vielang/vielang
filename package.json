@@ -14,7 +14,8 @@
     "prepare-audio": "tsx scripts/prepare-audio.ts",
     "build-content": "tsx scripts/build-content.ts",
     "copy-excalidraw-fonts": "tsx scripts/copy-excalidraw-fonts.ts",
-    "crawl-orgs": "tsx scripts/crawl-kiip-orgs.ts"
+    "crawl-orgs": "tsx scripts/crawl-kiip-orgs.ts",
+    "make-icons": "tsx scripts/make-icons.ts"
   },
   "dependencies": {
     "@excalidraw/excalidraw": "^0.18.1",

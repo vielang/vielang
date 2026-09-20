@@ -7,6 +7,7 @@ import {
   BookOpen,
   ChevronLeft,
   ChevronRight,
+  CircleQuestionMark,
   Columns2,
   Mic,
   NotebookText,
@@ -53,6 +54,7 @@ export function ReaderControls({
   onJump,
   onToggleBookmark,
   onResetZoom,
+  onOpenHelp,
   showLayoutToggle,
   pageLayout,
   onTogglePageLayout,
@@ -89,6 +91,7 @@ export function ReaderControls({
   onJump: (page: number) => void;
   onToggleBookmark: () => void;
   onResetZoom: () => void;
+  onOpenHelp: () => void;
   /** Chỉ hiện nút đổi 1/2 trang khi màn hình đủ rộng — màn hẹp thì 2 trang không đọc được. */
   showLayoutToggle: boolean;
   pageLayout: "single" | "double";
@@ -299,6 +302,24 @@ export function ReaderControls({
         >
           <RotateCcw className="size-4" aria-hidden />
         </Button>
+
+        {/* Nút hướng dẫn nằm ở thanh DƯỚI chứ không phải thanh trên: thanh
+            trên đã 6 nút, trên màn điện thoại là kín chỗ, còn dưới này chỉ
+            có 4 nút và rất rộng. */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-white hover:bg-white/10 hover:text-white"
+              onClick={onOpenHelp}
+              aria-label="Cách dùng trang đọc"
+            >
+              <CircleQuestionMark className="size-4" aria-hidden />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Cách dùng trang đọc</TooltipContent>
+        </Tooltip>
       </div>
 
       <Dialog open={jumpOpen} onOpenChange={onJumpOpenChange}>

@@ -155,15 +155,20 @@ export function PageGrid({
                   type="button"
                   aria-label={isBookmarked ? "Bỏ đánh dấu trang" : "Đánh dấu trang"}
                   onClick={() => toggleBookmark(bookId, page)}
+                  // Luôn hiện, chỉ mờ đi khi chưa đánh dấu. Trước đây nút
+                  // này `opacity-0` và chỉ hiện khi rê chuột — trên điện
+                  // thoại không có rê chuột nên nó VÔ HÌNH MÀ VẪN BẤM ĐƯỢC:
+                  // chạm hụt vào góc phải trên một trang là đánh dấu nhầm mà
+                  // không hiểu vì sao.
                   className={cn(
-                    "absolute top-1 right-1 rounded-full bg-background/90 p-1 shadow transition-colors",
+                    "absolute top-1 right-1 rounded-full bg-background/90 p-1.5 shadow transition-opacity",
                     isBookmarked
-                      ? "text-primary"
-                      : "text-muted-foreground opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
+                      ? "text-primary opacity-100"
+                      : "text-muted-foreground opacity-60 hover:opacity-100 focus-visible:opacity-100"
                   )}
                 >
                   <Bookmark
-                    className="size-3.5"
+                    className="size-4"
                     fill={isBookmarked ? "currentColor" : "none"}
                     aria-hidden
                   />

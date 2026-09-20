@@ -22,6 +22,7 @@ import { NoteWidget } from "@/components/reader/note-widget";
 import { NoteSheet } from "@/components/reader/note-sheet";
 import { AnnotationToolbar } from "@/components/reader/annotation-toolbar";
 import { RecorderWidget } from "@/components/reader/recorder-widget";
+import { ReaderHelp } from "@/components/reader/reader-help";
 import { useNoteWidgetStore } from "@/lib/note-widget-store";
 import {
   useAnnotationHydration,
@@ -107,6 +108,7 @@ export function ReaderView({
 
   const [toolbarVisible, setToolbarVisible] = useState(true);
   const [jumpOpen, setJumpOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
 
   const noteMode = useNoteWidgetStore((s) => s.mode);
   const setNoteMode = useNoteWidgetStore((s) => s.setMode);
@@ -221,7 +223,7 @@ export function ReaderView({
       // Input/Esc riêng của Radix) — nhường toàn bộ phím tắt, tránh vừa đóng
       // vừa chuyển trang. Panel nổi thì KHÔNG chặn: mở bài giảng rồi vẫn lật
       // trang bằng phím mũi tên được, đó mới là điểm lợi của nó.
-      if (jumpOpen || noteMode === "fullscreen") return;
+      if (jumpOpen || helpOpen || noteMode === "fullscreen") return;
       const target = e.target as HTMLElement | null;
       if (target && (INTERACTIVE_TAGS.has(target.tagName) || target.isContentEditable))
         return;
@@ -264,6 +266,9 @@ export function ReaderView({
         case "D":
           toggleDraw();
           break;
+        case "?":
+          setHelpOpen(true);
+          break;
         default:
           return;
       }
@@ -282,6 +287,7 @@ export function ReaderView({
     currentChapter,
     toggleBookmark,
     jumpOpen,
+    helpOpen,
     noteMode,
     toggleNote,
     drawActive,
@@ -312,6 +318,9 @@ export function ReaderView({
           chứ không thuộc về cả spread. */}
       <RecorderWidget bookId={book.id} page={page} />
 
+      {/* Tự hiện một lần ở lần mở sách đầu tiên — xem ReaderHelp. */}
+      <ReaderHelp open={helpOpen} onOpenChange={setHelpOpen} />
+
       <ReaderControls
         visible={toolbarVisible}
         book={book}
@@ -336,6 +345,7 @@ export function ReaderView({
         onJump={goTo}
         onToggleBookmark={() => toggleBookmark(book.id, page)}
         onResetZoom={() => viewerRef.current?.resetZoom()}
+        onOpenHelp={() => setHelpOpen(true)}
         showLayoutToggle={isWideScreen}
         pageLayout={pageLayout}
         onTogglePageLayout={togglePageLayout}

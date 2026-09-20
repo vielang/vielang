@@ -301,7 +301,10 @@ export function RecorderWidget({ bookId, page }: { bookId: string; page: number 
                   defaultValue={rec.label}
                   placeholder={recordingLabel(rec, i)}
                   aria-label="Tên bản ghi"
-                  className="h-8 flex-1 border-white/20 bg-white/10 text-sm text-white placeholder:text-white/40"
+                  // `select-text touch-auto`: cả bảng đặt `select-none` và
+                  // `touch-none` để kéo thả, nhưng ô nhập thì phải bôi chọn
+                  // và đặt con trỏ được, không thì sửa tên bản ghi rất khó.
+                  className="h-8 flex-1 touch-auto border-white/20 bg-white/10 text-sm text-white select-text placeholder:text-white/40"
                   onBlur={(e) => {
                     renameRecording(bookId, page, rec.id, e.target.value);
                     setEditingId(null);

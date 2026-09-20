@@ -10,9 +10,14 @@ import { AUDIO_WIDGET_SIZE, audioAnchor } from "@/lib/widget-dock";
 // Đường kính nút tròn lúc thu nhỏ. Các widget nổi khác neo theo số này nên
 // nó nằm ở bến đỗ chung — xem widget-dock.
 const SIZE = AUDIO_WIDGET_SIZE;
-const PANEL_WIDTH = 256;
-/** Chiều cao panel: thanh kéo + thẻ audio. */
-const PANEL_BASE_HEIGHT = 74;
+/**
+ * Bề ngang panel. Thẻ <audio> của trình duyệt nhồi play, thanh trượt, đồng
+ * hồ, âm lượng và nút ba chấm vào cùng một hàng — hẹp quá thì mấy vùng chạm
+ * đó chen nhau, chạm vào play lại trúng ba chấm.
+ */
+const PANEL_WIDTH = 300;
+/** Chiều cao panel: thanh kéo + thẻ audio ở chiều cao tự nhiên của nó. */
+const PANEL_BASE_HEIGHT = 100;
 /** Hàng chọn track (hoặc hàng chọn trang) cao bằng nhau, chỉ xuất hiện khi cần. */
 const TRACK_ROW_HEIGHT = 28;
 
@@ -186,10 +191,11 @@ export function AudioWidget({
   // z-[55]: trên tooltip (z-50) để panel canh giữa không bị tooltip che, nhưng
   // dưới panel bài giảng (z-[60]) khi cả hai cùng mở.
   return (
-    <div
-      className="fixed z-[55] touch-none select-none"
-      style={{ left: pos.x, top: pos.y, width }}
-    >
+    // KHÔNG đặt `touch-none` ở đây. Trình duyệt tính `touch-action` bằng
+    // cách đi ngược lên cây cha, nên để ở ngoài này là chặn luôn cử chỉ chạm
+    // của thẻ <audio> bên trong — chạm nút play lại bật ra menu ba chấm.
+    // Chỉ vùng thật sự kéo được mới cần, xem hai chỗ dưới.
+    <div className="fixed z-[55]" style={{ left: pos.x, top: pos.y, width }}>
       {collapsed ? (
         <button
           type="button"
@@ -198,7 +204,7 @@ export function AudioWidget({
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerUp}
           aria-label="Mở audio trang này"
-          className="flex size-12 items-center justify-center rounded-full bg-black/70 text-white shadow-lg backdrop-blur transition-transform active:scale-95"
+          className="flex size-12 touch-none items-center justify-center rounded-full bg-black/70 text-white shadow-lg backdrop-blur transition-transform select-none active:scale-95"
         >
           <Volume2 className="size-5" aria-hidden />
         </button>
@@ -215,7 +221,7 @@ export function AudioWidget({
             onPointerMove={onPointerMove}
             onPointerUp={onPointerUp}
             onPointerCancel={onPointerUp}
-            className="flex cursor-grab items-center justify-between px-2 py-1.5 drop-shadow-[0_1px_2px_rgb(0_0_0/0.9)] active:cursor-grabbing"
+            className="flex touch-none cursor-grab items-center justify-between px-2 py-1.5 drop-shadow-[0_1px_2px_rgb(0_0_0/0.9)] select-none active:cursor-grabbing"
           >
             <GripVertical className="size-4 text-white/50" aria-hidden />
             <span className="text-xs font-medium text-white/80">Audio</span>
@@ -273,7 +279,10 @@ export function AudioWidget({
               </div>
             )}
             {/* key={active.url}: reset trạng thái phát khi đổi track/trang */}
-            <audio key={active.url} controls src={active.url} className="h-8 w-full" />
+            {/* Không ép chiều cao: Chrome dựng bộ điều khiển ở ~54px, bóp
+                xuống 32px là mấy vùng chạm bên trong dồn cục lại, chạm nút
+                play rất dễ trúng nút ba chấm bên cạnh. */}
+            <audio key={active.url} controls src={active.url} className="w-full" />
           </div>
         </div>
       )}

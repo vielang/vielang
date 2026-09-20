@@ -91,14 +91,42 @@ describe("cấu hình", () => {
   });
 });
 
-describe("không tự tiếp quản giữa chừng", () => {
-  it("không gọi skipWaiting", () => {
+describe("không TỰ tiếp quản giữa chừng", () => {
+  const swSrc = () =>
+    readFileSync(path.resolve(process.cwd(), "public", "sw.js"), "utf8");
+
+  it("không nhường chỗ ngay lúc cài", () => {
     // Tráo service worker khi trang đang mở có thể khiến nó đi xin chunk của
-    // phiên bản khác. Bản mới chờ tới khi mọi tab đóng lại.
-    // Tìm lời GỌI chứ không tìm chữ — chính comment trong sw.js cũng nhắc
-    // tới tên hàm này để giải thích vì sao không dùng.
-    const src = readFileSync(path.resolve(process.cwd(), "public", "sw.js"), "utf8");
-    expect(src).not.toMatch(/self\.skipWaiting\s*\(/);
+    // phiên bản khác. Lúc cài thì tuyệt đối không được tự nhường.
+    const body = swSrc();
+    const install = body.indexOf('addEventListener("install"');
+    const activate = body.indexOf('addEventListener("activate"');
+
+    expect(body.slice(install, activate)).not.toMatch(/skipWaiting\s*\(/);
+  });
+
+  it("chỉ nhường chỗ khi người dùng bấm cập nhật", () => {
+    // Người dùng bấm thì trang được tải lại ngay sau đó nên an toàn — xem
+    // components/service-worker.tsx.
+    const body = swSrc();
+    const message = body.indexOf('addEventListener("message"');
+    const skip = body.search(/self\.skipWaiting\s*\(/);
+
+    expect(message).toBeGreaterThan(-1);
+    expect(skip).toBeGreaterThan(message);
+    expect(body.slice(message, skip)).toContain("SKIP_WAITING");
+  });
+
+  it("giao diện tải lại trang khi service worker đổi", () => {
+    // Thiếu bước này thì bấm "Cập nhật" xong trang CŨ vẫn chạy với service
+    // worker MỚI — đúng cảnh lệch phiên bản mà cả thiết kế này né tránh.
+    const ui = readFileSync(
+      path.resolve(process.cwd(), "src", "components", "service-worker.tsx"),
+      "utf8"
+    );
+
+    expect(ui).toContain("controllerchange");
+    expect(ui).toContain("window.location.reload()");
   });
 });
 

@@ -19,9 +19,10 @@
  *   giờ bị dọn tự động: người dùng đã cố ý tải thì chỉ người dùng được xoá.
  * - Payload RSC (lật trang trong app) đi MẠNG TRƯỚC, chỉ lấy bản cache khi
  *   mạng hỏng hẳn — xem `rscCacheKey`.
- * - KHÔNG gọi `skipWaiting()`: bản mới chỉ tiếp quản khi mọi tab đã đóng.
- *   Tráo service worker giữa chừng có thể khiến trang đang mở đi xin chunk
- *   của phiên bản khác.
+ * - KHÔNG tự gọi `skipWaiting()`: bản mới đứng chờ tới khi mọi tab đóng,
+ *   hoặc tới khi CHÍNH NGƯỜI DÙNG bấm cập nhật (xem trình nghe "message").
+ *   Tự tráo giữa chừng có thể khiến trang đang mở đi xin chunk của phiên bản
+ *   khác; còn người dùng bấm thì trang được tải lại ngay sau đó nên an toàn.
  */
 const VERSION = "v2";
 const DOC_CACHE = `kiip-doc-${VERSION}`;
@@ -36,6 +37,17 @@ const MAX_IMAGES = 300;
 
 /** Tiền tố cache của sách tải chủ động — phải khớp `lib/offline-books.ts`. */
 const BOOK_CACHE_PREFIX = "kiip-book-";
+
+/**
+ * Người dùng bấm "Cập nhật" trên thanh thông báo.
+ *
+ * Chỉ lúc này mới nhường chỗ cho bản mới — và bên giao diện tải lại trang
+ * ngay khi thấy service worker đổi, nên không có cảnh trang cũ chạy với
+ * service worker mới.
+ */
+self.addEventListener("message", (event) => {
+  if (event.data === "SKIP_WAITING") self.skipWaiting();
+});
 
 self.addEventListener("install", (event) => {
   event.waitUntil(

@@ -1,0 +1,9 @@
+[
+  {
+    "id": "p28-dialog",
+    "rect": [0.15, 0.23, 0.47, 0.15],
+    "label": "Hội thoại",
+    "ko": "잠시드: 집이 좀 더럽네요. 같이 집을 치워요.\n박진우: 네, 그래요. 내가 청소를 할게요. 잠시드 씨는 바닥의 물건들을 치워 주세요.\n잠시드: 알았어요. 물건을 치운 다음에 설거지를 할까요?\n박진우: 네, 그렇게 해요. 쓰레기는 내가 버릴게요.",
+    "vi": "Jamshid: Nhà hơi bẩn rồi nhỉ. Mình dọn nhà cùng nhau đi.\nPark Jin-woo: Ừ, được đấy. Tôi sẽ lau dọn. Anh Jamshid dọn mấy thứ đồ dưới sàn giúp tôi nhé.\nJamshid: Biết rồi. Dọn đồ xong thì rửa bát nhé?\nPark Jin-woo: Ừ, làm vậy đi. Rác thì để tôi đi đổ."
+  }
+]

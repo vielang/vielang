@@ -1,0 +1,9 @@
+[
+  {
+    "id": "p58-dialog",
+    "rect": [0.155, 0.2, 0.44, 0.215],
+    "label": "Hội thoại",
+    "ko": "약사: 어떻게 오셨어요?\n이링: 배가 아프고 설사를 해요.\n약사: 언제부터 아팠어요?\n이링: 오늘 아침부터 아팠어요.\n약사: 그럼 이 약을 지금 드세요. 그래도 계속 아프면 하루에 두 번, 아침과 저녁에 드세요. 그리고 죽을 끓여서 드세요.",
+    "vi": "Dược sĩ: Chị cần gì ạ?\nYi Ling: Tôi bị đau bụng và tiêu chảy.\nDược sĩ: Chị đau từ khi nào?\nYi Ling: Tôi đau từ sáng nay.\nDược sĩ: Vậy chị uống thuốc này ngay bây giờ. Nếu vẫn còn đau thì uống ngày hai lần, sáng và tối. Và chị nấu cháo ăn nhé."
+  }
+]

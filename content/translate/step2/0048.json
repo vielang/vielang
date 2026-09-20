@@ -1,0 +1,9 @@
+[
+  {
+    "id": "p48-dialog",
+    "rect": [0.15, 0.195, 0.42, 0.21],
+    "label": "Hội thoại",
+    "ko": "직원: 여보세요. 다문화 센터입니다.\n라흐만: 안녕하세요? 저는 라흐만이라고 하는데요. 정아라 선생님 좀 바꿔 주세요.\n직원: 정아라 선생님은 지금 자리에 안 계세요. 그런데 무슨 일이에요?\n라흐만: 오늘 수업에 갈 수 없어서 전화했어요.\n직원: 그럼 제가 말씀 전해 드릴게요.",
+    "vi": "Nhân viên: A lô. Trung tâm Đa văn hoá xin nghe.\nRahman: Xin chào? Tôi tên là Rahman. Cho tôi gặp cô Jeong A-ra một chút ạ.\nNhân viên: Cô Jeong A-ra bây giờ không có ở chỗ ngồi. Anh có việc gì vậy ạ?\nRahman: Hôm nay tôi không đi học được nên gọi điện báo.\nNhân viên: Vậy tôi sẽ nhắn lại giúp anh."
+  }
+]

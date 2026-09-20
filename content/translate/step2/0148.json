@@ -1,0 +1,9 @@
+[
+  {
+    "id": "p148-dialog",
+    "rect": [0.155, 0.18, 0.44, 0.23],
+    "label": "Hội thoại",
+    "ko": "후엔: 안녕하세요? 베트남에 소포를 보내려고 하는데요.\n직원: 이 안에 뭐가 들어 있어요?\n후엔: 옷하고 화장품요.\n직원: 일반하고 특급이 있는데 어떤 걸로 하실 거예요?\n후엔: 일반으로 할게요. 오늘 보내면 베트남에 언제 도착해요?\n직원: 보통 4일에서 7일 정도 걸려요. 다음 주말까지는 도착할 거예요.",
+    "vi": "Huyền: Xin chào? Tôi muốn gửi bưu kiện về Việt Nam ạ.\nNhân viên: Bên trong có gì vậy ạ?\nHuyền: Quần áo và mỹ phẩm ạ.\nNhân viên: Có loại thường và loại chuyển phát nhanh, chị chọn loại nào ạ?\nHuyền: Tôi gửi loại thường. Hôm nay gửi thì khi nào đến Việt Nam ạ?\nNhân viên: Thường mất khoảng 4 đến 7 ngày. Chậm nhất cuối tuần sau là tới."
+  }
+]

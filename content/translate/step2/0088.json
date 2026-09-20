@@ -1,0 +1,9 @@
+[
+  {
+    "id": "p88-dialog",
+    "rect": [0.15, 0.17, 0.43, 0.245],
+    "label": "Hội thoại",
+    "ko": "라흐만: 다음 주에 2단계가 끝나네요. 후엔 씨는 수업을 계속 들을 거예요?\n후엔: 네, 단계 평가 시험에 합격하면 3단계 수업을 신청할 거예요.\n라흐만: 3단계도 여기에서 배울 거예요?\n후엔: 아니요, 집이 멀어서 가까운 데서 공부하기로 했어요.\n라흐만: 아, 그래요? 저는 여기에서 계속 공부할 거예요. 아쉽네요.",
+    "vi": "Rahman: Tuần sau là kết thúc bậc 2 rồi nhỉ. Chị Huyền có học tiếp không?\nHuyền: Có chứ, nếu thi đánh giá bậc đậu thì tôi sẽ đăng ký lớp bậc 3.\nRahman: Bậc 3 chị cũng học ở đây chứ?\nHuyền: Không, nhà xa quá nên tôi quyết định học ở chỗ gần hơn.\nRahman: À, vậy à? Tôi thì vẫn học tiếp ở đây. Tiếc thật."
+  }
+]

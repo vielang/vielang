@@ -1,0 +1,9 @@
+[
+  {
+    "id": "p168-dialog",
+    "rect": [0.15, 0.2, 0.44, 0.205],
+    "label": "Hội thoại",
+    "ko": "반장님: 라흐만 씨, 오늘도 안전모 잊지 말고 꼭 쓰세요.\n라흐만: 네, 반장님.\n반장님: 지금 무슨 일을 하고 있어요?\n라흐만: 아까 도착한 물건들을 옮기고 있습니다. 그런데 오늘 작업은 얼마나 해야 돼요?\n반장님: 3시까지요. 일이 다 끝나면 기계 전원 끄는 거 잊으면 안 돼요.",
+    "vi": "Tổ trưởng: Anh Rahman, hôm nay cũng đừng quên đội mũ bảo hộ nhé.\nRahman: Vâng, thưa tổ trưởng.\nTổ trưởng: Bây giờ anh đang làm việc gì vậy?\nRahman: Tôi đang chuyển mấy kiện hàng vừa đến lúc nãy ạ. Mà hôm nay phải làm đến khi nào ạ?\nTổ trưởng: Đến 3 giờ. Làm xong hết rồi thì đừng quên tắt nguồn điện của máy nhé."
+  }
+]

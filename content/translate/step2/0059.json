@@ -1,0 +1,16 @@
+[
+  {
+    "id": "p59-medicine",
+    "rect": [0.16, 0.19, 0.27, 0.27],
+    "label": "Túi thuốc",
+    "ko": "약 봉투\n라민 귀하 — 남·여, 25세\n용법: 1일 2회 (아침, 저녁), 3일분\n식전 30분 / ☑ 식후 30분 / 식후 즉시 / 식후 1~2시간\n행복 약국",
+    "vi": "Túi thuốc\nKính gửi: Ramin — Nam·Nữ, 25 tuổi\nCách dùng: ngày 2 lần (sáng, tối), đủ cho 3 ngày\nTrước ăn 30 phút / ☑ Sau ăn 30 phút / Ngay sau ăn / Sau ăn 1–2 tiếng\nNhà thuốc Haengbok"
+  },
+  {
+    "id": "p59-post",
+    "rect": [0.11, 0.63, 0.7, 0.07],
+    "label": "Bài đăng",
+    "ko": "여러분 안녕하세요? 저는 필리핀에서 온 마리셀이에요. 저에게 한국의 겨울 날씨는 너무 추워요. 그래서 어제부터 기침을 하고 콧물이 나요. 열도 있어요. 어떻게 하면 좋을까요?",
+    "vi": "Chào mọi người? Tôi là Maricel, đến từ Philippines. Với tôi thì mùa đông ở Hàn Quốc lạnh quá. Vì vậy từ hôm qua tôi bị ho và chảy nước mũi. Tôi còn bị sốt nữa. Tôi nên làm thế nào đây?"
+  }
+]

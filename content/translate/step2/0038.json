@@ -1,0 +1,9 @@
+[
+  {
+    "id": "p38-dialog",
+    "rect": [0.155, 0.225, 0.47, 0.16],
+    "label": "Hội thoại",
+    "ko": "점원: 어서 오세요. 어떤 옷을 찾으세요?\n후엔: 정장 치마나 바지 있어요? 결혼식에서 입을 거예요.\n점원: 네, 이쪽에 있어요. 이건 어떠세요?\n후엔: 바지 허리가 조금 작아요. 더 큰 사이즈 있어요?\n점원: 그럼 이걸로 한번 입어 보세요.",
+    "vi": "Nhân viên: Mời chị vào. Chị tìm loại quần áo nào ạ?\nHuyền: Có chân váy hay quần công sở không ạ? Tôi định mặc đi dự đám cưới.\nNhân viên: Có ạ, ở phía này. Cái này thì thế nào ạ?\nHuyền: Cạp quần hơi nhỏ. Có cỡ to hơn không?\nNhân viên: Vậy chị mặc thử cái này xem ạ."
+  }
+]

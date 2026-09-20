@@ -101,3 +101,44 @@ describe("không tự tiếp quản giữa chừng", () => {
     expect(src).not.toMatch(/self\.skipWaiting\s*\(/);
   });
 });
+
+describe("sách tải chủ động", () => {
+  const src = () =>
+    readFileSync(path.resolve(process.cwd(), "public", "sw.js"), "utf8");
+
+  it("dùng đúng tiền tố cache mà bên tải về đang ghi", () => {
+    // Hai file không import được nhau (một bên là script thô trong public),
+    // nên lệch tiền tố là offline im lặng không hoạt động.
+    const lib = readFileSync(
+      path.resolve(process.cwd(), "src", "lib", "offline-books.ts"),
+      "utf8"
+    );
+    const prefix = lib.match(/BOOK_CACHE_PREFIX = "([^"]+)"/)?.[1];
+
+    expect(prefix).toBe("kiip-book-");
+    expect(src()).toContain(`BOOK_CACHE_PREFIX = "${prefix}"`);
+  });
+
+  it("KHÔNG dọn cache sách khi nâng cấp service worker", () => {
+    // Dọn nhầm là người dùng mất cả cuốn vừa tải 60MB mà không hiểu vì sao.
+    expect(src()).toMatch(/keep\.has\(n\) \|\| n\.startsWith\(BOOK_CACHE_PREFIX\)/);
+  });
+
+  it("tra sách đã tải TRƯỚC cả cache cơ hội lẫn mạng", () => {
+    const body = src();
+    const inCacheFirst = body.indexOf("async function cacheFirst");
+    const lookup = body.indexOf("matchDownloadedBook(request)", inCacheFirst);
+    const opportunistic = body.indexOf("caches.open(cacheName)", inCacheFirst);
+
+    expect(lookup).toBeGreaterThan(inCacheFirst);
+    expect(lookup).toBeLessThan(opportunistic);
+  });
+
+  it("mất mạng thì tài liệu cũng tra sách đã tải", () => {
+    const body = src();
+    const inNetworkFirst = body.indexOf("async function networkFirst");
+    expect(body.indexOf("matchDownloadedBook", inNetworkFirst)).toBeGreaterThan(
+      inNetworkFirst
+    );
+  });
+});

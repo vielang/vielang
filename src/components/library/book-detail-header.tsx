@@ -12,6 +12,7 @@ import {
   resumePage,
   useProgressStore,
 } from "@/lib/progress-store";
+import { OfflineDownload } from "@/components/library/offline-download";
 
 export function BookDetailHeader({ book }: { book: Book }) {
   const books = useProgressStore((s) => s.books);
@@ -69,6 +70,8 @@ export function BookDetailHeader({ book }: { book: Book }) {
           </Button>
         )}
       </div>
+
+      <OfflineDownload book={book} />
     </div>
   );
 }

@@ -9,6 +9,7 @@ import {
   type Position,
   type Size,
 } from "@/lib/note-widget-store";
+import { notePanelAnchor, notePanelSize } from "@/lib/widget-dock";
 
 const HEADER_HEIGHT = 36;
 const MIN_WIDTH = 260;
@@ -25,18 +26,12 @@ const MIN_VISIBLE = 64;
 
 function defaultSize(): Size {
   if (typeof window === "undefined") return { width: MIN_WIDTH, height: MIN_HEIGHT };
-  return {
-    width: Math.min(400, window.innerWidth - MARGIN * 2),
-    height: Math.min(560, window.innerHeight - 140),
-  };
+  return notePanelSize();
 }
 
-function defaultPosition(size: Size): Position {
+function defaultPosition(): Position {
   if (typeof window === "undefined") return { x: MARGIN, y: MARGIN };
-  return {
-    x: window.innerWidth - size.width - MARGIN,
-    y: 64, // ngay dưới thanh công cụ trên
-  };
+  return notePanelAnchor();
 }
 
 function clampPosition(pos: Position, size: Size): Position {
@@ -98,7 +93,7 @@ export function NoteWidget({
     if (storedSize && storedPosition) return;
     const size = storedSize ?? defaultSize();
     if (!storedSize) setSize(size);
-    if (!storedPosition) setPosition(defaultPosition(size));
+    if (!storedPosition) setPosition(defaultPosition());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

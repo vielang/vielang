@@ -4,14 +4,11 @@ import { useEffect, useRef } from "react";
 import { GripVertical, Volume2, X } from "lucide-react";
 import type { AudioTrack } from "@/lib/audio";
 import { cn } from "@/lib/utils";
-import {
-  AUDIO_WIDGET_BOTTOM_OFFSET,
-  AUDIO_WIDGET_SIZE,
-  useAudioWidgetStore,
-} from "@/lib/audio-widget-store";
+import { useAudioWidgetStore } from "@/lib/audio-widget-store";
+import { AUDIO_WIDGET_SIZE, audioAnchor } from "@/lib/widget-dock";
 
-// Đường kính nút tròn lúc thu nhỏ. Thanh công cụ vẽ neo theo số này nên nó
-// nằm ở lib dùng chung — xem audio-widget-store.
+// Đường kính nút tròn lúc thu nhỏ. Các widget nổi khác neo theo số này nên
+// nó nằm ở bến đỗ chung — xem widget-dock.
 const SIZE = AUDIO_WIDGET_SIZE;
 const PANEL_WIDTH = 256;
 /** Chiều cao panel: thanh kéo + thẻ audio. */
@@ -36,11 +33,7 @@ interface Pos {
 
 function defaultCollapsedPosition(): Pos {
   if (typeof window === "undefined") return { x: MARGIN, y: MARGIN };
-  return {
-    x: window.innerWidth - SIZE - MARGIN,
-    // Đặt cao hơn toolbar dưới (~64px) một chút để không đè lên nhau.
-    y: window.innerHeight - SIZE - AUDIO_WIDGET_BOTTOM_OFFSET,
-  };
+  return audioAnchor();
 }
 
 /**

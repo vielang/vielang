@@ -7,15 +7,8 @@ interface Position {
   y: number;
 }
 
-/**
- * Đường kính nút tròn audio lúc thu nhỏ, và khoảng chừa dưới đáy màn hình.
- *
- * Để ở đây chứ không nằm trong chính `audio-widget.tsx` vì thanh công cụ vẽ
- * cũng cần biết: nó neo mặc định ngay PHÍA TRÊN nút audio, mà hai widget
- * chồng lên nhau thì cái nào cũng khó bấm.
- */
-export const AUDIO_WIDGET_SIZE = 48;
-export const AUDIO_WIDGET_BOTTOM_OFFSET = 84;
+// Chỗ đứng mặc định của widget này nằm ở `widget-dock` cùng với ba widget
+// nổi còn lại — gom một chỗ để nhìn ra bố cục tổng thể.
 
 interface AudioWidgetState {
   /** Vị trí panel lúc mở rộng. null = chưa mở lần nào (sẽ canh giữa). */

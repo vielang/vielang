@@ -37,16 +37,8 @@ import {
   useAnnotationStore,
   type AnnotationTool,
 } from "@/lib/annotation-store";
-import {
-  AUDIO_WIDGET_BOTTOM_OFFSET,
-  AUDIO_WIDGET_SIZE,
-} from "@/lib/audio-widget-store";
-import {
-  DRAG_MARGIN,
-  clampToViewport,
-  useDraggable,
-  type DragPos,
-} from "@/lib/use-draggable";
+import { drawToolbarAnchor } from "@/lib/widget-dock";
+import { clampToViewport, useDraggable } from "@/lib/use-draggable";
 import { cn } from "@/lib/utils";
 
 const TOOLS: { value: AnnotationTool; label: string; Icon: typeof Pen }[] = [
@@ -61,24 +53,6 @@ const TOOLS: { value: AnnotationTool; label: string; Icon: typeof Pen }[] = [
 
 /** Chấm chọn cỡ nét — đường kính chỉ để gợi ý, không theo tỉ lệ thật. */
 const SIZE_DOTS = [3, 5, 8];
-
-/** Khoảng hở giữa thanh vẽ và nút audio ngay bên dưới. */
-const GAP_ABOVE_AUDIO = 10;
-
-/**
- * Chỗ đứng mặc định: dựng dọc sát mép phải, ngay TRÊN nút audio.
- *
- * Nằm dọc ở mép chứ không nằm ngang dưới đáy vì trang sách cao hơn rộng —
- * một cột dọc bên hông chỉ ăn mất chừng 45px bề ngang, còn thanh ngang dưới
- * đáy thì cắt mất một khoảng chiều cao, đúng chiều đang thiếu.
- */
-function defaultPosition(width: number, height: number): DragPos {
-  const audioTop = window.innerHeight - AUDIO_WIDGET_SIZE - AUDIO_WIDGET_BOTTOM_OFFSET;
-  return {
-    x: window.innerWidth - width - DRAG_MARGIN,
-    y: audioTop - GAP_ABOVE_AUDIO - height,
-  };
-}
 
 /**
  * Thanh công cụ vẽ: một cột dọc ở mép phải, kéo thả được, thu lại được.
@@ -147,7 +121,7 @@ export function AnnotationToolbar({ bookId, pages }: { bookId: string; pages: nu
       const { offsetWidth: w, offsetHeight: h } = el;
       if (w === 0) return;
       const store = useAnnotationStore.getState();
-      const next = clampToViewport(store.toolbarPos ?? defaultPosition(w, h), w, h);
+      const next = clampToViewport(store.toolbarPos ?? drawToolbarAnchor(w, h), w, h);
       if (next.x !== store.toolbarPos?.x || next.y !== store.toolbarPos?.y) {
         store.setToolbarPos(next);
       }

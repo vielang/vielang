@@ -29,25 +29,14 @@ import {
   useRecordingStore,
   type Recording,
 } from "@/lib/recording-store";
-import {
-  DRAG_MARGIN,
-  clampToViewport,
-  useDraggable,
-  type DragPos,
-} from "@/lib/use-draggable";
+import { clampToViewport, useDraggable } from "@/lib/use-draggable";
+import { recorderAnchor } from "@/lib/widget-dock";
 import { cn } from "@/lib/utils";
 
 /** Nhịp cập nhật đồng hồ lúc đang thu. */
 const TICK_MS = 200;
 /** Ngắn hơn chừng này thì gần như chắc là bấm nhầm — bỏ, không lưu. */
 const MIN_DURATION_MS = 400;
-
-function defaultPosition(width: number, height: number): DragPos {
-  return {
-    x: Math.max(DRAG_MARGIN, (window.innerWidth - width) / 2),
-    y: Math.max(DRAG_MARGIN, window.innerHeight - height - 96),
-  };
-}
 
 /**
  * Bảng ghi âm của một trang sách: một nút thu, một đồng hồ, và danh sách bản
@@ -96,7 +85,7 @@ export function RecorderWidget({ bookId, page }: { bookId: string; page: number 
       const { offsetWidth: w, offsetHeight: h } = el;
       if (w === 0) return;
       const store = useRecordingStore.getState();
-      const next = clampToViewport(store.panelPos ?? defaultPosition(w, h), w, h);
+      const next = clampToViewport(store.panelPos ?? recorderAnchor(w, h), w, h);
       if (next.x !== store.panelPos?.x || next.y !== store.panelPos?.y) {
         store.setPanelPos(next);
       }

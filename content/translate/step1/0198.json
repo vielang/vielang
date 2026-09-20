@@ -1,0 +1,9 @@
+[
+  {
+    "id": "p198-dialog",
+    "rect": [0.15, 0.175, 0.45, 0.185],
+    "label": "Hội thoại",
+    "ko": "잠시드: 여보세요? 라흐만 씨, 약국은 밤에 문을 닫지요?\n라흐만: 네. 그런데 왜요?\n잠시드: 배가 아파서요.\n라흐만: 그럼 편의점에 가세요. 약국은 밤에 문을 닫는데 편의점은 안 닫아요.\n잠시드: 그렇군요. 정말 고마워요.",
+    "vi": "Jamshid: A lô? Anh Rahman ơi, buổi tối hiệu thuốc đóng cửa phải không?\nRahman: Ừ. Mà sao thế?\nJamshid: Vì tôi bị đau bụng.\nRahman: Vậy anh ra cửa hàng tiện lợi đi. Hiệu thuốc thì tối đóng cửa nhưng cửa hàng tiện lợi thì không đóng.\nJamshid: Ra vậy. Cảm ơn anh nhiều."
+  }
+]

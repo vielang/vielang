@@ -1,9 +1,9 @@
 [
   {
     "id": "p19-reading",
-    "rect": [0.635, 0.262, 0.225, 0.152],
+    "rect": [0.63, 0.255, 0.24, 0.155],
     "label": "Bài đọc",
     "ko": "안녕하세요?\n저는 제이슨이에요.\n미국 뉴욕에서 왔어요.\n저는 영어 선생님이에요.\n만나서 반가워요.",
-    "vi": "Xin chào?\nTôi là Jason.\nTôi đến từ New York, Mỹ.\nTôi là giáo viên tiếng Anh.\nRất vui được gặp các bạn."
+    "vi": "Xin chào?\nTôi là Jason.\nTôi đến từ New York, Mỹ.\nTôi là giáo viên tiếng Anh.\nRất vui được gặp bạn."
   }
 ]

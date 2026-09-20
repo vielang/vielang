@@ -51,3 +51,7 @@ next-env.d.ts
 # font Excalidraw: copy-excalidraw-fonts.ts chép từ node_modules, luôn chạy
 # lại qua predev/prebuild — không commit ~14MB nhị phân trùng với dependency
 /public/excalidraw/
+
+# ảnh trang tải về để soạn bản dịch — chỉ dùng lúc làm nội dung
+/scratch/
+

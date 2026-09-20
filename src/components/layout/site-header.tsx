@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { BookOpenText } from "lucide-react";
+import { Bookmark, BookOpenText } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { LanguageNav } from "@/components/layout/language-nav";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 
@@ -18,7 +19,20 @@ export function SiteHeader() {
           <span className="h-4 w-px shrink-0 bg-border" aria-hidden />
           <LanguageNav />
         </div>
-        <ThemeToggle />
+        <div className="flex items-center gap-1">
+          <Button
+            asChild
+            variant="ghost"
+            size="icon"
+            aria-label="Trang đã đánh dấu"
+            title="Trang đã đánh dấu"
+          >
+            <Link href="/bookmarks">
+              <Bookmark className="size-5" aria-hidden />
+            </Link>
+          </Button>
+          <ThemeToggle />
+        </div>
       </div>
     </header>
   );

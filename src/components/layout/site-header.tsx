@@ -14,7 +14,11 @@ export function SiteHeader() {
             className="flex shrink-0 items-center gap-2 font-semibold tracking-tight"
           >
             <BookOpenText className="size-5 text-primary" aria-hidden />
-            <span>KIIP Reader</span>
+            {/* Màn điện thoại nhường chỗ cho nav ngôn ngữ và các nút bên
+                phải — chỉ giữ lại logo. Dùng `sr-only` chứ không phải
+                `hidden`: ẩn hẳn thì liên kết này mất luôn tên gọi, vì cái
+                icon đã `aria-hidden`. */}
+            <span className="sr-only sm:not-sr-only">KIIP Reader</span>
           </Link>
           <span className="h-4 w-px shrink-0 bg-border" aria-hidden />
           <LanguageNav />

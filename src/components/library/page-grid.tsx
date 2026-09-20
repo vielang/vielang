@@ -3,7 +3,7 @@
 import { Fragment } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Bookmark, Check, NotebookText, Volume2 } from "lucide-react";
+import { Bookmark, Check, Languages, NotebookText, Volume2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getThumbUrl } from "@/lib/books";
 import { useProgressStore } from "@/lib/progress-store";
@@ -55,6 +55,7 @@ export function PageGrid({
   chapters,
   notePages,
   audioPages,
+  translatedPages,
 }: {
   bookId: string;
   totalPages: number;
@@ -64,6 +65,8 @@ export function PageGrid({
   notePages: number[];
   /** Số trang có sẵn audio (xem lib/audio.ts) */
   audioPages: number[];
+  /** Số trang có sẵn bản dịch (xem lib/page-translation.ts) */
+  translatedPages: number[];
 }) {
   const books = useProgressStore((s) => s.books);
   const toggleBookmark = useProgressStore((s) => s.toggleBookmark);
@@ -71,6 +74,7 @@ export function PageGrid({
   const bookmarks = new Set(books[bookId]?.bookmarks ?? []);
   const notedPages = new Set(notePages);
   const audioedPages = new Set(audioPages);
+  const translatedSet = new Set(translatedPages);
   const chapterByStartPage = new Map(chapters.map((ch) => [ch.startPage, ch]));
 
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
@@ -85,6 +89,7 @@ export function PageGrid({
           const isBookmarked = bookmarks.has(page);
           const hasNote = notedPages.has(page);
           const hasAudio = audioedPages.has(page);
+          const hasTranslation = translatedSet.has(page);
           const chapter = chapterByStartPage.get(page);
 
           return (
@@ -125,7 +130,7 @@ export function PageGrid({
                         <Check className="size-3" aria-hidden />
                       </span>
                     )}
-                    {(hasNote || hasAudio) && (
+                    {(hasNote || hasAudio || hasTranslation) && (
                       <div className="absolute top-1 left-1 flex gap-1">
                         {hasNote && (
                           <span
@@ -141,6 +146,14 @@ export function PageGrid({
                             title="Có audio"
                           >
                             <Volume2 className="size-3" aria-hidden />
+                          </span>
+                        )}
+                        {hasTranslation && (
+                          <span
+                            className="rounded-full bg-background/95 p-1 text-primary shadow ring-1 ring-border"
+                            title="Có bản dịch tiếng Việt"
+                          >
+                            <Languages className="size-3" aria-hidden />
                           </span>
                         )}
                       </div>

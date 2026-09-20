@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { BOOKS, getBook } from "@/lib/books";
 import { getNotePages } from "@/lib/notes";
 import { getAudioPages } from "@/lib/audio";
+import { getTranslatedPages } from "@/lib/page-translation";
 import { getChapters } from "@/lib/chapters";
 import { BookDetailHeader } from "@/components/library/book-detail-header";
 import { PageGrid } from "@/components/library/page-grid";
@@ -44,6 +45,7 @@ export default async function BookDetailPage({
         chapters={getChapters(book.id, book.totalPages)}
         notePages={getNotePages(book.id)}
         audioPages={getAudioPages(book.id)}
+        translatedPages={getTranslatedPages(book.id)}
       />
     </div>
   );

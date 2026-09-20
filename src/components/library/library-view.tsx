@@ -1,5 +1,6 @@
 import { Languages } from "lucide-react";
 import { BookCard } from "@/components/library/book-card";
+import { ContinueReading } from "@/components/library/continue-reading";
 import type { Book } from "@/lib/books";
 import { groupBooksByLevel } from "@/lib/library";
 import type { LanguageConfig } from "@/lib/languages";
@@ -28,6 +29,10 @@ export function LibraryView({
           {language.description}
         </p>
       </div>
+
+      {/* Đặt TRƯỚC lưới sách: mở thư viện ra phần lớn là để đọc tiếp cuốn
+          đang dở, chứ không phải để chọn cuốn mới. Tự ẩn khi chưa đọc gì. */}
+      <ContinueReading books={books} />
 
       {groups.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-border py-24 text-center">

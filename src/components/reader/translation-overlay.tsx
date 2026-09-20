@@ -2,6 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { Languages } from "lucide-react";
 import type { TranslationRegion } from "@/lib/page-translation";
 
 /** Khoảng cách từ điểm bấm xuống đỉnh bong bóng, và lề tối thiểu với mép màn hình. */
@@ -46,14 +47,25 @@ export function TranslationOverlay({ regions }: { regions: TranslationRegion[] }
             data-translate-region
             onClick={(e) => setActive({ region, x: e.clientX, y: e.clientY })}
             aria-label={`Xem bản dịch: ${region.label ?? "đoạn này"}`}
-            className="absolute cursor-help"
+            className="group absolute cursor-help"
             style={{
               left: `${x * 100}%`,
               top: `${y * 100}%`,
               width: `${w * 100}%`,
               height: `${h * 100}%`,
             }}
-          />
+          >
+            {/* Dấu hiệu DUY NHẤT cho biết đoạn này có bản dịch. Vùng bấm vẫn
+                trong suốt như cũ để trang giữ nguyên dáng bản in — chỉ một
+                chấm nhỏ ở góc, đủ để người ta biết mà chạm vào. Không có nó
+                thì cả tính năng này tàng hình. */}
+            <span
+              className="absolute -top-1.5 -right-1.5 flex size-5 items-center justify-center rounded-full bg-primary/85 text-primary-foreground shadow-sm ring-1 ring-background/70 transition-transform group-hover:scale-110"
+              aria-hidden
+            >
+              <Languages className="size-3" />
+            </span>
+          </button>
         );
       })}
 

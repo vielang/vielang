@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   Dialog,
   DialogContent,
@@ -58,18 +59,21 @@ export function OfflineDownload({ book }: { book: Book }) {
   if (isDownloading) {
     const { done, total } = active.progress;
     return (
-      <div className="flex flex-col gap-2 sm:max-w-xs">
-        <div className="flex items-center justify-between text-xs">
-          <span className="flex items-center gap-1.5 text-muted-foreground">
-            <Loader2 className="size-3.5 animate-spin" aria-hidden />
-            Đang tải {done}/{total} trang
-          </span>
-          <Button variant="ghost" size="sm" className="h-6 px-2" onClick={cancel}>
-            <X className="size-3.5" aria-hidden />
-            Huỷ
-          </Button>
-        </div>
-        <Progress value={(done / total) * 100} className="h-1.5" />
+      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <Loader2 className="size-3.5 shrink-0 animate-spin" aria-hidden />
+        <span className="tabular-nums">
+          {done}/{total}
+        </span>
+        <Progress value={(done / total) * 100} className="h-1 w-20" />
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-7"
+          onClick={cancel}
+          aria-label="Huỷ tải về"
+        >
+          <X className="size-3.5" aria-hidden />
+        </Button>
       </div>
     );
   }
@@ -77,21 +81,22 @@ export function OfflineDownload({ book }: { book: Book }) {
   if (isDownloaded) {
     return (
       <>
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="flex items-center gap-1.5 rounded-full bg-secondary px-2.5 py-1 text-xs font-medium">
-            <Check className="size-3.5 text-primary" aria-hidden />
-            Đã tải về — đọc được khi mất mạng
-          </span>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setConfirmRemove(true)}
-            disabled={busyWithOther}
-          >
-            <Trash2 className="size-4" aria-hidden />
-            Xoá bản offline
-          </Button>
-        </div>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            {/* Nhãn "đã tải" và nút xoá gộp làm một: cùng nói về một thứ, mà
+                tách ra thì ăn mất hai chỗ trên hàng nút. */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setConfirmRemove(true)}
+              disabled={busyWithOther}
+            >
+              <Check className="size-4 text-primary" aria-hidden />
+              Đã tải offline
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Đọc được khi mất mạng — bấm để xoá</TooltipContent>
+        </Tooltip>
 
         <Dialog open={confirmRemove} onOpenChange={setConfirmRemove}>
           <DialogContent className="sm:max-w-sm">
@@ -128,23 +133,22 @@ export function OfflineDownload({ book }: { book: Book }) {
   return (
     <>
       <div className="flex flex-col gap-2">
-        <div className="flex flex-wrap items-center gap-2">
-          <Button
-            variant="outline"
-            disabled={busyWithOther}
-            onClick={() => {
-              clearError();
-              if (full) setLimitOpen(true);
-              else void start(book);
-            }}
-          >
-            <Download className="size-4" aria-hidden />
-            Tải về đọc offline
-          </Button>
-          <span className="text-xs text-muted-foreground">
-            khoảng {formatBytes(estimateBytes(book))}
-          </span>
-        </div>
+        {/* Dung lượng nằm ngay trong nhãn nút thay vì một dòng riêng — người
+            dùng mạng di động cần biết trước khi bấm, nhưng không cần cả một
+            dòng cho nó. */}
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={busyWithOther}
+          onClick={() => {
+            clearError();
+            if (full) setLimitOpen(true);
+            else void start(book);
+          }}
+        >
+          <Download className="size-4" aria-hidden />
+          Tải offline · {formatBytes(estimateBytes(book))}
+        </Button>
 
         {error && (
           <p className="flex items-start gap-1.5 text-xs text-destructive">

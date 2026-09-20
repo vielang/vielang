@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ServiceWorker } from "@/components/service-worker";
 import { InstallPromptCapture } from "@/components/install-prompt-capture";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const inter = Inter({
@@ -60,6 +61,20 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <TooltipProvider delayDuration={200}>{children}</TooltipProvider>
           <ServiceWorker />
           <InstallPromptCapture />
+          {/* Vercel Analytics — số lượt xem trang, không cookie, không
+              theo dấu người dùng qua các trang web khác.
+
+              Đặt trong layout gốc để đếm được cả những lần lật trang trong
+              app: lật trang sách là điều hướng phía client, không tải lại
+              trang, nên nếu chỉ nhúng script một lần thì mọi trang sau đều
+              không được tính.
+
+              Service worker KHÔNG cần sửa gì cho chỗ này (đã kiểm `sw.js`):
+              beacon là POST nên thoát ngay ở chốt `request.method !== "GET"`,
+              còn script `/_vercel/insights/*` không khớp nhánh nào nên rơi
+              hết, để trình duyệt tự lo. Mất mạng thì script hỏng lặng lẽ,
+              phần đọc offline không ảnh hưởng. */}
+          <Analytics />
         </ThemeProvider>
       </body>
     </html>

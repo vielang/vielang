@@ -239,3 +239,39 @@ describe("payload RSC (lật trang trong app)", () => {
     expect(network).toBeLessThan(fallback);
   });
 });
+
+/**
+ * Vercel Analytics tải script từ chính origin của app (`/_vercel/insights/`).
+ * Service worker này chặn MỌI request GET cùng origin, nên ranh giới đó phải
+ * được giữ có chủ đích chứ không phải may mà đúng.
+ *
+ * Hỏng ở đây lại hỏng lặng lẽ: trang vẫn chạy, không lỗi nào bắn ra, chỉ có
+ * số liệu là đứng im — mà đứng im thì nhìn y hệt "chưa ai vào xem".
+ */
+describe("đường của Vercel Analytics", () => {
+  const src = () =>
+    readFileSync(path.resolve(process.cwd(), "public", "sw.js"), "utf8");
+  const vercel = url("/_vercel/insights/script.js");
+
+  it("không bị xếp vào tài nguyên cache-trước", () => {
+    // Xếp nhầm vào đây là script analytics bị đóng băng ở bản đầu tiên tải
+    // được, không bao giờ cập nhật nữa.
+    expect(rules.isImmutableAsset(vercel)).toBe(false);
+  });
+
+  it("không bị nhầm là ảnh trang sách", () => {
+    expect(rules.isPageImage(vercel)).toBe(false);
+  });
+
+  it("beacon là POST nên service worker buông ngay từ đầu", () => {
+    // Chốt duy nhất giữ cho beacon đi thẳng ra mạng. Bỏ dòng này đi là mọi
+    // lượt xem trang đều chui qua service worker.
+    const body = src();
+    const handler = body.indexOf('self.addEventListener("fetch"');
+    const guard = body.indexOf('request.method !== "GET"', handler);
+    const firstRespond = body.indexOf("event.respondWith", handler);
+
+    expect(guard).toBeGreaterThan(handler);
+    expect(guard).toBeLessThan(firstRespond);
+  });
+});

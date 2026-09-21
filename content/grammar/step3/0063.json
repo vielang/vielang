@@ -2,7 +2,7 @@
   {
     "id": "p63-ina-bakke",
     "slug": "ina-bakke",
-    "rect": [0.3, 0.428, 0.4, 0.04],
+    "rect": [0.35, 0.43, 0.4, 0.04],
     "title": "명 이나/밖에",
     "ko": "수량이 예상보다 크거나 많음, 예상보다 작거나 적음을 나타낸다.",
     "vi": "Gắn sau số lượng: 이나 là nhiều hơn mình tưởng (“tới…”), 밖에 là ít hơn mình tưởng và luôn đi với phủ định (“chỉ có…”).",

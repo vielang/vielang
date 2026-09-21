@@ -36,6 +36,29 @@ import step4 from "../../content/grammar/step4.json";
 /** [x, y, rộng, cao] — tất cả theo tỉ lệ 0–1 của ảnh trang. */
 export type Rect = [number, number, number, number];
 
+/**
+ * Chỗ đặt chấm ngữ pháp — MỘT vị trí cho mọi trang, mọi sách.
+ *
+ * Tâm nằm ở (0.55, 0.45) của ảnh trang. Đo trên cả 104 trang ngữ pháp của
+ * Sơ cấp 1, Sơ cấp 2 và Trung cấp 1: không trang nào có chữ dưới chấm, chỗ
+ * dính nhiều nhất cũng chỉ 1.5% diện tích vòng chạm.
+ *
+ * Trước đây mỗi bộ sách neo vào một mốc riêng trong trang, và chấm nhảy
+ * theo bố cục từng trang: Sơ cấp 1 xê dịch tới 212px, Sơ cấp 2 tới 161px.
+ * Lật trang là phải đi tìm lại cái chấm, và có hai trang chấm còn cấn vào
+ * chữ. Một điểm cố định thì ngón tay quen được chỗ.
+ *
+ * Cái đánh đổi, nói thẳng: khung giải thích của Sơ cấp cao thấp không đều
+ * (đáy dao động 413px), nên điểm cố định này có trang rơi trong khung, có
+ * trang ngay dưới khung, có trang nằm cạnh dòng tiêu đề bài tập. Vị trí
+ * trên màn hình thì đứng yên, còn quan hệ với nội dung in thì vẫn đổi. Với
+ * một nút bấm thì đứng yên đáng giá hơn.
+ *
+ * Sách mới KHÔNG được mặc nhiên dùng lại con số này — phải đo lại trên ảnh
+ * trang thật rồi mới biết nó có rơi vào chữ hay không.
+ */
+export const GRAMMAR_DOT_RECT: Rect = [0.35, 0.43, 0.4, 0.04];
+
 export interface GrammarPoint {
   id: string;
   /**
@@ -45,12 +68,11 @@ export interface GrammarPoint {
    */
   slug: string;
   /**
-   * Khoảng TRỐNG trên ảnh để đặt cái chấm, không phải vùng tiêu đề.
+   * Khung định vị cái chấm. Chỉ TÂM của nó có tác dụng — chấm 44px được
+   * canh vào giữa, bề rộng và bề cao không tạo ra vùng bấm.
    *
-   * Chấm được canh vào giữa vùng này. Chỗ trống khác nhau theo từng bộ sách
-   * nên phải đo trên ảnh trang thật: Sơ cấp dùng khe giữa hộp ví dụ 예문 và
-   * hộp chia đuôi ở cột phải; Trung cấp 1 thì khe đó bị chữ lấp mất trên
-   * 22/32 trang nên dùng dải trắng ngay dưới khung giải thích.
+   * Mọi điểm ngữ pháp đều dùng chung một giá trị: `GRAMMAR_DOT_RECT`. Xem
+   * chú thích ở đó để biết vì sao.
    */
   rect: Rect;
   /** Nguyên văn tiêu đề trong sách, vd "명 이에요/예요". */

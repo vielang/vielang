@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { getGrammarPageNumbers, isGrammarPage } from "./grammar-pages";
-import { getGrammarPages, getPageGrammar } from "./page-grammar";
+import { GRAMMAR_DOT_RECT, getGrammarPages, getPageGrammar } from "./page-grammar";
 
 /** Sách đã soạn nội dung ngữ pháp. Thêm sách mới thì thêm vào đây. */
 const BOOKS_WITH_GRAMMAR = ["step1", "step2", "step3"] as const;
@@ -154,27 +154,26 @@ describe("chỗ đặt chấm ngữ pháp", () => {
     }
   });
 
-  it("Sơ cấp: nằm ở cột phải, tránh tranh hội thoại bên trái", () => {
-    // Ở Sơ cấp chấm nằm NGANG HÀNG với tranh, nên phải né sang phải.
-    for (const book of ["step1", "step2"]) {
-      for (const page of getGrammarPages(book)) {
-        for (const p of getPageGrammar(book, page)) {
-          expect(p.rect[0]).toBeGreaterThan(0.5);
-        }
+  it("mọi điểm dùng CHUNG một vị trí, không sách nào lệch", () => {
+    // Đây là lý do tồn tại của `GRAMMAR_DOT_RECT`. Trước đây mỗi bộ sách
+    // neo vào một mốc riêng trong trang nên chấm nhảy tới 212px giữa các
+    // trang Sơ cấp 1, và nằm hẳn chỗ khác so với Trung cấp 1. Soạn sách mới
+    // mà quên dùng hằng số này thì lại trôi về đúng cảnh cũ.
+    for (const { book, page } of everyPoint()) {
+      for (const p of getPageGrammar(book, page)) {
+        expect(p.rect).toEqual(GRAMMAR_DOT_RECT);
       }
     }
   });
 
-  it("Trung cấp 1: nằm hẳn DƯỚI khung giải thích nên không che gì", () => {
-    // Trung cấp không né sang phải được: khe giữa hộp ví dụ và hộp chia
-    // đuôi bị chữ lấp mất trên 22/32 trang. Bù lại khung giải thích kết
-    // thúc ở y≈0.43 trên mọi trang, nên dải trắng ngay dưới nó vừa trống
-    // vừa ổn định — đặt giữa trang cũng không đè lên gì.
-    for (const page of getGrammarPages("step3")) {
-      for (const p of getPageGrammar("step3", page)) {
-        expect(p.rect[1]).toBeGreaterThan(0.41);
-      }
-    }
+  it("chỉ TÂM của vùng có tác dụng, nên vùng phải nằm trong ảnh", () => {
+    // Chấm được canh vào giữa `rect`; bề rộng/cao không tạo vùng bấm. Vùng
+    // tràn ra ngoài ảnh thì tâm lệch đi mà không có gì báo.
+    const [x, y, w, h] = GRAMMAR_DOT_RECT;
+    expect(x).toBeGreaterThanOrEqual(0);
+    expect(y).toBeGreaterThanOrEqual(0);
+    expect(x + w).toBeLessThanOrEqual(1);
+    expect(y + h).toBeLessThanOrEqual(1);
   });
 });
 

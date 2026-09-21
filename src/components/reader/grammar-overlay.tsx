@@ -51,11 +51,9 @@ export function GrammarOverlay({ points }: { points: GrammarPoint[] }) {
               height: `${h * 100}%`,
             }}
           >
-            {/* Canh vào GIỮA vùng — `rect` ở đây là một khoảng TRỐNG đo
-                trên ảnh trang, không phải vùng tiêu đề. Sơ cấp dùng khe
-                giữa hộp ví dụ 예문 và hộp chia đuôi; Trung cấp 1 dùng dải
-                trắng ngay dưới khung giải thích, vì khe kia bị chữ lấp mất
-                trên 22/32 trang.
+            {/* Canh vào GIỮA vùng. `rect` giống nhau ở mọi điểm ngữ pháp —
+                xem `GRAMMAR_DOT_RECT` để biết vì sao một chỗ cố định lại
+                hơn việc neo theo bố cục từng trang.
 
                 Trước đây chấm nằm cạnh tiêu đề ở góc trên cùng. Chỗ đó hỏng
                 thật sự chứ không chỉ khó với tay: thanh công cụ là
@@ -64,9 +62,8 @@ export function GrammarOverlay({ points }: { points: GrammarPoint[] }) {
                 khoảng 11px từ mép trên, nằm gọn dưới thanh công cụ cao
                 ~60px. Tức là trên điện thoại nằm ngang thì KHÔNG BẤM ĐƯỢC.
 
-                Khoảng trống giữa hai hộp thì vừa ở tầm giữa màn hình (dễ
-                với ngón cái), vừa trống ở mọi trang, lại vẫn nằm trong vùng
-                giải thích ngữ pháp.
+                Chỗ hiện tại ở tầm giữa trang nên thoát cả thanh công cụ ở
+                mép trên lẫn thanh điều khiển ở mép dưới.
 
                 Vùng chạm 44px nhưng nét vẽ vẫn 20px — phần dôi ra là lề vô
                 hình. To cái chấm lên cho dễ bấm thì chọc vào dáng bản in. */}

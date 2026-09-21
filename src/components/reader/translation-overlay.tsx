@@ -17,11 +17,16 @@ interface ActiveBubble {
 }
 
 /**
- * Vùng bấm xem bản dịch, đặt đè lên ảnh trang.
+ * Chấm xem bản dịch, đặt đè lên ảnh trang.
  *
- * Vùng KHÔNG hiển thị gì cả — không viền, không nhãn, không nền. Trang sách
- * phải trông y như bản in; người dùng bấm vào đoạn nào thì bản dịch của đoạn
- * đó hiện ra, thế thôi.
+ * Vùng đoạn văn KHÔNG hiển thị gì và cũng KHÔNG bấm được — không viền, không
+ * nhãn, không nền. Trang sách phải trông y như bản in. Thứ bấm được chỉ là
+ * cái chấm nhỏ ngay dưới đoạn, với lề chạm 44px quanh nó.
+ *
+ * Trước đây cả khung đoạn văn là nút. Nghe thì tiện hơn, nhưng một vùng dịch
+ * chiếm trung bình 18% diện tích trang (trang nặng nhất tới 56%) — chừng đó
+ * trang thành nút vô hình, nuốt mất cử chỉ chạm để bật thanh công cụ và hay
+ * bung bản dịch lúc người ta chỉ định chạm cho hiện nút lật trang.
  *
  * Component này PHẢI nằm trong đúng khung ảnh thật (không phải khung chứa):
  * ảnh dùng `object-contain` nên có viền trống hai bên, đặt sai khung là toạ
@@ -43,16 +48,22 @@ export function TranslationOverlay({ regions }: { regions: TranslationRegion[] }
         const isOpen = active?.region.id === region.id;
         const what = region.label ?? "đoạn này";
         return (
-          <button
+          // Khung này CHỈ để định vị cái chấm vào đúng mép dưới của đoạn —
+          // nó không bấm được. `pointer-events-none` là chủ ý, không phải
+          // thừa: trước đây cả khung là nút, mà một vùng dịch chiếm trung
+          // bình 18% diện tích trang (trang nặng nhất tới 56%). Chừng đó
+          // trang biến thành nút vô hình, kéo theo hai chuyện:
+          //
+          //  - Chạm vào đó không bật/tắt được thanh công cụ nữa, vì
+          //    `page-viewer` bỏ qua tap bắt đầu trên vùng dịch.
+          //  - Chỉ định chạm để hiện nút lật trang thì lại bung bản dịch.
+          //
+          // Thứ NHÌN THẤY là cái chấm 20px, nên thứ BẤM ĐƯỢC cũng phải là
+          // nó. Vùng bấm vô hình to gấp trăm lần thứ vẽ ra là nói dối người
+          // dùng.
+          <div
             key={region.id}
-            type="button"
-            data-translate-region
-            onClick={(e) =>
-              setActive(isOpen ? null : { region, x: e.clientX, y: e.clientY })
-            }
-            aria-label={isOpen ? `Đóng bản dịch: ${what}` : `Xem bản dịch: ${what}`}
-            aria-expanded={isOpen}
-            className="group absolute cursor-help"
+            className="pointer-events-none absolute"
             style={{
               left: `${x * 100}%`,
               top: `${y * 100}%`,
@@ -90,17 +101,37 @@ export function TranslationOverlay({ regions }: { regions: TranslationRegion[] }
                 nào cũng là giấy in sáng, kể cả khi app đang ở chế độ tối —
                 dùng `text-foreground` thì chế độ tối sẽ lật nét thành trắng
                 và mất hút trên giấy trắng. */}
-            <span
-              className="absolute top-full left-1/2 mt-1 flex size-5 -translate-x-1/2 items-center justify-center text-neutral-900 transition-transform group-hover:scale-110"
-              style={{
-                filter:
-                  "drop-shadow(0 0 1.5px rgb(255 255 255)) drop-shadow(0 0 1.5px rgb(255 255 255))",
-              }}
-              aria-hidden
+            {/* Vùng chạm 44px (size-11) nhưng nét vẽ vẫn chỉ 20px như cũ —
+                phần dôi ra là lề vô hình quanh chấm. 20px là quá nhỏ cho
+                ngón tay (Apple khuyên 44, Google 48), mà phóng to cái chấm
+                cho dễ bấm thì lại chọc vào dáng bản in của trang.
+
+                `-mt-2` kéo nút lên 8px để TÂM nút trùng đúng tâm cái chấm ở
+                chỗ cũ (mép dưới vùng + 4px lề + nửa của 20px = +14px; nút
+                44px đặt ở -8px thì tâm cũng rơi vào +14px). Nhờ vậy đổi vùng
+                chạm mà không xê dịch thứ người dùng nhìn thấy. */}
+            <button
+              type="button"
+              data-translate-region
+              onClick={(e) =>
+                setActive(isOpen ? null : { region, x: e.clientX, y: e.clientY })
+              }
+              aria-label={isOpen ? `Đóng bản dịch: ${what}` : `Xem bản dịch: ${what}`}
+              aria-expanded={isOpen}
+              className="group pointer-events-auto absolute top-full left-1/2 -mt-2 flex size-11 -translate-x-1/2 cursor-help items-center justify-center"
             >
-              {isOpen ? <X className="size-4" /> : <Languages className="size-4" />}
-            </span>
-          </button>
+              <span
+                className="flex size-5 items-center justify-center text-neutral-900 transition-transform group-hover:scale-110"
+                style={{
+                  filter:
+                    "drop-shadow(0 0 1.5px rgb(255 255 255)) drop-shadow(0 0 1.5px rgb(255 255 255))",
+                }}
+                aria-hidden
+              >
+                {isOpen ? <X className="size-4" /> : <Languages className="size-4" />}
+              </span>
+            </button>
+          </div>
         );
       })}
 

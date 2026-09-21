@@ -99,3 +99,57 @@ describe("trang không có vùng dịch nào", () => {
     expect(container.innerHTML).toBe("");
   });
 });
+
+/**
+ * Chỉ cái chấm bấm được, KHÔNG phải cả đoạn văn.
+ *
+ * Trước đây cả khung đoạn là nút. Đo trên 239 vùng thật: một vùng chiếm
+ * trung bình 18% diện tích trang, trang nặng nhất tới 56%. Chừng đó trang
+ * thành nút vô hình, mà `page-viewer` lại bỏ qua tap bắt đầu trên vùng dịch
+ * — nên hơn nửa trang chết cử chỉ chạm để bật thanh công cụ.
+ */
+describe("vùng bấm", () => {
+  /** Khung định vị của một vùng — nhận ra bằng chiều rộng theo tỉ lệ. */
+  function frameOf(container: HTMLElement, widthPercent: string) {
+    return Array.from(container.querySelectorAll("div")).find(
+      (el) => el.style.width === widthPercent
+    );
+  }
+
+  it("khung đoạn văn không phải là nút và không nhận chạm", () => {
+    const { container } = render(<TranslationOverlay regions={REGIONS} />);
+    const frame = frameOf(container, "30%");
+
+    expect(frame).toBeDefined();
+    expect(frame!.tagName).toBe("DIV");
+    expect(frame!.className).toContain("pointer-events-none");
+  });
+
+  it("vùng chạm quanh chấm đủ to cho ngón tay", () => {
+    // size-11 = 44px, mức tối thiểu Apple khuyến nghị. Để trần 20px thì
+    // trên điện thoại bấm mười lần trượt ba.
+    render(<TranslationOverlay regions={REGIONS} />);
+
+    expect(open("Xem bản dịch: Hội thoại").className).toMatch(/\bsize-11\b/);
+  });
+
+  it("dấu hiệu cho page-viewer nằm trên NÚT chứ không trên khung đoạn", () => {
+    // `page-viewer` đọc `data-translate-region` để biết "tap này thuộc về
+    // vùng dịch, đừng bật/tắt thanh công cụ". Gắn nhầm lên khung đoạn là
+    // nuốt mất cử chỉ chạm trên tới 56% diện tích trang.
+    const { container } = render(<TranslationOverlay regions={REGIONS} />);
+    const tagged = Array.from(
+      container.querySelectorAll("[data-translate-region]")
+    );
+
+    expect(tagged).toHaveLength(REGIONS.length);
+    for (const el of tagged) expect(el.tagName).toBe("BUTTON");
+  });
+
+  it("chạm vào giữa đoạn văn KHÔNG bung bản dịch", () => {
+    const { container } = render(<TranslationOverlay regions={REGIONS} />);
+    tap(frameOf(container, "30%")!);
+
+    expect(screen.queryByText("Xin chào?")).toBeNull();
+  });
+});

@@ -108,10 +108,9 @@ describe("tìm kiếm", () => {
 describe("dữ liệu thật", () => {
   const all = getAllGrammar();
 
-  it("gom đủ điểm ngữ pháp của cả ba sách đã soạn", () => {
-    // 36 + 36 ở Sơ cấp, 32 ở Trung cấp 1 (16 bài x 2, ít hơn vì Trung cấp
-    // chỉ có 16 bài chứ không phải 18).
-    expect(all).toHaveLength(104);
+  it("gom đủ điểm ngữ pháp của cả bốn sách đã soạn", () => {
+    // 36 + 36 ở Sơ cấp (18 bài x 2), 32 + 32 ở Trung cấp (16 bài x 2).
+    expect(all).toHaveLength(136);
   });
 
   it("xếp theo đúng thứ tự học, không phải bảng chữ cái", () => {
@@ -121,13 +120,15 @@ describe("dữ liệu thật", () => {
     expect(all[36]).toMatchObject({ bookId: "step2", page: 15 });
     expect(all[71]).toMatchObject({ bookId: "step2", page: 197 });
     expect(all[72]).toMatchObject({ bookId: "step3", page: 15 });
-    expect(all.at(-1)).toMatchObject({ bookId: "step3", page: 206 });
+    expect(all[103]).toMatchObject({ bookId: "step3", page: 206 });
+    expect(all[104]).toMatchObject({ bookId: "step4", page: 15 });
+    expect(all.at(-1)).toMatchObject({ bookId: "step4", page: 208 });
   });
 
   it("mỗi mục biết mình nằm ở sách nào, trang nào", () => {
     // Thiếu là liên kết "mở trang trong sách" trỏ sai chỗ.
     for (const e of all) {
-      expect(e.bookId).toMatch(/^step[123]$/);
+      expect(e.bookId).toMatch(/^step[1234]$/);
       expect(e.page).toBeGreaterThan(0);
     }
   });
@@ -227,9 +228,13 @@ describe("không lẫn âm tiết Hàn", () => {
     }
   });
 
-  it("tra 도 ra vài mục chứ không ra nửa quyển sách", () => {
-    const found = searchGrammar(getAllGrammar(), "도");
-    expect(found.length).toBeLessThan(5);
+  it("tra 도 ra một nhúm chứ không ra nửa kho", () => {
+    // Chốt theo TỈ LỆ chứ không theo con số cứng: soạn thêm sách là con số
+    // tuyệt đối tăng theo, và một ngưỡng cứng sẽ đỏ lên vì lý do chẳng liên
+    // quan gì tới cái lỗi nó sinh ra để canh.
+    const all = getAllGrammar();
+    const found = searchGrammar(all, "도");
+    expect(found.length).toBeLessThan(all.length * 0.1);
     expect(found[0].title).toBe("명 도");
   });
 });

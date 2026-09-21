@@ -11,18 +11,17 @@ import { AUDIO_LAYOUTS } from "@/lib/audio-config";
  * 25, 195): mỗi bài đúng 2 điểm ngữ pháp, ở offset +3 và +5. Sơ cấp 2 dùng
  * chung bố cục với Sơ cấp 1.
  *
- * Trung cấp 1 có bố cục KHÁC: 12 trang một bài, hai trang ngữ pháp nằm LIỀN
- * NHAU ở +3 và +4, mỗi trang đúng một điểm. Đã soi cả 32 trang bằng máy để
- * xác nhận, kể cả bài 9 chỗ số trang nhảy quãng.
- *
- * Trung cấp 2 chưa khảo sát — để trống còn hơn đoán bừa rồi gắn chấm vào
- * trang không có ngữ pháp. Nó dùng chung bảng audio với Trung cấp 1 nhưng
- * đó không đủ để suy ra vị trí trang ngữ pháp.
+ * Trung cấp có bố cục KHÁC: 12 trang một bài, hai trang ngữ pháp nằm LIỀN
+ * NHAU ở +3 và +4, mỗi trang đúng một điểm. Đã soi cả hai quyển bằng máy để
+ * xác nhận, kể cả chỗ số trang nhảy quãng ở bài 9 (Trung cấp 1 nhảy sang
+ * 118, Trung cấp 2 sang 120). Các trang liền kề như +2 hay +5 đều không có
+ * khung giải thích, nên offset không phải là đoán.
  */
 const GRAMMAR_OFFSETS: Record<string, number[]> = {
   step1: [3, 5],
   step2: [3, 5],
   step3: [3, 4],
+  step4: [3, 4],
 };
 
 /** Danh sách trang ngữ pháp của 1 sách, sắp xếp tăng dần. */

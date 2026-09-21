@@ -3,7 +3,7 @@ import { getGrammarPageNumbers, isGrammarPage } from "./grammar-pages";
 import { GRAMMAR_DOT_RECT, getGrammarPages, getPageGrammar } from "./page-grammar";
 
 /** Sách đã soạn nội dung ngữ pháp. Thêm sách mới thì thêm vào đây. */
-const BOOKS_WITH_GRAMMAR = ["step1", "step2", "step3"] as const;
+const BOOKS_WITH_GRAMMAR = ["step1", "step2", "step3", "step4"] as const;
 
 /**
  * Mọi điểm ngữ pháp của mọi sách, để các luật dưới đây áp cho tất cả.
@@ -56,10 +56,18 @@ describe("trang ngữ pháp của Sơ cấp 1", () => {
     expect(getGrammarPageNumbers("step3")).not.toContain(111);
   });
 
-  it("Trung cấp 2 chưa khảo sát thì trả về rỗng, không đoán bừa", () => {
-    // Dùng chung bảng audio với Trung cấp 1 nhưng chừng đó không đủ để suy
-    // ra vị trí trang ngữ pháp.
-    expect(getGrammarPageNumbers("step4")).toEqual([]);
+  it("Trung cấp 2: cùng offset với Trung cấp 1 nhưng KHÁC số trang bắt đầu", () => {
+    // Bài 9 của Trung cấp 1 bắt đầu ở 118, của Trung cấp 2 ở 120. Chép
+    // nguyên danh sách trang của quyển kia là lệch hết nửa sau sách.
+    expect(getGrammarPageNumbers("step4")).toHaveLength(32);
+    expect(getGrammarPageNumbers("step4")).toContain(123);
+    expect(getGrammarPageNumbers("step4")).not.toContain(121);
+  });
+
+  it("sách chưa soạn thì trả về rỗng, không đoán bừa", () => {
+    // Sách bài tập và sách tiếng Anh có bố cục khác hẳn, chưa khảo sát.
+    expect(getGrammarPageNumbers("wb-step1")).toEqual([]);
+    expect(getGrammarPageNumbers("en-beginner")).toEqual([]);
   });
 });
 

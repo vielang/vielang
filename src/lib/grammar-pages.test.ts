@@ -2,6 +2,21 @@ import { describe, expect, it } from "vitest";
 import { getGrammarPageNumbers, isGrammarPage } from "./grammar-pages";
 import { getGrammarPages, getPageGrammar } from "./page-grammar";
 
+/** Sách đã soạn nội dung ngữ pháp. Thêm sách mới thì thêm vào đây. */
+const BOOKS_WITH_GRAMMAR = ["step1", "step2"] as const;
+
+/**
+ * Mọi điểm ngữ pháp của mọi sách, để các luật dưới đây áp cho tất cả.
+ *
+ * Chạy qua từng sách chứ không chốt cứng "step1": soạn sách mới mà test chỉ
+ * kiểm sách cũ thì mọi luật ở đây thành vô dụng đúng lúc cần nhất.
+ */
+function everyPoint(): { book: string; page: number }[] {
+  return BOOKS_WITH_GRAMMAR.flatMap((book) =>
+    getGrammarPages(book).map((page) => ({ book, page }))
+  );
+}
+
 /**
  * Bố cục bài học Sơ cấp: mỗi bài đúng 2 điểm ngữ pháp, ở offset +3 và +5.
  * Đã xác minh bằng ảnh trang thật ở đầu, giữa và cuối sách (trang 15, 25,
@@ -38,16 +53,16 @@ describe("nội dung ngữ pháp đã soạn", () => {
   it("chỉ nằm trên trang thật sự là trang ngữ pháp", () => {
     // Soạn tay nên rất dễ gõ nhầm số trang; nhầm là cái chấm mọc giữa bài
     // đọc mà không có lỗi nào bắn ra.
-    for (const page of getGrammarPages("step1")) {
-      expect(isGrammarPage("step1", page)).toBe(true);
+    for (const { book, page } of everyPoint()) {
+      expect(isGrammarPage(book, page)).toBe(true);
     }
   });
 
   it("mỗi điểm có mã tra cứu hợp lệ", () => {
     // `slug` là mã của CHÍNH điểm ngữ pháp, không gắn với trang — sau này
     // trang tra cứu gom theo mã này.
-    for (const page of getGrammarPages("step1")) {
-      for (const point of getPageGrammar("step1", page)) {
+    for (const { book, page } of everyPoint()) {
+      for (const point of getPageGrammar(book, page)) {
         expect(point.slug).toMatch(/^[a-z0-9-]+$/);
         expect(point.vi.trim()).not.toBe("");
       }
@@ -58,8 +73,8 @@ describe("nội dung ngữ pháp đã soạn", () => {
     // Bong bóng nổi trên chính trang sách đang đọc. Định nghĩa dài là che
     // mất thứ người ta đang học — đúng cái đã phải sửa ở bản đầu. Build
     // cũng chặn (xem MAX_GRAMMAR_VI), chốt thêm ở đây cho khỏi trôi dần.
-    for (const page of getGrammarPages("step1")) {
-      for (const point of getPageGrammar("step1", page)) {
+    for (const { book, page } of everyPoint()) {
+      for (const point of getPageGrammar(book, page)) {
         expect(point.vi.length).toBeLessThanOrEqual(200);
       }
     }
@@ -68,8 +83,8 @@ describe("nội dung ngữ pháp đã soạn", () => {
   it("điểm nào cũng có câu ví dụ kèm bản dịch", () => {
     // Định nghĩa thuần thì đúng nhưng khô. Thiếu ví dụ ở một trang là đúng
     // trang đó người học phải tự đoán.
-    for (const page of getGrammarPages("step1")) {
-      for (const point of getPageGrammar("step1", page)) {
+    for (const { book, page } of everyPoint()) {
+      for (const point of getPageGrammar(book, page)) {
         expect(point.exKo.trim()).not.toBe("");
         expect(point.exVi.trim()).not.toBe("");
       }
@@ -81,27 +96,14 @@ describe("nội dung ngữ pháp đã soạn", () => {
     // ngưỡng mà cộng lại vẫn có thể thành một khối chữ dày. Đo thật thì
     // trang dài nhất đang 161 — để ngưỡng 240 cho dư chỗ xoay xở nhưng
     // vẫn chặn được việc nó phình dần thành bài giảng.
-    for (const page of getGrammarPages("step1")) {
-      for (const p of getPageGrammar("step1", page)) {
+    for (const { book, page } of everyPoint()) {
+      for (const p of getPageGrammar(book, page)) {
         const total = p.title.length + p.vi.length + p.exKo.length + p.exVi.length;
         expect(total).toBeLessThanOrEqual(240);
       }
     }
   });
 
-  it("không có hai điểm khác nhau dùng chung một mã", () => {
-    const bySlug = new Map<string, string>();
-    for (const page of getGrammarPages("step1")) {
-      for (const point of getPageGrammar("step1", page)) {
-        const seen = bySlug.get(point.slug);
-        // Cùng mã thì phải cùng tiêu đề — nếu không là gom nhầm hai điểm
-        // ngữ pháp khác nhau vào một chỗ.
-        if (seen !== undefined) expect(point.title).toBe(seen);
-        bySlug.set(point.slug, point.title);
-      }
-    }
-    expect(bySlug.size).toBeGreaterThan(0);
-  });
 });
 
 /**
@@ -121,8 +123,8 @@ describe("chỗ đặt chấm ngữ pháp", () => {
   }
 
   it("thoát hẳn khỏi dải thanh công cụ ở mép trên", () => {
-    for (const page of getGrammarPages("step1")) {
-      for (const p of getPageGrammar("step1", page)) {
+    for (const { book, page } of everyPoint()) {
+      for (const p of getPageGrammar(book, page)) {
         expect(centerY(p.rect)).toBeGreaterThan(0.15);
       }
     }
@@ -131,8 +133,8 @@ describe("chỗ đặt chấm ngữ pháp", () => {
   it("nằm ở tầm giữa trang, chỗ ngón cái với tới", () => {
     // Quá thấp thì lại chui xuống dưới thanh điều khiển ở mép dưới, cũng
     // `fixed bottom-0 z-20`.
-    for (const page of getGrammarPages("step1")) {
-      for (const p of getPageGrammar("step1", page)) {
+    for (const { book, page } of everyPoint()) {
+      for (const p of getPageGrammar(book, page)) {
         expect(centerY(p.rect)).toBeLessThan(0.55);
       }
     }
@@ -140,10 +142,40 @@ describe("chỗ đặt chấm ngữ pháp", () => {
 
   it("nằm ở cột phải, nơi có hộp ví dụ và hộp chia đuôi", () => {
     // Cột trái là tranh hội thoại — đặt chấm lên đó là che mất hình.
-    for (const page of getGrammarPages("step1")) {
-      for (const p of getPageGrammar("step1", page)) {
+    for (const { book, page } of everyPoint()) {
+      for (const p of getPageGrammar(book, page)) {
         expect(p.rect[0]).toBeGreaterThan(0.5);
       }
     }
+  });
+});
+
+describe("trang ngữ pháp của Sơ cấp 2", () => {
+  it("cùng bố cục với Sơ cấp 1 — mỗi bài 2 trang, đủ 18 bài", () => {
+    expect(getGrammarPageNumbers("step2")).toHaveLength(36);
+    expect(getGrammarPageNumbers("step2")).toEqual(getGrammarPageNumbers("step1"));
+  });
+
+  it("đã soạn đủ nội dung cho mọi trang", () => {
+    // Sót một trang là người học mở ra không thấy chấm, mà không có lỗi nào
+    // báo cho ai biết.
+    expect(getGrammarPages("step2")).toEqual(getGrammarPageNumbers("step2"));
+  });
+});
+
+describe("mã ngữ pháp dùng chung giữa các sách", () => {
+  it("cùng mã thì phải cùng tiêu đề, kể cả khác sách", () => {
+    // `slug` là mã của CHÍNH điểm ngữ pháp, không gắn với sách — sau này
+    // trang tra cứu gom theo mã này. Hai điểm khác nhau mà trùng mã là gom
+    // nhầm chúng vào một chỗ.
+    const bySlug = new Map<string, string>();
+    for (const { book, page } of everyPoint()) {
+      for (const point of getPageGrammar(book, page)) {
+        const seen = bySlug.get(point.slug);
+        if (seen !== undefined) expect(point.title).toBe(seen);
+        bySlug.set(point.slug, point.title);
+      }
+    }
+    expect(bySlug.size).toBeGreaterThan(36);
   });
 });

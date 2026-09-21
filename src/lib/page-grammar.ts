@@ -26,6 +26,7 @@
  * Import TĨNH như `lib/notes.ts` và `lib/page-translation.ts`, cùng lý do
  * (Output File Tracing của Next không lần được file đọc qua path dựng động).
  */
+import { BOOKS } from "@/lib/books";
 import step1 from "../../content/grammar/step1.json";
 import step2 from "../../content/grammar/step2.json";
 import step3 from "../../content/grammar/step3.json";
@@ -88,4 +89,36 @@ export function getGrammarPages(bookId: string): number[] {
   return Object.keys(book)
     .map(Number)
     .sort((a, b) => a - b);
+}
+
+/** Một điểm ngữ pháp kèm chỗ nó xuất hiện trong sách. */
+export interface GrammarEntry extends GrammarPoint {
+  bookId: string;
+  page: number;
+}
+
+/**
+ * Toàn bộ điểm ngữ pháp của mọi sách, theo ĐÚNG THỨ TỰ HỌC.
+ *
+ * Xếp theo thứ tự sách rồi tới số trang, chứ không theo bảng chữ cái: người
+ * tra cứu hầu hết đang theo giáo trình, nên "bài này ở đâu trong chương
+ * trình" hữu ích hơn nhiều so với "chữ này đứng thứ mấy". Muốn tìm nhanh thì
+ * đã có ô tìm kiếm.
+ *
+ * Thứ tự `BOOK_ORDER` lấy từ `BOOKS` để khỏi phải nhớ hai nơi.
+ */
+export function getAllGrammar(): GrammarEntry[] {
+  const order = new Map(BOOKS.map((book, i) => [book.id, i]));
+
+  return Object.entries(GRAMMAR)
+    .flatMap(([bookId, pages]) =>
+      Object.entries(pages).flatMap(([page, points]) =>
+        points.map((point) => ({ ...point, bookId, page: Number(page) }))
+      )
+    )
+    .sort(
+      (a, b) =>
+        (order.get(a.bookId) ?? 0) - (order.get(b.bookId) ?? 0) ||
+        a.page - b.page
+    );
 }

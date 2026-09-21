@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Bookmark, BookOpenText, Download } from "lucide-react";
+import { Bookmark, BookOpen, BookOpenText, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LanguageNav } from "@/components/layout/language-nav";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
@@ -42,6 +42,19 @@ export function SiteHeader() {
           >
             <Link href="/install">
               <Download className="size-5" aria-hidden />
+            </Link>
+          </Button>
+          {/* Chỉ icon ở mọi cỡ màn hình: header đã chật vì nav ngôn ngữ bên
+              trái, mà "Tải app" đã chiếm suất hiện chữ rồi. */}
+          <Button
+            asChild
+            variant="ghost"
+            size="icon"
+            aria-label="Tra cứu ngữ pháp"
+            title="Tra cứu ngữ pháp"
+          >
+            <Link href="/grammar">
+              <BookOpen className="size-5" aria-hidden />
             </Link>
           </Button>
           <Button

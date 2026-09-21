@@ -35,6 +35,17 @@ function index() {
 }
 
 const searchBox = () => screen.getByLabelText("Tra cứu ngữ pháp");
+
+/**
+ * Tiêu đề trong thẻ kết quả bị chia thành nhiều node khi có đoạn được tô
+ * đậm, nên `getByText` không khớp nổi. Đọc `textContent` của cả thẻ là
+ * bám vào THỨ NGƯỜI DÙNG ĐỌC ĐƯỢC chứ không bám vào cách chia node.
+ */
+const cards = () => screen.queryAllByRole("link");
+const shown = (text: string) =>
+  cards().some((a) => a.textContent?.includes(text));
+const hrefOf = (text: string) =>
+  cards().find((a) => a.textContent?.includes(text))?.getAttribute("href");
 const type = (value: string) =>
   fireEvent.change(searchBox(), { target: { value } });
 
@@ -47,15 +58,15 @@ describe("chưa gõ đủ thì chưa đổ danh sách", () => {
   it("chưa gõ gì thì không hiện mục nào", () => {
     index();
 
-    expect(screen.queryByText("명 이에요/예요")).toBeNull();
-    expect(screen.queryByText("동 형 -으면")).toBeNull();
+    expect(shown("명 이에요/예요")).toBe(false);
+    expect(shown("동 형 -으면")).toBe(false);
   });
 
   it("mới gõ một chữ cái Latinh thì chưa hiện", () => {
     index();
     type("d");
 
-    expect(screen.queryByText("명 이에요/예요")).toBeNull();
+    expect(shown("명 이에요/예요")).toBe(false);
   });
 
   it("nhưng vẫn cho biết trong kho có gì", () => {
@@ -71,7 +82,7 @@ describe("chưa gõ đủ thì chưa đổ danh sách", () => {
     index();
     type("d");
 
-    expect(screen.queryByText(/Không tìm thấy/)).toBeNull();
+    expect(screen.queryByText(/Không có điểm ngữ pháp nào khớp/)).toBeNull();
   });
 });
 
@@ -80,16 +91,16 @@ describe("gõ đủ rồi", () => {
     index();
     type("이에요");
 
-    expect(screen.getByText("명 이에요/예요")).toBeTruthy();
-    expect(screen.queryByText("동 형 -으면")).toBeNull();
+    expect(shown("명 이에요/예요")).toBe(true);
+    expect(shown("동 형 -으면")).toBe(false);
   });
 
   it("lọc theo tiếng Việt KHÔNG dấu", () => {
     index();
     type("dieu kien");
 
-    expect(screen.getByText("동 형 -으면")).toBeTruthy();
-    expect(screen.queryByText("명 이에요/예요")).toBeNull();
+    expect(shown("동 형 -으면")).toBe(true);
+    expect(shown("명 이에요/예요")).toBe(false);
   });
 
   it("mỗi mục dẫn thẳng tới đúng trang trong sách", () => {
@@ -100,12 +111,12 @@ describe("gõ đủ rồi", () => {
 
     type("이에요");
     expect(
-      screen.getByText("명 이에요/예요").closest("a")?.getAttribute("href")
+      hrefOf("명 이에요/예요")
     ).toBe("/read/step1/15");
 
     type("dieu kien");
     expect(
-      screen.getByText("동 형 -으면").closest("a")?.getAttribute("href")
+      hrefOf("동 형 -으면")
     ).toBe("/read/step2/55");
   });
 
@@ -137,7 +148,7 @@ describe("gõ đủ rồi", () => {
     index();
     type("xyzzy");
 
-    expect(screen.getByText(/Không tìm thấy/)).toBeTruthy();
+    expect(screen.getByText(/Không có điểm ngữ pháp nào khớp/)).toBeTruthy();
   });
 });
 
@@ -147,7 +158,7 @@ describe("xoá từ khoá", () => {
     type("이에요");
     fireEvent.click(screen.getByLabelText("Xoá từ khoá"));
 
-    expect(screen.queryByText("명 이에요/예요")).toBeNull();
+    expect(shown("명 이에요/예요")).toBe(false);
     expect(screen.getByText(/2 điểm ngữ pháp/)).toBeTruthy();
   });
 
@@ -194,10 +205,10 @@ describe("bộ gõ ghép chữ (IME)", () => {
     index();
     composeKorean();
 
-    expect(screen.getByText("명 이에요/예요")).toBeTruthy();
+    expect(shown("명 이에요/예요")).toBe(true);
   });
 
-  it("không kêu không-tìm-thấy vì mảnh dở dang", () => {
+  it("không kêu không-khớp vì mảnh dở dang", () => {
     index();
     const box = searchBox();
     fireEvent.compositionStart(box);
@@ -205,7 +216,7 @@ describe("bộ gõ ghép chữ (IME)", () => {
 
     // "이ㅇ" không khớp mục nào; nếu đem đi lọc thì hiện "không tìm thấy",
     // nhấp nháy đúng lúc người ta đang gõ dở.
-    expect(screen.queryByText(/Không tìm thấy/)).toBeNull();
+    expect(screen.queryByText(/Không có điểm ngữ pháp nào khớp/)).toBeNull();
   });
 });
 
@@ -231,7 +242,7 @@ describe("tra bằng tiếng Hàn một âm tiết", () => {
     index();
     type("면");
 
-    expect(screen.getByText("동 형 -으면")).toBeTruthy();
+    expect(shown("동 형 -으면")).toBe(true);
   });
 
   it("vẫn lọc đúng chứ không đổ bừa cả danh sách", () => {
@@ -240,7 +251,7 @@ describe("tra bằng tiếng Hàn một âm tiết", () => {
     index();
     type("면");
 
-    expect(screen.queryByText("명 이에요/예요")).toBeNull();
+    expect(shown("명 이에요/예요")).toBe(false);
   });
 
   it("không còn bắt gõ thêm", () => {
@@ -258,7 +269,7 @@ describe("tra bằng tiếng Hàn một âm tiết", () => {
     fireEvent.compositionStart(box);
     fireEvent.change(box, { target: { value: "면" } });
 
-    expect(screen.getByText("동 형 -으면")).toBeTruthy();
+    expect(shown("동 형 -으면")).toBe(true);
   });
 
   it("ghép xong mà thật sự không khớp thì mới báo", () => {
@@ -270,7 +281,7 @@ describe("tra bằng tiếng Hàn một âm tiết", () => {
     fireEvent.change(box, { target: { value: "쀍" } });
     fireEvent.compositionEnd(box, { target: { value: "쀍" } });
 
-    expect(screen.getByText(/Không tìm thấy/)).toBeTruthy();
+    expect(screen.getByText(/Không có điểm ngữ pháp nào khớp/)).toBeTruthy();
   });
 });
 
@@ -288,5 +299,80 @@ describe("câu giới thiệu khi chưa gõ gì", () => {
 
     expect(screen.getByText(/Trung cấp 1/)).toBeTruthy();
     expect(screen.getByText(/3 điểm ngữ pháp/)).toBeTruthy();
+  });
+});
+
+describe("tô đậm chỗ khớp", () => {
+  it("tô đúng đoạn trong phần nghĩa, giữ nguyên dấu tiếng Việt", () => {
+    // Gõ không dấu mà tô lên chữ CÓ dấu — đây là chỗ dễ lệch chỉ số nhất.
+    index();
+    type("dieu kien");
+
+    const marks = document.querySelectorAll("mark");
+    expect([...marks].map((m) => m.textContent)).toContain("điều kiện");
+  });
+
+  it("tô cả ở tiêu đề tiếng Hàn", () => {
+    index();
+    type("이에요");
+
+    const marks = document.querySelectorAll("mark");
+    expect([...marks].map((m) => m.textContent)).toContain("이에요");
+  });
+
+  it("KHÔNG tô vào câu ví dụ, vì câu ví dụ không được đem đi lọc", () => {
+    // Tô ở chỗ không tham gia so khớp là nói dối người dùng về cách ô này
+    // hoạt động: họ sẽ tưởng gõ một câu trong sách cũng tra được.
+    //
+    // Mục này PHẢI khớp thì mới hiện ra thẻ — bản trước của test cho mục
+    // không khớp nên chẳng vẽ thẻ nào, và đếm được 0 vệt tô vì lý do
+    // chẳng liên quan gì tới điều cần chốt.
+    render(
+      <GrammarIndex
+        entries={[
+          {
+            ...ENTRIES[0],
+            vi: "Nêu điều kiện.",
+            exVi: "Câu này cũng có điều kiện.",
+          },
+        ]}
+        bookTitles={TITLES}
+      />
+    );
+    type("dieu kien");
+
+    const marks = [...document.querySelectorAll("mark")];
+    expect(marks).toHaveLength(1);
+    expect(marks[0].closest("p")?.textContent).toBe("Nêu điều kiện.");
+  });
+});
+
+describe("phím tắt và giới hạn hiển thị", () => {
+  it("Esc xoá từ khoá", () => {
+    index();
+    type("이에요");
+    expect(shown("명 이에요/예요")).toBe(true);
+
+    fireEvent.keyDown(searchBox(), { key: "Escape" });
+
+    expect((searchBox() as HTMLInputElement).value).toBe("");
+    expect(shown("명 이에요/예요")).toBe(false);
+  });
+
+  it("cắt danh sách ở 8 mục nhưng vẫn báo tổng số tìm được", () => {
+    // Đo trên dữ liệu thật: mục đúng lọt vào 5 kết quả đầu ở 96% số lần, và
+    // con số đó không nhúc nhích khi nới lên 20. Vẽ hai chục thẻ chỉ tổ đẩy
+    // tụt lưới sách xuống.
+    const many = Array.from({ length: 12 }, (_, i) => ({
+      ...ENTRIES[1],
+      id: `m${i}`,
+      title: `동 -테스트${i}`,
+      vi: "Nêu điều kiện.",
+    }));
+    render(<GrammarIndex entries={many} bookTitles={TITLES} />);
+    type("dieu kien");
+
+    expect(cards()).toHaveLength(8);
+    expect(screen.getByText(/12 kết quả/)).toBeTruthy();
   });
 });

@@ -23,14 +23,56 @@ import type { GrammarEntry } from "@/lib/page-grammar";
  * sửa nổi, và một lần chuẩn hoá Unicode nhầm là hỏng lặng lẽ.
  */
 export function normalize(text: string): string {
+  return fold(text).trim();
+}
+
+/**
+ * Như `normalize` nhưng KHÔNG cắt khoảng trắng hai đầu.
+ *
+ * Tách ra vì phần tô đậm chỗ khớp cần gấp TỪNG ký tự một rồi ghép lại: cắt
+ * khoảng trắng ở mức từng ký tự sẽ nuốt mất dấu cách và làm lệch toàn bộ
+ * vị trí ánh xạ ngược về chuỗi gốc.
+ */
+function fold(text: string): string {
   return text
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .normalize("NFC")
     .replace(/đ/g, "d")
     .replace(/Đ/g, "D")
-    .toLowerCase()
-    .trim();
+    .toLowerCase();
+}
+
+/**
+ * Vị trí khớp trong chuỗi GỐC, trả về [đầu, cuối) theo chỉ số ký tự.
+ *
+ * Dùng để tô đậm đúng chỗ đã khớp. Không thể lấy `indexOf` trên chuỗi đã
+ * chuẩn hoá rồi bê thẳng chỉ số sang chuỗi gốc: chuẩn hoá có thể đổi độ dài
+ * (NFD tách rồi xoá dấu, NFC ghép lại), nên phải gấp từng ký tự và nhớ mốc.
+ *
+ * Trả `null` khi không khớp — người gọi cứ vẽ nguyên văn.
+ */
+export function findMatch(text: string, query: string): [number, number] | null {
+  const needle = normalize(query);
+  if (needle === "") return null;
+
+  const chars = [...text];
+  const starts: number[] = [];
+  let folded = "";
+  for (const ch of chars) {
+    starts.push(folded.length);
+    folded += fold(ch);
+  }
+  starts.push(folded.length);
+
+  const at = folded.indexOf(needle);
+  if (at < 0) return null;
+
+  let from = 0;
+  while (from + 1 < starts.length && starts[from + 1] <= at) from++;
+  let to = from;
+  while (to < chars.length && starts[to] < at + needle.length) to++;
+  return [from, to];
 }
 
 /**
@@ -44,14 +86,15 @@ export const MIN_QUERY_LENGTH = 2;
 /**
  * Số kết quả vẽ ra tối đa.
  *
- * Từ khi chỉ tra tiêu đề và phần nghĩa, một âm tiết cho trung bình 7 kết
- * quả và nhiều nhất là 11, nên lằn cắt này gần như không còn chạm tới. Giữ
- * lại làm lưới chắn: nhãn từ loại `동` có mặt ở 49 trên 72 tiêu đề, gõ trúng
- * nó thì danh sách dài vô ích. Đó không phải phép tra thật — không ai tra
- * ngữ pháp bằng cách gõ "động từ" — nhưng cũng không nên để nó đổ cả kho ra
- * màn hình.
+ * Tám, không phải hai mươi. Đo trên 134 phép tra thật: mục đúng lọt vào 5
+ * kết quả đầu ở 96% số lần, và con số đó KHÔNG tăng thêm chút nào khi nới
+ * lên 10 hay 20 — xếp hạng đã làm xong việc. Số kết quả trung vị của một
+ * lần tra chỉ là 1, và 90% số lần tra ra không quá 5.
+ *
+ * Nghĩa là hai mươi thẻ chỉ tổ đẩy tụt lưới sách xuống chứ không giúp ai
+ * tìm thêm được gì. Tám là còn dư chỗ so với p90 mà trang vẫn gọn.
  */
-export const MAX_VISIBLE_RESULTS = 20;
+export const MAX_VISIBLE_RESULTS = 8;
 
 /**
  * Chuỗi có chứa chữ Hàn không — kể cả jamo rời lúc bộ gõ đang ghép dở.

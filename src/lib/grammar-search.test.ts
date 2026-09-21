@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { hasEnoughQuery, normalize, searchGrammar } from "./grammar-search";
+import {
+  findMatch,
+  hasEnoughQuery,
+  normalize,
+  searchGrammar,
+} from "./grammar-search";
 import { getAllGrammar, type GrammarEntry } from "./page-grammar";
 
 const entry = (over: Partial<GrammarEntry> = {}): GrammarEntry => ({
@@ -281,5 +286,68 @@ describe("xếp hạng theo độ liên quan", () => {
     expect(searchGrammar(all, "에")[0].title).toBe("명 에");
     expect(searchGrammar(all, "을")[0].title).toBe("동 -을");
     expect(searchGrammar(all, "는")[0].title).toBe("동 -는");
+  });
+});
+
+/**
+ * Tô đậm chỗ khớp. Cái bẫy ở đây là chỉ số: chuẩn hoá có thể đổi độ dài
+ * (NFD tách dấu rồi xoá, NFC ghép lại), nên lấy `indexOf` trên chuỗi đã
+ * chuẩn hoá rồi bê thẳng chỉ số sang chuỗi gốc là tô lệch — và lệch thầm
+ * lặng, vì chữ vẫn hiện đủ, chỉ tô sai chỗ.
+ */
+describe("tìm vị trí khớp để tô đậm", () => {
+  it("cắt đúng đoạn trong chuỗi GỐC, giữ nguyên dấu tiếng Việt", () => {
+    const text = "Nêu điều kiện hoặc giả định.";
+    const at = findMatch(text, "dieu kien");
+    expect(at).not.toBeNull();
+    expect([...text].slice(at![0], at![1]).join("")).toBe("điều kiện");
+  });
+
+  it("gõ CÓ dấu cũng cắt ra đúng chừng ấy chữ", () => {
+    const text = "Nêu điều kiện hoặc giả định.";
+    expect(findMatch(text, "điều kiện")).toEqual(findMatch(text, "dieu kien"));
+  });
+
+  it("cắt đúng cả khi chữ trong dữ liệu ở dạng TÁCH DẤU (NFD)", () => {
+    // Đây mới là ca chứng minh vì sao phải ánh xạ chỉ số chứ không bê
+    // thẳng. Chữ NFC thì gấp một ký tự vẫn ra một ký tự nên bê thẳng vẫn
+    // đúng; chữ NFD thì mỗi dấu là một ký tự riêng và bị XOÁ khi gấp, nên
+    // chỉ số lệch đi đúng bằng số dấu — tô sai chỗ mà chữ vẫn hiện đủ,
+    // không có gì báo.
+    const text = "Nêu điều kiện hoặc giả định.".normalize("NFD");
+    const at = findMatch(text, "dieu kien");
+    expect(at).not.toBeNull();
+    expect(
+      [...text].slice(at![0], at![1]).join("").normalize("NFC")
+    ).toBe("điều kiện");
+  });
+
+  it("cắt đúng đoạn tiếng Hàn", () => {
+    const text = "명 이에요/예요";
+    const at = findMatch(text, "이에요");
+    expect([...text].slice(at![0], at![1]).join("")).toBe("이에요");
+  });
+
+  it("không khớp thì trả null để vẽ nguyên văn", () => {
+    expect(findMatch("명 이에요/예요", "xyzzy")).toBeNull();
+    expect(findMatch("명 이에요/예요", "")).toBeNull();
+    expect(findMatch("명 이에요/예요", "   ")).toBeNull();
+  });
+
+  it("không lẫn âm tiết Hàn khác chung jamo đầu", () => {
+    // Cùng cái bẫy NFD ở trên, lần này ở phần tô: 도 không được tô vào 동.
+    expect(findMatch("동 형 -아요/어요", "도")).toBeNull();
+  });
+
+  it("mọi mục tra ra đều tô được ở tiêu đề hoặc ở nghĩa", () => {
+    // Nếu tra ra một mục mà không tô được chỗ nào thì hoặc phần tô sai,
+    // hoặc phần lọc đang khớp vào trường mà giao diện không hề tô.
+    const all = getAllGrammar();
+    for (const q of ["도", "는", "이", "dieu kien", "qua khu"]) {
+      for (const e of searchGrammar(all, q)) {
+        const hit = findMatch(e.title, q) ?? findMatch(e.vi, q);
+        expect(hit).not.toBeNull();
+      }
+    }
   });
 });

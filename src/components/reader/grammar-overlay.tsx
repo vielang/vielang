@@ -51,9 +51,19 @@ export function GrammarOverlay({ points }: { points: GrammarPoint[] }) {
               height: `${h * 100}%`,
             }}
           >
-            {/* Đặt bên TRÁI tiêu đề, canh giữa theo chiều dọc: tiêu đề ngữ
-                pháp luôn nằm sát mép phải trang, để chấm bên phải là rơi ra
-                ngoài giấy.
+            {/* Canh vào GIỮA vùng — `rect` ở đây là khoảng trống bên cột
+                phải, giữa hộp ví dụ 예문 và hộp chia đuôi.
+
+                Trước đây chấm nằm cạnh tiêu đề ở góc trên cùng. Chỗ đó hỏng
+                thật sự chứ không chỉ khó với tay: thanh công cụ là
+                `fixed top-0 z-20`, mà ở chế độ 2 trang ảnh bị giới hạn theo
+                chiều cao nên lấp đầy màn hình — chấm ở y≈0.03 rơi vào
+                khoảng 11px từ mép trên, nằm gọn dưới thanh công cụ cao
+                ~60px. Tức là trên điện thoại nằm ngang thì KHÔNG BẤM ĐƯỢC.
+
+                Khoảng trống giữa hai hộp thì vừa ở tầm giữa màn hình (dễ
+                với ngón cái), vừa trống ở mọi trang, lại vẫn nằm trong vùng
+                giải thích ngữ pháp.
 
                 Vùng chạm 44px nhưng nét vẽ vẫn 20px — phần dôi ra là lề vô
                 hình. To cái chấm lên cho dễ bấm thì chọc vào dáng bản in. */}
@@ -69,7 +79,7 @@ export function GrammarOverlay({ points }: { points: GrammarPoint[] }) {
                   : `Xem nghĩa ngữ pháp: ${point.title}`
               }
               aria-expanded={isOpen}
-              className="group pointer-events-auto absolute top-1/2 right-full flex size-11 -translate-y-1/2 cursor-help items-center justify-center"
+              className="group pointer-events-auto absolute top-1/2 left-1/2 flex size-11 -translate-x-1/2 -translate-y-1/2 cursor-help items-center justify-center"
             >
               <span
                 className="flex size-5 items-center justify-center text-neutral-900 transition-transform group-hover:scale-110"

@@ -43,12 +43,16 @@ describe("chấm ngữ pháp", () => {
     expect(trigger().className).toMatch(/\bsize-11\b/);
   });
 
-  it("chấm nằm BÊN TRÁI tiêu đề", () => {
-    // Tiêu đề ngữ pháp luôn sát mép phải trang, để chấm bên phải là rơi ra
-    // ngoài giấy.
+  it("chấm canh vào GIỮA vùng, không nép vào mép", () => {
+    // `rect` là khoảng trống giữa hộp ví dụ và hộp chia đuôi. Nép vào mép
+    // là chấm đè lên một trong hai hộp.
     render(<GrammarOverlay points={POINTS} />);
+    const cls = trigger().className;
 
-    expect(trigger().className).toMatch(/\bright-full\b/);
+    expect(cls).toMatch(/\btop-1\/2\b/);
+    expect(cls).toMatch(/\bleft-1\/2\b/);
+    expect(cls).toMatch(/-translate-x-1\/2/);
+    expect(cls).toMatch(/-translate-y-1\/2/);
   });
 
   it("khung tiêu đề không nhận chạm, chỉ để định vị", () => {

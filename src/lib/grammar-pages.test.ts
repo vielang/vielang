@@ -103,3 +103,47 @@ describe("nội dung ngữ pháp đã soạn", () => {
     expect(bySlug.size).toBeGreaterThan(0);
   });
 });
+
+/**
+ * Chỗ đặt chấm ngữ pháp trên trang.
+ *
+ * Bản đầu đặt cạnh tiêu đề ở góc trên cùng (y≈0.03). Chỗ đó hỏng thật sự
+ * chứ không chỉ khó với tay: thanh công cụ của trang đọc là
+ * `fixed top-0 z-20` (xem `reader-controls.tsx`), mà ở chế độ 2 trang ảnh
+ * bị giới hạn theo chiều cao nên lấp đầy màn hình — chấm rơi vào khoảng
+ * 11px từ mép trên, nằm gọn dưới thanh công cụ cao ~60px. Trên điện thoại
+ * nằm ngang thì KHÔNG BẤM ĐƯỢC.
+ */
+describe("chỗ đặt chấm ngữ pháp", () => {
+  /** Tâm chấm theo chiều dọc, tính theo tỉ lệ 0–1 của ảnh trang. */
+  function centerY(rect: readonly number[]): number {
+    return rect[1] + rect[3] / 2;
+  }
+
+  it("thoát hẳn khỏi dải thanh công cụ ở mép trên", () => {
+    for (const page of getGrammarPages("step1")) {
+      for (const p of getPageGrammar("step1", page)) {
+        expect(centerY(p.rect)).toBeGreaterThan(0.15);
+      }
+    }
+  });
+
+  it("nằm ở tầm giữa trang, chỗ ngón cái với tới", () => {
+    // Quá thấp thì lại chui xuống dưới thanh điều khiển ở mép dưới, cũng
+    // `fixed bottom-0 z-20`.
+    for (const page of getGrammarPages("step1")) {
+      for (const p of getPageGrammar("step1", page)) {
+        expect(centerY(p.rect)).toBeLessThan(0.55);
+      }
+    }
+  });
+
+  it("nằm ở cột phải, nơi có hộp ví dụ và hộp chia đuôi", () => {
+    // Cột trái là tranh hội thoại — đặt chấm lên đó là che mất hình.
+    for (const page of getGrammarPages("step1")) {
+      for (const p of getPageGrammar("step1", page)) {
+        expect(p.rect[0]).toBeGreaterThan(0.5);
+      }
+    }
+  });
+});

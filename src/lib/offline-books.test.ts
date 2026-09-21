@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  AUDIO_CAN_BE_CACHED,
   bookCacheName,
   countAudioTracks,
   deleteOfflineBook,
@@ -107,13 +108,17 @@ describe("gói tải về gồm cả bài nghe", () => {
     expect(countAudioTracks("step1")).toBe(55);
   });
 
-  it("ước lượng dung lượng có tính audio", () => {
-    // Audio mới là phần nặng: bỏ nó ra là báo thiếu tới ba lần, người dùng
-    // bấm tải xong mới ngã ngửa vì hết chỗ máy.
+  it("ước lượng khớp với thứ THẬT SỰ tải về", () => {
+    // Đây mới là bất biến, chứ không phải “có cộng audio hay không”. Báo
+    // một đằng tải một nẻo thì hoặc người dùng hết chỗ máy, hoặc tưởng đã
+    // mang sách theo mà hoá ra không — cả hai đều chỉ lộ ra lúc mất mạng.
     const step1 = BOOKS.find((b) => b.id === "step1")!;
-    const imagesOnly = step1.totalPages * 180 * 1024;
+    const images = step1.totalPages * 180 * 1024;
+    const audio = countAudioTracks("step1") * 1300 * 1024;
 
-    expect(estimateBytes(step1)).toBeGreaterThan(imagesOnly * 2.5);
+    expect(estimateBytes(step1)).toBe(
+      AUDIO_CAN_BE_CACHED ? images + audio : images
+    );
   });
 
   it("sách không có audio thì không cộng thêm gì", () => {

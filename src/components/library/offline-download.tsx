@@ -21,7 +21,19 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { getBook, type Book } from "@/lib/books";
-import { estimateBytes, formatBytes } from "@/lib/offline-books";
+import {
+  AUDIO_CAN_BE_CACHED,
+  estimateBytes,
+  formatBytes,
+} from "@/lib/offline-books";
+
+/**
+ * Nói đúng thứ gói tải về thật sự có. Hứa cả bài nghe trong khi nó không
+ * được lưu là lời hứa suông, và người dùng chỉ phát hiện lúc mất mạng.
+ */
+const PART_LABEL = AUDIO_CAN_BE_CACHED
+  ? "phần (trang sách và bài nghe)"
+  : "trang sách";
 import { hasFreeSlot, useDownloadStore, useOfflineBooks } from "@/lib/download-store";
 
 /**
@@ -66,7 +78,7 @@ export function OfflineDownload({ book }: { book: Book }) {
       // khiến người ta nhìn nhầm cái này ra cái kia.
       <div
         className="flex items-center gap-1.5 text-xs text-muted-foreground"
-        title={`Đang tải ${done}/${total} phần (trang sách và bài nghe)`}
+        title={`Đang tải ${done}/${total} ${PART_LABEL}`}
       >
         <Loader2 className="size-3.5 shrink-0 animate-spin" aria-hidden />
         <span className="tabular-nums" aria-label={`Đang tải ${percent}%`}>

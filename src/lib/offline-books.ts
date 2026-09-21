@@ -46,6 +46,23 @@ const BYTES_PER_PAGE = 180 * 1024;
  */
 const BYTES_PER_TRACK = 1300 * 1024;
 
+/**
+ * Bài nghe có gói theo được xuống máy hay không.
+ *
+ * ĐANG TẮT. Bài nghe nay trỏ thẳng R2 (xem `lib/audio.ts` để biết vì sao),
+ * mà bucket chưa bật CORS — `fetch` từ trang nhận về bản opaque nên
+ * `cache.put` không lưu được gì.
+ *
+ * Để nguyên thì tệ theo đúng kiểu mà cả file này sinh ra để tránh: người
+ * dùng thấy báo cần 100MB, tải xong thấy lưu thiếu hơn nửa, rồi mất mạng
+ * mở ra thì audio im lặng — tưởng đã mang sách theo mà hoá ra không.
+ *
+ * Bật CORS cho bucket rồi đổi cờ này thành `true` là xong, không phải sửa
+ * gì thêm ở đây. (Muốn nghe được khi offline thì còn phải mở thêm origin
+ * R2 ở chốt cùng-origin trong `sw.js` nữa.)
+ */
+export const AUDIO_CAN_BE_CACHED = false;
+
 /** Tải bao nhiêu trang một lúc. Nhiều hơn thì mạng di động bắt đầu nghẽn. */
 const CONCURRENCY = 4;
 
@@ -85,7 +102,7 @@ export function countAudioTracks(bookId: string): number {
 export function estimateBytes(book: Book): number {
   return (
     book.totalPages * BYTES_PER_PAGE +
-    countAudioTracks(book.id) * BYTES_PER_TRACK
+    (AUDIO_CAN_BE_CACHED ? countAudioTracks(book.id) * BYTES_PER_TRACK : 0)
   );
 }
 
@@ -228,8 +245,10 @@ function buildTasks(book: Book): Task[] {
   const tasks: Task[] = [];
   for (let page = 1; page <= book.totalPages; page++) {
     tasks.push({ kind: "page", page });
-    for (const track of getPageAudio(book.id, page)) {
-      tasks.push({ kind: "audio", url: track.url });
+    if (AUDIO_CAN_BE_CACHED) {
+      for (const track of getPageAudio(book.id, page)) {
+        tasks.push({ kind: "audio", url: track.url });
+      }
     }
   }
   return tasks;

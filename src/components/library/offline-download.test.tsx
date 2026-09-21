@@ -3,6 +3,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { OfflineDownload } from "./offline-download";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { BOOKS } from "@/lib/books";
+import { AUDIO_CAN_BE_CACHED } from "@/lib/offline-books";
 import { useDownloadStore } from "@/lib/download-store";
 
 const [book, other] = BOOKS;
@@ -52,14 +53,15 @@ describe("đang tải", () => {
     expect(screen.queryByRole("progressbar")).toBeNull();
   });
 
-  it("vẫn tra được con số chính xác khi cần", () => {
-    // "phần" chứ không phải "trang": gói tải về nay gồm cả bài nghe, mà một
-    // bài nghe nặng gấp hơn hai chục lần một trang nên phải đếm riêng, nếu
-    // không thanh tiến độ sẽ đứng im từng quãng dài.
+  it("nói đúng thứ gói tải về THẬT SỰ có", () => {
+    // Hứa cả bài nghe trong khi nó không được lưu là lời hứa suông, và
+    // người dùng chỉ phát hiện ra lúc mất mạng — đúng lúc không sửa được.
     widget();
-    expect(
-      screen.getByTitle("Đang tải 57/228 phần (trang sách và bài nghe)")
-    ).toBeTruthy();
+    const label = AUDIO_CAN_BE_CACHED
+      ? "phần (trang sách và bài nghe)"
+      : "trang sách";
+
+    expect(screen.getByTitle(`Đang tải 57/228 ${label}`)).toBeTruthy();
   });
 
   it("huỷ được giữa chừng", () => {

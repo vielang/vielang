@@ -3,7 +3,14 @@
 import { Fragment } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Bookmark, Check, Languages, NotebookText, Volume2 } from "lucide-react";
+import {
+  BookOpen,
+  Bookmark,
+  Check,
+  Languages,
+  NotebookText,
+  Volume2,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getThumbUrl } from "@/lib/books";
 import { useProgressStore } from "@/lib/progress-store";
@@ -56,6 +63,7 @@ export function PageGrid({
   notePages,
   audioPages,
   translatedPages,
+  grammarPages,
 }: {
   bookId: string;
   totalPages: number;
@@ -67,6 +75,8 @@ export function PageGrid({
   audioPages: number[];
   /** Số trang có sẵn bản dịch (xem lib/page-translation.ts) */
   translatedPages: number[];
+  /** Số trang có sẵn nghĩa ngữ pháp (xem lib/page-grammar.ts) */
+  grammarPages: number[];
 }) {
   const books = useProgressStore((s) => s.books);
   const toggleBookmark = useProgressStore((s) => s.toggleBookmark);
@@ -75,6 +85,7 @@ export function PageGrid({
   const notedPages = new Set(notePages);
   const audioedPages = new Set(audioPages);
   const translatedSet = new Set(translatedPages);
+  const grammarSet = new Set(grammarPages);
   const chapterByStartPage = new Map(chapters.map((ch) => [ch.startPage, ch]));
 
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
@@ -90,6 +101,7 @@ export function PageGrid({
           const hasNote = notedPages.has(page);
           const hasAudio = audioedPages.has(page);
           const hasTranslation = translatedSet.has(page);
+          const hasGrammar = grammarSet.has(page);
           const chapter = chapterByStartPage.get(page);
 
           return (
@@ -131,7 +143,7 @@ export function PageGrid({
                         <Check className="size-3" aria-hidden />
                       </span>
                     )}
-                    {(hasNote || hasAudio || hasTranslation) && (
+                    {(hasNote || hasAudio || hasTranslation || hasGrammar) && (
                       <div className="absolute top-1 left-1 flex gap-1">
                         {hasNote && (
                           <span
@@ -155,6 +167,17 @@ export function PageGrid({
                             title="Có bản dịch tiếng Việt"
                           >
                             <Languages className="size-3" aria-hidden />
+                          </span>
+                        )}
+                        {/* Cùng biểu tượng với chấm trên trang đọc: người
+                            dùng thấy ở đây rồi mở trang ra là nhận ra ngay
+                            phải tìm cái gì. */}
+                        {hasGrammar && (
+                          <span
+                            className="rounded-full bg-background/95 p-1 text-primary shadow ring-1 ring-border"
+                            title="Có giải nghĩa ngữ pháp"
+                          >
+                            <BookOpen className="size-3" aria-hidden />
                           </span>
                         )}
                       </div>

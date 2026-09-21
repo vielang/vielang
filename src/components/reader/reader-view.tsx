@@ -81,6 +81,30 @@ export function ReaderView({
     ? getSpreadPages(book.id, page, book.totalPages)
     : [page];
 
+  /**
+   * Spread liền trước và liền sau, để trình xem vẽ sẵn hai bên mà trượt
+   * sang khi lật.
+   *
+   * Tính bằng ĐÚNG mấy hàm mà stepPrev/stepNext dùng, nên cái hiện ra lúc
+   * lật không bao giờ lệch với trang sẽ mở. `getAdjacentSpreadAnchor` tự
+   * kẹp ở hai đầu sách và trả lại chính nó, nên so với `page` là biết đã
+   * hết trang.
+   */
+  const spreadAt = (anchor: number) =>
+    effectiveDouble ? getSpreadPages(book.id, anchor, book.totalPages) : [anchor];
+  const prevAnchor = effectiveDouble
+    ? getAdjacentSpreadAnchor(book.id, page, book.totalPages, -1)
+    : page - 1;
+  const nextAnchor = effectiveDouble
+    ? getAdjacentSpreadAnchor(book.id, page, book.totalPages, 1)
+    : page + 1;
+  const prevPages =
+    prevAnchor >= 1 && prevAnchor !== page ? spreadAt(prevAnchor) : null;
+  const nextPages =
+    nextAnchor <= book.totalPages && nextAnchor !== page
+      ? spreadAt(nextAnchor)
+      : null;
+
   // Bài giảng có thể đã được người dùng sửa/tự viết rồi lưu ở localStorage —
   // chờ rehydrate xong mới hiện chấm báo, tránh lệch với HTML server render.
   // Gọi useEffectiveNote cố định cho CẢ 2 trang (page, page+1) dù đang ở chế
@@ -195,6 +219,23 @@ export function ReaderView({
     );
   }, [effectiveDouble, book.id, book.totalPages, page, goTo]);
 
+  /**
+   * Nút mũi tên và phím mũi tên đi qua cùng một hiệu ứng lật như vuốt tay.
+   *
+   * Không thì bấm nút là trang nhảy cái rụp còn vuốt thì trượt, hai lối
+   * điều hướng cho cùng một việc mà cảm giác khác hẳn nhau.
+   *
+   * `turn` trả về false khi hết sách hoặc khung chưa đo xong — lúc đó cứ
+   * chuyển trang kiểu cũ, thà không có hiệu ứng còn hơn đứng im.
+   */
+  const turnNext = useCallback(() => {
+    if (!viewerRef.current?.turn(1)) stepNext();
+  }, [stepNext]);
+
+  const turnPrev = useCallback(() => {
+    if (!viewerRef.current?.turn(-1)) stepPrev();
+  }, [stepPrev]);
+
   const togglePageLayout = useCallback(() => {
     const next = pageLayout === "double" ? "single" : "double";
     setPageLayout(next);
@@ -230,10 +271,10 @@ export function ReaderView({
 
       switch (e.key) {
         case "ArrowRight":
-          stepNext();
+          turnNext();
           break;
         case "ArrowLeft":
-          stepPrev();
+          turnPrev();
           break;
         case "Home":
           goTo(1);
@@ -278,8 +319,8 @@ export function ReaderView({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [
     goTo,
-    stepNext,
-    stepPrev,
+    turnNext,
+    turnPrev,
     page,
     book.id,
     book.totalPages,
@@ -303,6 +344,8 @@ export function ReaderView({
         ref={viewerRef}
         book={book}
         pages={pages}
+        prevPages={prevPages}
+        nextPages={nextPages}
         onTap={() => setToolbarVisible((v) => !v)}
         onSwipePrev={stepPrev}
         onSwipeNext={stepNext}
@@ -340,8 +383,8 @@ export function ReaderView({
         recordOpen={recordOpen}
         recordHasContent={recordHasContent}
         onRecordToggle={() => setRecordOpen(!recordOpen)}
-        onPrev={stepPrev}
-        onNext={stepNext}
+        onPrev={turnPrev}
+        onNext={turnNext}
         onJump={goTo}
         onToggleBookmark={() => toggleBookmark(book.id, page)}
         onResetZoom={() => viewerRef.current?.resetZoom()}

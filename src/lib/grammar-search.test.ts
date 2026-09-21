@@ -118,24 +118,59 @@ describe("dữ liệu thật", () => {
   });
 });
 
+/**
+ * Đây là lỗi người dùng báo: "chỉ search được tiếng Việt, không search được
+ * tiếng Hàn". Nguyên nhân không nằm ở chuẩn hoá hay so khớp — cả hai vẫn
+ * đúng — mà ở ngưỡng hai ký tự. Đuôi ngữ pháp tiếng Hàn phần lớn dài đúng
+ * MỘT âm tiết nên không đuôi nào với tới ngưỡng, trong khi từ tiếng Việt tự
+ * nhiên đã dài hai ký tự trở lên và không bao giờ vướng.
+ *
+ * Kiểm trên dữ liệu THẬT chứ không trên mẫu tự chế: điều cần chốt là mấy
+ * đuôi này tra ra được thứ có trong sách, không phải là hàm ngưỡng trả về
+ * `true`.
+ */
+describe("tra bằng một âm tiết tiếng Hàn", () => {
+  const all = getAllGrammar();
+
+  for (const ending of ["은", "는", "이", "가", "도", "에", "을", "지", "고"]) {
+    it(`"${ending}" tra được và có khớp thật trong sách`, () => {
+      expect(hasEnoughQuery(ending)).toBe(true);
+      expect(searchGrammar(all, ending).length).toBeGreaterThan(0);
+    });
+  }
+});
+
 describe("ngưỡng bắt đầu tra", () => {
-  it("chưa gõ gì hoặc mới một ký tự thì chưa tra", () => {
+  it("chưa gõ gì thì chưa tra", () => {
     expect(hasEnoughQuery("")).toBe(false);
     expect(hasEnoughQuery("  ")).toBe(false);
+  });
+
+  it("chữ Latinh: một ký tự là chưa đủ", () => {
+    // Ô nằm ngay đầu trang thư viện; một chữ cái đổ ra hàng chục kết quả là
+    // đẩy tụt lưới sách xuống mỗi lần chạm nhầm.
     expect(hasEnoughQuery("d")).toBe(false);
-  });
-
-  it("một âm tiết Hàn tính là MỘT ký tự", () => {
-    // Bẫy thật: NFD tách `이` thành jamo ㅇ + ㅣ, nên đếm trên chuỗi đã
-    // chuẩn hoá thì nó thành 2 và lọt chốt ngay khi vừa gõ một chữ. Ngưỡng
-    // phải khớp với thứ người dùng NHÌN THẤY.
-    expect(hasEnoughQuery("이")).toBe(false);
-    expect(hasEnoughQuery("이에")).toBe(true);
-  });
-
-  it("hai ký tự trở lên thì tra", () => {
     expect(hasEnoughQuery("di")).toBe(true);
     expect(hasEnoughQuery("điều kiện")).toBe(true);
+  });
+
+  it("chữ Hàn: MỘT âm tiết đã đủ", () => {
+    // Gõ một chữ Hàn trong giao diện tiếng Việt không bao giờ là chạm nhầm,
+    // nên không có cái giá mà ngưỡng kia sinh ra để tránh.
+    expect(hasEnoughQuery("는")).toBe(true);
+    expect(hasEnoughQuery("이")).toBe(true);
+  });
+
+  it("jamo rời lúc bộ gõ đang ghép cũng tính là chữ Hàn", () => {
+    // Bàn phím Hàn bắn ra jamo tương thích (U+3130–318F) giữa chừng; nếu dải
+    // nhận diện bỏ sót dải này thì ô đứng im đúng lúc người ta đang gõ.
+    expect(hasEnoughQuery("ㅇ")).toBe(true);
+    expect(hasEnoughQuery("ㄴ")).toBe(true);
+  });
+
+  it("lẫn Hàn với ký tự khác thì vẫn tra", () => {
+    // Sách viết đuôi câu kèm gạch nối, và người ta chép y như vậy.
+    expect(hasEnoughQuery("-지")).toBe(true);
   });
 
   it("bỏ qua khoảng trắng thừa hai đầu", () => {

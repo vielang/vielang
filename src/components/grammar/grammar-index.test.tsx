@@ -51,9 +51,9 @@ describe("chưa gõ đủ thì chưa đổ danh sách", () => {
     expect(screen.queryByText("동 형 -으면")).toBeNull();
   });
 
-  it("mới gõ một ký tự cũng chưa hiện", () => {
+  it("mới gõ một chữ cái Latinh thì chưa hiện", () => {
     index();
-    type("이");
+    type("d");
 
     expect(screen.queryByText("명 이에요/예요")).toBeNull();
   });
@@ -69,7 +69,7 @@ describe("chưa gõ đủ thì chưa đổ danh sách", () => {
   it("chưa gõ đủ thì KHÔNG báo 'không tìm thấy'", () => {
     // Gõ một chữ mà đã bảo không tìm thấy là sai và gây hoang mang.
     index();
-    type("이");
+    type("d");
 
     expect(screen.queryByText(/Không tìm thấy/)).toBeNull();
   });
@@ -162,10 +162,11 @@ describe("xoá từ khoá", () => {
  * Bàn phím tiếng Hàn (và gõ Telex tiếng Việt) ghép chữ dần dần, bắn
  * `compositionstart` → nhiều `change` với mảnh dở dang → `compositionend`.
  *
- * Lọc trên mấy mảnh đó vừa vô nghĩa vừa làm danh sách nhấp nháy, và trên
- * một số bàn phím còn làm đứt mạch ghép chữ — gõ xong cả từ mà ô vẫn như
- * chưa nhận. Đây là loại lỗi CHỈ xuất hiện trên bàn phím thật, không bao
- * giờ tái hiện bằng chuột và bàn phím Latinh, nên phải chốt ở đây.
+ * Ô vẫn LỌC trong lúc ghép, chỉ nín phần báo không tìm thấy. Tạm ngưng lọc
+ * cho tới `compositionend` nghe thì gọn nhưng là một canh bạc: nhiều bàn
+ * phím Hàn trên Android giữ nguyên một mạch ghép chữ cho tới khi gõ dấu
+ * cách, nên ô sẽ đứng im suốt cả từ. Đây là loại lỗi CHỈ xuất hiện trên bàn
+ * phím thật, không bao giờ tái hiện bằng chuột và bàn phím Latinh.
  */
 describe("bộ gõ ghép chữ (IME)", () => {
   /** Gõ `이에` qua bộ gõ Hàn: ㅇ → 이 → 이ㅇ → 이에. */
@@ -186,7 +187,7 @@ describe("bộ gõ ghép chữ (IME)", () => {
     expect((searchBox() as HTMLInputElement).value).toBe("이에");
   });
 
-  it("ghép xong thì LỌC — đây chính là chỗ từng hỏng", () => {
+  it("ghép xong thì lọc", () => {
     // Nếu chỉ hạ cờ ở `compositionend` mà không lấy giá trị từ sự kiện, thì
     // chữ vừa ghép xong không bao giờ được đem đi lọc: gõ xong cả từ mà
     // danh sách vẫn trống.
@@ -196,7 +197,7 @@ describe("bộ gõ ghép chữ (IME)", () => {
     expect(screen.getByText("명 이에요/예요")).toBeTruthy();
   });
 
-  it("không lọc theo mảnh dở dang giữa chừng", () => {
+  it("không kêu không-tìm-thấy vì mảnh dở dang", () => {
     index();
     const box = searchBox();
     fireEvent.compositionStart(box);
@@ -216,5 +217,59 @@ describe("khi mới gõ một ký tự", () => {
     type("d");
 
     expect(screen.getByText(/Gõ thêm 1 ký tự nữa/)).toBeTruthy();
+  });
+});
+
+/**
+ * Lỗi người dùng báo: "chỉ search được tiếng Việt, không search được tiếng
+ * Hàn". Thủ phạm là ngưỡng hai ký tự — đuôi ngữ pháp tiếng Hàn phần lớn dài
+ * đúng MỘT âm tiết nên không bao giờ với tới, còn từ tiếng Việt tự nhiên đã
+ * dài hơn nên không ai thấy gì bất thường.
+ */
+describe("tra bằng tiếng Hàn một âm tiết", () => {
+  it("một âm tiết là đã lọc — đây chính là chỗ từng hỏng", () => {
+    index();
+    type("면");
+
+    expect(screen.getByText("동 형 -으면")).toBeTruthy();
+  });
+
+  it("vẫn lọc đúng chứ không đổ bừa cả danh sách", () => {
+    // Hạ ngưỡng mà quên lọc thì test trên vẫn xanh trong khi ô hoá ra vô
+    // dụng: gõ gì cũng ra đủ bảy chục mục.
+    index();
+    type("면");
+
+    expect(screen.queryByText("명 이에요/예요")).toBeNull();
+  });
+
+  it("không còn bắt gõ thêm", () => {
+    index();
+    type("면");
+
+    expect(screen.queryByText(/Gõ thêm/)).toBeNull();
+  });
+
+  it("lọc ngay giữa lúc bộ gõ đang ghép, không đợi ghép xong", () => {
+    // Trên bàn phím giữ một mạch ghép chữ tới tận dấu cách, đợi
+    // `compositionend` nghĩa là không bao giờ lọc.
+    index();
+    const box = searchBox();
+    fireEvent.compositionStart(box);
+    fireEvent.change(box, { target: { value: "면" } });
+
+    expect(screen.getByText("동 형 -으면")).toBeTruthy();
+  });
+
+  it("ghép xong mà thật sự không khớp thì mới báo", () => {
+    // Nín trong lúc ghép là đúng, nín luôn sau khi ghép xong là nuốt mất câu
+    // trả lời duy nhất người dùng cần.
+    index();
+    const box = searchBox();
+    fireEvent.compositionStart(box);
+    fireEvent.change(box, { target: { value: "쀍" } });
+    fireEvent.compositionEnd(box, { target: { value: "쀍" } });
+
+    expect(screen.getByText(/Không tìm thấy/)).toBeTruthy();
   });
 });

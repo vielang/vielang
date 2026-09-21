@@ -22,7 +22,9 @@ import {
 } from "react-zoom-pan-pinch";
 import { getPageUrl, getPageAspectRatio, type Book } from "@/lib/books";
 import { getPageTranslations } from "@/lib/page-translation";
+import { getPageGrammar } from "@/lib/page-grammar";
 import { TranslationOverlay } from "@/components/reader/translation-overlay";
+import { GrammarOverlay } from "@/components/reader/grammar-overlay";
 import { AnnotationLayer } from "@/components/reader/annotation-layer";
 import { useAnnotationStore } from "@/lib/annotation-store";
 
@@ -102,6 +104,7 @@ function PageImage({
   aspectRatio: number;
 }) {
   const regions = getPageTranslations(bookId, page);
+  const grammar = getPageGrammar(bookId, page);
   const { attempt, status, retrying, onLoad, onError, retry } = useRetryingMedia();
 
   return (
@@ -129,6 +132,7 @@ function PageImage({
         onError={onError}
       />
       <TranslationOverlay regions={regions} />
+      <GrammarOverlay points={grammar} />
       {/* Nằm SAU vùng dịch: đang bật chế độ vẽ thì nét vẽ phải nhận được
           chạm trước, nếu không bấm trúng vùng dịch là bật bản dịch thay vì
           vẽ. Tắt chế độ vẽ thì lớp này `pointer-events: none` nên vùng dịch

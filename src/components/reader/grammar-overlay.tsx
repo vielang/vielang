@@ -51,8 +51,11 @@ export function GrammarOverlay({ points }: { points: GrammarPoint[] }) {
               height: `${h * 100}%`,
             }}
           >
-            {/* Canh vào GIỮA vùng — `rect` ở đây là khoảng trống bên cột
-                phải, giữa hộp ví dụ 예문 và hộp chia đuôi.
+            {/* Canh vào GIỮA vùng — `rect` ở đây là một khoảng TRỐNG đo
+                trên ảnh trang, không phải vùng tiêu đề. Sơ cấp dùng khe
+                giữa hộp ví dụ 예문 và hộp chia đuôi; Trung cấp 1 dùng dải
+                trắng ngay dưới khung giải thích, vì khe kia bị chữ lấp mất
+                trên 22/32 trang.
 
                 Trước đây chấm nằm cạnh tiêu đề ở góc trên cùng. Chỗ đó hỏng
                 thật sự chứ không chỉ khó với tay: thanh công cụ là

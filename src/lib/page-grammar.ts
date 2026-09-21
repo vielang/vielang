@@ -20,8 +20,9 @@
  * `-지요?`. Nhờ vậy sau này làm được trang tra cứu ngữ pháp, hoặc dùng lại
  * định nghĩa khi cùng điểm ngữ pháp xuất hiện ở sách khác.
  *
- * Bố cục sách rất đều: mỗi bài đúng 2 điểm ngữ pháp, tiêu đề luôn nằm góc
- * trên bên phải. Xem `lib/grammar-pages.ts`.
+ * Mỗi bài đúng 2 điểm ngữ pháp, mỗi trang một điểm. Sơ cấp đặt hai trang đó
+ * ở offset +3 và +5, Trung cấp 1 đặt liền nhau ở +3 và +4. Xem
+ * `lib/grammar-pages.ts`.
  *
  * Import TĨNH như `lib/notes.ts` và `lib/page-translation.ts`, cùng lý do
  * (Output File Tracing của Next không lần được file đọc qua path dựng động).
@@ -43,7 +44,14 @@ export interface GrammarPoint {
    * chung mã.
    */
   slug: string;
-  /** Vùng tiêu đề trên ảnh, để neo cái chấm vào đúng chỗ. */
+  /**
+   * Khoảng TRỐNG trên ảnh để đặt cái chấm, không phải vùng tiêu đề.
+   *
+   * Chấm được canh vào giữa vùng này. Chỗ trống khác nhau theo từng bộ sách
+   * nên phải đo trên ảnh trang thật: Sơ cấp dùng khe giữa hộp ví dụ 예문 và
+   * hộp chia đuôi ở cột phải; Trung cấp 1 thì khe đó bị chữ lấp mất trên
+   * 22/32 trang nên dùng dải trắng ngay dưới khung giải thích.
+   */
   rect: Rect;
   /** Nguyên văn tiêu đề trong sách, vd "명 이에요/예요". */
   title: string;

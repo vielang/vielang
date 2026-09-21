@@ -8,15 +8,21 @@ import { AUDIO_LAYOUTS } from "@/lib/audio-config";
  * cảnh sửa một bên quên bên kia.
  *
  * Đã xác minh bằng ảnh trang thật ở đầu, giữa và cuối Sơ cấp 1 (trang 15,
- * 25, 195): mỗi bài đúng 2 điểm ngữ pháp, ở offset +3 và +5, tiêu đề luôn
- * nằm góc trên bên phải. Sơ cấp 2 dùng chung bố cục với Sơ cấp 1.
+ * 25, 195): mỗi bài đúng 2 điểm ngữ pháp, ở offset +3 và +5. Sơ cấp 2 dùng
+ * chung bố cục với Sơ cấp 1.
  *
- * Trung cấp (12 trang/bài) có bố cục khác và CHƯA khảo sát — để trống còn
- * hơn đoán bừa rồi gắn chấm vào trang không có ngữ pháp.
+ * Trung cấp 1 có bố cục KHÁC: 12 trang một bài, hai trang ngữ pháp nằm LIỀN
+ * NHAU ở +3 và +4, mỗi trang đúng một điểm. Đã soi cả 32 trang bằng máy để
+ * xác nhận, kể cả bài 9 chỗ số trang nhảy quãng.
+ *
+ * Trung cấp 2 chưa khảo sát — để trống còn hơn đoán bừa rồi gắn chấm vào
+ * trang không có ngữ pháp. Nó dùng chung bảng audio với Trung cấp 1 nhưng
+ * đó không đủ để suy ra vị trí trang ngữ pháp.
  */
 const GRAMMAR_OFFSETS: Record<string, number[]> = {
   step1: [3, 5],
   step2: [3, 5],
+  step3: [3, 4],
 };
 
 /** Danh sách trang ngữ pháp của 1 sách, sắp xếp tăng dần. */

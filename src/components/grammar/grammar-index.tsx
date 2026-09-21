@@ -55,6 +55,17 @@ export function GrammarIndex({
   // Mọi thứ hiển thị đều tính từ `deferred`, kể cả dòng đếm: lấy số kết quả
   // của nhịp này mà ghép với từ khoá của nhịp sau thì ra câu sai lè kiểu
   // "0 kết quả cho 이에요".
+  // Tên sách lấy từ chính dữ liệu chứ không chép tay vào câu giới thiệu:
+  // soạn thêm ngữ pháp cho một quyển nữa mà quên sửa câu này thì người
+  // dùng đọc được một câu sai, và không có gì báo lỗi cả.
+  const books = useMemo(
+    () =>
+      [...new Set(entries.map((e) => e.bookId))]
+        .map((id) => bookTitles[id] ?? id)
+        .join(", "),
+    [entries, bookTitles]
+  );
+
   const deferred = useDeferredValue(query);
   const ready = hasEnoughQuery(deferred);
   const typed = [...deferred.trim()].length;
@@ -111,7 +122,7 @@ export function GrammarIndex({
         // Chỉ chữ Latinh mới rơi vào đây: một chữ Hàn đã đủ để tra.
         <p className="text-sm text-muted-foreground" aria-live="polite">
           {typed === 0
-            ? `${entries.length} điểm ngữ pháp trong Sơ cấp 1 và Sơ cấp 2, kèm nghĩa tiếng Việt và câu ví dụ.`
+            ? `${entries.length} điểm ngữ pháp trong ${books}, kèm nghĩa tiếng Việt và câu ví dụ.`
             : `Gõ thêm ${MIN_QUERY_LENGTH - typed} ký tự nữa để tra cứu.`}
         </p>
       ) : quiet ? null : (

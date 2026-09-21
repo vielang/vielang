@@ -273,3 +273,20 @@ describe("tra bằng tiếng Hàn một âm tiết", () => {
     expect(screen.getByText(/Không tìm thấy/)).toBeTruthy();
   });
 });
+
+describe("câu giới thiệu khi chưa gõ gì", () => {
+  it("kể tên sách lấy từ DỮ LIỆU chứ không chép tay", () => {
+    // Chép cứng "Sơ cấp 1 và Sơ cấp 2" vào câu này đã sai một lần, đúng lúc
+    // soạn xong ngữ pháp Trung cấp 1 — người dùng đọc được một câu sai mà
+    // không có gì báo lỗi. Giờ phải suy ra từ chính danh sách mục.
+    render(
+      <GrammarIndex
+        entries={[...ENTRIES, { ...ENTRIES[0], id: "x", bookId: "step3" }]}
+        bookTitles={{ ...TITLES, step3: "Trung cấp 1" }}
+      />
+    );
+
+    expect(screen.getByText(/Trung cấp 1/)).toBeTruthy();
+    expect(screen.getByText(/3 điểm ngữ pháp/)).toBeTruthy();
+  });
+});

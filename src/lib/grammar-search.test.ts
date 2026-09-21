@@ -108,8 +108,10 @@ describe("tìm kiếm", () => {
 describe("dữ liệu thật", () => {
   const all = getAllGrammar();
 
-  it("gom đủ điểm ngữ pháp của cả hai sách", () => {
-    expect(all).toHaveLength(72);
+  it("gom đủ điểm ngữ pháp của cả ba sách đã soạn", () => {
+    // 36 + 36 ở Sơ cấp, 32 ở Trung cấp 1 (16 bài x 2, ít hơn vì Trung cấp
+    // chỉ có 16 bài chứ không phải 18).
+    expect(all).toHaveLength(104);
   });
 
   it("xếp theo đúng thứ tự học, không phải bảng chữ cái", () => {
@@ -117,13 +119,15 @@ describe("dữ liệu thật", () => {
     expect(all[0]).toMatchObject({ bookId: "step1", page: 15 });
     expect(all[35]).toMatchObject({ bookId: "step1", page: 197 });
     expect(all[36]).toMatchObject({ bookId: "step2", page: 15 });
-    expect(all.at(-1)).toMatchObject({ bookId: "step2", page: 197 });
+    expect(all[71]).toMatchObject({ bookId: "step2", page: 197 });
+    expect(all[72]).toMatchObject({ bookId: "step3", page: 15 });
+    expect(all.at(-1)).toMatchObject({ bookId: "step3", page: 206 });
   });
 
   it("mỗi mục biết mình nằm ở sách nào, trang nào", () => {
     // Thiếu là liên kết "mở trang trong sách" trỏ sai chỗ.
     for (const e of all) {
-      expect(e.bookId).toMatch(/^step[12]$/);
+      expect(e.bookId).toMatch(/^step[123]$/);
       expect(e.page).toBeGreaterThan(0);
     }
   });

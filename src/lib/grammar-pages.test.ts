@@ -3,7 +3,7 @@ import { getGrammarPageNumbers, isGrammarPage } from "./grammar-pages";
 import { getGrammarPages, getPageGrammar } from "./page-grammar";
 
 /** Sách đã soạn nội dung ngữ pháp. Thêm sách mới thì thêm vào đây. */
-const BOOKS_WITH_GRAMMAR = ["step1", "step2"] as const;
+const BOOKS_WITH_GRAMMAR = ["step1", "step2", "step3"] as const;
 
 /**
  * Mọi điểm ngữ pháp của mọi sách, để các luật dưới đây áp cho tất cả.
@@ -41,10 +41,24 @@ describe("trang ngữ pháp của Sơ cấp 1", () => {
     }
   });
 
-  it("Trung cấp chưa khảo sát thì trả về rỗng, không đoán bừa", () => {
-    // Trung cấp 12 trang/bài, bố cục khác. Suy bừa theo offset của Sơ cấp là
-    // gắn chấm vào trang không có ngữ pháp.
-    expect(getGrammarPageNumbers("step3")).toEqual([]);
+  it("Trung cấp 1: hai trang ngữ pháp LIỀN NHAU, khác Sơ cấp", () => {
+    // Sơ cấp là +3/+5, Trung cấp 1 là +3/+4. Suy bừa theo offset của Sơ cấp
+    // là gắn chấm vào trang không có ngữ pháp.
+    expect(getGrammarPageNumbers("step3").slice(0, 4)).toEqual([15, 16, 27, 28]);
+    expect(getGrammarPageNumbers("step3")).toHaveLength(32);
+  });
+
+  it("Trung cấp 1: bài 9 trở đi vẫn đúng chỗ số trang nhảy quãng", () => {
+    // Bài 8 bắt đầu ở 96 nhưng bài 9 ở 118, không phải 108. Tính offset từ
+    // một trang bắt đầu cố định là lệch hết nửa sau quyển sách.
+    expect(getGrammarPageNumbers("step3")).toContain(121);
+    expect(getGrammarPageNumbers("step3")).toContain(122);
+    expect(getGrammarPageNumbers("step3")).not.toContain(111);
+  });
+
+  it("Trung cấp 2 chưa khảo sát thì trả về rỗng, không đoán bừa", () => {
+    // Dùng chung bảng audio với Trung cấp 1 nhưng chừng đó không đủ để suy
+    // ra vị trí trang ngữ pháp.
     expect(getGrammarPageNumbers("step4")).toEqual([]);
   });
 });
@@ -140,11 +154,25 @@ describe("chỗ đặt chấm ngữ pháp", () => {
     }
   });
 
-  it("nằm ở cột phải, nơi có hộp ví dụ và hộp chia đuôi", () => {
-    // Cột trái là tranh hội thoại — đặt chấm lên đó là che mất hình.
-    for (const { book, page } of everyPoint()) {
-      for (const p of getPageGrammar(book, page)) {
-        expect(p.rect[0]).toBeGreaterThan(0.5);
+  it("Sơ cấp: nằm ở cột phải, tránh tranh hội thoại bên trái", () => {
+    // Ở Sơ cấp chấm nằm NGANG HÀNG với tranh, nên phải né sang phải.
+    for (const book of ["step1", "step2"]) {
+      for (const page of getGrammarPages(book)) {
+        for (const p of getPageGrammar(book, page)) {
+          expect(p.rect[0]).toBeGreaterThan(0.5);
+        }
+      }
+    }
+  });
+
+  it("Trung cấp 1: nằm hẳn DƯỚI khung giải thích nên không che gì", () => {
+    // Trung cấp không né sang phải được: khe giữa hộp ví dụ và hộp chia
+    // đuôi bị chữ lấp mất trên 22/32 trang. Bù lại khung giải thích kết
+    // thúc ở y≈0.43 trên mọi trang, nên dải trắng ngay dưới nó vừa trống
+    // vừa ổn định — đặt giữa trang cũng không đè lên gì.
+    for (const page of getGrammarPages("step3")) {
+      for (const p of getPageGrammar("step3", page)) {
+        expect(p.rect[1]).toBeGreaterThan(0.41);
       }
     }
   });
@@ -177,5 +205,24 @@ describe("mã ngữ pháp dùng chung giữa các sách", () => {
       }
     }
     expect(bySlug.size).toBeGreaterThan(36);
+  });
+});
+
+describe("nội dung phủ đủ bố cục", () => {
+  it("mọi trang ngữ pháp của sách đã soạn đều CÓ nội dung", () => {
+    // Test kia chỉ chốt chiều ngược lại: nội dung không nằm nhầm trang.
+    // Thiếu chiều này thì soạn 30/32 trang vẫn xanh hết, và hai trang bỏ
+    // quên chỉ lộ ra khi có người lật đúng tới đó.
+    for (const book of BOOKS_WITH_GRAMMAR) {
+      expect(getGrammarPages(book)).toEqual(getGrammarPageNumbers(book));
+    }
+  });
+
+  it("Trung cấp 1 đủ 32 điểm, mỗi trang đúng một điểm", () => {
+    const pages = getGrammarPages("step3");
+    expect(pages).toHaveLength(32);
+    for (const page of pages) {
+      expect(getPageGrammar("step3", page)).toHaveLength(1);
+    }
   });
 });

@@ -3,8 +3,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   MAX_AUTO_RETRIES,
   retryDelay,
-  useRetryingImage,
-} from "./use-retrying-image";
+  useRetryingMedia,
+} from "./use-retrying-media";
 
 /**
  * Ảnh trang sách là toàn bộ nội dung màn hình đọc — hỏng một lần là trang
@@ -22,14 +22,14 @@ function waitForRetry(n: number) {
 
 describe("tải bình thường", () => {
   it("bắt đầu ở trạng thái đang tải", () => {
-    const { result } = renderHook(() => useRetryingImage());
+    const { result } = renderHook(() => useRetryingMedia());
 
     expect(result.current.status).toBe("loading");
     expect(result.current.attempt).toBe(0);
   });
 
   it("ảnh lên là xong, không thử lại gì cả", () => {
-    const { result } = renderHook(() => useRetryingImage());
+    const { result } = renderHook(() => useRetryingMedia());
     act(() => result.current.onLoad());
 
     expect(result.current.status).toBe("ok");
@@ -39,7 +39,7 @@ describe("tải bình thường", () => {
 
 describe("hỏng rồi tự thử lại", () => {
   it("đổi attempt sau khi hết giãn cách, để bên gọi ép xin lại", () => {
-    const { result } = renderHook(() => useRetryingImage());
+    const { result } = renderHook(() => useRetryingMedia());
 
     act(() => result.current.onError());
     expect(result.current.retrying).toBe(true);
@@ -59,7 +59,7 @@ describe("hỏng rồi tự thử lại", () => {
   });
 
   it("thử lại giữa chừng mà ảnh lên thì dừng hẳn", () => {
-    const { result } = renderHook(() => useRetryingImage());
+    const { result } = renderHook(() => useRetryingMedia());
     act(() => result.current.onError());
     waitForRetry(0);
     act(() => result.current.onLoad());
@@ -73,7 +73,7 @@ describe("hỏng rồi tự thử lại", () => {
 });
 
 describe("thua hết các lần tự thử", () => {
-  function exhaust(result: { current: ReturnType<typeof useRetryingImage> }) {
+  function exhaust(result: { current: ReturnType<typeof useRetryingMedia> }) {
     for (let i = 0; i <= MAX_AUTO_RETRIES; i++) {
       act(() => result.current.onError());
       if (i < MAX_AUTO_RETRIES) waitForRetry(i);
@@ -81,7 +81,7 @@ describe("thua hết các lần tự thử", () => {
   }
 
   it("chịu thua và báo cho người dùng chứ không thử mãi", () => {
-    const { result } = renderHook(() => useRetryingImage());
+    const { result } = renderHook(() => useRetryingMedia());
     exhaust(result);
 
     expect(result.current.status).toBe("failed");
@@ -89,7 +89,7 @@ describe("thua hết các lần tự thử", () => {
   });
 
   it("không hẹn thêm lần thử nào nữa", () => {
-    const { result } = renderHook(() => useRetryingImage());
+    const { result } = renderHook(() => useRetryingMedia());
     exhaust(result);
     const stuck = result.current.attempt;
 
@@ -98,7 +98,7 @@ describe("thua hết các lần tự thử", () => {
   });
 
   it("người dùng bấm Tải lại thì chạy lại và được đủ lượt như lần đầu", () => {
-    const { result } = renderHook(() => useRetryingImage());
+    const { result } = renderHook(() => useRetryingMedia());
     exhaust(result);
 
     act(() => result.current.retry());
@@ -114,7 +114,7 @@ describe("thua hết các lần tự thử", () => {
 
 describe("dọn dẹp", () => {
   it("huỷ hẹn giờ khi component biến mất", () => {
-    const { result, unmount } = renderHook(() => useRetryingImage());
+    const { result, unmount } = renderHook(() => useRetryingMedia());
     act(() => result.current.onError());
     expect(vi.getTimerCount()).toBe(1);
 

@@ -12,9 +12,9 @@ import {
 } from "react";
 import { Button } from "@/components/ui/button";
 import {
-  useRetryingImage,
-  type ImageLoadStatus,
-} from "@/lib/use-retrying-image";
+  useRetryingMedia,
+  type MediaLoadStatus,
+} from "@/lib/use-retrying-media";
 import {
   TransformWrapper,
   TransformComponent,
@@ -60,7 +60,7 @@ function PageImageFallback({
   onRetry,
 }: {
   page: number;
-  status: ImageLoadStatus;
+  status: MediaLoadStatus;
   retrying: boolean;
   onRetry: () => void;
 }) {
@@ -102,7 +102,7 @@ function PageImage({
   aspectRatio: number;
 }) {
   const regions = getPageTranslations(bookId, page);
-  const { attempt, status, retrying, onLoad, onError, retry } = useRetryingImage();
+  const { attempt, status, retrying, onLoad, onError, retry } = useRetryingMedia();
 
   return (
     <div className="relative" style={{ width: box.width, height: box.height }}>
@@ -113,7 +113,7 @@ function PageImage({
         // `key` đổi theo số lần thử: phần tử <img> đang ở trạng thái lỗi có
         // thể bị dùng lại mà không xin lại gì cả, dựng phần tử mới mới chắc
         // chắn có lượt xin mới. URL thì giữ nguyên — xem chú thích trong
-        // `use-retrying-image.ts` về lý do không phá cache bằng query.
+        // `use-retrying-media.ts` về lý do không phá cache bằng query.
         key={attempt}
         src={getPageUrl(bookId, page)}
         alt={`Trang ${page}`}

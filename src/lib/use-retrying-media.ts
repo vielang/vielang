@@ -3,12 +3,16 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 /**
- * Tự thử lại khi ảnh tải hỏng.
+ * Tự thử lại khi ảnh hoặc audio tải hỏng.
  *
- * Vì sao cần: ảnh trang sách là TOÀN BỘ nội dung của màn hình đọc. Hỏng một
- * lần là trang trắng, mà trước đây không có gì thử lại — người dùng phải lật
- * sang trang khác rồi lật về mới thấy lại chữ. Một cú chập mạng lúc đi tàu
- * điện là đủ để trang chết như vậy.
+ * Vì sao cần: ảnh trang sách là TOÀN BỘ nội dung của màn hình đọc, còn audio
+ * là cả phần bài nghe. Hỏng một lần là trang trắng hoặc trình phát chết, mà
+ * trước đây không có gì thử lại — người dùng phải lật sang trang khác rồi lật
+ * về mới thấy lại chữ. Một cú chập mạng lúc đi tàu điện là đủ.
+ *
+ * Bên audio có một điểm khác ảnh mà hook này KHÔNG tự lo: dựng lại thẻ
+ * <audio> là mất chỗ đang nghe. Bên gọi phải tự nhớ `currentTime` rồi đặt
+ * lại — xem `TrackPlayer` trong `audio-widget.tsx`.
  *
  * KHÔNG thêm tham số phá cache vào URL. Nghe thì chắc ăn hơn, nhưng lại hỏng
  * đúng lúc cần nhất: `sw.js` tra cache theo nguyên URL, nên
@@ -24,7 +28,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
  * `page-viewer.tsx`). Làm vậy gọn hơn: không cần effect đặt lại state, tránh
  * luôn cái hẹn giờ của trang cũ bắn nhầm vào trang mới.
  */
-export type ImageLoadStatus = "loading" | "ok" | "failed";
+export type MediaLoadStatus = "loading" | "ok" | "failed";
 
 /** Số lần TỰ thử lại trước khi chịu thua và hỏi người dùng. */
 export const MAX_AUTO_RETRIES = 3;
@@ -37,7 +41,7 @@ export function retryDelay(attempt: number): number {
 export interface RetryingImage {
   /** Đưa vào `key` của <img> — đổi giá trị là ép xin lại. */
   attempt: number;
-  status: ImageLoadStatus;
+  status: MediaLoadStatus;
   /** true khi đang chờ hết giãn cách để tự thử lại. */
   retrying: boolean;
   onLoad: () => void;
@@ -46,9 +50,9 @@ export interface RetryingImage {
   retry: () => void;
 }
 
-export function useRetryingImage(): RetryingImage {
+export function useRetryingMedia(): RetryingImage {
   const [attempt, setAttempt] = useState(0);
-  const [status, setStatus] = useState<ImageLoadStatus>("loading");
+  const [status, setStatus] = useState<MediaLoadStatus>("loading");
   const [retrying, setRetrying] = useState(false);
   // Đếm bằng ref chứ không đọc state trong `onError`: `onError` có thể bắn
   // nhiều lần trước khi React vẽ lại, đọc state cũ là đếm thiếu.

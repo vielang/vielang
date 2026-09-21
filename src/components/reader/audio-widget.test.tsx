@@ -1,7 +1,8 @@
-import { beforeEach, describe, expect, it } from "vitest";
-import { render } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { AudioWidget } from "./audio-widget";
 import { useAudioWidgetStore } from "@/lib/audio-widget-store";
+import { MAX_AUTO_RETRIES, retryDelay } from "@/lib/use-retrying-media";
 
 /**
  * Trình duyệt tính `touch-action` bằng cách đi ngược lên cây cha. Đặt
@@ -75,5 +76,69 @@ describe("vùng kéo vẫn phải chặn cử chỉ chạm", () => {
     const button = container.querySelector("button")!;
 
     expect(button.className).toMatch(/\btouch-none\b/);
+  });
+});
+
+/**
+ * Mạng chập giữa bài nghe.
+ *
+ * Bài nghe dài vài phút. Dựng lại thẻ <audio> để xin lại file là về mốc 0
+ * giây — đang nghe dở mà bị kéo về đầu thì còn tệ hơn cả đứng im, nên phần
+ * nhớ chỗ đang nghe là thứ phải chốt lại.
+ */
+describe("bài nghe hỏng giữa chừng", () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => vi.useRealTimers());
+
+  /** Nghe tới giây thứ `t` rồi mạng đứt. */
+  function playUntilThenFail(container: HTMLElement, t: number) {
+    const audio = container.querySelector("audio")!;
+    audio.currentTime = t;
+    fireEvent.timeUpdate(audio);
+    fireEvent.error(audio);
+  }
+
+  it("quay lại đúng chỗ đang nghe sau khi thử lại", () => {
+    const { container } = widget();
+    playUntilThenFail(container, 83);
+
+    act(() => vi.advanceTimersByTime(retryDelay(0)));
+
+    // Thẻ mới dựng luôn bắt đầu ở 0 — phải tự kéo về chỗ cũ.
+    const retried = container.querySelector("audio")!;
+    expect(retried.currentTime).toBe(0);
+    fireEvent.loadedMetadata(retried);
+    expect(retried.currentTime).toBe(83);
+  });
+
+  it("chưa nghe gì thì không nhảy lung tung", () => {
+    const { container } = widget();
+    fireEvent.error(container.querySelector("audio")!);
+
+    act(() => vi.advanceTimersByTime(retryDelay(0)));
+
+    const retried = container.querySelector("audio")!;
+    fireEvent.loadedMetadata(retried);
+    expect(retried.currentTime).toBe(0);
+  });
+
+  it("thua hết các lần tự thử thì hỏi người dùng, không thử mãi", () => {
+    const { container } = widget();
+    for (let i = 0; i <= MAX_AUTO_RETRIES; i++) {
+      fireEvent.error(container.querySelector("audio")!);
+      if (i < MAX_AUTO_RETRIES) act(() => vi.advanceTimersByTime(retryDelay(i)));
+    }
+
+    expect(screen.getByText(/Không tải được/)).toBeTruthy();
+    expect(screen.getByRole("button", { name: /Tải lại/ })).toBeTruthy();
+  });
+
+  it("chưa thua thì chưa làm phiền người dùng", () => {
+    const { container } = widget();
+    fireEvent.error(container.querySelector("audio")!);
+
+    // Đang tự thử lại trong im lặng — hiện lời nhắn lỗi lúc này là doạ
+    // người dùng vì một cú chập mạng mà máy sắp tự xử lý xong.
+    expect(screen.queryByText(/Không tải được/)).toBeNull();
   });
 });

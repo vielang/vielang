@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { GripVertical, Volume2, X } from "lucide-react";
+import { useCallback, useEffect, useRef } from "react";
+import { GripVertical, RotateCw, Volume2, X } from "lucide-react";
 import type { AudioTrack } from "@/lib/audio";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import { useAudioWidgetStore } from "@/lib/audio-widget-store";
+import { useRetryingMedia } from "@/lib/use-retrying-media";
 import { AUDIO_WIDGET_SIZE, audioAnchor } from "@/lib/widget-dock";
 
 // Đường kính nút tròn lúc thu nhỏ. Các widget nổi khác neo theo số này nên
@@ -20,6 +22,70 @@ const PANEL_WIDTH = 300;
 const PANEL_BASE_HEIGHT = 100;
 /** Hàng chọn track (hoặc hàng chọn trang) cao bằng nhau, chỉ xuất hiện khi cần. */
 const TRACK_ROW_HEIGHT = 28;
+
+/**
+ * Một bài nghe, có tự thử lại khi mạng chập.
+ *
+ * Tách thành component riêng để bên gọi gắn `key={url}`: hook đếm số lần thử
+ * theo vòng đời component, nên đổi track là phải dựng lại mới đếm lại từ đầu.
+ *
+ * Khác ảnh ở một chỗ quan trọng: dựng lại thẻ <audio> là về mốc 0 giây. File
+ * bài nghe dài vài phút, đang nghe dở mà mạng chập rồi bị kéo về đầu thì còn
+ * tệ hơn cả đứng im. Nên nhớ `currentTime` lại rồi đặt về chỗ cũ sau khi
+ * dựng lại.
+ *
+ * KHÔNG tự phát tiếp sau khi thử lại, dù người dùng đang nghe dở. Thẻ mới
+ * dựng không thừa hưởng thao tác chạm đã cho phép phát, nên `play()` gần như
+ * chắc chắn bị trình duyệt chặn — bấm nút play một cái là tiếp tục đúng chỗ,
+ * vẫn hơn là tự phát rồi lỗi thầm lặng.
+ */
+function TrackPlayer({ url, label }: { url: string; label: string }) {
+  const { attempt, status, retrying, onLoad, onError, retry } = useRetryingMedia();
+  const resumeAt = useRef(0);
+
+  const rememberPosition = useCallback((e: React.SyntheticEvent<HTMLAudioElement>) => {
+    resumeAt.current = e.currentTarget.currentTime;
+  }, []);
+
+  const restorePosition = useCallback(
+    (e: React.SyntheticEvent<HTMLAudioElement>) => {
+      onLoad();
+      if (resumeAt.current > 0) e.currentTarget.currentTime = resumeAt.current;
+    },
+    [onLoad]
+  );
+
+  return (
+    <>
+      <audio
+        // Dựng thẻ mới mỗi lần thử: thẻ đang ở trạng thái lỗi có thể bị dùng
+        // lại mà không xin lại gì cả.
+        key={attempt}
+        controls
+        src={url}
+        className="w-full"
+        onTimeUpdate={rememberPosition}
+        onLoadedMetadata={restorePosition}
+        onError={onError}
+      />
+      {status === "failed" && (
+        <div className="flex items-center justify-between gap-2 rounded bg-black/70 px-2 py-1">
+          <span className="text-[11px] text-white/90">Không tải được {label}</span>
+          <Button
+            size="sm"
+            variant="secondary"
+            className="h-6 px-2 text-[11px]"
+            onClick={retry}
+            disabled={retrying}
+          >
+            <RotateCw className={retrying ? "size-3 animate-spin" : "size-3"} aria-hidden />
+            Tải lại
+          </Button>
+        </div>
+      )}
+    </>
+  );
+}
 
 function panelHeightFor(trackCount: number, showPageSelector: boolean): number {
   return (
@@ -278,11 +344,12 @@ export function AudioWidget({
                 ))}
               </div>
             )}
-            {/* key={active.url}: reset trạng thái phát khi đổi track/trang */}
+            {/* key={active.url}: đổi track/trang thì dựng lại, vừa reset
+                trạng thái phát vừa cho số lần thử lại đếm lại từ đầu. */}
             {/* Không ép chiều cao: Chrome dựng bộ điều khiển ở ~54px, bóp
                 xuống 32px là mấy vùng chạm bên trong dồn cục lại, chạm nút
                 play rất dễ trúng nút ba chấm bên cạnh. */}
-            <audio key={active.url} controls src={active.url} className="w-full" />
+            <TrackPlayer key={active.url} url={active.url} label={active.label} />
           </div>
         </div>
       )}

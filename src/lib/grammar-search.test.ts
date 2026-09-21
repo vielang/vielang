@@ -71,9 +71,26 @@ describe("tìm kiếm", () => {
     expect(searchGrammar(list, "NÊU").map((e) => e.id)).toEqual(["a"]);
   });
 
-  it("tìm được cả trong câu ví dụ", () => {
-    // Người ta hay nhớ mang máng một câu trong sách hơn là nhớ tên đuôi câu.
+  it("KHÔNG tra trong câu ví dụ", () => {
+    // Thu hẹp có chủ ý, không phải bỏ sót. Tra cả câu ví dụ nghe thì rộng
+    // rãi nhưng đo ra thì hỏng: gõ một âm tiết như 에 trả về trung bình 36
+    // mục và điểm ngữ pháp đúng tụt xuống hạng 53, tức là tra xong vẫn
+    // không thấy. Bỏ đi thì con số đó về 11.
     const found = searchGrammar([entry({ id: "c" })], "밥 먹을까요");
+    expect(found).toEqual([]);
+  });
+
+  it("KHÔNG tra trong phần giải thích tiếng Hàn", () => {
+    // Đây mới là nguồn nhiễu lớn nhất: riêng trường này đã thêm trung bình
+    // 17 kết quả cho mỗi lần tra một âm tiết.
+    const found = searchGrammar([entry({ id: "c" })], "조건이나 가정");
+    expect(found).toEqual([]);
+  });
+
+  it("nhưng nghĩa tiếng Việt thì PHẢI tra được", () => {
+    // Tiêu đề toàn chữ Hàn. Bỏ nốt trường này là mất sạch đường tra bằng
+    // tiếng Việt — mà chưa thuộc tên tiếng Hàn thì mới phải đi tra.
+    const found = searchGrammar([entry({ id: "c" })], "gia dinh");
     expect(found.map((e) => e.id)).toEqual(["c"]);
   });
 
@@ -176,5 +193,84 @@ describe("ngưỡng bắt đầu tra", () => {
   it("bỏ qua khoảng trắng thừa hai đầu", () => {
     expect(hasEnoughQuery("  d  ")).toBe(false);
     expect(hasEnoughQuery("  di  ")).toBe(true);
+  });
+});
+
+/**
+ * Lỗi âm thầm nhất trong cả phần này: NFD tách âm tiết Hàn thành jamo, mà
+ * jamo của 도 đúng là phần đầu của jamo 동. Tra 도 khớp luôn mọi tiêu đề mở
+ * đầu bằng nhãn từ loại 동 — 50 trên 72 mục. Không có gì báo lỗi, chỉ là kết
+ * quả trông như rác.
+ */
+describe("không lẫn âm tiết Hàn", () => {
+  it("chuẩn hoá xong vẫn là âm tiết trọn vẹn", () => {
+    expect(normalize("동 형 -아요").includes(normalize("도"))).toBe(false);
+    expect(normalize("명 이에요/예요").includes(normalize("이"))).toBe(true);
+  });
+
+  it("mọi kết quả đều THẬT SỰ chứa từ khoá", () => {
+    // Bất biến quan trọng nhất của ô tra cứu. Đây là thứ đáng ra phải bắt
+    // được lỗi trên ngay từ đầu: nó không chốt một con số cụ thể nào mà chốt
+    // đúng cái điều người dùng tin là đang xảy ra.
+    const all = getAllGrammar();
+    for (const q of ["도", "는", "이", "을", "에", "면", "고", "지"]) {
+      for (const e of searchGrammar(all, q)) {
+        // So trên dạng NFC — thứ người dùng NHÌN THẤY — chứ không qua
+        // `normalize()`. Dùng chính hàm đang kiểm để kiểm nó thì hai bên tự
+        // xác nhận lẫn nhau: lỗi jamo ở trên lọt qua test này y như thường.
+        expect(`${e.title} ${e.vi}`.normalize("NFC")).toContain(q.normalize("NFC"));
+      }
+    }
+  });
+
+  it("tra 도 ra vài mục chứ không ra nửa quyển sách", () => {
+    const found = searchGrammar(getAllGrammar(), "도");
+    expect(found.length).toBeLessThan(5);
+    expect(found[0].title).toBe("명 도");
+  });
+});
+
+/**
+ * Xếp theo độ liên quan chứ không theo thứ tự giáo trình. Đuôi ngữ pháp
+ * tiếng Hàn dài một âm tiết khớp rất nhiều mục, nên thứ tự giáo trình đẩy
+ * mục đúng xuống dưới lằn cắt `MAX_VISIBLE_RESULTS`: tra 을 thì 동 -을 từng
+ * nằm hạng 56, tức tra xong vẫn không thấy.
+ */
+describe("xếp hạng theo độ liên quan", () => {
+  it("khớp tiêu đề đứng trên khớp phần nghĩa", () => {
+    const list = [
+      entry({ id: "trong-nghia", title: "동 -으면", vi: "So sánh, giống 보다." }),
+      entry({ id: "trong-tieu-de", title: "명 보다", vi: "Dùng khi so sánh." }),
+    ];
+    expect(searchGrammar(list, "보다").map((e) => e.id)).toEqual([
+      "trong-tieu-de",
+      "trong-nghia",
+    ]);
+  });
+
+  it("khớp trọn một thành tố đứng trên khớp lọt giữa chữ", () => {
+    // Gõ 이 thì 명 이/가 phải đứng trước 명 이나.
+    const list = [
+      entry({ id: "lot-giua", title: "명 이나" }),
+      entry({ id: "tron-ven", title: "명 이/가" }),
+    ];
+    expect(searchGrammar(list, "이")[0].id).toBe("tron-ven");
+  });
+
+  it("hoà điểm thì tiêu đề ngắn hơn lên trước", () => {
+    // Ngắn hơn nghĩa là cụ thể hơn: gõ 에 thì 명 에 đáng đứng trên 명 에 있어요.
+    const list = [
+      entry({ id: "dai", title: "명 에 있어요" }),
+      entry({ id: "ngan", title: "명 에" }),
+    ];
+    expect(searchGrammar(list, "에")[0].id).toBe("ngan");
+  });
+
+  it("trên dữ liệu thật, mục đúng đứng ngay hạng 1", () => {
+    // Ba ca này trước đây nằm hạng 53, 56 và 27 — đều ngoài 20 mục hiển thị.
+    const all = getAllGrammar();
+    expect(searchGrammar(all, "에")[0].title).toBe("명 에");
+    expect(searchGrammar(all, "을")[0].title).toBe("동 -을");
+    expect(searchGrammar(all, "는")[0].title).toBe("동 -는");
   });
 });

@@ -7,16 +7,18 @@
  * dịch bài đọc giải quyết phần HIỂU NỘI DUNG, chỗ này giải quyết phần HIỂU
  * QUY TẮC.
  *
- * Cách hoạt động giống `page-translation`: mỗi trang có sẵn danh sách vùng
- * soạn tay, bấm vào chấm là hiện nội dung. Khác ở hai chỗ:
+ * Cách hoạt động giống hệt `page-translation`: mỗi trang có sẵn danh sách
+ * vùng soạn tay, bấm vào chấm là hiện một bong bóng nhỏ.
  *
- *  - Nội dung là HTML dựng sẵn từ Markdown (bảng chia theo patchim, ví dụ,
- *    mẹo nhớ) chứ không phải một đoạn chữ trơn, nên phải hiện trong panel
- *    chứ không nhét vừa bong bóng nhỏ.
- *  - Mỗi mục có `slug` riêng cho điểm ngữ pháp. Trang nào trong sách nào
- *    không quan trọng — `-지요?` vẫn là `-지요?`. Nhờ vậy sau này làm được
- *    trang tra cứu ngữ pháp, hoặc dùng lại lời giải thích khi cùng điểm ngữ
- *    pháp xuất hiện ở sách khác, mà không phải chép nội dung sang chỗ mới.
+ * CHỈ một định nghĩa ngắn, cố ý. Bản đầu có cả phần giải thích dài bằng
+ * Markdown — bảng chia theo patchim, ví dụ, mục lưu ý — hiện trong một tấm
+ * phủ. Đọc giữa lúc đang học thì quá dài và rối, mà còn che mất trang sách
+ * đang xem. Muốn học sâu thì đã có tab bài giảng.
+ *
+ * Khác `page-translation` đúng một chỗ: mỗi mục có `slug` riêng cho điểm
+ * ngữ pháp. Trang nào trong sách nào không quan trọng — `-지요?` vẫn là
+ * `-지요?`. Nhờ vậy sau này làm được trang tra cứu ngữ pháp, hoặc dùng lại
+ * định nghĩa khi cùng điểm ngữ pháp xuất hiện ở sách khác.
  *
  * Bố cục sách rất đều: mỗi bài đúng 2 điểm ngữ pháp, tiêu đề luôn nằm góc
  * trên bên phải. Xem `lib/grammar-pages.ts`.
@@ -44,12 +46,15 @@ export interface GrammarPoint {
   rect: Rect;
   /** Nguyên văn tiêu đề trong sách, vd "명 이에요/예요". */
   title: string;
-  /** Dòng chú thích tiếng Hàn in ngay dưới tiêu đề. */
+  /** Dòng chú thích tiếng Hàn in ngay dưới tiêu đề, để đối chiếu với sách. */
   ko?: string;
-  /** Dịch dòng chú thích đó — câu trả lời ngắn nhất cho "cái này để làm gì". */
+  /**
+   * Định nghĩa tiếng Việt — TOÀN BỘ nội dung người dùng thấy.
+   *
+   * Giữ trong khoảng một đến hai câu. Đây là câu trả lời cho "cái đuôi này
+   * để làm gì?", không phải chỗ dạy hết mọi quy tắc.
+   */
   vi: string;
-  /** Phần giải thích đầy đủ, HTML đã dựng sẵn từ Markdown lúc build. */
-  html: string;
 }
 
 const GRAMMAR = {

@@ -5,7 +5,7 @@
  *
  *   content/notes/<bookId>/<page>.md   -> content/notes/<bookId>.json  (HTML)
  *   content/quiz/<bookId>/<page>.json  -> content/quiz/<bookId>.json
- *   content/grammar/<bookId>/<page>.md -> content/grammar/<bookId>.json (HTML)
+ *   content/grammar/<bookId>/<page>.json -> content/grammar/<bookId>.json
  *
  * Vì sao Markdown -> HTML ngay ở bước build: note hiển thị/sửa bằng Tiptap
  * (xem components/reader/note-editor.tsx), mà Tiptap đọc/ghi HTML. Convert
@@ -34,6 +34,9 @@ const NOTES_ROOT = path.join(CONTENT_ROOT, "notes");
 const QUIZ_ROOT = path.join(CONTENT_ROOT, "quiz");
 const TRANSLATE_ROOT = path.join(CONTENT_ROOT, "translate");
 const GRAMMAR_ROOT = path.join(CONTENT_ROOT, "grammar");
+
+/** Định nghĩa ngữ pháp dài tối đa bao nhiêu ký tự — xem `validateGrammar`. */
+const MAX_GRAMMAR_VI = 200;
 
 /**
  * `gfm` (bảng, ~~gạch ngang~~) bật sẵn; `breaks: false` để xuống dòng đơn
@@ -170,12 +173,6 @@ async function buildQuiz(bookId: string): Promise<number> {
 }
 
 /**
- * Vùng bấm xem bản dịch — toạ độ theo tỉ lệ 0–1 của ảnh trang. Kiểm ngay ở
- * đây vì soạn tay bằng mắt rất dễ gõ nhầm số: vùng tràn ra ngoài ảnh hay
- * rộng/cao âm thì trên máy chỉ hiện ra một ô vô hình đặt sai chỗ, không có
- * lỗi nào cả — rất khó lần ra.
- */
-/**
  * Toạ độ vùng theo tỉ lệ 0–1 của ảnh trang.
  *
  * Kiểm ngay lúc build vì soạn tay bằng mắt rất dễ gõ nhầm số: vùng tràn ra
@@ -242,22 +239,19 @@ async function buildTranslations(bookId: string): Promise<number> {
   return Object.values(pages).reduce((n, regions) => n + regions.length, 0);
 }
 
-/** Dạng nguồn của 1 điểm ngữ pháp: giống bản build nhưng chứa Markdown thô. */
-type GrammarSource = Omit<GrammarPoint, "html"> & { md: string };
-
 /**
  * Điểm ngữ pháp gắn vào trang.
  *
  * `slug` phải hợp lệ vì nó là mã của CHÍNH điểm ngữ pháp, không gắn với
  * trang — sau này trang tra cứu sẽ gom theo mã này, gõ nhầm là gom sai.
  */
-function validateGrammar(source: string, data: unknown): GrammarSource[] {
+function validateGrammar(source: string, data: unknown): GrammarPoint[] {
   if (!Array.isArray(data)) {
     throw new Error(`${source}: phải là 1 mảng điểm ngữ pháp`);
   }
 
   const seen = new Set<string>();
-  for (const point of data as GrammarSource[]) {
+  for (const point of data as GrammarPoint[]) {
     const at = `${source} (id=${point?.id ?? "?"})`;
     if (!point?.id) throw new Error(`${at}: thiếu "id"`);
     if (seen.has(point.id)) throw new Error(`${at}: trùng "id" trong cùng trang`);
@@ -271,13 +265,22 @@ function validateGrammar(source: string, data: unknown): GrammarSource[] {
       );
     }
     if (!point.title?.trim()) throw new Error(`${at}: thiếu "title"`);
-    if (!point.vi?.trim()) throw new Error(`${at}: thiếu nghĩa ngắn "vi"`);
-    if (!point.md?.trim()) throw new Error(`${at}: thiếu phần giải thích "md"`);
+    if (!point.vi?.trim()) throw new Error(`${at}: thiếu định nghĩa "vi"`);
+
+    // Định nghĩa là TOÀN BỘ thứ người dùng thấy, và nó nằm trong một bong
+    // bóng nhỏ trên trang sách. Dài quá là che mất chính trang đang học —
+    // đúng cái đã phải sửa ở bản đầu. Chặn ngay tại đây cho khỏi trôi dần.
+    if (point.vi.length > MAX_GRAMMAR_VI) {
+      throw new Error(
+        `${at}: định nghĩa "vi" dài ${point.vi.length} ký tự, tối đa ` +
+          `${MAX_GRAMMAR_VI}. Phần giải thích sâu thuộc về tab bài giảng.`
+      );
+    }
 
     validateRect(at, point.rect);
   }
 
-  return data as GrammarSource[];
+  return data as GrammarPoint[];
 }
 
 async function buildGrammar(bookId: string): Promise<number> {
@@ -292,15 +295,7 @@ async function buildGrammar(bookId: string): Promise<number> {
     } catch (err) {
       throw new Error(`${bookId}/${file}: JSON hỏng — ${(err as Error).message}`);
     }
-    // Markdown -> HTML ngay ở đây, cùng lý do như note: cả app chỉ làm việc
-    // với một định dạng duy nhất, không phải nhúng thư viện Markdown vào
-    // bundle chạy trên máy người dùng.
-    pages[pageKey(file)] = validateGrammar(`${bookId}/${file}`, parsed).map(
-      ({ md, ...rest }) => ({
-        ...rest,
-        html: (marked.parse(md) as string).trim(),
-      })
-    );
+    pages[pageKey(file)] = validateGrammar(`${bookId}/${file}`, parsed);
   }
 
   await writeFile(

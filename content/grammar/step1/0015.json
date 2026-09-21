@@ -5,7 +5,6 @@
     "rect": [0.63, 0.028, 0.33, 0.048],
     "title": "명 이에요/예요",
     "ko": "사람, 사물 이름을 말할 때 사용해요.",
-    "vi": "Dùng khi nói tên người hoặc tên đồ vật — tương đương \"là\" trong tiếng Việt.",
-    "md": "## Cách dùng\n\n**Danh từ + 이에요/예요** = \"(là) [danh từ]\"\n\nĐây là mẫu câu cơ bản nhất của tiếng Hàn. Nó đứng ở cuối câu, gắn thẳng vào sau danh từ.\n\n## Chọn 이에요 hay 예요?\n\nNhìn vào **âm cuối (patchim)** của từ đứng ngay trước:\n\n| Từ kết thúc bằng | Dùng | Ví dụ |\n|---|---|---|\n| phụ âm (CÓ patchim) | **이에요** | 후엔 → 후엔**이에요** |\n| nguyên âm (KHÔNG patchim) | **예요** | 제이슨 → 제이슨**이에요**... |\n\n> Khoan — 제이슨 kết thúc bằng ㄴ nên **có** patchim, vì vậy vẫn là 제이슨**이에요**. Từ không patchim thì như 안젤라 → 안젤라**예요**, 잠시드 → 잠시드**예요**.\n\n## Ví dụ trong sách\n\n- 가: 제이슨**이에요**? — *Là Jason phải không?*\n- 나: 네, 제이슨**이에요**. — *Vâng, là Jason.*\n- 가: 라흐만**이에요**? — *Là Rahman phải không?*\n- 나: 아니요, 잠시드**예요**. — *Không, là Jamshid.*\n\n## Lưu ý cho người Việt\n\nTiếng Việt nói \"là\" trong mọi trường hợp, không đổi gì cả. Tiếng Hàn thì **phải đổi đuôi theo âm cuối của từ đứng trước** — đây là thói quen hoàn toàn mới, cần luyện phản xạ chứ không thể dịch thẳng.\n\nMột điểm nữa: tiếng Hàn **không cần chủ ngữ** khi đã rõ ngữ cảnh. Người Việt hay thêm \"저는\" (tôi là) vào mọi câu, nhưng khi tự giới thiệu chỉ cần nói **\"후엔이에요\"** là đủ tự nhiên."
+    "vi": "Dùng khi nói tên người hoặc tên đồ vật — tương đương \"là\" trong tiếng Việt."
   }
 ]

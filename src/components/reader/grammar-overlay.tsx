@@ -1,23 +1,34 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
+import { useState } from "react";
 import { BookOpen, X } from "lucide-react";
 import type { GrammarPoint } from "@/lib/page-grammar";
-import { NOTE_PROSE_CLASS } from "@/lib/note-store";
+import { HintBubble } from "@/components/reader/hint-bubble";
+
+interface ActiveBubble {
+  point: GrammarPoint;
+  /** Toạ độ điểm bấm, theo hệ toạ độ màn hình (clientX/clientY). */
+  x: number;
+  y: number;
+}
 
 /**
- * Chấm xem giải thích ngữ pháp, đặt cạnh tiêu đề điểm ngữ pháp trên ảnh trang.
+ * Chấm xem nghĩa điểm ngữ pháp, đặt cạnh tiêu đề trên ảnh trang.
  *
- * Cùng ý tưởng với `translation-overlay`: khung chỉ để định vị, thứ bấm được
- * là chính cái chấm với lề chạm 44px. Trang sách giữ nguyên dáng bản in.
+ * Sách chú thích ngữ pháp CHỈ bằng tiếng Hàn — dòng kiểu
+ * `사람, 사물 이름을 말할 때 사용해요` là một vòng luẩn quẩn: người mới học
+ * cần lời giải thích thì lại không đọc nổi chính lời giải thích đó. Chấm này
+ * trả lời đúng một câu: "cái đuôi này để làm gì?".
  *
- * Khác chỗ hiển thị: bản dịch là một đoạn chữ trơn nên nhét vừa bong bóng
- * nhỏ, còn giải thích ngữ pháp có bảng chia theo patchim và nhiều mục — phải
- * là tấm phủ đọc được, cuộn được. Bong bóng 24rem thì bảng vỡ hết.
+ * CHỈ một định nghĩa ngắn, cố ý. Bản đầu làm cả tấm phủ với bảng chia theo
+ * patchim, ví dụ và mục lưu ý — đọc giữa lúc đang học thì quá dài và rối,
+ * mà còn che mất trang sách đang xem. Muốn học sâu thì đã có tab bài giảng.
+ *
+ * Dùng chung `HintBubble` với bản dịch: cùng là "chạm vào chấm trên trang,
+ * đọc vài dòng, đóng", nên cùng dáng và cùng cách kéo thả.
  */
 export function GrammarOverlay({ points }: { points: GrammarPoint[] }) {
-  const [active, setActive] = useState<GrammarPoint | null>(null);
+  const [active, setActive] = useState<ActiveBubble | null>(null);
 
   if (points.length === 0) return null;
 
@@ -25,8 +36,9 @@ export function GrammarOverlay({ points }: { points: GrammarPoint[] }) {
     <>
       {points.map((point) => {
         const [x, y, w, h] = point.rect;
+        const isOpen = active?.point.id === point.id;
         return (
-          // Khung KHÔNG bấm được — xem chú thích cùng kiểu ở
+          // Khung CHỈ để định vị, không bấm được — xem chú thích cùng kiểu ở
           // `translation-overlay`: vùng bấm vô hình to hơn thứ vẽ ra là nói
           // dối người dùng, và nó nuốt mất cử chỉ chạm của trang.
           <div
@@ -39,14 +51,24 @@ export function GrammarOverlay({ points }: { points: GrammarPoint[] }) {
               height: `${h * 100}%`,
             }}
           >
-            {/* Đặt bên TRÁI tiêu đề, canh giữa theo chiều dọc. Tiêu đề ngữ
-                pháp luôn nằm sát mép phải trang, nên để chấm bên phải là
-                rơi ra ngoài giấy. */}
+            {/* Đặt bên TRÁI tiêu đề, canh giữa theo chiều dọc: tiêu đề ngữ
+                pháp luôn nằm sát mép phải trang, để chấm bên phải là rơi ra
+                ngoài giấy.
+
+                Vùng chạm 44px nhưng nét vẽ vẫn 20px — phần dôi ra là lề vô
+                hình. To cái chấm lên cho dễ bấm thì chọc vào dáng bản in. */}
             <button
               type="button"
               data-grammar-point
-              onClick={() => setActive(point)}
-              aria-label={`Xem giải thích ngữ pháp: ${point.title}`}
+              onClick={(e) =>
+                setActive(isOpen ? null : { point, x: e.clientX, y: e.clientY })
+              }
+              aria-label={
+                isOpen
+                  ? `Đóng nghĩa ngữ pháp: ${point.title}`
+                  : `Xem nghĩa ngữ pháp: ${point.title}`
+              }
+              aria-expanded={isOpen}
               className="group pointer-events-auto absolute top-1/2 right-full flex size-11 -translate-y-1/2 cursor-help items-center justify-center"
             >
               <span
@@ -57,100 +79,27 @@ export function GrammarOverlay({ points }: { points: GrammarPoint[] }) {
                 }}
                 aria-hidden
               >
-                <BookOpen className="size-4" />
+                {isOpen ? <X className="size-4" /> : <BookOpen className="size-4" />}
               </span>
             </button>
           </div>
         );
       })}
 
-      {active && <GrammarSheet point={active} onClose={() => setActive(null)} />}
+      {active && (
+        <HintBubble
+          key={`${active.point.id}:${active.x}:${active.y}`}
+          x={active.x}
+          y={active.y}
+          onClose={() => setActive(null)}
+          ownTriggerSelector="[data-grammar-point]"
+        >
+          <span className="font-heading mb-0.5 block font-semibold">
+            {active.point.title}
+          </span>
+          {active.point.vi}
+        </HintBubble>
+      )}
     </>
-  );
-}
-
-/**
- * Tấm phủ đọc giải thích ngữ pháp.
- *
- * Dựng qua portal ra `document.body`, cùng lý do với bong bóng bản dịch: lớp
- * phủ nằm trong cây đã bị `react-zoom-pan-pinch` gắn `transform`, mà phần tử
- * tổ tiên có `transform` thì trở thành gốc toạ độ cho con `position: fixed`
- * — render tại chỗ là vừa phóng to theo ảnh vừa lệch vị trí khi zoom.
- *
- * Neo đáy màn hình trên điện thoại (dễ với ngón cái) và canh giữa trên màn
- * rộng. Chặn cử chỉ chạm lọt xuống trang bên dưới, nếu không thì cuộn nội
- * dung lại thành vuốt lật trang.
- */
-function GrammarSheet({
-  point,
-  onClose,
-}: {
-  point: GrammarPoint;
-  onClose: () => void;
-}) {
-  useEffect(() => {
-    function onKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
-    }
-    document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
-  }, [onClose]);
-
-  return createPortal(
-    <div
-      className="fixed inset-0 z-50 flex items-end justify-center sm:items-center"
-      onPointerDown={(e) => e.stopPropagation()}
-      onPointerUp={(e) => e.stopPropagation()}
-    >
-      {/* Nền mờ bấm được để đóng — đường thoát mà ai cũng đoán ra. */}
-      <button
-        type="button"
-        aria-label="Đóng giải thích ngữ pháp"
-        className="absolute inset-0 bg-black/50"
-        onClick={onClose}
-      />
-
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-label={`Ngữ pháp: ${point.title}`}
-        className="relative flex max-h-[85vh] w-full max-w-xl flex-col rounded-t-xl bg-background shadow-xl sm:rounded-xl"
-      >
-        <div className="flex items-start justify-between gap-3 border-b border-border px-4 py-3">
-          <div className="min-w-0">
-            <h2 className="font-heading text-lg leading-tight font-semibold">
-              {point.title}
-            </h2>
-            <p className="mt-0.5 text-sm text-muted-foreground">{point.vi}</p>
-            {point.ko && (
-              <p className="mt-1 text-xs text-muted-foreground/80 italic">
-                {point.ko}
-              </p>
-            )}
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Đóng"
-            className="shrink-0 rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
-          >
-            <X className="size-5" aria-hidden />
-          </button>
-        </div>
-
-        {/* `touch-auto` để cuộn được bên trong, dù trang đọc bên ngoài đang
-            chặn cử chỉ chạm. */}
-        <div className="touch-auto overflow-y-auto px-4 py-3">
-          <div
-            className={NOTE_PROSE_CLASS}
-            // Nội dung do chính dự án biên soạn rồi dựng sẵn thành HTML lúc
-            // build (xem `scripts/build-content.ts`) — không có gì từ người
-            // dùng hay từ mạng lọt vào đây.
-            dangerouslySetInnerHTML={{ __html: point.html }}
-          />
-        </div>
-      </div>
-    </div>,
-    document.body
   );
 }

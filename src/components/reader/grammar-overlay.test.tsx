@@ -11,19 +11,26 @@ const POINTS: GrammarPoint[] = [
     title: "명 이에요/예요",
     ko: "사람, 사물 이름을 말할 때 사용해요.",
     vi: "Dùng khi nói tên người hoặc tên đồ vật.",
-    html: "<h2>Cách dùng</h2><table><tr><td>후엔</td></tr></table>",
   },
 ];
 
-const openButton = () => screen.getByLabelText(/Xem giải thích ngữ pháp/);
+const trigger = () => screen.getByLabelText(/nghĩa ngữ pháp/);
+
+/**
+ * Trình duyệt thật bắn `pointerdown` TRƯỚC `click`, mà bong bóng nghe
+ * `pointerdown` ở pha bắt để đóng khi bấm ra ngoài — chỉ bắn mỗi `click` là
+ * bỏ lọt đúng loại lỗi do hai thứ đó giẫm chân nhau.
+ */
+function tap(el: HTMLElement) {
+  fireEvent.pointerDown(el, { bubbles: true });
+  fireEvent.click(el);
+}
 
 describe("chấm ngữ pháp", () => {
-  it("mời người dùng xem giải thích, kèm tên điểm ngữ pháp", () => {
+  it("mời xem nghĩa, kèm tên điểm ngữ pháp", () => {
     render(<GrammarOverlay points={POINTS} />);
 
-    expect(
-      screen.getByLabelText("Xem giải thích ngữ pháp: 명 이에요/예요")
-    ).toBeTruthy();
+    expect(screen.getByLabelText("Xem nghĩa ngữ pháp: 명 이에요/예요")).toBeTruthy();
   });
 
   it("vùng chạm đủ to cho ngón tay", () => {
@@ -31,7 +38,7 @@ describe("chấm ngữ pháp", () => {
     // vô hình — to cái chấm lên thì chọc vào dáng bản in của trang.
     render(<GrammarOverlay points={POINTS} />);
 
-    expect(openButton().className).toMatch(/\bsize-11\b/);
+    expect(trigger().className).toMatch(/\bsize-11\b/);
   });
 
   it("chấm nằm BÊN TRÁI tiêu đề", () => {
@@ -39,7 +46,7 @@ describe("chấm ngữ pháp", () => {
     // ngoài giấy.
     render(<GrammarOverlay points={POINTS} />);
 
-    expect(openButton().className).toMatch(/\bright-full\b/);
+    expect(trigger().className).toMatch(/\bright-full\b/);
   });
 
   it("khung tiêu đề không nhận chạm, chỉ để định vị", () => {
@@ -59,54 +66,63 @@ describe("chấm ngữ pháp", () => {
   });
 });
 
-describe("tấm phủ giải thích", () => {
-  it("hiện tiêu đề, nghĩa ngắn và phần giải thích khi bấm", () => {
+describe("bong bóng nghĩa", () => {
+  it("hiện tiêu đề và định nghĩa khi bấm", () => {
     render(<GrammarOverlay points={POINTS} />);
-    fireEvent.click(openButton());
+    tap(trigger());
 
-    expect(screen.getByRole("dialog")).toBeTruthy();
-    expect(screen.getByText("Dùng khi nói tên người hoặc tên đồ vật.")).toBeTruthy();
-    expect(screen.getByText("Cách dùng")).toBeTruthy();
+    const bubble = screen.getByRole("tooltip");
+    expect(bubble.textContent).toContain("명 이에요/예요");
+    expect(bubble.textContent).toContain("Dùng khi nói tên người hoặc tên đồ vật.");
   });
 
   it("chưa bấm thì chưa hiện gì", () => {
     render(<GrammarOverlay points={POINTS} />);
 
-    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(screen.queryByRole("tooltip")).toBeNull();
   });
 
-  it("đóng được bằng nút X", () => {
+  it("CHỈ có định nghĩa ngắn, không phải cả bài giảng", () => {
+    // Bản đầu làm cả tấm phủ với bảng chia theo patchim, ví dụ và mục lưu ý.
+    // Đọc giữa lúc đang học thì quá dài và rối, mà còn che mất trang sách
+    // đang xem. Muốn học sâu thì đã có tab bài giảng.
     render(<GrammarOverlay points={POINTS} />);
-    fireEvent.click(openButton());
-    fireEvent.click(screen.getByLabelText("Đóng"));
+    tap(trigger());
+    const bubble = screen.getByRole("tooltip");
 
-    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(bubble.querySelector("table")).toBeNull();
+    expect(bubble.textContent!.length).toBeLessThan(200);
   });
 
-  it("đóng được bằng cách bấm ra nền mờ", () => {
-    // Đường thoát mà ai cũng đoán ra — thiếu nó thì trên điện thoại người
-    // dùng dễ thấy bí.
+  it("bấm lại chính chấm đó thì đóng, không mở lại", () => {
     render(<GrammarOverlay points={POINTS} />);
-    fireEvent.click(openButton());
-    fireEvent.click(screen.getByLabelText("Đóng giải thích ngữ pháp"));
+    tap(trigger());
+    tap(trigger());
 
-    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(screen.queryByRole("tooltip")).toBeNull();
+  });
+
+  it("đang mở thì chấm đổi thành dấu đóng", () => {
+    // Bấm ra ngoài vốn đã đóng được, nhưng không có gì nói ra điều đó.
+    render(<GrammarOverlay points={POINTS} />);
+    tap(trigger());
+
+    expect(screen.getByLabelText(/^Đóng nghĩa ngữ pháp/)).toBeTruthy();
+  });
+
+  it("bấm ra ngoài thì đóng", () => {
+    render(<GrammarOverlay points={POINTS} />);
+    tap(trigger());
+    fireEvent.pointerDown(document.body, { bubbles: true });
+
+    expect(screen.queryByRole("tooltip")).toBeNull();
   });
 
   it("đóng được bằng phím Esc", () => {
     render(<GrammarOverlay points={POINTS} />);
-    fireEvent.click(openButton());
+    tap(trigger());
     fireEvent.keyDown(document, { key: "Escape" });
 
-    expect(screen.queryByRole("dialog")).toBeNull();
-  });
-
-  it("giữ được bảng trong phần giải thích", () => {
-    // Lý do chọn tấm phủ thay vì bong bóng nhỏ như bản dịch: giải thích ngữ
-    // pháp nào cũng có bảng chia theo patchim, nhét vào 24rem là vỡ hết.
-    render(<GrammarOverlay points={POINTS} />);
-    fireEvent.click(openButton());
-
-    expect(screen.getByRole("dialog").querySelector("table")).toBeTruthy();
+    expect(screen.queryByRole("tooltip")).toBeNull();
   });
 });

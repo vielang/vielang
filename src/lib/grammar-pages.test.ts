@@ -50,7 +50,17 @@ describe("nội dung ngữ pháp đã soạn", () => {
       for (const point of getPageGrammar("step1", page)) {
         expect(point.slug).toMatch(/^[a-z0-9-]+$/);
         expect(point.vi.trim()).not.toBe("");
-        expect(point.html.trim()).not.toBe("");
+      }
+    }
+  });
+
+  it("định nghĩa đủ NGẮN để nằm trong một bong bóng nhỏ", () => {
+    // Bong bóng nổi trên chính trang sách đang đọc. Định nghĩa dài là che
+    // mất thứ người ta đang học — đúng cái đã phải sửa ở bản đầu. Build
+    // cũng chặn (xem MAX_GRAMMAR_VI), chốt thêm ở đây cho khỏi trôi dần.
+    for (const page of getGrammarPages("step1")) {
+      for (const point of getPageGrammar("step1", page)) {
+        expect(point.vi.length).toBeLessThanOrEqual(200);
       }
     }
   });

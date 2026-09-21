@@ -22,7 +22,7 @@ const ENTRIES: GrammarEntry[] = [
     title: "동 형 -으면",
     vi: "Nêu điều kiện hoặc giả định.",
     exKo: "시간이 있으면 밥 먹을까요?",
-    exVi: "Nếu có thời gian thì mình đi ăn nhé?",
+    exVi: "Trường hợp có thời gian thì mình đi ăn nhé?",
     bookId: "step2",
     page: 55,
   },
@@ -34,54 +34,51 @@ function index() {
   return render(<GrammarIndex entries={ENTRIES} bookTitles={TITLES} />);
 }
 
-const searchBox = () => screen.getByLabelText("Tìm điểm ngữ pháp");
+const searchBox = () => screen.getByLabelText("Tra cứu ngữ pháp");
+const type = (value: string) =>
+  fireEvent.change(searchBox(), { target: { value } });
 
-describe("danh sách", () => {
-  it("hiện tất cả khi chưa gõ gì", () => {
+/**
+ * Ô này nằm ngay đầu trang thư viện, thay chỗ tiêu đề. Nếu gõ một ký tự đã
+ * đổ ra hàng chục kết quả thì nó đẩy tụt lưới sách xuống mỗi lần chạm nhầm
+ * — mà phần lớn người mở thư viện là để đọc tiếp, không phải để tra.
+ */
+describe("chưa gõ đủ thì chưa đổ danh sách", () => {
+  it("chưa gõ gì thì không hiện mục nào", () => {
     index();
 
-    expect(screen.getByText("명 이에요/예요")).toBeTruthy();
-    expect(screen.getByText("동 형 -으면")).toBeTruthy();
-    expect(screen.getByText("2 điểm ngữ pháp")).toBeTruthy();
+    expect(screen.queryByText("명 이에요/예요")).toBeNull();
+    expect(screen.queryByText("동 형 -으면")).toBeNull();
   });
 
-  it("mỗi mục dẫn thẳng tới đúng trang trong sách", () => {
-    // Đây là lý do tồn tại của cả trang này. Sai liên kết là tra cứu xong
-    // vẫn không tới được chỗ cần xem.
-    //
-    // Kiểm CẢ HAI sách, không chỉ mục đầu: chốt cứng "step1" vào đường dẫn
-    // vẫn làm mục đầu đúng, nên chỉ kiểm một mục là bỏ lọt đúng loại lỗi
-    // khiến mọi mục Sơ cấp 2 mở nhầm sang Sơ cấp 1.
+  it("mới gõ một ký tự cũng chưa hiện", () => {
     index();
+    type("이");
 
-    expect(
-      screen.getByText("명 이에요/예요").closest("a")?.getAttribute("href")
-    ).toBe("/read/step1/15");
-    expect(
-      screen.getByText("동 형 -으면").closest("a")?.getAttribute("href")
-    ).toBe("/read/step2/55");
+    expect(screen.queryByText("명 이에요/예요")).toBeNull();
   });
 
-  it("nói rõ mục đó ở sách nào, trang nào", () => {
+  it("nhưng vẫn cho biết trong kho có gì", () => {
+    // Ô này thế chỗ tiêu đề "Thư viện", nên phải gánh luôn phần thông tin
+    // mà tiêu đề từng mang — nếu không thì trang mở ra chỉ còn một ô trống.
     index();
 
-    expect(screen.getByText("Sơ cấp 1 · tr. 15")).toBeTruthy();
-    expect(screen.getByText("Sơ cấp 2 · tr. 55")).toBeTruthy();
+    expect(screen.getByText(/2 điểm ngữ pháp/)).toBeTruthy();
   });
 
-  it("hiện cả nghĩa lẫn câu ví dụ", () => {
+  it("chưa gõ đủ thì KHÔNG báo 'không tìm thấy'", () => {
+    // Gõ một chữ mà đã bảo không tìm thấy là sai và gây hoang mang.
     index();
+    type("이");
 
-    expect(screen.getByText("Dùng khi nói tên người hoặc tên đồ vật.")).toBeTruthy();
-    expect(screen.getByText("저는 후엔이에요.")).toBeTruthy();
-    expect(screen.getByText("Tôi là Huyền.")).toBeTruthy();
+    expect(screen.queryByText(/Không tìm thấy/)).toBeNull();
   });
 });
 
-describe("tìm kiếm", () => {
+describe("gõ đủ rồi", () => {
   it("lọc theo tiếng Hàn", () => {
     index();
-    fireEvent.change(searchBox(), { target: { value: "이에요" } });
+    type("이에요");
 
     expect(screen.getByText("명 이에요/예요")).toBeTruthy();
     expect(screen.queryByText("동 형 -으면")).toBeNull();
@@ -89,32 +86,69 @@ describe("tìm kiếm", () => {
 
   it("lọc theo tiếng Việt KHÔNG dấu", () => {
     index();
-    fireEvent.change(searchBox(), { target: { value: "dieu kien" } });
+    type("dieu kien");
 
     expect(screen.getByText("동 형 -으면")).toBeTruthy();
     expect(screen.queryByText("명 이에요/예요")).toBeNull();
   });
 
+  it("mỗi mục dẫn thẳng tới đúng trang trong sách", () => {
+    // Đây là lý do tồn tại của ô này. Kiểm CẢ HAI sách, không chỉ mục đầu:
+    // chốt cứng "step1" vào đường dẫn vẫn làm mục đầu đúng, nên chỉ kiểm
+    // một mục là bỏ lọt đúng loại lỗi khiến mọi mục Sơ cấp 2 mở nhầm sách.
+    index();
+
+    type("이에요");
+    expect(
+      screen.getByText("명 이에요/예요").closest("a")?.getAttribute("href")
+    ).toBe("/read/step1/15");
+
+    type("dieu kien");
+    expect(
+      screen.getByText("동 형 -으면").closest("a")?.getAttribute("href")
+    ).toBe("/read/step2/55");
+  });
+
+  it("nói rõ mục đó ở sách nào, trang nào", () => {
+    index();
+    type("이에요");
+
+    expect(screen.getByText(/Sơ cấp 1/)).toBeTruthy();
+    expect(screen.getByText(/tr\./)).toBeTruthy();
+  });
+
+  it("hiện cả nghĩa lẫn câu ví dụ", () => {
+    index();
+    type("이에요");
+
+    expect(screen.getByText("Dùng khi nói tên người hoặc tên đồ vật.")).toBeTruthy();
+    expect(screen.getByText("저는 후엔이에요.")).toBeTruthy();
+    expect(screen.getByText("Tôi là Huyền.")).toBeTruthy();
+  });
+
   it("báo số kết quả tìm được", () => {
     index();
-    fireEvent.change(searchBox(), { target: { value: "이에요" } });
+    type("이에요");
 
     expect(screen.getByText(/1 kết quả/)).toBeTruthy();
   });
 
-  it("không có kết quả thì chỉ đường thay vì để trang trống", () => {
+  it("không khớp gì thì chỉ đường thay vì để trống", () => {
     index();
-    fireEvent.change(searchBox(), { target: { value: "xyzzy" } });
+    type("xyzzy");
 
     expect(screen.getByText(/Không tìm thấy/)).toBeTruthy();
   });
+});
 
-  it("xoá được từ khoá để quay lại danh sách đầy đủ", () => {
+describe("xoá từ khoá", () => {
+  it("quay lại trạng thái chưa tra, không đổ danh sách", () => {
     index();
-    fireEvent.change(searchBox(), { target: { value: "이에요" } });
+    type("이에요");
     fireEvent.click(screen.getByLabelText("Xoá từ khoá"));
 
-    expect(screen.getByText("2 điểm ngữ pháp")).toBeTruthy();
+    expect(screen.queryByText("명 이에요/예요")).toBeNull();
+    expect(screen.getByText(/2 điểm ngữ pháp/)).toBeTruthy();
   });
 
   it("chưa gõ gì thì không bày nút xoá", () => {

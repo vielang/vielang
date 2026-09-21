@@ -27,6 +27,34 @@ export function normalize(text: string): string {
 }
 
 /**
+ * Số ký tự tối thiểu trước khi hiện danh sách kết quả.
+ *
+ * Ô tra cứu nằm ngay đầu trang thư viện, nên nếu gõ một ký tự đã đổ ra hàng
+ * chục kết quả thì nó đẩy tụt lưới sách xuống mỗi lần người ta chạm nhầm.
+ * Hai ký tự là đủ để chủ ý tra cứu mới hiện.
+ */
+export const MIN_QUERY_LENGTH = 2;
+
+/**
+ * Từ khoá đã đủ dài để tra chưa.
+ *
+ * Tách riêng khỏi `searchGrammar` vì giao diện cần phân biệt BA trạng thái:
+ * chưa gõ đủ (không hiện gì), gõ đủ mà không khớp (báo không tìm thấy), và
+ * có kết quả. Gộp "chưa đủ" thành mảng rỗng là mất mất trạng thái giữa, rồi
+ * người dùng gõ một chữ lại thấy "không tìm thấy" — sai và gây hoang mang.
+ *
+ * Đếm trên chuỗi GỐC chứ KHÔNG trên chuỗi đã chuẩn hoá: NFD tách một âm
+ * tiết Hàn thành các jamo rời, nên `이` đếm ra 2 và lọt chốt ngay khi vừa gõ
+ * một chữ. Đếm chuỗi gốc thì ngưỡng khớp với thứ người dùng NHÌN THẤY —
+ * hai chữ là hai chữ, dù là Hàn hay Việt.
+ *
+ * Trải chuỗi qua `[...]` để đếm theo ký tự chứ không theo đơn vị UTF-16.
+ */
+export function hasEnoughQuery(query: string): boolean {
+  return [...query.trim()].length >= MIN_QUERY_LENGTH;
+}
+
+/**
  * Lọc danh sách ngữ pháp theo từ khoá.
  *
  * Tìm trong tiêu đề tiếng Hàn, định nghĩa tiếng Việt VÀ câu ví dụ — người ta

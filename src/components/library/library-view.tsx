@@ -4,6 +4,8 @@ import { ContinueReading } from "@/components/library/continue-reading";
 import type { Book } from "@/lib/books";
 import { groupBooksByLevel } from "@/lib/library";
 import type { LanguageConfig } from "@/lib/languages";
+import type { GrammarEntry } from "@/lib/page-grammar";
+import { GrammarIndex } from "@/components/grammar/grammar-index";
 
 /**
  * Khung trang thư viện dùng chung cho trang gốc (tiếng Hàn) và mọi trang
@@ -13,22 +15,41 @@ import type { LanguageConfig } from "@/lib/languages";
 export function LibraryView({
   language,
   books,
+  grammar,
+  bookTitles,
 }: {
   language: LanguageConfig;
   books: readonly Book[];
+  /**
+   * Điểm ngữ pháp để tra cứu. Bỏ trống thì giữ tiêu đề như cũ.
+   *
+   * Chỉ giáo trình tiếng Hàn mới có nội dung ngữ pháp, mà khung này dùng
+   * chung cho cả `/[lang]` — đặt ô tra cứu rỗng lên trang tiếng Anh thì gõ
+   * gì cũng không ra, tệ hơn là không có.
+   */
+  grammar?: GrammarEntry[];
+  bookTitles?: Record<string, string>;
 }) {
   const groups = groupBooksByLevel(books);
+  const hasGrammar = grammar !== undefined && grammar.length > 0;
 
   return (
     <div className="flex flex-col gap-8">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">
-          {language.heading}
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {language.description}
-        </p>
-      </div>
+      {/* Ô tra cứu THAY CHỖ tiêu đề: tiêu đề "Thư viện" chỉ nhắc lại thứ
+          người dùng vừa bấm để tới đây, còn ô này làm được việc. Dòng gợi ý
+          bên trong nó giữ lại phần thông tin mà tiêu đề từng mang. */}
+      {hasGrammar ? (
+        <GrammarIndex entries={grammar} bookTitles={bookTitles ?? {}} />
+      ) : (
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            {language.heading}
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {language.description}
+          </p>
+        </div>
+      )}
 
       {/* Đặt TRƯỚC lưới sách: mở thư viện ra phần lớn là để đọc tiếp cuốn
           đang dở, chứ không phải để chọn cuốn mới. Tự ẩn khi chưa đọc gì. */}

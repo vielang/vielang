@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { normalize, searchGrammar } from "./grammar-search";
+import { hasEnoughQuery, normalize, searchGrammar } from "./grammar-search";
 import { getAllGrammar, type GrammarEntry } from "./page-grammar";
 
 const entry = (over: Partial<GrammarEntry> = {}): GrammarEntry => ({
@@ -115,5 +115,31 @@ describe("dữ liệu thật", () => {
     const found = searchGrammar(all, "-지요");
     expect(found.length).toBeGreaterThan(0);
     expect(found[0].bookId).toBe("step1");
+  });
+});
+
+describe("ngưỡng bắt đầu tra", () => {
+  it("chưa gõ gì hoặc mới một ký tự thì chưa tra", () => {
+    expect(hasEnoughQuery("")).toBe(false);
+    expect(hasEnoughQuery("  ")).toBe(false);
+    expect(hasEnoughQuery("d")).toBe(false);
+  });
+
+  it("một âm tiết Hàn tính là MỘT ký tự", () => {
+    // Bẫy thật: NFD tách `이` thành jamo ㅇ + ㅣ, nên đếm trên chuỗi đã
+    // chuẩn hoá thì nó thành 2 và lọt chốt ngay khi vừa gõ một chữ. Ngưỡng
+    // phải khớp với thứ người dùng NHÌN THẤY.
+    expect(hasEnoughQuery("이")).toBe(false);
+    expect(hasEnoughQuery("이에")).toBe(true);
+  });
+
+  it("hai ký tự trở lên thì tra", () => {
+    expect(hasEnoughQuery("di")).toBe(true);
+    expect(hasEnoughQuery("điều kiện")).toBe(true);
+  });
+
+  it("bỏ qua khoảng trắng thừa hai đầu", () => {
+    expect(hasEnoughQuery("  d  ")).toBe(false);
+    expect(hasEnoughQuery("  di  ")).toBe(true);
   });
 });

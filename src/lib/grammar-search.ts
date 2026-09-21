@@ -36,6 +36,15 @@ export function normalize(text: string): string {
 export const MIN_QUERY_LENGTH = 2;
 
 /**
+ * Số kết quả vẽ ra tối đa.
+ *
+ * Từ khoá ngắn và phổ biến khớp rất nhiều — "vi" khớp tới 30 mục. Vẽ hết ra
+ * thì vừa chậm trên máy yếu vừa vô dụng: không ai đọc ba chục thẻ để tìm một
+ * cái. Cắt bớt rồi mời gõ thêm cho hẹp lại.
+ */
+export const MAX_VISIBLE_RESULTS = 20;
+
+/**
  * Từ khoá đã đủ dài để tra chưa.
  *
  * Tách riêng khỏi `searchGrammar` vì giao diện cần phân biệt BA trạng thái:

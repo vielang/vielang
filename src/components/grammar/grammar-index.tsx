@@ -1,10 +1,15 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useDeferredValue, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { Search, X } from "lucide-react";
 import type { GrammarEntry } from "@/lib/page-grammar";
-import { hasEnoughQuery, searchGrammar } from "@/lib/grammar-search";
+import {
+  MAX_VISIBLE_RESULTS,
+  MIN_QUERY_LENGTH,
+  hasEnoughQuery,
+  searchGrammar,
+} from "@/lib/grammar-search";
 
 /**
  * Ô tra cứu ngữ pháp, đặt ngay đầu trang thư viện.
@@ -30,12 +35,51 @@ export function GrammarIndex({
   /** bookId -> tên hiển thị, dựng sẵn ở phía máy chủ. */
   bookTitles: Record<string, string>;
 }) {
+  // HAI trạng thái, không phải một:
+  //  - `input` là thứ hiện trong ô, cập nhật theo TỪNG phím để gõ không khựng.
+  //  - `query` là thứ đem đi lọc, chỉ cập nhật khi bộ gõ đã ghép xong chữ.
+  //
+  // Bàn phím tiếng Hàn ghép từng jamo: gõ "이에" thì ô lần lượt mang
+  // "ㅇ" → "이" → "이ㅇ" → "이에". Lọc trên mấy mảnh dở dang đó vừa vô nghĩa
+  // vừa khiến danh sách nhấp nháy, và trên một số bàn phím Android còn làm
+  // đứt mạch ghép chữ — gõ xong cả từ mà ô vẫn như chưa nhận. Tiếng Việt gõ
+  // Telex cũng vậy: "dieu" đang ghép dở thành "diê" rồi mới ra "điều".
+  const [input, setInput] = useState("");
   const [query, setQuery] = useState("");
+  const composing = useRef(false);
+
+  function onChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const value = e.target.value;
+    setInput(value);
+    if (!composing.current) setQuery(value);
+  }
+
+  function onCompositionEnd(e: React.CompositionEvent<HTMLInputElement>) {
+    composing.current = false;
+    // Lấy giá trị từ chính sự kiện: `onChange` của nhịp cuối có thể chạy
+    // TRƯỚC sự kiện này, lúc cờ còn bật, nên nếu chỉ hạ cờ thì chữ vừa ghép
+    // xong không bao giờ được đem đi lọc.
+    setQuery(e.currentTarget.value);
+  }
+
+  function clear() {
+    setInput("");
+    setQuery("");
+  }
+
+  const typed = [...input.trim()].length;
   const ready = hasEnoughQuery(query);
-  const results = useMemo(
-    () => (ready ? searchGrammar(entries, query) : []),
-    [entries, query, ready]
+
+  // Lọc chạy sau một nhịp so với việc gõ: gõ luôn mượt, danh sách theo sau.
+  // Với 72 mục thì gần như cùng nhịp, nhưng đây là thứ giữ cho ô không khựng
+  // khi kho ngữ pháp lớn dần.
+  const deferredQuery = useDeferredValue(query);
+  const matches = useMemo(
+    () => (hasEnoughQuery(deferredQuery) ? searchGrammar(entries, deferredQuery) : []),
+    [entries, deferredQuery]
   );
+  const results = matches.slice(0, MAX_VISIBLE_RESULTS);
+  const hidden = matches.length - results.length;
 
   return (
     <div className="flex flex-col gap-3">
@@ -46,16 +90,18 @@ export function GrammarIndex({
         />
         <input
           type="search"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          value={input}
+          onChange={onChange}
+          onCompositionStart={() => (composing.current = true)}
+          onCompositionEnd={onCompositionEnd}
           placeholder="Tra cứu ngữ pháp — tiếng Hàn hoặc tiếng Việt…"
           aria-label="Tra cứu ngữ pháp"
           className="focus-visible:ring-ring w-full rounded-lg border border-border bg-background py-2.5 pr-9 pl-9 text-sm focus-visible:ring-2 focus-visible:outline-none"
         />
-        {query !== "" && (
+        {input !== "" && (
           <button
             type="button"
-            onClick={() => setQuery("")}
+            onClick={clear}
             aria-label="Xoá từ khoá"
             className="absolute top-1/2 right-2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
           >
@@ -65,14 +111,18 @@ export function GrammarIndex({
       </div>
 
       {!ready ? (
-        <p className="text-sm text-muted-foreground">
-          {entries.length} điểm ngữ pháp trong Sơ cấp 1 và Sơ cấp 2, kèm nghĩa
-          tiếng Việt và câu ví dụ.
+        // Gõ được một ký tự mà giao diện không đổi gì thì trông y như hỏng —
+        // người dùng không có cách nào đoán ra là cần gõ thêm. Nói thẳng ra.
+        <p className="text-sm text-muted-foreground" aria-live="polite">
+          {typed === 0
+            ? `${entries.length} điểm ngữ pháp trong Sơ cấp 1 và Sơ cấp 2, kèm nghĩa tiếng Việt và câu ví dụ.`
+            : `Gõ thêm ${MIN_QUERY_LENGTH - typed} ký tự nữa để tra cứu.`}
         </p>
       ) : (
         <>
           <p className="text-sm text-muted-foreground" aria-live="polite">
-            {results.length} kết quả cho “{query}”
+            {matches.length} kết quả cho “{query}”
+            {hidden > 0 && ` — hiện ${results.length} mục đầu, gõ thêm cho hẹp lại`}
           </p>
 
           {results.length === 0 ? (

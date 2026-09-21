@@ -157,3 +157,64 @@ describe("xoá từ khoá", () => {
     expect(screen.queryByLabelText("Xoá từ khoá")).toBeNull();
   });
 });
+
+/**
+ * Bàn phím tiếng Hàn (và gõ Telex tiếng Việt) ghép chữ dần dần, bắn
+ * `compositionstart` → nhiều `change` với mảnh dở dang → `compositionend`.
+ *
+ * Lọc trên mấy mảnh đó vừa vô nghĩa vừa làm danh sách nhấp nháy, và trên
+ * một số bàn phím còn làm đứt mạch ghép chữ — gõ xong cả từ mà ô vẫn như
+ * chưa nhận. Đây là loại lỗi CHỈ xuất hiện trên bàn phím thật, không bao
+ * giờ tái hiện bằng chuột và bàn phím Latinh, nên phải chốt ở đây.
+ */
+describe("bộ gõ ghép chữ (IME)", () => {
+  /** Gõ `이에` qua bộ gõ Hàn: ㅇ → 이 → 이ㅇ → 이에. */
+  function composeKorean() {
+    const box = searchBox();
+    fireEvent.compositionStart(box);
+    for (const step of ["ㅇ", "이", "이ㅇ"]) {
+      fireEvent.change(box, { target: { value: step } });
+    }
+    fireEvent.change(box, { target: { value: "이에" } });
+    fireEvent.compositionEnd(box, { target: { value: "이에" } });
+  }
+
+  it("ô vẫn hiện đúng từng bước người ta gõ", () => {
+    index();
+    composeKorean();
+
+    expect((searchBox() as HTMLInputElement).value).toBe("이에");
+  });
+
+  it("ghép xong thì LỌC — đây chính là chỗ từng hỏng", () => {
+    // Nếu chỉ hạ cờ ở `compositionend` mà không lấy giá trị từ sự kiện, thì
+    // chữ vừa ghép xong không bao giờ được đem đi lọc: gõ xong cả từ mà
+    // danh sách vẫn trống.
+    index();
+    composeKorean();
+
+    expect(screen.getByText("명 이에요/예요")).toBeTruthy();
+  });
+
+  it("không lọc theo mảnh dở dang giữa chừng", () => {
+    index();
+    const box = searchBox();
+    fireEvent.compositionStart(box);
+    fireEvent.change(box, { target: { value: "이ㅇ" } });
+
+    // "이ㅇ" không khớp mục nào; nếu đem đi lọc thì hiện "không tìm thấy",
+    // nhấp nháy đúng lúc người ta đang gõ dở.
+    expect(screen.queryByText(/Không tìm thấy/)).toBeNull();
+  });
+});
+
+describe("khi mới gõ một ký tự", () => {
+  it("nói rõ là phải gõ thêm, không im lặng", () => {
+    // Gõ một ký tự mà giao diện không đổi gì thì trông y như hỏng — người
+    // dùng không có cách nào đoán ra là cần gõ thêm.
+    index();
+    type("d");
+
+    expect(screen.getByText(/Gõ thêm 1 ký tự nữa/)).toBeTruthy();
+  });
+});

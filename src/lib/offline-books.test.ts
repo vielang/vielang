@@ -1,6 +1,13 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { bookCacheName, listOfflineBooks, pageImageUrl } from "./offline-books";
-import { getPageUrl } from "./books";
+import {
+  bookCacheName,
+  countAudioTracks,
+  deleteOfflineBook,
+  estimateBytes,
+  listOfflineBooks,
+  pageImageUrl,
+} from "./offline-books";
+import { BOOKS, getPageUrl } from "./books";
 
 /**
  * Cache API giả, vừa đủ cho `listOfflineBooks`: chỉ cần kể tên cache và kể
@@ -91,5 +98,51 @@ describe("trình duyệt chặn Cache API", () => {
     });
 
     expect(await listOfflineBooks()).toEqual([]);
+  });
+});
+
+describe("gói tải về gồm cả bài nghe", () => {
+  it("đếm đúng số bài nghe của cuốn", () => {
+    // Sơ cấp 1: 18 bài × 3 track (말하기, 듣기, 발음) + 1 track mở đầu.
+    expect(countAudioTracks("step1")).toBe(55);
+  });
+
+  it("ước lượng dung lượng có tính audio", () => {
+    // Audio mới là phần nặng: bỏ nó ra là báo thiếu tới ba lần, người dùng
+    // bấm tải xong mới ngã ngửa vì hết chỗ máy.
+    const step1 = BOOKS.find((b) => b.id === "step1")!;
+    const imagesOnly = step1.totalPages * 180 * 1024;
+
+    expect(estimateBytes(step1)).toBeGreaterThan(imagesOnly * 2.5);
+  });
+
+  it("sách không có audio thì không cộng thêm gì", () => {
+    // Vài cuốn tiếng Anh chưa khảo sát xong bảng track nên chưa có audio.
+    // Khẳng định luôn là có cuốn như vậy, chứ không lặng lẽ bỏ qua: bỏ qua
+    // thì hôm nào mọi cuốn đều có audio, test này xanh mà chẳng kiểm gì.
+    const noAudio = BOOKS.find((b) => countAudioTracks(b.id) === 0);
+
+    expect(noAudio).toBeDefined();
+    expect(estimateBytes(noAudio!)).toBe(noAudio!.totalPages * 180 * 1024);
+  });
+});
+
+describe("xoá sách offline", () => {
+  it("xoá đúng MỘT cache, nên ảnh và audio đi cùng nhau", async () => {
+    // Cả hai nằm chung `kiip-book-<id>` chính là để chuyện này đúng: không
+    // có đường nào sót lại âm thầm chiếm chỗ trên máy người dùng.
+    const store: Record<string, string[]> = {
+      [bookCacheName("step1")]: [
+        "/img/books/step1/pages/0001.webp",
+        "/img/books/step1/audio/1-S.mp3",
+        "/read/step1/1",
+      ],
+    };
+    const deleted = mockCaches(store);
+
+    await deleteOfflineBook("step1");
+
+    expect(deleted).toEqual([bookCacheName("step1")]);
+    expect(store[bookCacheName("step1")]).toBeUndefined();
   });
 });

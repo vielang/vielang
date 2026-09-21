@@ -66,7 +66,7 @@ export function OfflineDownload({ book }: { book: Book }) {
       // khiến người ta nhìn nhầm cái này ra cái kia.
       <div
         className="flex items-center gap-1.5 text-xs text-muted-foreground"
-        title={`Đang tải ${done}/${total} trang`}
+        title={`Đang tải ${done}/${total} phần (trang sách và bài nghe)`}
       >
         <Loader2 className="size-3.5 shrink-0 animate-spin" aria-hidden />
         <span className="tabular-nums" aria-label={`Đang tải ${percent}%`}>

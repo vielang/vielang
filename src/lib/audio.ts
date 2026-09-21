@@ -16,21 +16,24 @@ export interface AudioTrack {
   url: string;
 }
 
-let warnedMissingBase = false;
+/**
+ * Tiền tố cùng origin, chuyển tiếp sang R2 bởi `rewrites()` trong
+ * `next.config.ts`. Giống hệt đường của ảnh trang.
+ *
+ * Tên `/img` là do lịch sử — nó ra đời lúc mới chỉ có ảnh đi qua. Giữ
+ * nguyên chứ không đổi thành `/media` cho đẹp: đường dẫn này là KHOÁ CACHE
+ * của những cuốn người dùng đã tải về máy, đổi một chữ là mấy cuốn đó không
+ * khớp nữa và họ phải tải lại từ đầu. Cái tên hơi lệch nghĩa rẻ hơn nhiều.
+ *
+ * Vì sao phải cùng origin: `sw.js` bỏ qua mọi request khác origin, và quan
+ * trọng hơn — `cache.put()` TỪ CHỐI bản trả về `opaque` (status 0), mà
+ * fetch sang r2.dev không CORS thì chỉ nhận được opaque. Tức là trỏ thẳng
+ * R2 thì không tài nào tải audio về máy được.
+ */
+const MEDIA_PREFIX = "/img";
 
 function audioBaseUrl(): string {
-  const base = process.env.NEXT_PUBLIC_IMAGE_BASE_URL;
-  if (!base) {
-    if (!warnedMissingBase) {
-      console.warn(
-        "⚠ Thiếu biến môi trường NEXT_PUBLIC_IMAGE_BASE_URL — audio sẽ không " +
-          "tải được. Xem web/.env.local.example."
-      );
-      warnedMissingBase = true;
-    }
-    return "";
-  }
-  return base.replace(/\/$/, "");
+  return MEDIA_PREFIX;
 }
 
 function fileNameFor(lesson: number | null, type: AudioTrackType): string {

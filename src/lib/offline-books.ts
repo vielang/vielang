@@ -1,6 +1,7 @@
 "use client";
 
 import { getPageUrl, type Book } from "@/lib/books";
+import { getAudioPages, getPageAudio } from "@/lib/audio";
 
 /**
  * Tải nguyên một cuốn sách về máy để đọc khi mất mạng.
@@ -34,6 +35,17 @@ const BOOK_CACHE_PREFIX = "kiip-book-";
  */
 const BYTES_PER_PAGE = 180 * 1024;
 
+/**
+ * Ước lượng dung lượng mỗi bài nghe. Đo thật trên R2, 3 file mẫu mỗi cuốn:
+ *
+ *   giáo trình tiếng Hàn  1205–1442 KB
+ *   sách bài tập          ~1494 KB
+ *   giáo trình tiếng Anh  ~1118 KB
+ *
+ * Đều tay hơn ảnh nhiều, nên một con số chung là đủ sát.
+ */
+const BYTES_PER_TRACK = 1300 * 1024;
+
 /** Tải bao nhiêu trang một lúc. Nhiều hơn thì mạng di động bắt đầu nghẽn. */
 const CONCURRENCY = 4;
 
@@ -50,9 +62,31 @@ export function bookIdFromCache(name: string): string {
   return name.slice(BOOK_CACHE_PREFIX.length);
 }
 
-/** Dung lượng ước tính của một cuốn, tính bằng byte. */
+/**
+ * Số bài nghe của cả cuốn. Đếm thật qua bảng tra audio chứ không ước:
+ * số track mỗi bài khác nhau giữa giáo trình (3), sách bài tập (2) và sách
+ * tiếng Anh (thay đổi theo trang).
+ */
+export function countAudioTracks(bookId: string): number {
+  return getAudioPages(bookId).reduce(
+    (sum, page) => sum + getPageAudio(bookId, page).length,
+    0
+  );
+}
+
+/**
+ * Dung lượng ước tính của một cuốn, tính bằng byte.
+ *
+ * Audio chiếm phần lớn chứ không phải ảnh — một bài nghe nặng gấp cả chục
+ * lần một trang sách. Với Sơ cấp 1: ~30MB ảnh nhưng ~70MB audio. Bỏ audio
+ * ra khỏi con số này là báo thiếu tới ba lần, người dùng bấm tải xong mới
+ * ngã ngửa vì hết chỗ.
+ */
 export function estimateBytes(book: Book): number {
-  return book.totalPages * BYTES_PER_PAGE;
+  return (
+    book.totalPages * BYTES_PER_PAGE +
+    countAudioTracks(book.id) * BYTES_PER_TRACK
+  );
 }
 
 export function formatBytes(bytes: number): string {
@@ -177,13 +211,37 @@ export interface DownloadProgress {
   total: number;
 }
 
+/** Một việc cần tải: hoặc một trang (ảnh + HTML + RSC), hoặc một bài nghe. */
+type Task =
+  | { kind: "page"; page: number }
+  | { kind: "audio"; url: string };
+
 /**
- * Tải cả cuốn. Gọi `onProgress` sau mỗi trang xong, và dừng ngay khi
- * `signal` bị huỷ.
+ * Xếp việc theo thứ tự đọc: trang 1, audio của trang 1, trang 2…
  *
- * Trang nào tải hỏng thì BỎ QUA chứ không làm hỏng cả lượt: mạng di động
- * rớt một nhịp là chuyện thường, mất một trang còn hơn mất cả cuốn. Số trang
- * thật sự tải được trả về ở cuối để bên gọi biết mà nói lại.
+ * Đếm bài nghe thành ĐƠN VỊ RIÊNG chứ không gộp vào trang của nó. Một trang
+ * có audio nặng ~4MB, gấp hơn hai chục lần trang thường — gộp thì thanh tiến
+ * độ đứng im cả nửa phút ở đúng 18 bước đó, nhìn y như treo và người dùng
+ * bấm huỷ.
+ */
+function buildTasks(book: Book): Task[] {
+  const tasks: Task[] = [];
+  for (let page = 1; page <= book.totalPages; page++) {
+    tasks.push({ kind: "page", page });
+    for (const track of getPageAudio(book.id, page)) {
+      tasks.push({ kind: "audio", url: track.url });
+    }
+  }
+  return tasks;
+}
+
+/**
+ * Tải cả cuốn: ảnh trang, HTML, payload RSC và bài nghe. Gọi `onProgress`
+ * sau mỗi phần xong, và dừng ngay khi `signal` bị huỷ.
+ *
+ * Phần nào tải hỏng thì BỎ QUA chứ không làm hỏng cả lượt: mạng di động rớt
+ * một nhịp là chuyện thường, mất một trang còn hơn mất cả cuốn. Số phần thật
+ * sự tải được trả về ở cuối để bên gọi biết mà nói lại.
  */
 export async function downloadBook(
   book: Book,
@@ -193,32 +251,40 @@ export async function downloadBook(
   }: { onProgress?: (p: DownloadProgress) => void; signal?: AbortSignal } = {}
 ): Promise<{ saved: number; total: number }> {
   const cache = await caches.open(bookCacheName(book.id));
-  const total = book.totalPages;
+  const tasks = buildTasks(book);
+  const total = tasks.length;
   let done = 0;
   let saved = 0;
 
-  const pages = Array.from({ length: total }, (_, i) => i + 1);
+  /** Tải một đường rồi cất vào cache. Bỏ qua bản trả về hỏng. */
+  async function save(url: string) {
+    const response = await fetch(url, { signal });
+    if (response.ok) await cache.put(url, response);
+  }
 
   async function worker() {
     for (;;) {
       if (signal?.aborted) return;
-      const page = pages.shift();
-      if (page === undefined) return;
+      const task = tasks.shift();
+      if (task === undefined) return;
       try {
-        // `cache.addAll` sẽ vứt cả nhóm nếu một đường hỏng — tự thêm từng
-        // cái để giữ được phần đã tải.
-        await Promise.all([
-          ...[pageImageUrl(book.id, page), pageDocUrl(book.id, page)].map(
-            async (url) => {
-              const response = await fetch(url, { signal });
-              if (response.ok) await cache.put(url, response);
-            }
-          ),
-          cacheRsc(cache, book.id, page, signal),
-        ]);
+        if (task.kind === "audio") {
+          // Audio nằm CÙNG cache `kiip-book-<id>` với ảnh, không tách riêng:
+          // nhờ vậy xoá sách vẫn chỉ là xoá đúng một cache, ảnh và audio đi
+          // cùng nhau, không có đường nào sót lại chiếm chỗ trên máy.
+          await save(task.url);
+        } else {
+          // `cache.addAll` sẽ vứt cả nhóm nếu một đường hỏng — tự thêm từng
+          // cái để giữ được phần đã tải.
+          await Promise.all([
+            save(pageImageUrl(book.id, task.page)),
+            save(pageDocUrl(book.id, task.page)),
+            cacheRsc(cache, book.id, task.page, signal),
+          ]);
+        }
         saved++;
       } catch {
-        /* trang này hỏng — đi tiếp, xem chú thích ở trên */
+        /* phần này hỏng — đi tiếp, xem chú thích ở trên */
       }
       done++;
       onProgress?.({ done, total });

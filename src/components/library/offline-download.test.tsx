@@ -52,9 +52,14 @@ describe("đang tải", () => {
     expect(screen.queryByRole("progressbar")).toBeNull();
   });
 
-  it("vẫn tra được số trang chính xác khi cần", () => {
+  it("vẫn tra được con số chính xác khi cần", () => {
+    // "phần" chứ không phải "trang": gói tải về nay gồm cả bài nghe, mà một
+    // bài nghe nặng gấp hơn hai chục lần một trang nên phải đếm riêng, nếu
+    // không thanh tiến độ sẽ đứng im từng quãng dài.
     widget();
-    expect(screen.getByTitle("Đang tải 57/228 trang")).toBeTruthy();
+    expect(
+      screen.getByTitle("Đang tải 57/228 phần (trang sách và bài nghe)")
+    ).toBeTruthy();
   });
 
   it("huỷ được giữa chừng", () => {

@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 /**
  * Kiểm luật phân loại của service worker.
@@ -273,5 +273,157 @@ describe("đường của Vercel Analytics", () => {
 
     expect(guard).toBeGreaterThan(handler);
     expect(guard).toBeLessThan(firstRespond);
+  });
+});
+
+/**
+ * Bài nghe của cuốn đã tải về máy.
+ *
+ * Phần cắt khoảng (`Range`) là thứ quyết định iPhone có nghe được hay không,
+ * nên chạy hàm thật chứ không chỉ dò chữ trong file.
+ */
+describe("bài nghe offline", () => {
+  const src = () =>
+    readFileSync(path.resolve(process.cwd(), "public", "sw.js"), "utf8");
+
+  /** Bản trả về 1000 byte, giả như đã nằm sẵn trong cache. */
+  const cached = () =>
+    new Response(new Uint8Array(1000), {
+      headers: { "Content-Type": "audio/mpeg" },
+    });
+
+  /**
+   * Nạp service worker với một Cache API giả.
+   *
+   * `downloaded = false` là giả cảnh chưa tải cuốn nào về.
+   */
+  function audioRules(downloaded = true) {
+    const stubSelf = { addEventListener: () => {}, location: { origin: "https://x" } };
+    const stubCaches = {
+      keys: async () => (downloaded ? ["kiip-book-step1"] : []),
+      open: async () => ({ match: async () => (downloaded ? cached() : undefined) }),
+    };
+    const factory = new Function(
+      "self",
+      "caches",
+      `${src()}\nreturn { isAudio, sliceForRange, serveAudio };`
+    );
+    return factory(stubSelf, stubCaches) as {
+      isAudio: (url: URL) => boolean;
+      sliceForRange: (res: Response, range: string) => Promise<Response>;
+      serveAudio: (req: Request) => Promise<Response>;
+    };
+  }
+
+  const { isAudio, sliceForRange } = audioRules();
+
+  it("nhận ra file mp3, không nhầm với ảnh trang", () => {
+    expect(isAudio(url("/img/books/step1/audio/1-S.mp3"))).toBe(true);
+    expect(isAudio(url("/img/books/step1/pages/0020.webp"))).toBe(false);
+  });
+
+  it("đòi khoảng thì trả 206 kèm Content-Range", async () => {
+    // Safari/iOS từ chối phát hẳn nếu đòi khoảng mà nhận về 200 — tức là
+    // sách đã tải về vẫn không nghe được trên iPhone.
+    const res = await sliceForRange(cached(), "bytes=0-99");
+
+    expect(res.status).toBe(206);
+    expect(res.headers.get("Content-Range")).toBe("bytes 0-99/1000");
+    expect(res.headers.get("Content-Length")).toBe("100");
+    expect((await res.arrayBuffer()).byteLength).toBe(100);
+  });
+
+  it("tua tới giữa bài (khoảng hở đuôi) thì lấy tới hết file", async () => {
+    const res = await sliceForRange(cached(), "bytes=500-");
+
+    expect(res.headers.get("Content-Range")).toBe("bytes 500-999/1000");
+    expect((await res.arrayBuffer()).byteLength).toBe(500);
+  });
+
+  it("đòi quá cỡ file thì cắt về đúng mép, không vỡ", async () => {
+    const res = await sliceForRange(cached(), "bytes=900-99999");
+
+    expect(res.headers.get("Content-Range")).toBe("bytes 900-999/1000");
+    expect((await res.arrayBuffer()).byteLength).toBe(100);
+  });
+
+  it("dạng lạ thì trả nguyên bản chứ không đoán bừa", async () => {
+    // `bytes=-100` là "100 byte cuối" — thẻ <audio> không dùng dạng này,
+    // đoán bừa thì sai còn tệ hơn nhường cho mạng.
+    const res = await sliceForRange(cached(), "bytes=-100");
+
+    expect(res.status).toBe(200);
+  });
+
+  it("KHÔNG tự cache bài nghe nghe lướt", () => {
+    // Một bài nghe 1,3MB, gấp hơn hai chục lần một trang. Tự cache là đầy
+    // máy người ta mà họ không hề xin.
+    //
+    // Dò `.put(` chứ không dò `cache.put`: đổi tên biến một cái là lọt.
+    const body = src();
+    const fn = body.indexOf("async function serveAudio");
+    const next = body.indexOf("async function sliceForRange");
+    const region = body.slice(fn, next);
+
+    expect(region).toContain("matchDownloadedBook");
+    expect(region).not.toContain(".put(");
+  });
+});
+
+/**
+ * `serveAudio` chạy thật, với Cache API giả.
+ *
+ * Tách khỏi nhóm trên vì nhóm đó chỉ kiểm từng hàm rời. Kiểm rời thôi là
+ * chưa đủ: gỡ đúng dòng nối `serveAudio` vào `sliceForRange` thì mọi test
+ * rời vẫn xanh, mà trên iPhone thì sách đã tải về không nghe được.
+ */
+describe("phục vụ bài nghe từ cuốn đã tải", () => {
+  const src = () =>
+    readFileSync(path.resolve(process.cwd(), "public", "sw.js"), "utf8");
+
+  const cached = () =>
+    new Response(new Uint8Array(1000), {
+      headers: { "Content-Type": "audio/mpeg" },
+    });
+
+  function load(downloaded: boolean) {
+    const stubSelf = { addEventListener: () => {}, location: { origin: "https://x" } };
+    const stubCaches = {
+      keys: async () => (downloaded ? ["kiip-book-step1"] : []),
+      open: async () => ({ match: async () => (downloaded ? cached() : undefined) }),
+    };
+    const factory = new Function("self", "caches", `${src()}\nreturn { serveAudio };`);
+    return factory(stubSelf, stubCaches) as {
+      serveAudio: (req: Request) => Promise<Response>;
+    };
+  }
+
+  const audioRequest = (range?: string) =>
+    new Request("https://x/img/books/step1/audio/1-S.mp3", {
+      headers: range ? { Range: range } : {},
+    });
+
+  it("đòi khoảng thì cắt ra 206, không trả nguyên bản 200", async () => {
+    const res = await load(true).serveAudio(audioRequest("bytes=100-199"));
+
+    expect(res.status).toBe(206);
+    expect(res.headers.get("Content-Range")).toBe("bytes 100-199/1000");
+  });
+
+  it("không đòi khoảng thì trả nguyên bài", async () => {
+    const res = await load(true).serveAudio(audioRequest());
+
+    expect(res.status).toBe(200);
+    expect((await res.arrayBuffer()).byteLength).toBe(1000);
+  });
+
+  it("chưa tải cuốn nào thì ra thẳng mạng", async () => {
+    const fetched = new Response("từ mạng");
+    vi.stubGlobal("fetch", vi.fn(async () => fetched));
+
+    const res = await load(false).serveAudio(audioRequest());
+
+    expect(await res.text()).toBe("từ mạng");
+    vi.unstubAllGlobals();
   });
 });

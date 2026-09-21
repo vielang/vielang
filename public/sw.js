@@ -156,6 +156,64 @@ async function matchDownloadedBook(request) {
   return undefined;
 }
 
+/** Bài nghe của sách — nhận theo đuôi tệp, cùng cách `isPageImage` làm. */
+function isAudio(url) {
+  return /\.mp3$/i.test(url.pathname);
+}
+
+/**
+ * Bài nghe: CHỈ lấy từ cuốn người dùng đã chủ động tải, còn lại ra thẳng mạng.
+ *
+ * Cố ý KHÔNG cache tự động như ảnh. Một bài nghe nặng 1,3MB — gấp mười một
+ * trang sách. Nghe lướt vài bài là đầy máy người ta, mà họ có xin đâu. Ai
+ * muốn mang theo thì bấm tải cả cuốn.
+ *
+ * Trình duyệt vốn đã tự cache rồi (R2 gửi `immutable`, hạn một năm), nên
+ * nghe lại lần hai vẫn không tốn mạng dù ta không đụng tay vào.
+ */
+async function serveAudio(request) {
+  const hit = await matchDownloadedBook(request);
+  if (!hit) return fetch(request);
+
+  const range = request.headers.get("range");
+  if (!range) return hit;
+  return sliceForRange(hit, range);
+}
+
+/**
+ * Cắt một khúc của bản trả về đã cache, trả về 206.
+ *
+ * BẮT BUỘC, không phải cho đẹp: Cache API luôn trả nguyên bản 200, mà
+ * <audio> thì xin theo khoảng (`Range`) mỗi lần tua. Safari/iOS từ chối
+ * phát hẳn nếu đòi khoảng mà nhận về 200 — tức là trên iPhone, sách đã tải
+ * về vẫn không nghe được. Chrome dễ tính hơn nhưng tua thì vẫn hỏng.
+ *
+ * Chỉ nhận dạng `bytes=START-END` và `bytes=START-`; dạng nhiều khoảng hay
+ * đếm ngược từ cuối thì nhường cho mạng — trình duyệt không dùng mấy dạng
+ * đó cho thẻ <audio>.
+ */
+async function sliceForRange(response, range) {
+  const match = /^bytes=(\d*)-(\d*)$/.exec(range.trim());
+  if (!match || match[1] === "") return response;
+
+  const buffer = await response.arrayBuffer();
+  const size = buffer.byteLength;
+  const start = Number(match[1]);
+  const end = match[2] === "" ? size - 1 : Math.min(Number(match[2]), size - 1);
+  if (start > end) return response;
+
+  return new Response(buffer.slice(start, end + 1), {
+    status: 206,
+    statusText: "Partial Content",
+    headers: {
+      "Content-Type": response.headers.get("Content-Type") || "audio/mpeg",
+      "Content-Length": String(end - start + 1),
+      "Content-Range": `bytes ${start}-${end}/${size}`,
+      "Accept-Ranges": "bytes",
+    },
+  });
+}
+
 async function cacheFirst(request, cacheName, max) {
   const downloaded = await matchDownloadedBook(request);
   if (downloaded) return downloaded;
@@ -211,6 +269,10 @@ self.addEventListener("fetch", (event) => {
   }
   if (isImmutableAsset(url)) {
     event.respondWith(cacheFirst(request, ASSET_CACHE));
+    return;
+  }
+  if (isAudio(url)) {
+    event.respondWith(serveAudio(request));
     return;
   }
   if (isPageImage(url)) {

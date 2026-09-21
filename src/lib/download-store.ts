@@ -59,6 +59,9 @@ export const useDownloadStore = create<DownloadState>((set, get) => ({
 
     controller = new AbortController();
     set({
+      // Tổng thật do `downloadBook` tính (trang + bài nghe) và gửi về ở nhịp
+      // tiến độ đầu tiên. Ở đây chỉ cần một con số tạm khác 0 để phép chia
+      // phần trăm không ra NaN trong khoảnh khắc trước nhịp đó.
       active: { bookId: book.id, progress: { done: 0, total: book.totalPages } },
       error: null,
     });
@@ -77,7 +80,7 @@ export const useDownloadStore = create<DownloadState>((set, get) => ({
         await deleteOfflineBook(book.id);
       } else if (saved < total) {
         set({
-          error: `Tải được ${saved}/${total} trang. Vài trang sẽ không xem được khi mất mạng — thử tải lại.`,
+          error: `Tải được ${saved}/${total} phần. Vài trang hoặc bài nghe sẽ không dùng được khi mất mạng — thử tải lại.`,
         });
       }
     } catch {

@@ -168,6 +168,12 @@ function isAudio(url) {
  * trang sách. Nghe lướt vài bài là đầy máy người ta, mà họ có xin đâu. Ai
  * muốn mang theo thì bấm tải cả cuốn.
  *
+ * TẠM THỜI KHÔNG VỚI TỚI: bài nghe nay trỏ thẳng R2 (xem `lib/audio.ts`
+ * để biết vì sao), mà service worker bỏ qua mọi request khác origin — nên
+ * nhánh này không chạy nữa. Giữ lại chứ không xoá: bật CORS cho bucket R2
+ * rồi mở thêm origin đó ở chốt bên dưới là nó sống lại nguyên vẹn, kể cả
+ * phần cắt khoảng byte vốn là chỗ khó nhất.
+ *
  * Trình duyệt vốn đã tự cache rồi (R2 gửi `immutable`, hạn một năm), nên
  * nghe lại lần hai vẫn không tốn mạng dù ta không đụng tay vào.
  */

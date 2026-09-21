@@ -1,3 +1,4 @@
+import { mediaOriginBase } from "@/lib/books";
 import {
   resolvePageAudio,
   getTrackLabel,
@@ -17,23 +18,33 @@ export interface AudioTrack {
 }
 
 /**
- * Tiền tố cùng origin, chuyển tiếp sang R2 bởi `rewrites()` trong
- * `next.config.ts`. Giống hệt đường của ảnh trang.
+ * Bài nghe trỏ THẲNG vào R2, không đi qua `/img/...` như ảnh trang.
  *
- * Tên `/img` là do lịch sử — nó ra đời lúc mới chỉ có ảnh đi qua. Giữ
- * nguyên chứ không đổi thành `/media` cho đẹp: đường dẫn này là KHOÁ CACHE
- * của những cuốn người dùng đã tải về máy, đổi một chữ là mấy cuốn đó không
- * khớp nữa và họ phải tải lại từ đầu. Cái tên hơi lệch nghĩa rẻ hơn nhiều.
+ * Đi qua proxy cùng origin nghe hợp lý hơn, và đã từng làm thế — nhưng nó
+ * hỏng nặng: thẻ <audio> tải file theo từng KHOẢNG byte (`Range`), mà cache
+ * biên của Vercel lấy khoá cache chỉ theo đường dẫn, không tính header
+ * `Range`. Nó giữ lại bản trả lời của khoảng ĐẦU TIÊN — đúng 2 byte thăm
+ * dò — rồi đem 2 byte ấy trả cho mọi khoảng xin sau đó.
  *
- * Vì sao phải cùng origin: `sw.js` bỏ qua mọi request khác origin, và quan
- * trọng hơn — `cache.put()` TỪ CHỐI bản trả về `opaque` (status 0), mà
- * fetch sang r2.dev không CORS thì chỉ nhận được opaque. Tức là trỏ thẳng
- * R2 thì không tài nào tải audio về máy được.
+ * Hỏng kiểu tệ nhất: mã vẫn 206, vẫn coi như thành công, không lỗi nào bắn
+ * ra. Trình duyệt xin đoạn tiếp, nhận lại đoạn nó đã có, xin lại, lại nhận
+ * đúng thứ đó — người dùng chỉ thấy một vòng xoay không bao giờ dứt, trên
+ * MỌI thiết bị. Đã thử vá bằng `headers()` trong next.config để tắt cache
+ * CDN: KHÔNG ăn thua, vì `headers()` không áp lên đường đã `rewrites()` ra
+ * ngoài (đã dựng bản production ra kiểm).
+ *
+ * R2 thì trả đúng khoảng được xin, luôn luôn. Nên đường ngắn nhất là đừng
+ * để ai đứng giữa.
+ *
+ * Cái mất: R2 chưa bật CORS, nên `fetch` từ trang nhận về bản `opaque` và
+ * không cất vào cache được — tải sách về máy sẽ KHÔNG kèm bài nghe nữa
+ * (phần tải bỏ qua êm, không làm hỏng cả lượt). Bật CORS cho bucket là
+ * phần này tự sống lại, không phải sửa dòng nào.
+ *
+ * Kiểm lại sau mỗi lần deploy: `npm run check-media`.
  */
-const MEDIA_PREFIX = "/img";
-
 function audioBaseUrl(): string {
-  return MEDIA_PREFIX;
+  return mediaOriginBase();
 }
 
 function fileNameFor(lesson: number | null, type: AudioTrackType): string {

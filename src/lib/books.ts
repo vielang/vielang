@@ -272,6 +272,16 @@ export function getThumbUrl(bookId: string, page: number): string {
   return `/img/books/${bookId}/thumbs/${padPage(page)}.webp`;
 }
 
+/**
+ * Gốc R2 tuyệt đối.
+ *
+ * Ảnh trang đi qua `/img/...` cùng origin, còn bài nghe thì trỏ thẳng vào
+ * đây — xem `lib/audio.ts` để biết vì sao hai thứ đi hai đường.
+ */
+export function mediaOriginBase(): string {
+  return imageBaseUrl();
+}
+
 /** URL R2 tuyệt đối — chỉ dùng cho script phía máy chủ, không dùng ở trình duyệt. */
 export function getPageOriginUrl(bookId: string, page: number): string {
   return `${imageBaseUrl()}/books/${bookId}/pages/${padPage(page)}.webp`;

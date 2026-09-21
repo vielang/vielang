@@ -15,7 +15,8 @@
     "build-content": "tsx scripts/build-content.ts",
     "copy-excalidraw-fonts": "tsx scripts/copy-excalidraw-fonts.ts",
     "crawl-orgs": "tsx scripts/crawl-kiip-orgs.ts",
-    "make-icons": "tsx scripts/make-icons.ts"
+    "make-icons": "tsx scripts/make-icons.ts",
+    "check-media": "tsx scripts/check-media-range.mts"
   },
   "dependencies": {
     "@excalidraw/excalidraw": "^0.18.1",

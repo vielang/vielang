@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { act, fireEvent, render } from "@testing-library/react";
+import { act, render } from "@testing-library/react";
 import { createRef } from "react";
 import { PageViewer, type PageViewerHandle } from "./page-viewer";
 import { BOOKS } from "@/lib/books";

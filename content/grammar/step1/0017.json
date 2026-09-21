@@ -5,6 +5,8 @@
     "rect": [0.72, 0.028, 0.24, 0.048],
     "title": "명 은/는",
     "ko": "이름이나 직업 등을 소개할 때 사용해요.",
-    "vi": "Trợ từ chủ đề — đánh dấu \"cái mà ta đang nói tới\", dùng khi giới thiệu tên, nghề nghiệp."
+    "vi": "Trợ từ chủ đề — đánh dấu \"cái mà ta đang nói tới\", dùng khi giới thiệu tên, nghề nghiệp.",
+    "exKo": "김성민은 학생이에요.",
+    "exVi": "Kim Seong-min thì là học sinh."
   }
 ]

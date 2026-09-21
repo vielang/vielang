@@ -5,6 +5,8 @@
     "rect": [0.77, 0.028, 0.19, 0.048],
     "title": "명 으로 (방향)",
     "ko": "이동의 목적지나 방향을 나타낼 때 사용해요.",
-    "vi": "Chỉ HƯỚNG đi — \"về phía…\", \"đi hướng…\". Cùng chữ 으로 với phương tiện nhưng khác nghĩa."
+    "vi": "Chỉ HƯỚNG đi — \"về phía…\", \"đi hướng…\". Cùng chữ 으로 với phương tiện nhưng khác nghĩa.",
+    "exKo": "식당은 7층에 있어요. 위로 올라가세요.",
+    "exVi": "Nhà ăn ở tầng 7. Anh lên phía trên nhé."
   }
 ]

@@ -5,6 +5,8 @@
     "rect": [0.77, 0.028, 0.19, 0.05],
     "title": "동 형 -아요/어요",
     "ko": "동사, 형용사 뒤에 붙어 문장의 끝(종결)을 나타내요.",
-    "vi": "Đuôi câu lịch sự thông dụng nhất — gắn vào động từ, tính từ để kết thúc câu ở thì hiện tại."
+    "vi": "Đuôi câu lịch sự thông dụng nhất — gắn vào động từ, tính từ để kết thúc câu ở thì hiện tại.",
+    "exKo": "한국어는 쉬워요. 영어는 어려워요.",
+    "exVi": "Tiếng Hàn thì dễ. Tiếng Anh thì khó."
   }
 ]

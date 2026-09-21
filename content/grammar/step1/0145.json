@@ -5,6 +5,8 @@
     "rect": [0.77, 0.028, 0.19, 0.048],
     "title": "명 으로 (수단)",
     "ko": "이동의 교통수단을 말할 때 사용해요.",
-    "vi": "Chỉ phương tiện di chuyển — \"đi bằng xe buýt, bằng tàu điện…\"."
+    "vi": "Chỉ phương tiện di chuyển — \"đi bằng xe buýt, bằng tàu điện…\".",
+    "exKo": "공항에 택시로 가요.",
+    "exVi": "Tôi đi taxi ra sân bay."
   }
 ]

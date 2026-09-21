@@ -49,12 +49,25 @@ export interface GrammarPoint {
   /** Dòng chú thích tiếng Hàn in ngay dưới tiêu đề, để đối chiếu với sách. */
   ko?: string;
   /**
-   * Định nghĩa tiếng Việt — TOÀN BỘ nội dung người dùng thấy.
+   * Định nghĩa tiếng Việt.
    *
    * Giữ trong khoảng một đến hai câu. Đây là câu trả lời cho "cái đuôi này
    * để làm gì?", không phải chỗ dạy hết mọi quy tắc.
    */
   vi: string;
+  /**
+   * Một câu ví dụ, LẤY TỪ CHÍNH TRANG ĐÓ (hộp 예문 trong sách).
+   *
+   * Lấy từ trang đang mở chứ không tự đặt câu mới: người học vừa nhìn thấy
+   * đúng câu đó ở ngay bên cạnh, nên đối chiếu được lập tức. Câu tự chế thì
+   * lại là một thứ nữa phải giải mã.
+   *
+   * Định nghĩa thuần thì đúng nhưng khô — "trợ từ chủ ngữ, đánh dấu chủ thể"
+   * chẳng giúp gì cho người mới. Một câu thật mới làm nó rơi xuống.
+   */
+  exKo: string;
+  /** Bản dịch của đúng câu ví dụ đó. */
+  exVi: string;
 }
 
 const GRAMMAR = {

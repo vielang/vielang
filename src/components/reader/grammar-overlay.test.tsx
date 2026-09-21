@@ -11,6 +11,8 @@ const POINTS: GrammarPoint[] = [
     title: "명 이에요/예요",
     ko: "사람, 사물 이름을 말할 때 사용해요.",
     vi: "Dùng khi nói tên người hoặc tên đồ vật.",
+    exKo: "가: 제이슨이에요? 나: 아니요, 잠시드예요.",
+    exVi: "A: Là Jason phải không? B: Không, là Jamshid.",
   },
 ];
 
@@ -80,6 +82,27 @@ describe("bong bóng nghĩa", () => {
     render(<GrammarOverlay points={POINTS} />);
 
     expect(screen.queryByRole("tooltip")).toBeNull();
+  });
+
+  it("hiện cả câu ví dụ tiếng Hàn và bản dịch của nó", () => {
+    // Định nghĩa thuần thì đúng nhưng khô — "trợ từ chủ ngữ, đánh dấu chủ
+    // thể" chẳng giúp gì cho người mới. Một câu thật mới làm nó rơi xuống.
+    render(<GrammarOverlay points={POINTS} />);
+    tap(trigger());
+    const bubble = screen.getByRole("tooltip");
+
+    expect(bubble.textContent).toContain("가: 제이슨이에요? 나: 아니요, 잠시드예요.");
+    expect(bubble.textContent).toContain("A: Là Jason phải không? B: Không, là Jamshid.");
+  });
+
+  it("ví dụ nằm SAU định nghĩa", () => {
+    // Đọc định nghĩa trước rồi mới soi ví dụ. Đảo lại thì câu Hàn đập vào
+    // mắt trước, đúng thứ người ta đang không hiểu.
+    render(<GrammarOverlay points={POINTS} />);
+    tap(trigger());
+    const text = screen.getByRole("tooltip").textContent!;
+
+    expect(text.indexOf(POINTS[0].vi)).toBeLessThan(text.indexOf(POINTS[0].exKo));
   });
 
   it("CHỈ có định nghĩa ngắn, không phải cả bài giảng", () => {

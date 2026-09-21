@@ -5,6 +5,8 @@
     "rect": [0.8, 0.028, 0.16, 0.048],
     "title": "동 형 -지만",
     "ko": "앞의 내용과 반대되는 뒤의 내용을 연결해서 말할 때 사용해요.",
-    "vi": "Nối hai vế trái ngược nhau trong một câu — \"tuy… nhưng…\"."
+    "vi": "Nối hai vế trái ngược nhau trong một câu — \"tuy… nhưng…\".",
+    "exKo": "오빠는 회사원이지만 저는 학생이에요.",
+    "exVi": "Anh tôi là nhân viên công ty nhưng tôi là học sinh."
   }
 ]

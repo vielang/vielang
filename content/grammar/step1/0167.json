@@ -5,6 +5,8 @@
     "rect": [0.85, 0.028, 0.11, 0.048],
     "title": "명 보다",
     "ko": "앞의 것이 비교 대상임을 나타낼 때 사용해요.",
-    "vi": "Trợ từ so sánh — gắn sau cái được ĐEM RA so, nghĩa là \"hơn…\"."
+    "vi": "Trợ từ so sánh — gắn sau cái được ĐEM RA so, nghĩa là \"hơn…\".",
+    "exKo": "저는 농구보다 축구를 잘해요.",
+    "exVi": "Tôi chơi bóng đá giỏi hơn bóng rổ."
   }
 ]

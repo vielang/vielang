@@ -5,6 +5,8 @@
     "rect": [0.78, 0.028, 0.18, 0.048],
     "title": "동 -지 마세요",
     "ko": "듣는 사람에게 어떤 행동을 금지시킬 때 사용해요.",
-    "vi": "Cấm đoán lịch sự — \"xin đừng làm…\". Đây là dạng phủ định của -으세요."
+    "vi": "Cấm đoán lịch sự — \"xin đừng làm…\". Đây là dạng phủ định của -으세요.",
+    "exKo": "공연장 안에서 사진을 찍지 마세요.",
+    "exVi": "Xin đừng chụp ảnh bên trong hội trường."
   }
 ]

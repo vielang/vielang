@@ -5,6 +5,8 @@
     "rect": [0.81, 0.028, 0.15, 0.048],
     "title": "안 동 형",
     "ko": "어떤 행동이나 상태를 부정할 때 사용해요.",
-    "vi": "Đặt 안 TRƯỚC động từ hoặc tính từ để phủ định — \"không làm\", \"không phải vậy\"."
+    "vi": "Đặt 안 TRƯỚC động từ hoặc tính từ để phủ định — \"không làm\", \"không phải vậy\".",
+    "exKo": "오늘은 일요일이에요. 출근을 안 해요.",
+    "exVi": "Hôm nay là Chủ nhật. Tôi không đi làm."
   }
 ]

@@ -38,6 +38,9 @@ const GRAMMAR_ROOT = path.join(CONTENT_ROOT, "grammar");
 /** Định nghĩa ngữ pháp dài tối đa bao nhiêu ký tự — xem `validateGrammar`. */
 const MAX_GRAMMAR_VI = 200;
 
+/** Câu ví dụ dài tối đa bao nhiêu ký tự. Một câu, không phải một đoạn. */
+const MAX_GRAMMAR_EXAMPLE = 150;
+
 /**
  * `gfm` (bảng, ~~gạch ngang~~) bật sẵn; `breaks: false` để xuống dòng đơn
  * trong .md không thành <br> — note được viết wrap ~76 cột cho dễ đọc ở
@@ -275,6 +278,23 @@ function validateGrammar(source: string, data: unknown): GrammarPoint[] {
         `${at}: định nghĩa "vi" dài ${point.vi.length} ký tự, tối đa ` +
           `${MAX_GRAMMAR_VI}. Phần giải thích sâu thuộc về tab bài giảng.`
       );
+    }
+
+    if (!point.exKo?.trim()) throw new Error(`${at}: thiếu câu ví dụ "exKo"`);
+    if (!point.exVi?.trim()) throw new Error(`${at}: thiếu bản dịch ví dụ "exVi"`);
+
+    // MỘT câu, không phải một đoạn. Cả bong bóng phải đọc lướt được trong
+    // vài giây, nếu không thì lại thành cái tấm phủ dài dòng đã phải bỏ.
+    for (const [field, text] of [
+      ["exKo", point.exKo],
+      ["exVi", point.exVi],
+    ] as const) {
+      if (text.length > MAX_GRAMMAR_EXAMPLE) {
+        throw new Error(
+          `${at}: ví dụ "${field}" dài ${text.length} ký tự, tối đa ` +
+            `${MAX_GRAMMAR_EXAMPLE}. Lấy một câu thôi, đừng lấy cả hộp 예문.`
+        );
+      }
     }
 
     validateRect(at, point.rect);

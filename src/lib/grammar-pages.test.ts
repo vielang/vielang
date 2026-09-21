@@ -65,6 +65,30 @@ describe("nội dung ngữ pháp đã soạn", () => {
     }
   });
 
+  it("điểm nào cũng có câu ví dụ kèm bản dịch", () => {
+    // Định nghĩa thuần thì đúng nhưng khô. Thiếu ví dụ ở một trang là đúng
+    // trang đó người học phải tự đoán.
+    for (const page of getGrammarPages("step1")) {
+      for (const point of getPageGrammar("step1", page)) {
+        expect(point.exKo.trim()).not.toBe("");
+        expect(point.exVi.trim()).not.toBe("");
+      }
+    }
+  });
+
+  it("cả bong bóng vẫn đọc lướt được trong vài giây", () => {
+    // Chốt TỔNG chứ không chỉ từng trường: mỗi trường riêng lẻ đều lọt
+    // ngưỡng mà cộng lại vẫn có thể thành một khối chữ dày. Đo thật thì
+    // trang dài nhất đang 161 — để ngưỡng 240 cho dư chỗ xoay xở nhưng
+    // vẫn chặn được việc nó phình dần thành bài giảng.
+    for (const page of getGrammarPages("step1")) {
+      for (const p of getPageGrammar("step1", page)) {
+        const total = p.title.length + p.vi.length + p.exKo.length + p.exVi.length;
+        expect(total).toBeLessThanOrEqual(240);
+      }
+    }
+  });
+
   it("không có hai điểm khác nhau dùng chung một mã", () => {
     const bySlug = new Map<string, string>();
     for (const page of getGrammarPages("step1")) {

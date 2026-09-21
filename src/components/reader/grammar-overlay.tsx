@@ -98,6 +98,14 @@ export function GrammarOverlay({ points }: { points: GrammarPoint[] }) {
             {active.point.title}
           </span>
           {active.point.vi}
+          {/* Ví dụ tách hẳn xuống dưới, có vạch ngăn: định nghĩa và ví dụ là
+              hai thứ khác nhau, dính liền thì mắt phải tự tách ra. Câu Hàn
+              để nguyên cỡ chữ vì đó mới là thứ cần nhìn kỹ; bản dịch mờ hơn
+              một bậc, vai trò của nó chỉ là chú thích. */}
+          <span className="mt-2 block border-t border-white/25 pt-2">
+            <span className="block">{active.point.exKo}</span>
+            <span className="mt-0.5 block text-white/70">{active.point.exVi}</span>
+          </span>
         </HintBubble>
       )}
     </>

@@ -5,6 +5,8 @@
     "rect": [0.81, 0.028, 0.15, 0.048],
     "title": "동 형 -아서/어서",
     "ko": "앞의 내용이 뒤의 내용의 이유가 될 때 사용해요.",
-    "vi": "Nối nguyên nhân với kết quả — \"vì… nên…\"."
+    "vi": "Nối nguyên nhân với kết quả — \"vì… nên…\".",
+    "exKo": "어제는 피곤해서 집에서 쉬었어요.",
+    "exVi": "Hôm qua vì mệt nên tôi nghỉ ở nhà."
   }
 ]

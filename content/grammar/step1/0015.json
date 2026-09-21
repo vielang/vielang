@@ -5,6 +5,8 @@
     "rect": [0.63, 0.028, 0.33, 0.048],
     "title": "명 이에요/예요",
     "ko": "사람, 사물 이름을 말할 때 사용해요.",
-    "vi": "Dùng khi nói tên người hoặc tên đồ vật — tương đương \"là\" trong tiếng Việt."
+    "vi": "Dùng khi nói tên người hoặc tên đồ vật — tương đương \"là\" trong tiếng Việt.",
+    "exKo": "가: 제이슨이에요? 나: 아니요, 잠시드예요.",
+    "exVi": "A: Là Jason phải không? B: Không, là Jamshid."
   }
 ]

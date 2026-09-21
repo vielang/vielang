@@ -5,6 +5,8 @@
     "rect": [0.83, 0.028, 0.13, 0.048],
     "title": "못 동",
     "ko": "행동을 할 능력이 없거나 가능성이 없을 때 사용해요.",
-    "vi": "Phủ định vì KHÔNG THỂ — khác 안 (không làm vì không muốn)."
+    "vi": "Phủ định vì KHÔNG THỂ — khác 안 (không làm vì không muốn).",
+    "exKo": "배가 아파요. 그래서 밥을 못 먹어요.",
+    "exVi": "Tôi đau bụng. Nên không ăn cơm được."
   }
 ]

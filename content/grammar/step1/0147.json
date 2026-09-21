@@ -5,6 +5,8 @@
     "rect": [0.7, 0.028, 0.26, 0.048],
     "title": "동 -으러 가다/오다",
     "ko": "이동의 목적을 나타낼 때 사용해요.",
-    "vi": "Nói MỤC ĐÍCH của việc đi lại — \"đi để làm gì\", \"đến để làm gì\"."
+    "vi": "Nói MỤC ĐÍCH của việc đi lại — \"đi để làm gì\", \"đến để làm gì\".",
+    "exKo": "친구들과 식당에 점심을 먹으러 가요.",
+    "exVi": "Tôi đi ăn trưa ở quán cùng bạn bè."
   }
 ]

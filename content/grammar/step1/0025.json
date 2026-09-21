@@ -5,6 +5,8 @@
     "rect": [0.74, 0.028, 0.22, 0.048],
     "title": "명 이/가",
     "ko": "문장의 주어를 나타낼 때 사용해요.",
-    "vi": "Trợ từ chủ ngữ — đánh dấu ai/cái gì là chủ thể của hành động hay trạng thái."
+    "vi": "Trợ từ chủ ngữ — đánh dấu ai/cái gì là chủ thể của hành động hay trạng thái.",
+    "exKo": "가: 책이 있어요? 나: 아니요, 책이 없어요.",
+    "exVi": "A: Có sách không? B: Không, không có sách."
   }
 ]

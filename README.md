@@ -108,9 +108,13 @@ npm run prepare-exams                      # đẩy ảnh + file nghe lên R2
 - `import-topik` làm sạch HTML của đề, ghi `content/exams/<kỳ>-topik{1,2}.json`
   (COMMIT vào git) và chép tài nguyên sang `public/img/exams/<kỳ>/` (ảnh đổi
   sang WebP, KHÔNG commit). Lúc `npm run dev` app đọc thẳng từ `public/`.
-- Mốc thời gian từng câu nghe (để nghe lại riêng một câu) nằm ở
-  `content/exams/marks/<id>-listening.json`; đề chưa có file này thì trang
-  luyện tập cho nghe cả bài.
+- File nghe được chuẩn hoá sang MP3 CBR 128 kbps (`<kỳ>_<cấp>-cbr.mp3`) — file
+  gốc có bản VBR / lẫn byte rác làm trình duyệt tua lệch vài giây. Cần ffmpeg:
+  có sẵn trong PATH hoặc đặt `FFMPEG=<đường dẫn ffmpeg>` khi chạy `import-topik`.
+- Mốc thời gian từng câu nghe nằm ở `content/exams/marks/<id>-listening.json`
+  (đo trên file CBR): `audio` là cả câu tới hết khoảng dừng trả lời (tô câu
+  đang phát khi thi thử), `play` là đoạn nghe lại khi luyện tập — chỉ phần
+  lời đọc. Đề chưa có file này thì trang luyện tập cho nghe cả bài.
 - TOPIK II có thêm phần viết (câu 51–54): đề chỉ có ảnh trang in, người học
   viết vào ô chữ (có đếm ký tự), rồi đối chiếu trang đáp án mẫu chính thức và
   TỰ CHẤM — điểm tự chấm cộng vào tổng 300 để quy ra cấp.

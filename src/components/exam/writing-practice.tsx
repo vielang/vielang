@@ -6,7 +6,13 @@ import { Button } from "@/components/ui/button";
 import { qKey, type Exam, type ExamSection } from "@/lib/exams";
 import { useExamStore } from "@/lib/exam-store";
 import { SelfGrade, WritingImage, WritingInput, hasWritten } from "@/components/exam/writing-parts";
-import { ActionBar, PracticeHeader, QuestionGrid, QuestionGridSheet, type GridItem } from "@/components/exam/exam-chrome";
+import {
+  ActionBar,
+  PracticeHeader,
+  QuestionGrid,
+  QuestionGridSheet,
+  type GridItem,
+} from "@/components/exam/exam-chrome";
 
 const NO_SUBSCRIBE = () => () => {};
 
@@ -24,9 +30,18 @@ export function WritingPractice({
   section: ExamSection;
   initialNo?: number;
 }) {
-  const isClient = useSyncExternalStore(NO_SUBSCRIBE, () => true, () => false);
+  const isClient = useSyncExternalStore(
+    NO_SUBSCRIBE,
+    () => true,
+    () => false
+  );
   const tasks = section.writing!.tasks;
-  const [index, setIndex] = useState(() => Math.max(0, tasks.findIndex((t) => t.no === initialNo)));
+  const [index, setIndex] = useState(() =>
+    Math.max(
+      0,
+      tasks.findIndex((t) => t.no === initialNo)
+    )
+  );
   const task = tasks[index];
 
   const practice = useExamStore((s) => s.practice[exam.id]);
@@ -52,7 +67,8 @@ export function WritingPractice({
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-col gap-6 pb-24 sm:pb-12">
+    // Máy tính: trang đề dính bên trái, ô viết + đáp án mẫu bên phải.
+    <div className="mx-auto flex w-full max-w-2xl flex-col gap-6 pb-24 sm:pb-12 lg:max-w-none">
       <PracticeHeader
         exam={exam}
         section={section}
@@ -67,26 +83,38 @@ export function WritingPractice({
           <span className="text-sm text-muted-foreground">{task.points} điểm</span>
         </h1>
 
-        <WritingImage exam={exam} src={task.page} alt={`Đề câu ${task.no <= 52 ? "51–52" : "53–54"}`} />
-
-        <WritingInput task={task} texts={texts} onChange={(key, text) => setText(exam.id, key, text)} />
-
-        {revealed ? (
-          <div className="flex flex-col gap-3 border-t border-border pt-4">
-            <h2 className="text-sm font-semibold">Đáp án mẫu và tiêu chí chấm chính thức</h2>
-            <p className="text-xs text-muted-foreground">
-              Tìm dòng câu {task.no} trong bảng. Đáp án mẫu chỉ là một cách viết — ý đúng, ngữ pháp đúng là được điểm.
-            </p>
-            {section.writing!.modelAnswers.map((src, i) => (
-              <WritingImage key={src} exam={exam} src={src} alt={`Đáp án mẫu phần viết, trang ${i + 1}`} />
-            ))}
-            <SelfGrade task={task} value={grades[task.no]} onChange={(p) => setGrade(exam.id, task.no, p)} />
+        <div className="flex flex-col gap-4 lg:grid lg:grid-cols-2 lg:items-start lg:gap-8">
+          <div className="lg:sticky lg:top-20">
+            <WritingImage exam={exam} src={task.page} alt={`Đề câu ${task.no <= 52 ? "51–52" : "53–54"}`} />
           </div>
-        ) : null}
+          <div className="flex flex-col gap-4">
+            <WritingInput task={task} texts={texts} onChange={(key, text) => setText(exam.id, key, text)} />
+
+            {revealed ? (
+              <div className="flex flex-col gap-3 border-t border-border pt-4">
+                <h2 className="text-sm font-semibold">Đáp án mẫu và tiêu chí chấm chính thức</h2>
+                <p className="text-xs text-muted-foreground">
+                  Tìm dòng câu {task.no} trong bảng. Đáp án mẫu chỉ là một cách viết — ý đúng, ngữ pháp đúng là được
+                  điểm.
+                </p>
+                {section.writing!.modelAnswers.map((src, i) => (
+                  <WritingImage key={src} exam={exam} src={src} alt={`Đáp án mẫu phần viết, trang ${i + 1}`} />
+                ))}
+                <SelfGrade task={task} value={grades[task.no]} onChange={(p) => setGrade(exam.id, task.no, p)} />
+              </div>
+            ) : null}
+          </div>
+        </div>
       </article>
 
       <ActionBar>
-        <Button variant="ghost" size="icon-lg" onClick={() => go(index - 1)} disabled={index === 0} aria-label="Câu trước">
+        <Button
+          variant="ghost"
+          size="icon-lg"
+          onClick={() => go(index - 1)}
+          disabled={index === 0}
+          aria-label="Câu trước"
+        >
           <ChevronLeft className="size-5" aria-hidden />
         </Button>
         <QuestionGridSheet items={grid} current={index} onPick={go} count={`${graded.length}/${tasks.length}`} />

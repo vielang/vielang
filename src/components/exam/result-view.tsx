@@ -9,6 +9,8 @@ import {
   examAudioUrl,
   examTitle,
   groupOf,
+  levelCuts,
+  nextLevel,
   qKey,
   questionAudio,
   scoreExam,
@@ -20,6 +22,7 @@ import { useExamStore, type MockAttempt } from "@/lib/exam-store";
 import { GroupBlock, PromptView } from "@/components/exam/exam-content";
 import { OptionList } from "@/components/exam/option-list";
 import { useExamAudio } from "@/components/exam/use-exam-audio";
+import { LevelBadge, ProgressBar } from "@/components/exam/exam-chrome";
 import { SelfGrade, WritingImage, WritingInput, hasWritten } from "@/components/exam/writing-parts";
 
 const NO_SUBSCRIBE = () => () => {};
@@ -50,6 +53,12 @@ export function ResultView({ exam, attemptId }: { exam: Exam; attemptId?: string
   }
 
   const result = scoreExam(exam, attempt.answers, attempt.grades);
+  const next = nextLevel(exam.level, result.score);
+  const wrong = exam.sections.flatMap((s) =>
+    s.questions.filter((q) => attempt.answers[qKey(s.id, q.no)] !== q.answer).map((q) => ({ section: s.id, no: q.no }))
+  );
+  const firstWrong = wrong[0];
+  const wrongCount = wrong.length;
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-8 pb-16">
@@ -61,25 +70,33 @@ export function ResultView({ exam, attemptId }: { exam: Exam; attemptId?: string
         {examTitle(exam)}
       </Link>
 
-      <section className="flex flex-col gap-4 rounded-2xl bg-muted/60 p-6">
-        <p className="text-sm text-muted-foreground">
-          Kết quả thi thử · {new Date(attempt.finishedAt!).toLocaleDateString("vi-VN")} · làm trong{" "}
-          {duration(attempt)}
-        </p>
-        <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-          <span className="text-4xl font-semibold tabular-nums">
-            {result.score}
-            <span className="text-lg font-normal text-muted-foreground">/{result.max}</span>
-          </span>
-          <span
-            className={cn(
-              "rounded-full px-3 py-1 text-sm font-medium",
-              result.level ? "bg-primary text-primary-foreground" : "bg-background text-muted-foreground"
-            )}
-          >
-            {result.level ? `Đạt ${exam.level} ${result.level}` : "Chưa đạt cấp nào"}
-          </span>
+      <section className="flex flex-col gap-6">
+        <div className="flex flex-col gap-2">
+          <p className="text-sm text-muted-foreground">
+            Kết quả thi thử · {new Date(attempt.finishedAt!).toLocaleDateString("vi-VN")} · làm trong {duration(attempt)}
+          </p>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <span className="text-5xl font-semibold tracking-tight tabular-nums">
+              {result.score}
+              <span className="text-xl font-normal text-muted-foreground">/{result.max}</span>
+            </span>
+            <span className="flex flex-col gap-1">
+              <LevelBadge
+                level={result.level ? `Đạt ${exam.level} ${result.level}` : null}
+                emptyLabel="Chưa đạt cấp nào"
+                className="px-3 py-1 text-sm"
+              />
+              {next && (
+                <span className="text-xs text-muted-foreground">
+                  Còn <b className="text-foreground tabular-nums">{next.need}</b> điểm nữa lên {next.level}
+                </span>
+              )}
+            </span>
+          </div>
         </div>
+
+        <LevelLadder exam={exam} score={result.score} max={result.max} />
+
         {result.ungraded > 0 && (
           <p className="rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-900 dark:bg-amber-950/40 dark:text-amber-200">
             Còn {result.ungraded} câu viết chưa tự chấm — điểm và cấp trên đây mới là tạm tính.{" "}
@@ -88,30 +105,32 @@ export function ResultView({ exam, attemptId }: { exam: Exam; attemptId?: string
             </a>
           </p>
         )}
-        <ul className="flex flex-col gap-2">
+
+        <ul className="flex flex-col divide-y divide-border border-y border-border">
           {result.sections.map((s) => (
-            <li key={s.id} className="grid grid-cols-[3.5rem_1fr_auto] items-center gap-3 text-sm">
-              <span>{sectionVi(s.id)}</span>
-              <span className="h-1.5 overflow-hidden rounded-full bg-background">
-                <span className="block h-full rounded-full bg-primary" style={{ width: `${(s.score / s.max) * 100}%` }} />
-              </span>
-              <span className="tabular-nums text-muted-foreground">
-                {s.score}/{s.max} điểm · {s.id === "writing" ? "đã chấm" : "đúng"} {s.correct}/{s.total}
+            <li key={s.id} className="grid grid-cols-[3.5rem_1fr_auto] items-center gap-3 py-3 text-sm">
+              <span className="font-medium">{sectionVi(s.id)}</span>
+              <ProgressBar value={s.score} max={s.max} />
+              <span className="text-right tabular-nums">
+                <b>{s.score}</b>
+                <span className="text-muted-foreground">
+                  /{s.max} · {s.id === "writing" ? "đã chấm" : "đúng"} {s.correct}/{s.total}
+                </span>
               </span>
             </li>
           ))}
         </ul>
-        <p className="text-xs text-muted-foreground">
-          {exam.level === "TOPIK I"
-            ? "Ngưỡng TOPIK I: Cấp 1 từ 80 điểm, Cấp 2 từ 140 điểm."
-            : "Ngưỡng TOPIK II: Cấp 3 từ 120, Cấp 4 từ 150, Cấp 5 từ 190, Cấp 6 từ 230 điểm."}
-        </p>
+
         <div className="flex flex-wrap gap-2">
-          <Button asChild>
+          {firstWrong && (
+            <Button asChild size="lg">
+              <Link href={`/exam/${exam.id}/practice?section=${firstWrong.section}&q=${firstWrong.no}`}>
+                Luyện lại {wrongCount} câu chưa đúng
+              </Link>
+            </Button>
+          )}
+          <Button asChild size="lg" variant={firstWrong ? "outline" : "default"}>
             <Link href={`/exam/${exam.id}/mock`}>Thi lại</Link>
-          </Button>
-          <Button asChild variant="outline">
-            <Link href={`/exam/${exam.id}/practice`}>Luyện từng câu</Link>
           </Button>
         </div>
       </section>
@@ -143,6 +162,45 @@ export function ResultView({ exam, attemptId }: { exam: Exam; attemptId?: string
           <ReviewSection key={s.id} exam={exam} section={s} attempt={attempt} filter={filter} />
         )
       )}
+    </div>
+  );
+}
+
+/**
+ * Thang cấp: thanh 0 → điểm tối đa, vạch ở từng ngưỡng cấp, phần đã đạt tô
+ * đậm — nhìn là biết mình đứng đâu và cách cấp sau bao xa.
+ */
+function LevelLadder({ exam, score, max }: { exam: Exam; score: number; max: number }) {
+  const cuts = levelCuts(exam.level);
+  const pct = (n: number) => `${(n / max) * 100}%`;
+  return (
+    <div className="flex flex-col gap-1.5" aria-label={`Thang cấp ${exam.level}`} role="img">
+      <div className="relative h-2 rounded-full bg-muted">
+        <div className="absolute inset-y-0 left-0 rounded-full bg-foreground/80" style={{ width: pct(Math.min(score, max)) }} />
+        {cuts.map(([cut]) => (
+          <span
+            key={cut}
+            className="absolute -top-1 h-4 w-0.5 -translate-x-1/2 rounded-full bg-background ring-1 ring-foreground/30"
+            style={{ left: pct(cut) }}
+            aria-hidden
+          />
+        ))}
+      </div>
+      <div className="relative h-8 text-[0.7rem] text-muted-foreground tabular-nums">
+        {cuts.map(([cut, name]) => (
+          <span
+            key={cut}
+            className={cn(
+              "absolute flex -translate-x-1/2 flex-col items-center leading-tight",
+              score >= cut && "font-medium text-foreground"
+            )}
+            style={{ left: pct(cut) }}
+          >
+            <span>{name}</span>
+            <span>{cut}</span>
+          </span>
+        ))}
+      </div>
     </div>
   );
 }

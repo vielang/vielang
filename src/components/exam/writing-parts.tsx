@@ -86,6 +86,7 @@ export function WritingInput({
         aria-label={`Bài viết câu ${task.no}`}
         className="w-full resize-y rounded-md border border-input bg-background px-3 py-2 font-korean text-[0.95rem] leading-relaxed outline-none focus-visible:ring-2 focus-visible:ring-ring read-only:bg-muted/50"
       />
+      {Number.isFinite(max) && <LengthMeter n={n} min={min} max={max} />}
       <p
         className={cn(
           "self-end text-xs tabular-nums",
@@ -95,6 +96,31 @@ export function WritingInput({
       >
         {n} ký tự · yêu cầu {min}–{max} (tính cả dấu cách)
       </p>
+    </div>
+  );
+}
+
+/**
+ * Thanh độ dài bài viết: vùng nhạt là khoảng yêu cầu (vd 200–300), phần tô là
+ * số chữ đã viết — thấy ngay còn thiếu hay đã quá.
+ */
+function LengthMeter({ n, min, max }: { n: number; min: number; max: number }) {
+  const scale = max * 1.15;
+  const pct = (x: number) => `${(Math.min(x, scale) / scale) * 100}%`;
+  const ok = n >= min && n <= max;
+  return (
+    <div className="relative h-1.5 rounded-full bg-muted" aria-hidden>
+      <div
+        className="absolute inset-y-0 bg-emerald-500/20 dark:bg-emerald-400/20"
+        style={{ left: pct(min), width: `calc(${pct(max)} - ${pct(min)})` }}
+      />
+      <div
+        className={cn(
+          "absolute inset-y-0 left-0 rounded-full transition-[width] duration-200",
+          ok ? "bg-emerald-600 dark:bg-emerald-500" : n > max ? "bg-amber-600" : "bg-foreground/60"
+        )}
+        style={{ width: pct(n) }}
+      />
     </div>
   );
 }

@@ -111,10 +111,11 @@ export function groupOf(section: ExamSection, no: number): ExamGroup | undefined
  * chưa có mốc thời gian từng câu — lúc đó giao diện cho nghe cả bài.
  */
 export function questionAudio(section: ExamSection, q: ExamQuestion): [number, number][] {
-  if (!q.audio) return [];
+  const own = q.replay ?? q.audio;
+  if (!own) return [];
   const d = groupOf(section, q.no)?.dialogue;
-  if (d && q.audio[0] >= d[1]) return [d, q.audio];
-  return [q.audio];
+  if (d && own[0] >= d[1]) return [d, own];
+  return [own];
 }
 
 /**
@@ -200,6 +201,55 @@ const LEVEL_CUTS: Record<ExamLevel, [number, string][]> = {
 
 export function levelFor(examLevel: ExamLevel, score: number): string | null {
   return LEVEL_CUTS[examLevel].find(([cut]) => score >= cut)?.[1] ?? null;
+}
+
+/** Các ngưỡng cấp, từ thấp lên cao: [[80, "Cấp 1"], [140, "Cấp 2"]]. */
+export function levelCuts(examLevel: ExamLevel): [number, string][] {
+  return [...LEVEL_CUTS[examLevel]].reverse();
+}
+
+/** Cấp kế tiếp và số điểm còn thiếu; `null` khi đã đạt cấp cao nhất. */
+export function nextLevel(examLevel: ExamLevel, score: number): { level: string; need: number } | null {
+  const next = levelCuts(examLevel).find(([cut]) => score < cut);
+  return next ? { level: next[1], need: next[0] - score } : null;
+}
+
+/**
+ * Tiến độ luyện từng câu của một đề: câu trắc nghiệm đã bấm "Kiểm tra" và
+ * câu viết đã tự chấm, trên tổng số câu.
+ */
+export function practiceProgress(
+  exam: Exam,
+  practice: { checked: string[]; grades?: Grades } | undefined
+): { done: number; total: number } {
+  const checked = new Set(practice?.checked ?? []);
+  let done = 0;
+  let total = 0;
+  for (const s of exam.sections) {
+    for (const q of s.questions) if (checked.has(qKey(s.id, q.no))) done++;
+    for (const t of s.writing?.tasks ?? []) if (practice?.grades?.[t.no] !== undefined) done++;
+    total += sectionCount(s);
+  }
+  return { done, total };
+}
+
+/**
+ * Chỗ để "Luyện tiếp": câu đầu tiên chưa làm, theo thứ tự các phần. Làm hết
+ * rồi thì về câu đầu.
+ */
+export function nextPracticeTarget(
+  exam: Exam,
+  practice: { checked: string[]; grades?: Grades } | undefined
+): { section: SectionId; no: number } {
+  const checked = new Set(practice?.checked ?? []);
+  for (const s of exam.sections) {
+    const q = s.questions.find((x) => !checked.has(qKey(s.id, x.no)));
+    if (q) return { section: s.id, no: q.no };
+    const t = s.writing?.tasks.find((x) => practice?.grades?.[x.no] === undefined);
+    if (t) return { section: s.id, no: t.no };
+  }
+  const first = exam.sections[0];
+  return { section: first.id, no: first.questions[0]?.no ?? first.writing?.tasks[0].no ?? 1 };
 }
 
 export function scoreExam(exam: Exam, answers: Answers, grades: Grades = {}): ExamScore {

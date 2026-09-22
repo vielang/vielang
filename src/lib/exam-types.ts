@@ -50,8 +50,18 @@ export interface ExamQuestion {
   /** Đề câu hỏi — có thể rỗng (câu nghe chỉ có lựa chọn) hoặc là tranh. */
   prompt: Content;
   options: [Content, Content, Content, Content];
-  /** Đoạn âm thanh của riêng câu này (chỉ phần nghe, nếu đã đo), giây. */
+  /**
+   * Đoạn âm thanh của câu trong buổi thi (chỉ phần nghe, nếu đã đo), giây:
+   * từ lúc đọc số câu tới HẾT khoảng dừng trả lời — dùng để tô câu đang phát
+   * khi thi thử.
+   */
   audio?: [number, number];
+  /**
+   * Đoạn NGHE LẠI riêng câu này khi luyện tập: chỉ phần lời đọc, cắt ở đầu
+   * khoảng dừng trả lời — không bắt người học chờ ~20 giây im lặng, và không
+   * lọt sang tiếng đọc số câu sau.
+   */
+  replay?: [number, number];
 }
 
 /**

@@ -24,28 +24,44 @@ export function useExamAudio(src: string | undefined) {
     const audio = new Audio(src);
     audio.preload = "metadata";
     ref.current = audio;
+    const checkStop = () => {
+      if (stopAt.current === null || audio.currentTime < stopAt.current) return;
+      const next = queue.current.shift();
+      if (next) {
+        stopAt.current = next[1];
+        audio.currentTime = next[0];
+      } else {
+        audio.pause();
+        stopAt.current = null;
+      }
+    };
+    // `timeupdate` chỉ bắn ~4 lần/giây (có khi thưa hơn): dừng theo nó là lố
+    // tới vài trăm ms — đủ nghe lọt tiếng đầu câu sau. Khi đang phát một đoạn
+    // thì soát thêm theo từng khung hình.
+    let raf = 0;
+    const loop = () => {
+      checkStop();
+      raf = !audio.paused && stopAt.current !== null ? requestAnimationFrame(loop) : 0;
+    };
     const onTime = () => {
       setTime(audio.currentTime);
-      if (stopAt.current !== null && audio.currentTime >= stopAt.current) {
-        const next = queue.current.shift();
-        if (next) {
-          stopAt.current = next[1];
-          audio.currentTime = next[0];
-        } else {
-          audio.pause();
-          stopAt.current = null;
-        }
-      }
+      checkStop();
+    };
+    const onPlaying = () => {
+      if (!raf) raf = requestAnimationFrame(loop);
     };
     const onPlay = () => setPlaying(true);
     const onPause = () => setPlaying(false);
     audio.addEventListener("timeupdate", onTime);
     audio.addEventListener("play", onPlay);
+    audio.addEventListener("playing", onPlaying);
     audio.addEventListener("pause", onPause);
     audio.addEventListener("ended", onPause);
     return () => {
       audio.pause();
+      cancelAnimationFrame(raf);
       audio.removeEventListener("timeupdate", onTime);
+      audio.removeEventListener("playing", onPlaying);
       audio.removeEventListener("play", onPlay);
       audio.removeEventListener("pause", onPause);
       audio.removeEventListener("ended", onPause);

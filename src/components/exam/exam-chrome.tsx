@@ -32,6 +32,53 @@ export function ProgressBar({ value, max, className }: { value: number; max: num
   );
 }
 
+/** Vòng tiến độ nhỏ (vd đã luyện bao nhiêu câu của một đề). */
+export function ProgressRing({ value, max, size = 32 }: { value: number; max: number; size?: number }) {
+  const r = (size - 4) / 2;
+  const c = 2 * Math.PI * r;
+  const p = max ? value / max : 0;
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="-rotate-90" aria-hidden>
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth={3} className="stroke-muted" />
+      {p > 0 && (
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          fill="none"
+          strokeWidth={3}
+          strokeLinecap="round"
+          strokeDasharray={`${c * p} ${c}`}
+          className="stroke-foreground/70"
+        />
+      )}
+    </svg>
+  );
+}
+
+/** Huy hiệu cấp đạt được ("Cấp 2"), hoặc "Chưa đạt". */
+export function LevelBadge({
+  level,
+  emptyLabel = "Chưa đạt",
+  className,
+}: {
+  level: string | null | undefined;
+  emptyLabel?: string;
+  className?: string;
+}) {
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap",
+        level ? "bg-foreground text-background" : "bg-muted text-muted-foreground",
+        className
+      )}
+    >
+      {level ?? emptyLabel}
+    </span>
+  );
+}
+
 /** Đầu trang luyện tập: về trang đề, chuyển phần Nghe / Viết / Đọc, tiến độ phần đang luyện. */
 export function PracticeHeader({
   exam,

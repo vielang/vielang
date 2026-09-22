@@ -18,7 +18,8 @@
  *    nghe giữ nguyên — thư mục này KHÔNG commit; đẩy lên R2 bằng
  *    `npm run prepare-exams`.
  */
-import { copyFile, mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
+import { spawnSync } from "node:child_process";
+import { mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
 import { sanitizeExamHtml, webpName } from "../src/lib/exam-html";
@@ -42,6 +43,35 @@ const ONLY = argOf("--round");
 const OUT_JSON = path.resolve("content/exams");
 const OUT_ASSETS = path.resolve("public/img/exams");
 const MARKS = path.resolve("content/exams/marks");
+/** ffmpeg để chuẩn hoá file nghe (xem `copyAudio`). */
+const FFMPEG = process.env.FFMPEG ?? "ffmpeg";
+
+/**
+ * Tên file nghe trong app: "<kỳ>_<cấp>-cbr.mp3". Tên MỚI so với file gốc vì
+ * tài nguyên trên R2 để cache "immutable" một năm — giữ tên cũ thì trình
+ * duyệt đã tải bản gốc sẽ dùng mãi bản đó.
+ */
+function audioName(srcFile: string): string {
+  return path.basename(srcFile).replace(/\.mp3$/i, "-cbr.mp3");
+}
+
+/**
+ * Chuẩn hoá file nghe thành MP3 CBR 128 kbps "sạch". Trình duyệt tua
+ * (`currentTime`) theo vị trí byte: file gốc có bản VBR (tua theo mục lục thô
+ * của file) và bản CBR lẫn byte rác giữa các khung — đo trong Chrome thấy
+ * lệch từ nửa giây tới vài giây, nghe lại một câu là lẫn tiếng câu bên cạnh.
+ * Mã hoá lại thì tua khớp đúng từng khung, và giữ nguyên dòng thời gian (các
+ * mốc trong content/exams/marks đo trên file gốc vẫn đúng, lệch < 0.05s).
+ */
+async function copyAudio(srcFile: string, outFile: string) {
+  if (await exists(outFile)) return; // đã chuẩn hoá từ lần nhập trước
+  const r = spawnSync(FFMPEG, ["-y", "-loglevel", "error", "-i", srcFile, "-map", "0:a", "-c:a", "libmp3lame", "-b:a", "128k", outFile]);
+  if (r.status !== 0) {
+    throw new Error(
+      `không chuẩn hoá được ${path.basename(srcFile)} — cần ffmpeg (đặt biến FFMPEG=<đường dẫn ffmpeg>): ${r.error?.message ?? r.stderr}`
+    );
+  }
+}
 
 /** Năm tổ chức từng kỳ (theo danh sách đề đã công bố trên topik.go.kr). */
 const YEAR: Record<number, number> = {
@@ -73,7 +103,8 @@ interface SrcWriting {
 interface Marks {
   intro?: [number, number];
   groups: { from: number; audio?: [number, number]; dialogue?: [number, number] }[];
-  questions: { no: number; audio: [number, number] }[];
+  /** `play`: đoạn nghe lại riêng câu — chỉ phần lời đọc, bỏ khoảng dừng trả lời. */
+  questions: { no: number; audio: [number, number]; play?: [number, number] }[];
 }
 
 async function exists(p: string) {
@@ -133,6 +164,7 @@ async function convertSection(src: SrcSection, round: number, marksFile: string)
       prompt: convertContent(q.prompt, base),
       options: q.options.map((o) => convertContent(o, base)) as ExamQuestion["options"],
       ...(m ? { audio: m.audio } : {}),
+      ...(m?.play ? { replay: m.play } : {}),
     };
   });
 
@@ -140,7 +172,7 @@ async function convertSection(src: SrcSection, round: number, marksFile: string)
     id: src.section,
     title: src.title,
     minutes: src.durationMinutes,
-    ...(src.audio ? { audio: `audio/${path.basename(src.audio)}` } : {}),
+    ...(src.audio ? { audio: `audio/${audioName(src.audio)}` } : {}),
     ...(marks?.intro ? { intro: marks.intro } : {}),
     groups,
     questions,
@@ -190,7 +222,10 @@ async function copyAssets(round: number, sections: SrcSection[], pages: string[]
   for (const s of sections) {
     const all = JSON.stringify(s);
     for (const m of all.matchAll(/images\/([^"'\\]+?\.(?:png|jpe?g|gif))/gi)) used.add(m[1]);
-    if (s.audio) await copyFile(path.join(srcDir, s.audio), path.join(outDir, "audio", path.basename(s.audio)));
+    if (s.audio) {
+      const from = path.join(srcDir, s.audio);
+      await copyAudio(from, path.join(outDir, "audio", audioName(from)));
+    }
   }
   let converted = 0;
   for (const file of used) {

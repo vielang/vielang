@@ -9,6 +9,9 @@ import {
   levelFor,
   listExams,
   maxScore,
+  nextLevel,
+  nextPracticeTarget,
+  practiceProgress,
   qKey,
   questionAudio,
   questionPrompt,
@@ -48,6 +51,30 @@ describe("chấm điểm và quy ra cấp", () => {
     const r = scoreExam(exam, { "listening:1": 1, "listening:3": 1 });
     expect(r.score).toBe(4);
     expect(r.sections[0]).toMatchObject({ score: 4, correct: 1, total: 30 });
+  });
+});
+
+describe("thang cấp và tiến độ luyện", () => {
+  it("cấp kế tiếp và số điểm còn thiếu", () => {
+    expect(nextLevel("TOPIK I", 50)).toEqual({ level: "Cấp 1", need: 30 });
+    expect(nextLevel("TOPIK I", 100)).toEqual({ level: "Cấp 2", need: 40 });
+    expect(nextLevel("TOPIK I", 150)).toBeNull();
+    expect(nextLevel("TOPIK II", 200)).toEqual({ level: "Cấp 6", need: 30 });
+  });
+
+  it("tiến độ tính cả câu trắc nghiệm đã kiểm tra và câu viết đã tự chấm", () => {
+    expect(practiceProgress(exam2, { checked: ["listening:1", "reading:1"], grades: { 53: 20 } })).toEqual({
+      done: 3,
+      total: 104,
+    });
+  });
+
+  it("luyện tiếp từ câu đầu tiên chưa làm, theo thứ tự các phần", () => {
+    expect(nextPracticeTarget(exam, undefined)).toEqual({ section: "listening", no: 1 });
+    const listening = exam.sections[0].questions.map((q) => qKey("listening", q.no));
+    expect(nextPracticeTarget(exam, { checked: [...listening, "reading:31"] })).toEqual({ section: "reading", no: 32 });
+    const l2 = exam2.sections[0].questions.map((q) => qKey("listening", q.no));
+    expect(nextPracticeTarget(exam2, { checked: l2, grades: { 51: 10 } })).toEqual({ section: "writing", no: 52 });
   });
 });
 
@@ -120,7 +147,14 @@ describe("nghe lại một câu", () => {
     const q26 = listening.questions.find((q) => q.no === 26)!;
     const segs = questionAudio(listening, q26);
     expect(segs).toHaveLength(2);
-    expect(segs[1]).toEqual(q26.audio);
+    expect(segs[1]).toEqual(q26.replay);
+  });
+
+  it("nghe lại chỉ phát phần lời đọc — không kèm khoảng dừng trả lời ~20 giây", () => {
+    const q1 = exam.sections[0].questions[0];
+    const [start, end] = questionAudio(exam.sections[0], q1)[0];
+    expect(start).toBe(q1.replay![0]);
+    expect(q1.audio![1] - end).toBeGreaterThan(15);
   });
 
   it("đề chưa đo mốc thời gian thì không có đoạn riêng (giao diện cho nghe cả bài)", () => {
@@ -190,6 +224,21 @@ describe.each(listExams().map((e) => [e.id, e] as [string, Exam]))("dữ liệu 
         const [start, end] = q.audio!;
         expect(end).toBeGreaterThan(start);
         expect(start).toBeGreaterThanOrEqual(last);
+        last = end;
+      }
+    }
+  });
+
+  it("đoạn nghe lại từng câu nằm gọn trong đoạn của câu, theo thứ tự, không lấn sang câu sau", () => {
+    for (const s of e.sections.filter((s) => s.questions.some((q) => q.audio))) {
+      let last = 0;
+      for (const q of s.questions) {
+        expect(q.replay, `câu ${q.no}`).toBeDefined();
+        const [start, end] = q.replay!;
+        expect(end).toBeGreaterThan(start);
+        expect(start).toBeGreaterThanOrEqual(last);
+        // Kết thúc trước hết đoạn của câu (tức trước tiếng đọc số câu sau).
+        expect(end).toBeLessThanOrEqual(q.audio![1]);
         last = end;
       }
     }

@@ -51,19 +51,18 @@ function mmss(ms: number): string {
  *   lưu, file nghe phát tiếp từ đúng chỗ lẽ ra đang phát.
  */
 export function MockView({ exam }: { exam: Exam }) {
-  const isClient = useSyncExternalStore(NO_SUBSCRIBE, () => true, () => false);
+  const isClient = useSyncExternalStore(
+    NO_SUBSCRIBE,
+    () => true,
+    () => false
+  );
   const attempts = useExamStore((s) => s.attempts);
   const attempt = isClient ? activeAttempt(attempts, exam.id) : undefined;
   const startMock = useExamStore((s) => s.startMock);
 
   if (!isClient) return null;
   if (!attempt) {
-    return (
-      <MockIntro
-        exam={exam}
-        onStart={() => startMock(exam.id, exam.sections[0].minutes)}
-      />
-    );
+    return <MockIntro exam={exam} onStart={() => startMock(exam.id, exam.sections[0].minutes)} />;
   }
   return <MockRunning key={attempt.id} exam={exam} attempt={attempt} />;
 }
@@ -166,28 +165,30 @@ function MockRunning({ exam, attempt }: { exam: Exam; attempt: MockAttempt }) {
   const answered = section.writing
     ? section.writing.tasks.filter((t) => hasWritten(t, texts)).length
     : section.questions.filter((q) => attempt.answers[qKey(section.id, q.no)] !== undefined).length;
+  const onAnswer = (no: number, choice: number) => setAnswer(attempt.id, qKey(section.id, no), choice);
 
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-col gap-5 pb-28">
+    // Máy tính dùng cả bề ngang (đề + phiếu trả lời, hoặc đề viết + ô viết).
+    <div className="mx-auto flex w-full max-w-2xl flex-col gap-5 pb-28 lg:max-w-none lg:pb-12">
       <div className="sticky top-14 z-30 -mx-4 flex flex-col gap-2 border-b border-border bg-background/95 px-4 pt-2 pb-2.5 backdrop-blur">
         <div className="flex items-center justify-between gap-3">
-        <div className="min-w-0">
-          <p className="truncate text-sm font-medium">{examTitle(exam)}</p>
-          <SectionStepper exam={exam} current={attempt.sectionIndex} />
-        </div>
-        <span
-          className={cn(
-            "inline-flex items-center gap-1 rounded-full px-3 py-1 text-sm font-semibold tabular-nums",
-            remaining < 5 * 60_000 ? "bg-red-600 text-white" : "bg-muted"
-          )}
-          aria-label={`Còn ${mmss(remaining)}`}
-        >
-          <Clock className="size-4" aria-hidden />
-          {mmss(remaining)}
-        </span>
-        <Button size="sm" onClick={() => setConfirm(true)}>
-          {isLast ? "Nộp bài" : "Xong phần này"}
-        </Button>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-medium">{examTitle(exam)}</p>
+            <SectionStepper exam={exam} current={attempt.sectionIndex} />
+          </div>
+          <span
+            className={cn(
+              "inline-flex items-center gap-1 rounded-full px-3 py-1 text-sm font-semibold tabular-nums",
+              remaining < 5 * 60_000 ? "bg-red-600 text-white" : "bg-muted"
+            )}
+            aria-label={`Còn ${mmss(remaining)}`}
+          >
+            <Clock className="size-4" aria-hidden />
+            {mmss(remaining)}
+          </span>
+          <Button size="sm" onClick={() => setConfirm(true)}>
+            {isLast ? "Nộp bài" : "Xong phần này"}
+          </Button>
         </div>
         <div className="flex items-center gap-3">
           <ProgressBar value={answered} max={total} className="flex-1" />
@@ -206,74 +207,56 @@ function MockRunning({ exam, attempt }: { exam: Exam; attempt: MockAttempt }) {
           onChange={(key, text) => setText(attempt.id, key, text)}
         />
       ) : (
-        <SectionQuestions
-          key={section.id}
-          exam={exam}
-          section={section}
-          attempt={attempt}
-          onAnswer={(no, c) => setAnswer(attempt.id, qKey(section.id, no), c)}
-        />
+        // Máy tính: đề bên trái, phiếu trả lời dính bên phải như phiếu tô
+        // đáp án ở phòng thi. Điện thoại: phiếu mở từ nút nổi.
+        <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_13rem] lg:gap-10">
+          <SectionQuestions key={section.id} exam={exam} section={section} attempt={attempt} onAnswer={onAnswer} />
+          <aside aria-label="Phiếu trả lời" className="hidden lg:block">
+            <div className="sticky top-40 flex max-h-[calc(100vh-11rem)] flex-col gap-2">
+              <p className="text-xs font-medium text-muted-foreground">Phiếu trả lời · {sectionVi(section.id)}</p>
+              <div className="overflow-y-auto pr-1">
+                <AnswerSheet section={section} attempt={attempt} onAnswer={onAnswer} />
+              </div>
+            </div>
+          </aside>
+        </div>
       )}
 
-      <Button
-        variant="outline"
-        className="fixed right-4 bottom-4 z-30 shadow-lg"
-        onClick={() => setSheetOpen(true)}
-      >
-        <ListChecks className="size-4" aria-hidden />
-        Phiếu trả lời {answered}/{total}
-      </Button>
+      {!section.writing && (
+        <>
+          <Button
+            variant="outline"
+            className="fixed right-4 bottom-4 z-30 shadow-lg lg:hidden"
+            onClick={() => setSheetOpen(true)}
+          >
+            <ListChecks className="size-4" aria-hidden />
+            Phiếu trả lời {answered}/{total}
+          </Button>
 
-      <Dialog open={sheetOpen} onOpenChange={setSheetOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Phiếu trả lời — {sectionVi(section.id)}</DialogTitle>
-            <DialogDescription>Bấm vào số câu để tới câu đó.</DialogDescription>
-          </DialogHeader>
-          <div className="grid grid-cols-5 gap-2 sm:grid-cols-6">
-            {section.writing?.tasks.map((t) => (
-              <a
-                key={t.no}
-                href={`#q-${t.no}`}
-                onClick={() => setSheetOpen(false)}
-                className={cn(
-                  "flex flex-col items-center rounded-md border py-1 text-xs tabular-nums",
-                  hasWritten(t, texts) ? "border-primary bg-primary text-primary-foreground" : "border-border"
-                )}
-              >
-                <span>{t.no}</span>
-                <span className="text-sm">{hasWritten(t, texts) ? "✎" : "·"}</span>
-              </a>
-            ))}
-            {section.questions.map((q) => {
-              const a = attempt.answers[qKey(section.id, q.no)];
-              return (
-                <a
-                  key={q.no}
-                  href={`#q-${q.no}`}
-                  onClick={() => setSheetOpen(false)}
-                  className={cn(
-                    "flex flex-col items-center rounded-md border py-1 text-xs tabular-nums",
-                    a ? "border-primary bg-primary text-primary-foreground" : "border-border"
-                  )}
-                >
-                  <span>{q.no}</span>
-                  <span className="text-sm">{a ? "①②③④"[a - 1] : "·"}</span>
-                </a>
-              );
-            })}
-          </div>
-        </DialogContent>
-      </Dialog>
+          <Dialog open={sheetOpen} onOpenChange={setSheetOpen}>
+            <DialogContent className="max-h-[85vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Phiếu trả lời — {sectionVi(section.id)}</DialogTitle>
+                <DialogDescription>Tô đáp án ngay trên phiếu, hoặc bấm số câu để tới câu đó.</DialogDescription>
+              </DialogHeader>
+              <AnswerSheet
+                section={section}
+                attempt={attempt}
+                onAnswer={onAnswer}
+                onJump={() => setSheetOpen(false)}
+                columns
+              />
+            </DialogContent>
+          </Dialog>
+        </>
+      )}
 
       <Dialog open={confirm} onOpenChange={setConfirm}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{isLast ? "Nộp bài?" : `Kết thúc phần ${sectionVi(section.id)}?`}</DialogTitle>
             <DialogDescription>
-              {answered < total
-                ? `Còn ${total - answered} câu chưa ${section.writing ? "viết" : "chọn"}. `
-                : ""}
+              {answered < total ? `Còn ${total - answered} câu chưa ${section.writing ? "viết" : "chọn"}. ` : ""}
               {isLast
                 ? "Nộp rồi thì không sửa được nữa."
                 : `Sang phần ${sectionVi(exam.sections[attempt.sectionIndex + 1].id)} rồi thì không quay lại được.`}
@@ -333,11 +316,11 @@ function SectionQuestions({
         <div className="flex items-center gap-3 rounded-xl bg-muted/60 p-4">
           <Headphones className="size-5 shrink-0" aria-hidden />
           {started && audio.playing ? (
-            <p className="text-sm">
-              Đang phát{current ? ` câu ${current}` : ""} — nghe và chọn đáp án như thi thật.
-            </p>
+            <p className="text-sm">Đang phát{current ? ` câu ${current}` : ""} — nghe và chọn đáp án như thi thật.</p>
           ) : started ? (
-            <p className="text-sm text-muted-foreground">Bài nghe đã phát xong. Soát lại đáp án rồi bấm “Xong phần này”.</p>
+            <p className="text-sm text-muted-foreground">
+              Bài nghe đã phát xong. Soát lại đáp án rồi bấm “Xong phần này”.
+            </p>
           ) : (
             <Button onClick={startListening}>
               <Play className="size-4" aria-hidden />
@@ -380,7 +363,10 @@ function SectionQuestions({
   );
 }
 
-/** Phần viết khi thi thử: trang đề (ảnh) và ô viết từng câu. */
+/**
+ * Phần viết khi thi thử: mỗi trang đề (hai câu) một khối. Máy tính chia đôi —
+ * trang đề dính bên trái, ô viết bên phải — khỏi cuộn qua lại giữa đề và bài.
+ */
 function WritingSection({
   exam,
   section,
@@ -393,20 +379,97 @@ function WritingSection({
   onChange: (key: string, text: string) => void;
 }) {
   const tasks = section.writing!.tasks;
+  const pages = [...new Set(tasks.map((t) => t.page))];
   return (
-    <div className="flex flex-col gap-6">
-      {tasks.map((t, i) => (
-        <section key={t.no} id={`q-${t.no}`} className="flex scroll-mt-32 flex-col gap-3">
-          {/* Mỗi trang đề có hai câu — hiện trang ở câu đầu của trang. */}
-          {(i === 0 || tasks[i - 1].page !== t.page) && (
-            <WritingImage exam={exam} src={t.page} alt={`Đề câu ${t.no}–${t.no + 1}`} />
-          )}
-          <p className="text-sm font-semibold">
-            {t.no}. <span className="font-normal text-muted-foreground">({t.points} điểm)</span>
-          </p>
-          <WritingInput task={t} texts={texts} onChange={onChange} />
-        </section>
-      ))}
+    <div className="flex flex-col gap-10">
+      {pages.map((page, pi) => {
+        const onPage = tasks.filter((t) => t.page === page);
+        return (
+          <section
+            key={page}
+            className={cn(
+              "flex flex-col gap-5 lg:grid lg:grid-cols-2 lg:items-start lg:gap-8",
+              pi > 0 && "border-t border-border pt-10"
+            )}
+          >
+            <div className="lg:sticky lg:top-40">
+              <WritingImage exam={exam} src={page} alt={`Đề câu ${onPage.map((t) => t.no).join("–")}`} />
+            </div>
+            <div className="flex flex-col gap-8">
+              {onPage.map((t) => (
+                <div key={t.no} id={`q-${t.no}`} className="flex scroll-mt-36 flex-col gap-3">
+                  <p className="flex items-baseline gap-2">
+                    <span className="font-semibold tabular-nums">{t.no}.</span>
+                    <span className="text-xs text-muted-foreground">{t.points} điểm</span>
+                  </p>
+                  <WritingInput task={t} texts={texts} onChange={onChange} />
+                </div>
+              ))}
+            </div>
+          </section>
+        );
+      })}
     </div>
+  );
+}
+
+/**
+ * Phiếu trả lời kiểu OMR: mỗi câu một hàng bốn ô tròn — tô thẳng trên phiếu
+ * được, bấm số câu để cuộn tới câu đó.
+ */
+function AnswerSheet({
+  section,
+  attempt,
+  onAnswer,
+  onJump,
+  columns,
+}: {
+  section: ExamSection;
+  attempt: MockAttempt;
+  onAnswer: (no: number, choice: number) => void;
+  onJump?: () => void;
+  /** Chia hai cột (trong hộp thoại, màn đủ rộng). */
+  columns?: boolean;
+}) {
+  return (
+    <ol className={cn("flex flex-col gap-0.5", columns && "sm:grid sm:grid-cols-2 sm:gap-x-6")}>
+      {section.questions.map((q) => {
+        const a = attempt.answers[qKey(section.id, q.no)];
+        return (
+          <li key={q.no} className="flex items-center gap-2">
+            <a
+              href={`#q-${q.no}`}
+              onClick={onJump}
+              className={cn(
+                "w-7 shrink-0 text-right text-xs tabular-nums hover:underline",
+                a ? "text-foreground" : "text-muted-foreground"
+              )}
+            >
+              {q.no}
+            </a>
+            <span className="flex gap-1" role="radiogroup" aria-label={`Câu ${q.no}`}>
+              {[1, 2, 3, 4].map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  role="radio"
+                  aria-checked={a === c}
+                  aria-label={`Câu ${q.no}: chọn ${c}`}
+                  onClick={() => onAnswer(q.no, c)}
+                  className={cn(
+                    "flex size-6 items-center justify-center rounded-full text-[0.65rem] tabular-nums transition-colors",
+                    a === c
+                      ? "bg-foreground text-background"
+                      : "border border-foreground/20 text-muted-foreground hover:border-foreground/50"
+                  )}
+                >
+                  {c}
+                </button>
+              ))}
+            </span>
+          </li>
+        );
+      })}
+    </ol>
   );
 }

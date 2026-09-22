@@ -47,7 +47,10 @@ export function ContinueReading({ books }: { books: readonly Book[] }) {
   return (
     <section className="flex flex-col gap-3">
       <h2 className="text-base font-semibold tracking-tight">Đọc tiếp</h2>
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      {/* `grid-cols-1` (= minmax(0,1fr)) chứ không để lưới tự tạo cột: cột
+          tự tạo co giãn theo nội dung, tên sách dài sẽ đẩy thẻ rộng quá
+          khung trang trên điện thoại (dù tên đã `truncate`). */}
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {items.map(({ book, progress }) => {
           const page = resumePage(progress);
           const percent = percentRead(progress, book.totalPages);
@@ -55,7 +58,7 @@ export function ContinueReading({ books }: { books: readonly Book[] }) {
             <Link
               key={book.id}
               href={`/read/${book.id}/${page}`}
-              className="group focus-visible:ring-ring flex items-center gap-3 rounded-xl border border-border bg-card p-2.5 transition-shadow hover:shadow-md focus-visible:ring-2 focus-visible:outline-none"
+              className="group focus-visible:ring-ring flex min-w-0 items-center gap-3 rounded-xl border border-border bg-card p-2.5 transition-shadow hover:shadow-md focus-visible:ring-2 focus-visible:outline-none"
             >
               <div className="relative aspect-[192/250] w-12 shrink-0 overflow-hidden rounded-md bg-muted">
                 <Image

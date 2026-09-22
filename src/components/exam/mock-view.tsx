@@ -34,6 +34,7 @@ import { OptionList } from "@/components/exam/option-list";
 import { useExamAudio } from "@/components/exam/use-exam-audio";
 import { useLeaveGuard } from "@/components/exam/use-leave-guard";
 import { WritingTaskView, hasWritten } from "@/components/exam/writing-parts";
+import { AnswerSheet, MobileAnswerSheet, jumpToQuestion } from "@/components/exam/answer-sheet";
 
 const NO_SUBSCRIBE = () => () => {};
 
@@ -127,7 +128,6 @@ function MockRunning({ exam, attempt }: { exam: Exam; attempt: MockAttempt }) {
   const isLast = attempt.sectionIndex === exam.sections.length - 1;
   const [now, setNow] = useState(() => Date.now());
   const [confirm, setConfirm] = useState(false);
-  const [sheetOpen, setSheetOpen] = useState(false);
   const remaining = attempt.deadline - now;
   // Rời trang giữa lượt thi thì hỏi lại — đồng hồ vẫn chạy khi đi chỗ khác.
   const leaveGuard = useLeaveGuard(!attempt.finishedAt, `/exam/${exam.id}`);
@@ -173,7 +173,7 @@ function MockRunning({ exam, attempt }: { exam: Exam; attempt: MockAttempt }) {
 
   return (
     // Máy tính dùng cả bề ngang (đề + phiếu trả lời, hoặc đề viết + ô viết).
-    <div className="mx-auto flex w-full max-w-2xl flex-col gap-5 pb-28 lg:max-w-none lg:pb-12">
+    <div className="mx-auto flex w-full max-w-2xl flex-col gap-5 pb-6 lg:max-w-none lg:pb-12">
       <div className="sticky top-14 z-30 -mx-4 flex flex-col gap-2 border-b border-border bg-background/95 px-4 pt-2 pb-2.5 backdrop-blur">
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
@@ -219,7 +219,12 @@ function MockRunning({ exam, attempt }: { exam: Exam; attempt: MockAttempt }) {
             <div className="sticky top-40 flex max-h-[calc(100vh-11rem)] flex-col gap-2">
               <p className="text-xs font-medium text-muted-foreground">Phiếu trả lời · {sectionVi(section.id)}</p>
               <div className="overflow-y-auto pr-1">
-                <AnswerSheet section={section} attempt={attempt} onAnswer={onAnswer} />
+                <AnswerSheet
+                  section={section}
+                  answers={attempt.answers}
+                  onAnswer={onAnswer}
+                  onJump={jumpToQuestion}
+                />
               </div>
             </div>
           </aside>
@@ -227,32 +232,7 @@ function MockRunning({ exam, attempt }: { exam: Exam; attempt: MockAttempt }) {
       )}
 
       {!section.writing && (
-        <>
-          <Button
-            variant="outline"
-            className="fixed right-4 bottom-4 z-30 shadow-lg lg:hidden"
-            onClick={() => setSheetOpen(true)}
-          >
-            <ListChecks className="size-4" aria-hidden />
-            Phiếu trả lời {answered}/{total}
-          </Button>
-
-          <Dialog open={sheetOpen} onOpenChange={setSheetOpen}>
-            <DialogContent className="max-h-[85vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Phiếu trả lời — {sectionVi(section.id)}</DialogTitle>
-                <DialogDescription>Tô đáp án ngay trên phiếu, hoặc bấm số câu để tới câu đó.</DialogDescription>
-              </DialogHeader>
-              <AnswerSheet
-                section={section}
-                attempt={attempt}
-                onAnswer={onAnswer}
-                onJump={() => setSheetOpen(false)}
-                columns
-              />
-            </DialogContent>
-          </Dialog>
-        </>
+        <MobileAnswerSheet key={section.id} section={section} answers={attempt.answers} onAnswer={onAnswer} />
       )}
 
       <Dialog open={leaveGuard.pending} onOpenChange={(open) => !open && leaveGuard.stay()}>
@@ -403,66 +383,5 @@ function WritingSection({
         </section>
       ))}
     </div>
-  );
-}
-
-/**
- * Phiếu trả lời kiểu OMR: mỗi câu một hàng bốn ô tròn — tô thẳng trên phiếu
- * được, bấm số câu để cuộn tới câu đó.
- */
-function AnswerSheet({
-  section,
-  attempt,
-  onAnswer,
-  onJump,
-  columns,
-}: {
-  section: ExamSection;
-  attempt: MockAttempt;
-  onAnswer: (no: number, choice: number) => void;
-  onJump?: () => void;
-  /** Chia hai cột (trong hộp thoại, màn đủ rộng). */
-  columns?: boolean;
-}) {
-  return (
-    <ol className={cn("flex flex-col gap-0.5", columns && "sm:grid sm:grid-cols-2 sm:gap-x-6")}>
-      {section.questions.map((q) => {
-        const a = attempt.answers[qKey(section.id, q.no)];
-        return (
-          <li key={q.no} className="flex items-center gap-2">
-            <a
-              href={`#q-${q.no}`}
-              onClick={onJump}
-              className={cn(
-                "w-7 shrink-0 text-right text-xs tabular-nums hover:underline",
-                a ? "text-foreground" : "text-muted-foreground"
-              )}
-            >
-              {q.no}
-            </a>
-            <span className="flex gap-1" role="radiogroup" aria-label={`Câu ${q.no}`}>
-              {[1, 2, 3, 4].map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  role="radio"
-                  aria-checked={a === c}
-                  aria-label={`Câu ${q.no}: chọn ${c}`}
-                  onClick={() => onAnswer(q.no, c)}
-                  className={cn(
-                    "flex size-6 items-center justify-center rounded-full text-[0.65rem] tabular-nums transition-colors",
-                    a === c
-                      ? "bg-foreground text-background"
-                      : "border border-foreground/20 text-muted-foreground hover:border-foreground/50"
-                  )}
-                >
-                  {c}
-                </button>
-              ))}
-            </span>
-          </li>
-        );
-      })}
-    </ol>
   );
 }

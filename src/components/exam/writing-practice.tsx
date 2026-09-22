@@ -6,7 +6,15 @@ import { Button } from "@/components/ui/button";
 import { qKey, writingBlocks, type Exam, type ExamSection } from "@/lib/exams";
 import { useExamStore } from "@/lib/exam-store";
 import { WritingTaskView, hasWritten } from "@/components/exam/writing-parts";
-import { ActionBar, PracticeHeader, QuestionGrid, QuestionGridSheet, type GridItem } from "@/components/exam/exam-chrome";
+import {
+  ActionBar,
+  NextButton,
+  PracticeHeader,
+  QuestionGrid,
+  QuestionGridSheet,
+  rangeLabel,
+  type GridItem,
+} from "@/components/exam/exam-chrome";
 
 const NO_SUBSCRIBE = () => () => {};
 
@@ -32,6 +40,7 @@ export function WritingPractice({
   const [bi, setBi] = useState(() => (initialNo ? blockOf(initialNo) : 0));
   const block = blocks[bi];
   const isLast = bi === blocks.length - 1;
+  const label = (b: typeof block | undefined) => b && rangeLabel(b[0].no, b[b.length - 1].no);
 
   const practice = useExamStore((s) => s.practice[exam.id]);
   const setText = useExamStore((s) => s.setPracticeText);
@@ -59,7 +68,7 @@ export function WritingPractice({
     for (const t of block) check(exam.id, qKey("writing", t.no));
   };
 
-  const range = block.length > 1 ? `Câu ${block[0].no}–${block[block.length - 1].no}` : `Câu ${block[0].no}`;
+  const range = label(block)!;
   const points = block.reduce((n, t) => n + t.points, 0);
 
   return (
@@ -95,7 +104,7 @@ export function WritingPractice({
       </section>
 
       <ActionBar>
-        <Button variant="ghost" size="icon-lg" onClick={() => go(bi - 1)} disabled={bi === 0} aria-label="Khối trước">
+        <Button variant="ghost" size="icon-lg" onClick={() => go(bi - 1)} disabled={bi === 0} aria-label={label(blocks[bi - 1]) ?? "Câu trước"}>
           <ChevronLeft className="size-5" aria-hidden />
         </Button>
         <QuestionGridSheet
@@ -106,10 +115,7 @@ export function WritingPractice({
         />
         <div className="flex flex-1 justify-end gap-2 sm:flex-none">
           {revealed ? (
-            <Button size="lg" onClick={() => go(bi + 1)} disabled={isLast} className="min-w-32">
-              {isLast ? "Hết phần" : "Khối sau"}
-              {!isLast && <ChevronRight className="size-4" aria-hidden />}
-            </Button>
+            <NextButton exam={exam} section={section} next={label(blocks[bi + 1])} onNext={() => go(bi + 1)} />
           ) : (
             <Button size="lg" variant={block.some((t) => hasWritten(t, texts)) ? "default" : "outline"} onClick={reveal}>
               <Eye className="size-4" aria-hidden />
@@ -117,7 +123,7 @@ export function WritingPractice({
             </Button>
           )}
         </div>
-        <Button variant="ghost" size="icon-lg" onClick={() => go(bi + 1)} disabled={isLast} aria-label="Khối sau">
+        <Button variant="ghost" size="icon-lg" onClick={() => go(bi + 1)} disabled={isLast} aria-label={label(blocks[bi + 1]) ?? "Câu sau"}>
           <ChevronRight className="size-5" aria-hidden />
         </Button>
       </ActionBar>

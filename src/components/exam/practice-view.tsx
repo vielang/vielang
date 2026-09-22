@@ -21,9 +21,11 @@ import {
   ActionBar,
   GridLegend,
   KeyHint,
+  NextButton,
   PracticeHeader,
   QuestionGrid,
   QuestionGridSheet,
+  rangeLabel,
   Verdict,
   type GridItem,
 } from "@/components/exam/exam-chrome";
@@ -76,6 +78,8 @@ function GroupPractice({ exam, section, initialNo }: { exam: Exam; section: Exam
   const group = groups[gi];
   const items = questions.filter((q) => q.no >= group.from && q.no <= group.to);
   const isLastGroup = gi === groups.length - 1;
+  const prevGroup = groups[gi - 1];
+  const nextGroup = groups[gi + 1];
   // Câu cần cuộn tới sau khi đổi khối (bấm số câu trong bảng, link ?q=).
   const scrollTo = useRef<number | null>(initialNo ?? null);
 
@@ -175,7 +179,7 @@ function GroupPractice({ exam, section, initialNo }: { exam: Exam; section: Exam
       })?.no
     : undefined;
 
-  const range = group.from === group.to ? `Câu ${group.from}` : `Câu ${group.from}–${group.to}`;
+  const range = rangeLabel(group.from, group.to);
   const points = items.reduce((n, q) => n + q.points, 0);
 
   return (
@@ -271,7 +275,7 @@ function GroupPractice({ exam, section, initialNo }: { exam: Exam; section: Exam
           size="icon-lg"
           onClick={() => goGroup(gi - 1)}
           disabled={gi === 0}
-          aria-label="Khối trước"
+          aria-label={prevGroup ? rangeLabel(prevGroup.from, prevGroup.to) : "Câu trước"}
         >
           <ChevronLeft className="size-5" aria-hidden />
         </Button>
@@ -283,10 +287,12 @@ function GroupPractice({ exam, section, initialNo }: { exam: Exam; section: Exam
         />
         <div className="flex flex-1 justify-end gap-2 sm:flex-none">
           {groupDone ? (
-            <Button size="lg" onClick={() => goGroup(gi + 1)} disabled={isLastGroup} className="min-w-32">
-              {isLastGroup ? "Hết phần" : "Khối sau"}
-              {!isLastGroup && <ChevronRight className="size-4" aria-hidden />}
-            </Button>
+            <NextButton
+              exam={exam}
+              section={section}
+              next={nextGroup && rangeLabel(nextGroup.from, nextGroup.to)}
+              onNext={() => goGroup(gi + 1)}
+            />
           ) : (
             <Button size="lg" onClick={checkGroup} className="min-w-32">
               Kiểm tra
@@ -306,7 +312,7 @@ function GroupPractice({ exam, section, initialNo }: { exam: Exam; section: Exam
           size="icon-lg"
           onClick={() => goGroup(gi + 1)}
           disabled={isLastGroup}
-          aria-label="Khối sau"
+          aria-label={nextGroup ? rangeLabel(nextGroup.from, nextGroup.to) : "Câu sau"}
         >
           <ChevronRight className="size-5" aria-hidden />
         </Button>
@@ -317,8 +323,8 @@ function GroupPractice({ exam, section, initialNo }: { exam: Exam; section: Exam
         <div className="flex flex-wrap items-center justify-between gap-2">
           <GridLegend />
           <KeyHint>
-            Phím tắt: <kbd>Enter</kbd> kiểm tra khối / sang khối sau,{" "}
-            <kbd>←</kbd> <kbd>→</kbd> đổi khối.
+            Phím tắt: <kbd>Enter</kbd> kiểm tra / tiếp tục,{" "}
+            <kbd>←</kbd> <kbd>→</kbd> nhóm câu trước / sau.
           </KeyHint>
         </div>
       </section>

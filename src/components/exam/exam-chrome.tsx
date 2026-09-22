@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Check, CheckCircle2, Grid3x3, XCircle } from "lucide-react";
+import { ArrowLeft, Check, CheckCircle2, ChevronRight, Grid3x3, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
@@ -301,4 +301,47 @@ export function Verdict({ right, children }: { right: boolean; children: React.R
 /** Gợi ý phím tắt — chỉ hiện khi có chuột/bàn phím (màn cảm ứng thì vô nghĩa). */
 export function KeyHint({ children }: { children: React.ReactNode }) {
   return <p className="hidden text-xs text-muted-foreground [@media(pointer:fine)]:block">{children}</p>;
+}
+
+/** "Câu 5–6" / "Câu 53" — nhãn khoảng câu của một khối. */
+export function rangeLabel(from: number, to: number): string {
+  return from === to ? `Câu ${from}` : `Câu ${from}–${to}`;
+}
+
+/**
+ * Nút đi tiếp sau khi làm xong một khối: "Tiếp tục · Câu 5–6" (ghi rõ sẽ
+ * sang đâu — mỗi lần bấm là cả một nhóm câu, không phải một câu). Ở khối
+ * cuối thì sang phần kế tiếp ("Sang phần Đọc"), hết đề thì về trang đề.
+ */
+export function NextButton({
+  exam,
+  section,
+  next,
+  onNext,
+}: {
+  exam: Exam;
+  section: ExamSection;
+  /** Khoảng câu của khối kế tiếp; không có = đang ở khối cuối của phần. */
+  next?: string;
+  onNext: () => void;
+}) {
+  if (next) {
+    return (
+      <Button size="lg" onClick={onNext} className="min-w-32">
+        Tiếp tục
+        <span className="font-normal tabular-nums opacity-70">{next}</span>
+        <ChevronRight className="size-4" aria-hidden />
+      </Button>
+    );
+  }
+  const i = exam.sections.findIndex((s) => s.id === section.id);
+  const after = exam.sections[i + 1];
+  return (
+    <Button asChild size="lg" className="min-w-32">
+      <Link href={after ? `/exam/${exam.id}/practice?section=${after.id}` : `/exam/${exam.id}`}>
+        {after ? `Sang phần ${sectionVi(after.id)}` : "Về trang đề"}
+        <ChevronRight className="size-4" aria-hidden />
+      </Link>
+    </Button>
+  );
 }

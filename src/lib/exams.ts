@@ -48,6 +48,7 @@ import {
   type ExamQuestion,
   type ExamSection,
   type SectionId,
+  type WritingTask,
 } from "@/lib/exam-types";
 
 export * from "@/lib/exam-types";
@@ -100,6 +101,20 @@ export function countChars(text: string): number {
   return text.replace(/\r?\n/g, "").length;
 }
 
+/**
+ * Các khối của phần viết: câu điền chỗ trống liền nhau gộp thành một khối
+ * (51–52, cùng lời chỉ dẫn "[51~52]"), mỗi bài viết (53, 54) một khối.
+ */
+export function writingBlocks(tasks: WritingTask[]): WritingTask[][] {
+  const out: WritingTask[][] = [];
+  for (const t of tasks) {
+    const last = out.at(-1);
+    if (last && t.kind === "blanks" && last[0].kind === "blanks") last.push(t);
+    else out.push([t]);
+  }
+  return out;
+}
+
 /** Khối "※ [a~b]" chứa câu `no`. */
 export function groupOf(section: ExamSection, no: number): ExamGroup | undefined {
   return section.groups.find((g) => no >= g.from && no <= g.to);
@@ -124,7 +139,13 @@ export function questionAudio(section: ExamSection, q: ExamQuestion): [number, n
  * án, thời lượng khớp với đề. Các đoạn nối liền nhau nên thường gộp thành
  * một đoạn duy nhất; hội thoại dùng chung chỉ phát một lần. Rỗng khi đề chưa
  * có mốc thời gian.
+ *
+ * Dừng sớm `BLOCK_END_MARGIN` giây trước khi hết khoảng dừng của câu cuối:
+ * mốc "hết khoảng dừng" trùng đúng lúc khối sau bắt đầu (tiếng chuông), dừng
+ * sát mốc là nghe lọt nửa giây tiếng của khối sau.
  */
+const BLOCK_END_MARGIN = 0.7;
+
 export function groupAudio(section: ExamSection, group: ExamGroup): [number, number][] {
   const items = section.questions.filter((q) => q.no >= group.from && q.no <= group.to);
   const parts = [...(group.audio ? [group.audio] : []), ...items.map((q) => q.audio)].filter(
@@ -137,6 +158,8 @@ export function groupAudio(section: ExamSection, group: ExamGroup): [number, num
     if (last && start - last[1] <= 0.3) last[1] = Math.max(last[1], end);
     else merged.push([start, end]);
   }
+  const last = merged.at(-1);
+  if (last && last[1] - last[0] > 2 * BLOCK_END_MARGIN) last[1] = Math.round((last[1] - BLOCK_END_MARGIN) * 10) / 10;
   return merged;
 }
 

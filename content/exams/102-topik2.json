@@ -1742,13 +1742,15 @@
       "no": 51,
       "points": 10,
       "kind": "blanks",
-      "page": "writing/page-1.webp"
+      "image": "writing/q51.webp",
+      "answer": "answer-key/w51.webp"
      },
      {
       "no": 52,
       "points": 10,
       "kind": "blanks",
-      "page": "writing/page-1.webp"
+      "image": "writing/q52.webp",
+      "answer": "answer-key/w52.webp"
      },
      {
       "no": 53,
@@ -1758,7 +1760,8 @@
        200,
        300
       ],
-      "page": "writing/page-2.webp"
+      "image": "writing/q53.webp",
+      "answer": "answer-key/w53.webp"
      },
      {
       "no": 54,
@@ -1768,11 +1771,9 @@
        600,
        700
       ],
-      "page": "writing/page-2.webp"
+      "image": "writing/q54.webp",
+      "answer": "answer-key/w54.webp"
      }
-    ],
-    "modelAnswers": [
-     "answer-key/topik2-2.webp"
     ]
    }
   },

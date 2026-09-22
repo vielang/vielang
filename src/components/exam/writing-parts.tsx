@@ -175,3 +175,82 @@ export function SelfGrade({
     </div>
   );
 }
+
+/**
+ * Một câu viết: ảnh đề của riêng câu, ô viết; `revealed` thì thêm đáp án mẫu
+ * chính thức của câu (một dòng của bảng đáp án) và thanh tự chấm.
+ *
+ * Bài viết (53–54) trên máy tính chia đôi — đề dính bên trái (`stickyTop`:
+ * khoảng chừa cho thanh dính phía trên), ô viết + đáp án bên phải; câu điền
+ * chỗ trống (51–52) thì xếp dọc vì đề ngắn.
+ */
+export function WritingTaskView({
+  exam,
+  task,
+  texts,
+  onText,
+  readOnly,
+  revealed,
+  grade,
+  onGrade,
+  stickyTop = "lg:top-20",
+  showHead = true,
+}: {
+  exam: Exam;
+  task: WritingTask;
+  texts: Texts;
+  onText: (key: string, text: string) => void;
+  readOnly?: boolean;
+  revealed?: boolean;
+  grade?: number;
+  onGrade?: (points: number) => void;
+  stickyTop?: string;
+  /** Hiện dòng "51. 10 điểm" — tắt khi khối chỉ có một câu (tiêu đề khối đã ghi). */
+  showHead?: boolean;
+}) {
+  const head = showHead && (
+    <p className="flex items-baseline gap-2">
+      <span className="font-semibold tabular-nums">{task.no}.</span>
+      <span className="text-xs text-muted-foreground">{task.points} điểm</span>
+    </p>
+  );
+  const prompt = <WritingImage exam={exam} src={task.image} alt={`Đề câu ${task.no}`} />;
+  const input =
+    readOnly && !hasWritten(task, texts) ? (
+      <p className="rounded-md bg-muted/60 px-3 py-2 text-sm text-muted-foreground">Bỏ trống.</p>
+    ) : (
+      <WritingInput task={task} texts={texts} onChange={onText} readOnly={readOnly} />
+    );
+  const answer = revealed && (
+    <div className="flex flex-col gap-3 border-t border-border pt-4">
+      <p className="text-xs font-medium text-muted-foreground">
+        Đáp án mẫu và tiêu chí chấm chính thức — chỉ là một cách viết, ý đúng và ngữ pháp đúng là được điểm.
+      </p>
+      <WritingImage exam={exam} src={task.answer} alt={`Đáp án mẫu câu ${task.no}`} />
+      {onGrade && <SelfGrade task={task} value={grade} onChange={onGrade} />}
+    </div>
+  );
+
+  if (task.kind === "blanks") {
+    return (
+      <div id={`q-${task.no}`} className="flex scroll-mt-36 flex-col gap-3">
+        {head}
+        {prompt}
+        {input}
+        {answer}
+      </div>
+    );
+  }
+  return (
+    <div id={`q-${task.no}`} className="flex scroll-mt-36 flex-col gap-3">
+      {head}
+      <div className="flex flex-col gap-4 lg:grid lg:grid-cols-2 lg:items-start lg:gap-8">
+        <div className={cn("lg:sticky", stickyTop)}>{prompt}</div>
+        <div className="flex flex-col gap-4">
+          {input}
+          {answer}
+        </div>
+      </div>
+    </div>
+  );
+}

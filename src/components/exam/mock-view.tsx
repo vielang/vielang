@@ -22,6 +22,7 @@ import {
   sectionCount,
   sectionVi,
   totalMinutes,
+  writingBlocks,
   type Exam,
   type ExamSection,
 } from "@/lib/exams";
@@ -32,7 +33,7 @@ import { ProgressBar, SectionStepper } from "@/components/exam/exam-chrome";
 import { OptionList } from "@/components/exam/option-list";
 import { useExamAudio } from "@/components/exam/use-exam-audio";
 import { useLeaveGuard } from "@/components/exam/use-leave-guard";
-import { WritingImage, WritingInput, hasWritten } from "@/components/exam/writing-parts";
+import { WritingTaskView, hasWritten } from "@/components/exam/writing-parts";
 
 const NO_SUBSCRIBE = () => () => {};
 
@@ -357,14 +358,7 @@ function SectionQuestions({
           {section.questions
             .filter((q) => q.no >= g.from && q.no <= g.to)
             .map((q) => (
-              <div
-                key={q.no}
-                id={`q-${q.no}`}
-                className={cn(
-                  "-mx-3 flex scroll-mt-36 flex-col gap-3 rounded-xl border-l-2 px-3 py-1 transition-colors",
-                  current === q.no ? "border-foreground bg-muted/50 py-3" : "border-transparent"
-                )}
-              >
+              <div key={q.no} id={`q-${q.no}`} className="flex scroll-mt-36 flex-col gap-3 py-1">
                 <p className="flex items-baseline gap-2">
                   <span className="font-semibold tabular-nums">{q.no}.</span>
                   <span className="text-xs text-muted-foreground">{q.points} điểm</span>
@@ -385,8 +379,8 @@ function SectionQuestions({
 }
 
 /**
- * Phần viết khi thi thử: mỗi trang đề (hai câu) một khối. Máy tính chia đôi —
- * trang đề dính bên trái, ô viết bên phải — khỏi cuộn qua lại giữa đề và bài.
+ * Phần viết khi thi thử: các khối [51–52], [53], [54] như luyện tập — mỗi câu
+ * một ảnh đề riêng + ô viết; bài viết trên máy tính chia đôi (đề | ô viết).
  */
 function WritingSection({
   exam,
@@ -399,37 +393,15 @@ function WritingSection({
   texts: Record<string, string>;
   onChange: (key: string, text: string) => void;
 }) {
-  const tasks = section.writing!.tasks;
-  const pages = [...new Set(tasks.map((t) => t.page))];
   return (
     <div className="flex flex-col gap-10">
-      {pages.map((page, pi) => {
-        const onPage = tasks.filter((t) => t.page === page);
-        return (
-          <section
-            key={page}
-            className={cn(
-              "flex flex-col gap-5 lg:grid lg:grid-cols-2 lg:items-start lg:gap-8",
-              pi > 0 && "border-t border-border pt-10"
-            )}
-          >
-            <div className="lg:sticky lg:top-40">
-              <WritingImage exam={exam} src={page} alt={`Đề câu ${onPage.map((t) => t.no).join("–")}`} />
-            </div>
-            <div className="flex flex-col gap-8">
-              {onPage.map((t) => (
-                <div key={t.no} id={`q-${t.no}`} className="flex scroll-mt-36 flex-col gap-3">
-                  <p className="flex items-baseline gap-2">
-                    <span className="font-semibold tabular-nums">{t.no}.</span>
-                    <span className="text-xs text-muted-foreground">{t.points} điểm</span>
-                  </p>
-                  <WritingInput task={t} texts={texts} onChange={onChange} />
-                </div>
-              ))}
-            </div>
-          </section>
-        );
-      })}
+      {writingBlocks(section.writing!.tasks).map((block, bi) => (
+        <section key={block[0].no} className={cn("flex flex-col gap-8", bi > 0 && "border-t border-border pt-10")}>
+          {block.map((t) => (
+            <WritingTaskView key={t.no} exam={exam} task={t} texts={texts} onText={onChange} stickyTop="lg:top-40" />
+          ))}
+        </section>
+      ))}
     </div>
   );
 }

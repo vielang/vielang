@@ -3,23 +3,18 @@
 import { useState, useSyncExternalStore } from "react";
 import { ChevronLeft, ChevronRight, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { qKey, type Exam, type ExamSection } from "@/lib/exams";
+import { qKey, writingBlocks, type Exam, type ExamSection } from "@/lib/exams";
 import { useExamStore } from "@/lib/exam-store";
-import { SelfGrade, WritingImage, WritingInput, hasWritten } from "@/components/exam/writing-parts";
-import {
-  ActionBar,
-  PracticeHeader,
-  QuestionGrid,
-  QuestionGridSheet,
-  type GridItem,
-} from "@/components/exam/exam-chrome";
+import { WritingTaskView, hasWritten } from "@/components/exam/writing-parts";
+import { ActionBar, PracticeHeader, QuestionGrid, QuestionGridSheet, type GridItem } from "@/components/exam/exam-chrome";
 
 const NO_SUBSCRIBE = () => () => {};
 
 /**
- * Luyện phần viết (TOPIK II, câu 51–54): xem trang đề, viết bài, mở đáp án
- * mẫu chính thức rồi tự chấm. Bài viết và điểm tự chấm lưu theo đề như bài
- * luyện trắc nghiệm.
+ * Luyện phần viết (TOPIK II) THEO KHỐI như Nghe/Đọc: [51–52] (điền ㉠ ㉡, cùng
+ * lời chỉ dẫn), [53], [54]. Mỗi câu có ảnh đề riêng (cắt từ trang in) và ô
+ * viết; "Xem đáp án mẫu" mở đáp án chính thức của từng câu ngay dưới ô viết
+ * kèm thanh tự chấm. Bài viết và điểm tự chấm lưu theo đề.
  */
 export function WritingPractice({
   exam,
@@ -30,19 +25,13 @@ export function WritingPractice({
   section: ExamSection;
   initialNo?: number;
 }) {
-  const isClient = useSyncExternalStore(
-    NO_SUBSCRIBE,
-    () => true,
-    () => false
-  );
+  const isClient = useSyncExternalStore(NO_SUBSCRIBE, () => true, () => false);
   const tasks = section.writing!.tasks;
-  const [index, setIndex] = useState(() =>
-    Math.max(
-      0,
-      tasks.findIndex((t) => t.no === initialNo)
-    )
-  );
-  const task = tasks[index];
+  const blocks = writingBlocks(tasks);
+  const blockOf = (no: number) => Math.max(0, blocks.findIndex((b) => b.some((t) => t.no === no)));
+  const [bi, setBi] = useState(() => (initialNo ? blockOf(initialNo) : 0));
+  const block = blocks[bi];
+  const isLast = bi === blocks.length - 1;
 
   const practice = useExamStore((s) => s.practice[exam.id]);
   const setText = useExamStore((s) => s.setPracticeText);
@@ -52,7 +41,7 @@ export function WritingPractice({
   const texts = isClient ? (practice?.texts ?? {}) : {};
   const grades = isClient ? (practice?.grades ?? {}) : {};
   const checked = new Set(isClient ? (practice?.checked ?? []) : []);
-  const revealed = checked.has(qKey("writing", task.no));
+  const revealed = block.every((t) => checked.has(qKey("writing", t.no)));
   const graded = tasks.filter((t) => grades[t.no] !== undefined);
   const grid: GridItem[] = tasks.map((t) => ({
     no: t.no,
@@ -60,14 +49,21 @@ export function WritingPractice({
     suffix: grades[t.no] !== undefined ? ` · ${grades[t.no]}` : undefined,
     label: `Câu ${t.no}${grades[t.no] !== undefined ? `, tự chấm ${grades[t.no]} điểm` : ""}`,
   }));
+  const current = tasks.findIndex((t) => t.no === block[0].no);
 
   const go = (to: number) => {
-    setIndex(Math.max(0, Math.min(tasks.length - 1, to)));
+    setBi(Math.max(0, Math.min(blocks.length - 1, to)));
     window.scrollTo({ top: 0 });
   };
+  const reveal = () => {
+    for (const t of block) check(exam.id, qKey("writing", t.no));
+  };
+
+  const range = block.length > 1 ? `Câu ${block[0].no}–${block[block.length - 1].no}` : `Câu ${block[0].no}`;
+  const points = block.reduce((n, t) => n + t.points, 0);
 
   return (
-    // Máy tính: trang đề dính bên trái, ô viết + đáp án mẫu bên phải.
+    // Máy tính: bài viết chia đôi (đề | ô viết) nên dùng cả bề ngang.
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-6 pb-24 sm:pb-12 lg:max-w-none">
       <PracticeHeader
         exam={exam}
@@ -77,77 +73,57 @@ export function WritingPractice({
         summary={`tự chấm ${graded.length}/${tasks.length} · ${graded.reduce((n, t) => n + grades[t.no], 0)} điểm`}
       />
 
-      <article className="flex flex-col gap-4">
+      <section className="flex flex-col gap-6" aria-label={range}>
         <h1 className="flex items-baseline gap-2">
-          <span className="text-xl font-semibold tabular-nums">Câu {task.no}</span>
-          <span className="text-sm text-muted-foreground">{task.points} điểm</span>
+          <span className="text-xl font-semibold tabular-nums">{range}</span>
+          <span className="text-sm text-muted-foreground">{points} điểm</span>
         </h1>
-
-        <div className="flex flex-col gap-4 lg:grid lg:grid-cols-2 lg:items-start lg:gap-8">
-          <div className="lg:sticky lg:top-20">
-            <WritingImage exam={exam} src={task.page} alt={`Đề câu ${task.no <= 52 ? "51–52" : "53–54"}`} />
+        {block.map((t, i) => (
+          <div key={t.no} className={i > 0 ? "border-t border-border pt-6" : undefined}>
+            <WritingTaskView
+              exam={exam}
+              task={t}
+              texts={texts}
+              onText={(key, text) => setText(exam.id, key, text)}
+              revealed={revealed}
+              grade={grades[t.no]}
+              onGrade={(p) => setGrade(exam.id, t.no, p)}
+              showHead={block.length > 1}
+            />
           </div>
-          <div className="flex flex-col gap-4">
-            <WritingInput task={task} texts={texts} onChange={(key, text) => setText(exam.id, key, text)} />
-
-            {revealed ? (
-              <div className="flex flex-col gap-3 border-t border-border pt-4">
-                <h2 className="text-sm font-semibold">Đáp án mẫu và tiêu chí chấm chính thức</h2>
-                <p className="text-xs text-muted-foreground">
-                  Tìm dòng câu {task.no} trong bảng. Đáp án mẫu chỉ là một cách viết — ý đúng, ngữ pháp đúng là được
-                  điểm.
-                </p>
-                {section.writing!.modelAnswers.map((src, i) => (
-                  <WritingImage key={src} exam={exam} src={src} alt={`Đáp án mẫu phần viết, trang ${i + 1}`} />
-                ))}
-                <SelfGrade task={task} value={grades[task.no]} onChange={(p) => setGrade(exam.id, task.no, p)} />
-              </div>
-            ) : null}
-          </div>
-        </div>
-      </article>
+        ))}
+      </section>
 
       <ActionBar>
-        <Button
-          variant="ghost"
-          size="icon-lg"
-          onClick={() => go(index - 1)}
-          disabled={index === 0}
-          aria-label="Câu trước"
-        >
+        <Button variant="ghost" size="icon-lg" onClick={() => go(bi - 1)} disabled={bi === 0} aria-label="Khối trước">
           <ChevronLeft className="size-5" aria-hidden />
         </Button>
-        <QuestionGridSheet items={grid} current={index} onPick={go} count={`${graded.length}/${tasks.length}`} />
+        <QuestionGridSheet
+          items={grid}
+          current={current}
+          onPick={(i) => go(blockOf(tasks[i].no))}
+          count={`${graded.length}/${tasks.length}`}
+        />
         <div className="flex flex-1 justify-end gap-2 sm:flex-none">
           {revealed ? (
-            <Button size="lg" onClick={() => go(index + 1)} disabled={index === tasks.length - 1} className="min-w-28">
-              Câu sau
-              <ChevronRight className="size-4" aria-hidden />
+            <Button size="lg" onClick={() => go(bi + 1)} disabled={isLast} className="min-w-32">
+              {isLast ? "Hết phần" : "Khối sau"}
+              {!isLast && <ChevronRight className="size-4" aria-hidden />}
             </Button>
           ) : (
-            <Button
-              size="lg"
-              variant={hasWritten(task, texts) ? "default" : "outline"}
-              onClick={() => check(exam.id, qKey("writing", task.no))}
-            >
+            <Button size="lg" variant={block.some((t) => hasWritten(t, texts)) ? "default" : "outline"} onClick={reveal}>
               <Eye className="size-4" aria-hidden />
               Xem đáp án mẫu
             </Button>
           )}
         </div>
-        <Button
-          variant="ghost"
-          size="icon-lg"
-          onClick={() => go(index + 1)}
-          disabled={index === tasks.length - 1}
-          aria-label="Câu sau"
-        >
+        <Button variant="ghost" size="icon-lg" onClick={() => go(bi + 1)} disabled={isLast} aria-label="Khối sau">
           <ChevronRight className="size-5" aria-hidden />
         </Button>
       </ActionBar>
 
       <section aria-label="Bảng câu" className="hidden border-t border-border pt-5 sm:block">
-        <QuestionGrid items={grid} current={index} onPick={go} />
+        <QuestionGrid items={grid} current={current} onPick={(i) => go(blockOf(tasks[i].no))} />
       </section>
     </div>
   );

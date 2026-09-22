@@ -23,7 +23,7 @@ import { GroupBlock, PromptView } from "@/components/exam/exam-content";
 import { OptionList } from "@/components/exam/option-list";
 import { useExamAudio } from "@/components/exam/use-exam-audio";
 import { LevelBadge, ProgressBar } from "@/components/exam/exam-chrome";
-import { SelfGrade, WritingImage, WritingInput, hasWritten } from "@/components/exam/writing-parts";
+import { WritingTaskView } from "@/components/exam/writing-parts";
 
 const NO_SUBSCRIBE = () => () => {};
 
@@ -306,30 +306,18 @@ function WritingReview({ exam, section, attempt }: { exam: Exam; section: ExamSe
       <h3 className="text-sm font-medium text-muted-foreground">
         {sectionVi(section.id)} · {section.writing!.tasks.length} câu — tự chấm theo đáp án mẫu
       </h3>
-      <details className="rounded-xl bg-muted/60 p-3">
-        <summary className="cursor-pointer text-sm font-medium">Đáp án mẫu và tiêu chí chấm chính thức</summary>
-        <div className="mt-3 flex flex-col gap-3">
-          {section.writing!.modelAnswers.map((src, i) => (
-            <WritingImage key={src} exam={exam} src={src} alt={`Đáp án mẫu phần viết, trang ${i + 1}`} />
-          ))}
-        </div>
-      </details>
       {section.writing!.tasks.map((t) => (
-        <div key={t.no} className="flex flex-col gap-3 border-t border-border pt-5">
-          <p className="text-sm font-medium">
-            Câu {t.no}{" "}
-            <span className="font-normal text-muted-foreground">
-              · {hasWritten(t, texts) ? `tối đa ${t.points} điểm` : "bỏ trống"}
-            </span>
-          </p>
-          <details>
-            <summary className="cursor-pointer text-sm text-muted-foreground">Xem đề</summary>
-            <div className="mt-2">
-              <WritingImage exam={exam} src={t.page} alt={`Đề câu ${t.no}`} />
-            </div>
-          </details>
-          {hasWritten(t, texts) && <WritingInput task={t} texts={texts} onChange={() => {}} readOnly />}
-          <SelfGrade task={t} value={grades[t.no]} onChange={(p) => grade(t.no, p)} />
+        <div key={t.no} className="border-t border-border pt-5">
+          <WritingTaskView
+            exam={exam}
+            task={t}
+            texts={texts}
+            onText={() => {}}
+            readOnly
+            revealed
+            grade={grades[t.no]}
+            onGrade={(p) => grade(t.no, p)}
+          />
         </div>
       ))}
     </section>

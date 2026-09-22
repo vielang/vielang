@@ -75,8 +75,13 @@ export interface WritingTask {
   kind: "blanks" | "essay";
   /** Bài viết: độ dài yêu cầu, ký tự (tính cả dấu cách như ô 원고지). */
   chars?: [number, number];
-  /** Ảnh trang đề có câu này (đề viết chỉ có bản in, không có chữ). */
-  page: string;
+  /**
+   * Ảnh đề của RIÊNG câu này, cắt từ trang đề in (đề viết chỉ có bản in).
+   * Câu 51 kèm luôn lời chỉ dẫn "[51~52]" ở đầu.
+   */
+  image: string;
+  /** Ảnh đáp án mẫu + tiêu chí chấm chính thức của câu này (một dòng của bảng đáp án). */
+  answer: string;
 }
 
 export interface ExamSection {
@@ -95,8 +100,6 @@ export interface ExamSection {
   /** Chỉ phần viết. */
   writing?: {
     tasks: WritingTask[];
-    /** Ảnh trang đáp án mẫu + tiêu chí chấm chính thức. */
-    modelAnswers: string[];
   };
 }
 

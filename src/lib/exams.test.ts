@@ -17,6 +17,7 @@ import {
   questionAudio,
   questionPrompt,
   splitInstruction,
+  writingBlocks,
   scoreExam,
   sectionMax,
   type Answers,
@@ -100,6 +101,16 @@ describe("TOPIK II", () => {
     expect(full.sections[1]).toMatchObject({ id: "writing", score: 100, correct: 4, total: 4 });
   });
 
+  it("phần viết chia 3 khối [51–52] [53] [54], mỗi câu có ảnh đề và đáp án mẫu riêng", () => {
+    const tasks = exam2.sections[1].writing!.tasks;
+    expect(writingBlocks(tasks).map((b) => b.map((t) => t.no))).toEqual([[51, 52], [53], [54]]);
+    for (const e of listExams().filter((x) => x.level === "TOPIK II")) {
+      const ts = e.sections.find((s) => s.writing)!.writing!.tasks;
+      expect(new Set(ts.map((t) => t.image)).size).toBe(4);
+      expect(new Set(ts.map((t) => t.answer)).size).toBe(4);
+    }
+  });
+
   it("điểm tự chấm vượt thang của câu thì bị kẹp lại", () => {
     expect(scoreExam(exam2, {}, { 51: 99, 53: -5 }).score).toBe(10);
   });
@@ -173,7 +184,11 @@ describe("nghe lại một câu", () => {
     const listening = exam.sections[0];
     const g = listening.groups[0]; // [1~4]
     const items = listening.questions.filter((q) => q.no >= g.from && q.no <= g.to);
-    expect(groupAudio(listening, g)).toEqual([[g.audio![0], items.at(-1)!.audio![1]]]);
+    const [[start, end]] = groupAudio(listening, g);
+    expect(start).toBe(g.audio![0]);
+    // Dừng trong khoảng dừng của câu 4, trước khi tiếng chuông của khối sau vang lên.
+    expect(end).toBeLessThan(items.at(-1)!.audio![1] - 0.5);
+    expect(end).toBeGreaterThan(items.at(-1)!.replay![1]);
   });
 
   it("mọi khối của mọi đề là MỘT đoạn liền (không lấn sang khối sau)", () => {
@@ -184,7 +199,8 @@ describe("nghe lại một câu", () => {
           expect(segs, `${e.id} khối ${g.from}`).toHaveLength(1);
           const next = s.groups.find((x) => x.from > g.to);
           const nextStart = next && (next.audio ?? s.questions.find((q) => q.no === next.from)!.audio!)[0];
-          if (nextStart !== undefined) expect(segs[0][1]).toBeLessThanOrEqual(nextStart + 0.2);
+          // Kết thúc TRƯỚC khi khối sau bắt đầu (không lọt tiếng của khối sau).
+          if (nextStart !== undefined) expect(segs[0][1]).toBeLessThan(nextStart - 0.4);
         }
   });
 
@@ -192,7 +208,11 @@ describe("nghe lại một câu", () => {
     const listening = exam2.sections[0];
     const g = listening.groups.find((x) => x.from === 21)!;
     const [q21, q22] = listening.questions.filter((q) => q.no === 21 || q.no === 22);
-    expect(groupAudio(listening, g)).toEqual([[q21.audio![0], q22.audio![1]]]);
+    const segs = groupAudio(listening, g);
+    expect(segs).toHaveLength(1);
+    expect(segs[0][0]).toBe(q21.audio![0]);
+    expect(segs[0][1]).toBeGreaterThan(q22.replay![1]);
+    expect(segs[0][1]).toBeLessThan(q22.audio![1]);
     expect(questionAudio(listening, q22)).toEqual([g.dialogue, q22.replay]);
   });
 

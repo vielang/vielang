@@ -12,7 +12,7 @@
  *    ghép mốc thời gian từng câu nghe nếu có (content/exams/marks/…), rồi
  *    ghi content/exams/<kỳ>-topik{1,2}.json — file này COMMIT vào git.
  *    TOPIK II thêm phần viết (topik2-writing.json): đề chỉ có ảnh trang in,
- *    kèm trang đáp án mẫu; thứ tự các phần như buổi thi thật: nghe → viết
+ *    kèm trang đáp án mẫu — cắt thành ảnh từng câu (scripts/writing-crops.ts); thứ tự các phần như buổi thi thật: nghe → viết
  *    (tiết 1) → đọc (tiết 2).
  * 2. Chép tài nguyên sang public/img/exams/<kỳ>/: ảnh đổi sang WebP, file
  *    nghe giữ nguyên — thư mục này KHÔNG commit; đẩy lên R2 bằng
@@ -23,6 +23,7 @@ import { mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
 import { sanitizeExamHtml, webpName } from "../src/lib/exam-html";
+import { cropAnswerKey, cropPage1, cropPage2, writeCrop } from "./writing-crops";
 import {
   examAssetBase,
   type Content,
@@ -183,14 +184,12 @@ async function convertSection(src: SrcSection, round: number, marksFile: string)
  * Câu viết theo khung đề TOPIK II (từ kỳ 35, 2014): 51–52 điền ㉠ ㉡ (10
  * điểm), 53 đoạn 200–300 chữ (30 điểm), 54 bài 600–700 chữ (50 điểm).
  */
-const WRITING: Omit<WritingTask, "page">[] = [
+const WRITING: Omit<WritingTask, "image" | "answer">[] = [
   { no: 51, points: 10, kind: "blanks" },
   { no: 52, points: 10, kind: "blanks" },
   { no: 53, points: 30, kind: "essay", chars: [200, 300] },
   { no: 54, points: 50, kind: "essay", chars: [600, 700] },
 ];
-
-const webpPath = (p: string) => p.replace(/\.(png|jpe?g|gif)$/i, ".webp");
 
 function convertWriting(src: SrcWriting): ExamSection {
   if (src.pages.length !== 2) throw new Error(`phần viết có ${src.pages.length} trang đề`);
@@ -204,14 +203,35 @@ function convertWriting(src: SrcWriting): ExamSection {
     groups: [],
     questions: [],
     writing: {
-      // Trang 1 có câu 51–52, trang 2 có câu 53–54.
-      tasks: WRITING.map((t) => ({ ...t, page: webpPath(src.pages[t.no <= 52 ? 0 : 1].image) })),
-      modelAnswers: src.answerKey.slice(1, -1).map((a) => webpPath(a.image)),
+      // Ảnh đề / đáp án mẫu cắt theo từng câu — xem `cutWriting`.
+      tasks: WRITING.map((t) => ({ ...t, image: `writing/q${t.no}.webp`, answer: `answer-key/w${t.no}.webp` })),
     },
   };
 }
 
-async function copyAssets(round: number, sections: SrcSection[], pages: string[] = []) {
+/**
+ * Cắt ảnh phần viết theo từng câu (xem `scripts/writing-crops.ts`): đề
+ * `writing/q51…q54.webp`, đáp án mẫu `answer-key/w51…w54.webp`.
+ */
+async function cutWriting(round: number, w: SrcWriting): Promise<number> {
+  const srcDir = path.join(SRC, String(round));
+  const outDir = path.join(OUT_ASSETS, String(round));
+  await mkdir(path.join(outDir, "writing"), { recursive: true });
+  await mkdir(path.join(outDir, "answer-key"), { recursive: true });
+  const [page1, page2] = w.pages.map((p) => path.join(srcDir, p.image));
+  const q12 = await cropPage1(page1);
+  const q34 = await cropPage2(page2);
+  const keyPages = w.answerKey.slice(1, -1).map((a) => path.join(srcDir, a.image));
+  const key = await cropAnswerKey(keyPages);
+  for (const no of [51, 52] as const) await writeCrop(page1, q12[no], path.join(outDir, "writing", `q${no}.webp`));
+  for (const no of [53, 54] as const) await writeCrop(page2, q34[no], path.join(outDir, "writing", `q${no}.webp`));
+  for (const no of [51, 52, 53, 54] as const) {
+    await writeCrop(keyPages[key[no].page], key[no].crop, path.join(outDir, "answer-key", `w${no}.webp`), 8);
+  }
+  return 8;
+}
+
+async function copyAssets(round: number, sections: SrcSection[]) {
   const srcDir = path.join(SRC, String(round));
   const outDir = path.join(OUT_ASSETS, String(round));
   await mkdir(path.join(outDir, "images"), { recursive: true });
@@ -232,17 +252,6 @@ async function copyAssets(round: number, sections: SrcSection[], pages: string[]
     const from = path.join(srcDir, "images", file);
     if (!(await exists(from))) throw new Error(`thiếu ảnh ${from}`);
     await sharp(from).webp({ quality: 85 }).toFile(path.join(outDir, "images", webpName(file)));
-    converted++;
-  }
-  // Trang đề viết / đáp án mẫu: cắt lề trắng, giữ chữ đủ nét để phóng to.
-  for (const page of pages) {
-    const to = path.join(outDir, webpPath(page));
-    await mkdir(path.dirname(to), { recursive: true });
-    await sharp(path.join(srcDir, page))
-      .trim({ background: "#ffffff", threshold: 20 })
-      .extend({ top: 24, bottom: 24, left: 24, right: 24, background: "#ffffff" })
-      .webp({ quality: 85 })
-      .toFile(to);
     converted++;
   }
   return converted;
@@ -271,11 +280,11 @@ async function importExam(round: number, level: 1 | 2) {
     src.map((s) => convertSection(s, round, path.join(MARKS, `${id}-${s.section}.json`)))
   );
   let sections = [listening, reading];
-  let pages: string[] = [];
+  let writingImages = 0;
   if (level === 2) {
     const w = JSON.parse(await readFile(path.join(dir, "topik2-writing.json"), "utf8")) as SrcWriting;
     sections = [listening, convertWriting(w), reading];
-    pages = [...w.pages, ...w.answerKey.slice(1, -1)].map((p) => p.image);
+    writingImages = await cutWriting(round, w);
   }
   const exam: Exam = {
     id,
@@ -287,7 +296,7 @@ async function importExam(round: number, level: 1 | 2) {
     sections,
   };
   await writeFile(path.join(OUT_JSON, `${id}.json`), JSON.stringify(exam, null, 1) + "\n");
-  const images = await copyAssets(round, src, pages);
+  const images = (await copyAssets(round, src)) + writingImages;
   const marked = listening.questions.filter((q) => q.audio).length;
   console.log(
     `  ${id}: ${sections.map((s) => `${s.id} ${s.questions.length || s.writing?.tasks.length} câu`).join(", ")}, ${images} ảnh` +

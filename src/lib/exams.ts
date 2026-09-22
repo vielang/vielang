@@ -119,6 +119,28 @@ export function questionAudio(section: ExamSection, q: ExamQuestion): [number, n
 }
 
 /**
+ * Các đoạn cần phát để NGHE CẢ KHỐI: lời chỉ dẫn (+ câu mẫu) của khối nếu có
+ * mốc riêng, rồi phần lời đọc của từng câu — bỏ các khoảng dừng trả lời.
+ * Hội thoại dùng chung đã nằm trong đoạn của câu đầu khối nên chỉ phát một
+ * lần. Các đoạn sát nhau được gộp lại cho khỏi phải tua. Rỗng khi đề chưa
+ * có mốc thời gian.
+ */
+export function groupAudio(section: ExamSection, group: ExamGroup): [number, number][] {
+  const items = section.questions.filter((q) => q.no >= group.from && q.no <= group.to);
+  const parts = [...(group.audio ? [group.audio] : []), ...items.map((q) => q.replay ?? q.audio)].filter(
+    (p): p is [number, number] => !!p
+  );
+  if (parts.length < items.length) return [];
+  const merged: [number, number][] = [];
+  for (const [start, end] of parts) {
+    const last = merged.at(-1);
+    if (last && start - last[1] <= 0.3) last[1] = Math.max(last[1], end);
+    else merged.push([start, end]);
+  }
+  return merged;
+}
+
+/**
  * Đề câu hỏi chỉ là "(4점)" thì không cần hiện: số điểm đã có ở tiêu đề câu,
  * còn câu nghe thì nội dung nằm trong file nghe.
  */

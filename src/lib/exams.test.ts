@@ -4,6 +4,7 @@ import path from "node:path";
 import {
   countChars,
   getExam,
+  groupAudio,
   isImage,
   isPointsOnly,
   levelFor,
@@ -158,8 +159,36 @@ describe("nghe lại một câu", () => {
   });
 
   it("đề chưa đo mốc thời gian thì không có đoạn riêng (giao diện cho nghe cả bài)", () => {
-    const old = getExam("102-topik2")!.sections[0];
-    expect(questionAudio(old, old.questions[0])).toEqual([]);
+    const listening = exam.sections[0];
+    const bare = {
+      ...listening,
+      groups: listening.groups.map((g) => ({ ...g, audio: undefined, dialogue: undefined })),
+      questions: listening.questions.map((q) => ({ ...q, audio: undefined, replay: undefined })),
+    };
+    expect(questionAudio(bare, bare.questions[0])).toEqual([]);
+    expect(groupAudio(bare, bare.groups[0])).toEqual([]);
+  });
+
+  it("nghe cả khối: lời chỉ dẫn + lời đọc từng câu, bỏ các khoảng dừng trả lời", () => {
+    const listening = exam.sections[0];
+    const g = listening.groups[0]; // [1~4]
+    const segs = groupAudio(listening, g);
+    const items = listening.questions.filter((q) => q.no >= g.from && q.no <= g.to);
+    expect(segs[0][0]).toBe(g.audio![0]); // bắt đầu từ lời chỉ dẫn
+    expect(segs).toHaveLength(items.length); // lời chỉ dẫn liền câu 1 → gộp; giữa các câu là khoảng dừng
+    for (const q of items) {
+      // Khoảng dừng trả lời của câu (sau phần lời đọc) không nằm trong đoạn nào.
+      const pauseMid = (q.replay![1] + q.audio![1]) / 2;
+      expect(segs.some(([a, b]) => pauseMid >= a && pauseMid <= b)).toBe(false);
+    }
+  });
+
+  it("TOPIK II khối hai câu: hội thoại phát một lần, rồi tới câu sau", () => {
+    const listening = exam2.sections[0];
+    const g = listening.groups.find((x) => x.from === 21)!;
+    const [q21, q22] = listening.questions.filter((q) => q.no === 21 || q.no === 22);
+    expect(groupAudio(listening, g)).toEqual([q21.replay, q22.replay]);
+    expect(questionAudio(listening, q22)).toEqual([g.dialogue, q22.replay]);
   });
 
   it("câu đơn thì chỉ một đoạn", () => {

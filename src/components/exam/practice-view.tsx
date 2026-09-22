@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
   examAudioUrl,
+  groupAudio,
   qKey,
   questionAudio,
   type Exam,
@@ -189,6 +190,22 @@ function GroupPractice({
     return () => window.removeEventListener("keydown", onKey);
   });
 
+  // Nghe cả khối: lời chỉ dẫn + lời đọc từng câu, bỏ khoảng dừng trả lời.
+  const blockSegments = groupAudio(section, group);
+  const playingBlock =
+    audio.playing &&
+    audio.segment !== null &&
+    blockSegments.length > 0 &&
+    audio.segment[0] === blockSegments[0][0] &&
+    audio.segment[1] === blockSegments[blockSegments.length - 1][1];
+  // Câu đang được đọc (tô trong khối khi đang nghe).
+  const playingNo = audio.playing
+    ? items.find((q) => {
+        const seg = q.replay ?? q.audio;
+        return seg && audio.time >= seg[0] && audio.time < seg[1];
+      })?.no
+    : undefined;
+
   const range = group.from === group.to ? `Câu ${group.from}` : `Câu ${group.from}–${group.to}`;
   const points = items.reduce((n, q) => n + q.points, 0);
 
@@ -226,11 +243,23 @@ function GroupPractice({
             <span className="text-xl font-semibold tabular-nums">{range}</span>
             <span className="text-sm text-muted-foreground">{points} điểm</span>
           </h1>
-          {group.audio && (
-            <Button variant="ghost" size="sm" onClick={() => audio.playSegments([group.audio!])}>
-              <Volume2 className="size-4" aria-hidden />
-              Nghe lời chỉ dẫn
-            </Button>
+          {blockSegments.length > 0 && (
+            <div className="flex flex-wrap items-center gap-1">
+              {group.audio && (
+                <Button variant="ghost" size="sm" onClick={() => audio.playSegments([group.audio!])}>
+                  <Volume2 className="size-4" aria-hidden />
+                  Lời chỉ dẫn
+                </Button>
+              )}
+              <Button
+                size="sm"
+                variant={playingBlock ? "secondary" : "default"}
+                onClick={() => (playingBlock ? audio.pause() : audio.playSegments(blockSegments))}
+              >
+                {playingBlock ? <Pause className="size-3.5" aria-hidden /> : <Play className="size-3.5" aria-hidden />}
+                {playingBlock ? "Tạm dừng" : items.length > 1 ? "Nghe cả khối" : "Nghe"}
+              </Button>
+            </div>
           )}
         </div>
 
@@ -246,6 +275,7 @@ function GroupPractice({
               value={answerOf(q)}
               checked={isChecked(q)}
               active={items.length > 1 && active?.no === q.no}
+              playing={items.length > 1 && playingNo === q.no}
               audio={audio}
               onChoose={(c) => choose(q, c)}
               onFocus={() => setActiveNo(q.no)}
@@ -336,6 +366,7 @@ function QuestionItem({
   value,
   checked,
   active,
+  playing,
   audio,
   onChoose,
   onFocus,
@@ -346,6 +377,7 @@ function QuestionItem({
   value: number | undefined;
   checked: boolean;
   active: boolean;
+  playing: boolean;
   audio: ReturnType<typeof useExamAudio>;
   onChoose: (choice: number) => void;
   onFocus: () => void;
@@ -364,13 +396,19 @@ function QuestionItem({
       onFocusCapture={onFocus}
       className={cn(
         "-mx-3 flex scroll-mt-32 flex-col gap-3 rounded-xl border-l-2 px-3 py-3 transition-colors",
-        active ? "border-foreground/60 bg-muted/40" : "border-transparent"
+        playing ? "border-foreground bg-muted/60" : active ? "border-foreground/60 bg-muted/40" : "border-transparent"
       )}
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="flex items-baseline gap-2">
           <span className="font-semibold tabular-nums">{q.no}.</span>
           <span className="text-xs text-muted-foreground">{q.points} điểm</span>
+          {playing && (
+            <span className="inline-flex items-center gap-1 text-xs font-medium">
+              <Volume2 className="size-3" aria-hidden />
+              đang đọc
+            </span>
+          )}
           {checked && (
             <span
               className={cn(

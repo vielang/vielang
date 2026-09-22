@@ -25,6 +25,7 @@ import { getPageUrl, getPageAspectRatio, type Book } from "@/lib/books";
 import { getPageTranslations } from "@/lib/page-translation";
 import { getPageGrammar } from "@/lib/page-grammar";
 import { getPageAnswers } from "@/lib/page-answers";
+import { answersHidden, useReaderPrefsStore } from "@/lib/reader-prefs-store";
 import { TranslationOverlay } from "@/components/reader/translation-overlay";
 import { GrammarOverlay } from "@/components/reader/grammar-overlay";
 import { AnswerOverlay } from "@/components/reader/answer-overlay";
@@ -147,7 +148,10 @@ function PageImage({
 }) {
   const regions = getPageTranslations(bookId, page);
   const grammar = getPageGrammar(bookId, page);
-  const answerKeys = getPageAnswers(bookId, page);
+  // Người dùng tắt chấm đáp án của cuốn này ở trang chi tiết sách (muốn tự
+  // làm bài trước rồi mới dò) — xem `AnswersToggle`.
+  const hideAnswers = useReaderPrefsStore((s) => answersHidden(s, bookId));
+  const answerKeys = hideAnswers ? [] : getPageAnswers(bookId, page);
   const { attempt, status, retrying, onLoad, onError, retry } = useRetryingMedia();
 
   return (

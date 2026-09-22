@@ -1,9 +1,10 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { BookDetailHeader } from "./book-detail-header";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { BOOKS } from "@/lib/books";
 import { useProgressStore, type BookProgress } from "@/lib/progress-store";
+import { useReaderPrefsStore } from "@/lib/reader-prefs-store";
 
 /**
  * Đầu trang này từng có sáu khối chồng nhau, đẩy lưới trang — thứ người ta
@@ -87,5 +88,41 @@ describe("khi đang đọc dở", () => {
 
     expect(back.closest("a")?.getAttribute("href")).toBe(`/read/${book.id}/1`);
     expect(back.textContent).toBe("");
+  });
+});
+
+describe("công tắc chấm đáp án", () => {
+  beforeEach(() => useReaderPrefsStore.setState({ hiddenAnswerBooks: [] }));
+
+  function headerWith(hasAnswers: boolean) {
+    render(
+      <TooltipProvider>
+        <BookDetailHeader book={book} hasAnswers={hasAnswers} />
+      </TooltipProvider>
+    );
+  }
+
+  it("sách không có đáp án thì không hiện công tắc", () => {
+    headerWith(false);
+
+    expect(screen.queryByLabelText("Hiện chấm đáp án trên trang")).toBeNull();
+  });
+
+  it("mặc định đang bật, và nói rõ bằng chữ", () => {
+    headerWith(true);
+    const toggle = screen.getByLabelText("Hiện chấm đáp án trên trang");
+
+    expect(toggle.getAttribute("aria-pressed")).toBe("true");
+    expect(toggle.textContent).toContain("bật");
+  });
+
+  it("bấm thì tắt đáp án của RIÊNG cuốn này", () => {
+    headerWith(true);
+    fireEvent.click(screen.getByLabelText("Hiện chấm đáp án trên trang"));
+
+    expect(useReaderPrefsStore.getState().hiddenAnswerBooks).toEqual([book.id]);
+    expect(
+      screen.getByLabelText("Hiện chấm đáp án trên trang").getAttribute("aria-pressed")
+    ).toBe("false");
   });
 });

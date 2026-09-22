@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { PageGrid } from "./page-grid";
 import { useProgressStore } from "@/lib/progress-store";
+import { useReaderPrefsStore } from "@/lib/reader-prefs-store";
 
 /**
  * Hàng huy hiệu ở góc trên mỗi ô trang là cách DUY NHẤT để biết trang nào có
@@ -80,5 +81,23 @@ describe("huy hiệu đáp án sách", () => {
     grid({ answerPages: [] });
 
     expect(screen.queryByTitle("Có đáp án sách")).toBeNull();
+  });
+});
+
+describe("huy hiệu đáp án khi người dùng tắt đáp án của cuốn này", () => {
+  it("thôi hiện — nó hứa một thứ người dùng sẽ không thấy trên trang", () => {
+    useReaderPrefsStore.setState({ hiddenAnswerBooks: ["step1"] });
+    grid({ answerPages: [2] });
+
+    expect(screen.queryByTitle("Có đáp án sách")).toBeNull();
+    useReaderPrefsStore.setState({ hiddenAnswerBooks: [] });
+  });
+
+  it("tắt cuốn khác thì cuốn này vẫn hiện", () => {
+    useReaderPrefsStore.setState({ hiddenAnswerBooks: ["wb-step1"] });
+    grid({ answerPages: [2] });
+
+    expect(screen.getByTitle("Có đáp án sách")).toBeTruthy();
+    useReaderPrefsStore.setState({ hiddenAnswerBooks: [] });
   });
 });

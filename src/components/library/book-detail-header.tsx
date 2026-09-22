@@ -13,6 +13,7 @@ import {
   useProgressStore,
 } from "@/lib/progress-store";
 import { OfflineDownload } from "@/components/library/offline-download";
+import { AnswersToggle } from "@/components/library/answers-toggle";
 
 /**
  * Đầu trang chi tiết sách.
@@ -25,7 +26,14 @@ import { OfflineDownload } from "@/components/library/offline-download";
  * dùng mới được chiếm chỗ riêng: thanh tiến độ chỉ hiện khi đã đọc dở, vì
  * thanh 0% không nói thêm điều gì mà vẫn ăn một dòng.
  */
-export function BookDetailHeader({ book }: { book: Book }) {
+export function BookDetailHeader({
+  book,
+  hasAnswers = false,
+}: {
+  book: Book;
+  /** Sách có chấm đáp án không (xem lib/page-answers.ts) — không có thì khỏi hiện công tắc. */
+  hasAnswers?: boolean;
+}) {
   const books = useProgressStore((s) => s.books);
   const hasHydrated = useProgressStore((s) => s.hasHydrated);
   const progress = getBookProgress(books, book.id);
@@ -84,6 +92,8 @@ export function BookDetailHeader({ book }: { book: Book }) {
         )}
 
         <OfflineDownload book={book} />
+
+        {hasAnswers && <AnswersToggle bookId={book.id} />}
       </div>
     </div>
   );

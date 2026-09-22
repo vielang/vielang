@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment } from "react";
+import { Fragment, useSyncExternalStore } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -15,7 +15,10 @@ import {
 import { cn } from "@/lib/utils";
 import { getThumbUrl } from "@/lib/books";
 import { useProgressStore } from "@/lib/progress-store";
+import { answersHidden, useReaderPrefsStore } from "@/lib/reader-prefs-store";
 import type { Chapter } from "@/lib/chapters";
+
+const NO_SUBSCRIBE = () => () => {};
 
 function chapterAnchor(lesson: number): string {
   return `bai-${lesson}`;
@@ -90,7 +93,12 @@ export function PageGrid({
   const audioedPages = new Set(audioPages);
   const translatedSet = new Set(translatedPages);
   const grammarSet = new Set(grammarPages);
-  const answerSet = new Set(answerPages);
+  // Tắt chấm đáp án của cuốn này thì huy hiệu cũng thôi hiện — nó hứa một thứ
+  // người dùng sẽ không thấy khi mở trang ra. Chỉ đọc sau khi đã ở trình
+  // duyệt, cùng lý do với `AnswersToggle` (tránh lệch hydration).
+  const isClient = useSyncExternalStore(NO_SUBSCRIBE, () => true, () => false);
+  const answersOff = useReaderPrefsStore((s) => answersHidden(s, bookId));
+  const answerSet = new Set(isClient && answersOff ? [] : answerPages);
   const chapterByStartPage = new Map(chapters.map((ch) => [ch.startPage, ch]));
 
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);

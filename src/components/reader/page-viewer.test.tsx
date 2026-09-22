@@ -4,6 +4,7 @@ import { createRef } from "react";
 import { PageViewer, type PageViewerHandle } from "./page-viewer";
 import { BOOKS } from "@/lib/books";
 import { TEST_ELEMENT_WIDTH } from "@/test-setup";
+import { useReaderPrefsStore } from "@/lib/reader-prefs-store";
 
 const book = BOOKS[0];
 
@@ -270,5 +271,32 @@ describe("chạm trúng chấm trên trang", () => {
     drag(2);
 
     expect(onTap).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("chấm đáp án theo công tắc của từng sách", () => {
+  afterEach(() => useReaderPrefsStore.setState({ hiddenAnswerBooks: [] }));
+
+  // step1 trang 18 có chấm đáp án (mục 듣기).
+  const page18 = { pages: [18], prevPages: [17], nextPages: [19] };
+
+  it("mặc định hiện chấm đáp án", () => {
+    view(page18);
+
+    expect(document.querySelector("[data-answer-key]")).not.toBeNull();
+  });
+
+  it("tắt đáp án của cuốn này thì trang không còn chấm nào", () => {
+    useReaderPrefsStore.setState({ hiddenAnswerBooks: [book.id] });
+    view(page18);
+
+    expect(document.querySelector("[data-answer-key]")).toBeNull();
+  });
+
+  it("tắt cuốn khác thì cuốn này vẫn hiện", () => {
+    useReaderPrefsStore.setState({ hiddenAnswerBooks: ["wb-step1"] });
+    view(page18);
+
+    expect(document.querySelector("[data-answer-key]")).not.toBeNull();
   });
 });

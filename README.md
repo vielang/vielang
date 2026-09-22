@@ -94,6 +94,24 @@ Tóm tắt / Từ vựng / Ngữ pháp / Văn hoá. Không cần chạy gì thê
 5. (Tuỳ chọn) viết note vào `content/notes/step<N>/`.
 6. Deploy lại.
 
+## 6b. Đề thi TOPIK (tab "Luyện thi")
+
+Nguồn: bộ dữ liệu chính thức lấy từ dịch vụ "토픽 기출문제 풀어보기" của
+topik.go.kr (bản v2: JSON + ảnh + mp3), đặt ở `../topik/Chinh-thuc-v2`.
+
+```bash
+npm run import-topik                       # nhập mọi kỳ (TOPIK I)
+npm run import-topik -- --round 102       # chỉ một kỳ
+npm run prepare-exams                      # đẩy ảnh + file nghe lên R2
+```
+
+- `import-topik` làm sạch HTML của đề, ghi `content/exams/<kỳ>-topik1.json`
+  (COMMIT vào git) và chép tài nguyên sang `public/img/exams/<kỳ>/` (ảnh đổi
+  sang WebP, KHÔNG commit). Lúc `npm run dev` app đọc thẳng từ `public/`.
+- Mốc thời gian từng câu nghe (để nghe lại riêng một câu) nằm ở
+  `content/exams/marks/<id>-listening.json`; đề chưa có file này thì trang
+  luyện tập cho nghe cả bài.
+
 ## 7. Deploy lên Vercel
 
 1. Push repo này lên GitHub.
@@ -117,6 +135,8 @@ Tóm tắt / Từ vựng / Ngữ pháp / Văn hoá. Không cần chạy gì thê
 | `npm run prepare-images`  | Convert + upload ảnh trang sách lên R2    |
 | `npm run prepare-audio`   | Upload audio trang sách lên R2            |
 | `npm run build-notes`     | Gộp note .md → JSON (tự chạy qua predev/prebuild) |
+| `npm run import-topik`    | Nhập đề TOPIK từ bộ dữ liệu chính thức |
+| `npm run prepare-exams`   | Đẩy ảnh + file nghe đề thi TOPIK lên R2 |
 
 ## Cấu trúc chính
 

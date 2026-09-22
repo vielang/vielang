@@ -15,6 +15,7 @@ export const BACKUP_KEYS = [
   "kiip-progress-v1",
   "kiip-quiz-v1",
   "kiip-activity-v1",
+  "kiip-exam-v1",
   "kiip-notes-v1",
   "kiip-reader-prefs-v1",
 ] as const;

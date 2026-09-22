@@ -57,6 +57,12 @@ function imageRewrites() {
       source: "/img/books/:path*",
       destination: `${base.replace(/\/$/, "")}/books/:path*`,
     },
+    // Ảnh trang đề thi — cùng cách với ảnh sách. Lúc dev, file có sẵn trong
+    // public/img/exams/ được phục vụ trước rewrite (xem lib/exams.ts).
+    {
+      source: "/img/exams/:path*",
+      destination: `${base.replace(/\/$/, "")}/exams/:path*`,
+    },
   ];
 }
 

@@ -21,6 +21,7 @@ import { BookProgressCard, booksInProgress } from "@/components/my/book-progress
 import { summarizeQuiz, WrongList } from "@/components/my/quiz-review";
 import { RedoList, SkillBars, WeakGrammarList } from "@/components/my/ability-panel";
 import { BackupPanel } from "@/components/my/backup-panel";
+import { ExamCard } from "@/components/my/exam-card";
 
 const NO_SUBSCRIBE = () => () => {};
 const GOAL_CHOICES = [30, 60, 90, 150, 300];
@@ -191,6 +192,14 @@ export function MyPageView({ books }: { books: readonly Book[] }) {
           </div>
         </section>
       )}
+
+      {/* Luyện thi TOPIK */}
+      <section className="flex flex-col gap-3" aria-labelledby="exam-title">
+        <h2 id="exam-title" className="text-base font-semibold">
+          Luyện thi TOPIK
+        </h2>
+        <ExamCard />
+      </section>
 
       {/* 5. Kỹ năng */}
       {ability.total > 0 && (

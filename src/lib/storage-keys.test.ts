@@ -69,3 +69,9 @@ describe("khoá lịch sử học", () => {
     expect(source("src", "lib", "activity-store.ts")).toContain('name: "kiip-activity-v1"');
   });
 });
+
+describe("khoá bài làm đề thi", () => {
+  it("giữ nguyên tên, nếu không thì mất lịch sử thi thử của người đang dùng", () => {
+    expect(source("src", "lib", "exam-store.ts")).toContain('name: "kiip-exam-v1"');
+  });
+});

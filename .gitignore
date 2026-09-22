@@ -58,3 +58,6 @@ next-env.d.ts
 # ảnh trang tải về để soạn bản dịch — chỉ dùng lúc làm nội dung
 /scratch/
 
+
+# đề thi: tài nguyên sinh ra từ PDF/MP3 gốc, đưa lên R2 bằng prepare-exams — không commit
+/public/img/exams/

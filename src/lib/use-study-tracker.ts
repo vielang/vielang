@@ -27,20 +27,24 @@ export function shouldCountTick(now: number, lastInteraction: number, visible: b
 const INTERACTIONS = ["pointerdown", "keydown", "wheel", "touchstart"] as const;
 
 /**
- * Ghi lịch sử học từ trang đọc: thời gian học thật và trang đã học.
- *
- * "Thời gian học thật" = trang đọc đang hiện trên màn hình VÀ người dùng có
+ * Đếm "thời gian học thật" = trang đang hiện trên màn hình VÀ người dùng có
  * thao tác trong `IDLE_MS` gần nhất. Chỉ đo lúc tab mở thì chuyển tab khác,
  * hay mở sách rồi bỏ đó, cũng thành hàng giờ "học".
  *
  * Mở trang được tính là một thao tác: người ta thường vào trang rồi ngồi đọc
  * luôn, không chạm gì thêm.
+ *
+ * `isBusy`: trả `true` khi người học đang học mà KHÔNG cần chạm gì — vd đang
+ * nghe phần nghe của đề thi (cả chục phút chỉ ngồi nghe). Lúc đó vẫn tính
+ * giờ dù quá `IDLE_MS` không có thao tác nào.
  */
-export function useStudyTracker(bookId: string, pages: number[]) {
+export function useActiveTime(isBusy?: () => boolean) {
   const addActiveTime = useActivityStore((s) => s.addActiveTime);
-  const markPageStudied = useActivityStore((s) => s.markPageStudied);
   const lastInteraction = useRef(0);
-  const pagesKey = pages.join(",");
+  const busyRef = useRef(isBusy);
+  useEffect(() => {
+    busyRef.current = isBusy;
+  });
 
   useEffect(() => {
     lastInteraction.current = Date.now();
@@ -51,12 +55,10 @@ export function useStudyTracker(bookId: string, pages: number[]) {
       window.addEventListener(type, touch, { passive: true, capture: true })
     );
     const timer = window.setInterval(() => {
+      const visible = document.visibilityState === "visible";
       if (
-        shouldCountTick(
-          Date.now(),
-          lastInteraction.current,
-          document.visibilityState === "visible"
-        )
+        shouldCountTick(Date.now(), lastInteraction.current, visible) ||
+        (visible && busyRef.current?.())
       ) {
         addActiveTime(TICK_MS);
       }
@@ -68,6 +70,16 @@ export function useStudyTracker(bookId: string, pages: number[]) {
       window.clearInterval(timer);
     };
   }, [addActiveTime]);
+}
+
+/**
+ * Ghi lịch sử học từ trang đọc: thời gian học thật (xem `useActiveTime`) và
+ * trang đã học (ở lại ít nhất `DWELL_MS`).
+ */
+export function useStudyTracker(bookId: string, pages: number[]) {
+  const markPageStudied = useActivityStore((s) => s.markPageStudied);
+  const pagesKey = pages.join(",");
+  useActiveTime();
 
   useEffect(() => {
     const timer = window.setTimeout(() => {

@@ -1,14 +1,15 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ChevronLeft, ChevronRight, Pause, Play, RotateCcw, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
   examAudioUrl,
-  groupOf,
   qKey,
   questionAudio,
   type Exam,
+  type ExamQuestion,
   type ExamSection,
   type SectionId,
 } from "@/lib/exams";
@@ -31,15 +32,20 @@ import { useExamAudio } from "@/components/exam/use-exam-audio";
 import { WritingPractice } from "@/components/exam/writing-practice";
 
 const NO_SUBSCRIBE = () => () => {};
+const MARKS = "①②③④";
 
 /**
- * Luyện tập: từng câu một, không tính giờ, chấm ngay khi bấm "Kiểm tra".
+ * Luyện tập: không tính giờ, chấm ngay khi bấm "Kiểm tra".
+ *
+ * Trắc nghiệm luyện THEO KHỐI "※ [a~b]" như tờ đề: lời chỉ dẫn, câu mẫu,
+ * đoạn văn dùng chung hiện một lần, các câu của khối xếp bên dưới, một nút
+ * kiểm tra cả khối. Phần viết luyện từng câu (mỗi câu một bài).
  *
  * Nghe: đề nào đã đo mốc thời gian từng câu thì có nút "Nghe câu N" phát
- * đúng đoạn của câu; đề chưa đo thì hiện trình phát cả bài (tua được).
+ * đúng phần lời đọc của câu; đề chưa đo thì hiện trình phát cả bài (tua được).
  *
- * Bài làm lưu trong `exam-store` (theo đề), nên đóng trang mở lại vẫn thấy
- * câu nào đã làm, đúng hay sai.
+ * Bài làm lưu trong `exam-store` theo từng câu, nên đóng trang mở lại vẫn
+ * thấy câu nào đã làm, đúng hay sai.
  */
 export function PracticeView({
   exam,
@@ -52,11 +58,11 @@ export function PracticeView({
 }) {
   const section = exam.sections.find((s) => s.id === sectionId) ?? exam.sections[0];
   if (section.writing) return <WritingPractice exam={exam} section={section} initialNo={initialNo} />;
-  return <ChoicePractice exam={exam} section={section} initialNo={initialNo} />;
+  return <GroupPractice exam={exam} section={section} initialNo={initialNo} />;
 }
 
-/** Luyện câu trắc nghiệm (nghe, đọc). */
-function ChoicePractice({
+/** Luyện trắc nghiệm (nghe, đọc) theo khối. */
+function GroupPractice({
   exam,
   section,
   initialNo,
@@ -66,15 +72,18 @@ function ChoicePractice({
   initialNo?: number;
 }) {
   const isClient = useSyncExternalStore(NO_SUBSCRIBE, () => true, () => false);
-  const questions = section.questions;
+  const { groups, questions } = section;
   const key = useCallback((no: number) => qKey(section.id, no), [section.id]);
-  const [index, setIndex] = useState(() => {
-    const i = questions.findIndex((q) => q.no === initialNo);
-    return i >= 0 ? i : 0;
-  });
-  const q = questions[index];
-  const group = groupOf(section, q.no);
-  const isLast = index === questions.length - 1;
+  const groupIndexOf = useCallback(
+    (no: number) => Math.max(0, groups.findIndex((g) => no >= g.from && no <= g.to)),
+    [groups]
+  );
+  const [gi, setGi] = useState(() => (initialNo ? groupIndexOf(initialNo) : 0));
+  const group = groups[gi];
+  const items = questions.filter((q) => q.no >= group.from && q.no <= group.to);
+  const isLastGroup = gi === groups.length - 1;
+  // Câu cần cuộn tới sau khi đổi khối (bấm số câu trong bảng, link ?q=).
+  const scrollTo = useRef<number | null>(initialNo ?? null);
 
   const practice = useExamStore((s) => s.practice[exam.id]);
   const setAnswer = useExamStore((s) => s.setPracticeAnswer);
@@ -84,12 +93,23 @@ function ChoicePractice({
 
   const answers = isClient ? (practice?.answers ?? {}) : {};
   const checked = new Set(isClient ? (practice?.checked ?? []) : []);
-  const value = answers[key(q.no)];
-  const isChecked = checked.has(key(q.no));
-  const isRight = isChecked && value === q.answer;
+  const isChecked = (q: ExamQuestion) => checked.has(key(q.no));
+  const answerOf = (q: ExamQuestion) => answers[key(q.no)];
+
+  const pending = items.filter((q) => !isChecked(q));
+  const toCheck = pending.filter((q) => answerOf(q) !== undefined);
+  const groupDone = pending.length === 0;
+  const groupRight = items.filter((q) => isChecked(q) && answerOf(q) === q.answer);
+  const chosenCount = items.filter((q) => isChecked(q) || answerOf(q) !== undefined).length;
+
+  // Câu đang "cầm bút": phím 1–4 chọn cho câu này. Mặc định là câu chưa
+  // chọn đầu tiên của khối; bấm vào một câu thì chuyển sang câu đó.
+  const [activeNo, setActiveNo] = useState<number | null>(null);
+  const firstOpen = items.find((q) => !isChecked(q) && answerOf(q) === undefined) ?? pending[0];
+  const active = items.find((q) => q.no === activeNo && !isChecked(q)) ?? firstOpen;
 
   const audioSrc = section.audio ? examAudioUrl(exam, section.audio) : undefined;
-  const hasMarks = section.questions.some((x) => x.audio);
+  const hasMarks = questions.some((x) => x.audio);
   const audio = useExamAudio(hasMarks ? audioSrc : undefined);
   const [fullPlaying, setFullPlaying] = useState(false);
   // Đang nghe thì vẫn là đang học, dù không chạm gì — xem `useActiveTime`.
@@ -106,46 +126,71 @@ function ChoicePractice({
   });
   const doneCount = grid.filter((x) => x.state === "right" || x.state === "wrong").length;
   const rightCount = grid.filter((x) => x.state === "right").length;
+  const currentIndex = questions.findIndex((q) => q.no === (active ?? items[0]).no);
 
-  const go = useCallback(
-    (to: number) => {
+  const goGroup = useCallback(
+    (to: number, no?: number) => {
       audio.pause();
-      setIndex(Math.max(0, Math.min(questions.length - 1, to)));
-      window.scrollTo({ top: 0 });
+      setActiveNo(null);
+      scrollTo.current = no ?? null;
+      setGi(Math.max(0, Math.min(groups.length - 1, to)));
+      if (no === undefined) window.scrollTo({ top: 0 });
     },
-    [audio, questions.length]
+    [audio, groups.length]
   );
+  const goQuestion = (index: number) => {
+    const no = questions[index].no;
+    goGroup(groupIndexOf(no), no);
+    setActiveNo(no);
+  };
 
-  const doCheck = useCallback(() => {
-    if (value === undefined || isChecked) return;
-    check(exam.id, key(q.no));
-    recordQuizCheck(value === q.answer);
-  }, [value, isChecked, check, exam.id, key, q.no, q.answer, recordQuizCheck]);
+  // Tới đúng câu được chọn trong bảng (câu đầu khối thì lên đầu trang).
+  useEffect(() => {
+    const no = scrollTo.current;
+    if (no === null) return;
+    scrollTo.current = null;
+    if (no === group.from) window.scrollTo({ top: 0 });
+    else document.getElementById(`q-${no}`)?.scrollIntoView({ block: "center" });
+  }, [gi, group.from]);
 
-  // Phím tắt: 1–4 chọn, Enter kiểm tra (đã kiểm tra thì sang câu), ← → sang câu.
+  const checkGroup = () => {
+    for (const q of toCheck) {
+      check(exam.id, key(q.no));
+      recordQuizCheck(answerOf(q) === q.answer);
+    }
+  };
+
+  const choose = (q: ExamQuestion, choice: number) => {
+    setAnswer(exam.id, key(q.no), choice);
+    setActiveNo(q.no);
+  };
+
+  // Phím tắt: 1–4 chọn cho câu đang cầm bút (rồi sang câu chưa chọn kế
+  // tiếp), Enter kiểm tra khối (đã kiểm tra thì sang khối sau), ← → đổi khối.
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       const tag = (e.target as HTMLElement | null)?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "AUDIO") return;
-      if (["1", "2", "3", "4"].includes(e.key)) setAnswer(exam.id, key(q.no), Number(e.key));
-      else if (e.key === "Enter") {
-        if (isChecked) go(index + 1);
-        else doCheck();
-      } else if (e.key === "ArrowRight") go(index + 1);
-      else if (e.key === "ArrowLeft") go(index - 1);
+      if (["1", "2", "3", "4"].includes(e.key)) {
+        if (!active) return;
+        setAnswer(exam.id, key(active.no), Number(e.key));
+        const next = items.find((q) => q.no > active.no && !checked.has(key(q.no)) && answers[key(q.no)] === undefined);
+        setActiveNo(next?.no ?? active.no);
+      } else if (e.key === "Enter") {
+        if (tag === "BUTTON" || tag === "A") return; // Enter trên nút là bấm nút đó
+        if (groupDone) goGroup(gi + 1);
+        else checkGroup();
+      } else if (e.key === "ArrowRight") goGroup(gi + 1);
+      else if (e.key === "ArrowLeft") goGroup(gi - 1);
       else return;
       e.preventDefault();
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [exam.id, key, q.no, index, isChecked, doCheck, go, setAnswer]);
+  });
 
-  const segments = useMemo(() => questionAudio(section, q), [section, q]);
-  const playingThis =
-    audio.playing &&
-    audio.segment !== null &&
-    segments.length > 0 &&
-    audio.segment[1] === segments[segments.length - 1][1];
+  const range = group.from === group.to ? `Câu ${group.from}` : `Câu ${group.from}–${group.to}`;
+  const points = items.reduce((n, q) => n + q.points, 0);
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-6 pb-24 sm:pb-12">
@@ -175,95 +220,181 @@ function ChoicePractice({
         </div>
       )}
 
-      <article className="flex flex-col gap-4">
-        <h1 className="flex items-baseline gap-2">
-          <span className="text-xl font-semibold tabular-nums">Câu {q.no}</span>
-          <span className="text-sm text-muted-foreground">{q.points} điểm</span>
-        </h1>
-
-        {group && <GroupBlock exam={exam} group={group} />}
-
-        <PromptView exam={exam} question={q} />
-
-        {segments.length > 0 && (
-          <div className="flex flex-wrap items-center gap-2">
-            <Button
-              variant="outline"
-              onClick={() => (playingThis ? audio.pause() : audio.playSegments(segments))}
-            >
-              {playingThis ? <Pause className="size-4" aria-hidden /> : <Play className="size-4" aria-hidden />}
-              {playingThis ? "Tạm dừng" : `Nghe câu ${q.no}`}
+      <section className="flex flex-col gap-4" aria-label={range}>
+        <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+          <h1 className="flex items-baseline gap-2">
+            <span className="text-xl font-semibold tabular-nums">{range}</span>
+            <span className="text-sm text-muted-foreground">{points} điểm</span>
+          </h1>
+          {group.audio && (
+            <Button variant="ghost" size="sm" onClick={() => audio.playSegments([group.audio!])}>
+              <Volume2 className="size-4" aria-hidden />
+              Nghe lời chỉ dẫn
             </Button>
-            {group?.audio && group.from === q.no && (
-              <Button variant="ghost" size="sm" onClick={() => audio.playSegments([group.audio!])}>
-                <Volume2 className="size-4" aria-hidden />
-                Lời chỉ dẫn
-              </Button>
-            )}
-          </div>
-        )}
+          )}
+        </div>
 
-        <OptionList
-          exam={exam}
-          question={q}
-          value={value}
-          onChange={(c) => setAnswer(exam.id, key(q.no), c)}
-          reveal={isChecked}
-        />
+        <GroupBlock exam={exam} group={group} showRange={false} />
 
-        {isChecked && (
-          <Verdict right={isRight}>
+        <div className="flex flex-col gap-2">
+          {items.map((q) => (
+            <QuestionItem
+              key={q.no}
+              exam={exam}
+              section={section}
+              question={q}
+              value={answerOf(q)}
+              checked={isChecked(q)}
+              active={items.length > 1 && active?.no === q.no}
+              audio={audio}
+              onChoose={(c) => choose(q, c)}
+              onFocus={() => setActiveNo(q.no)}
+            />
+          ))}
+        </div>
+
+        {groupDone && (
+          <Verdict right={groupRight.length === items.length}>
             <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
               <span>
-                {isRight
-                  ? `Đúng rồi — +${q.points} điểm.`
-                  : `Chưa đúng — đáp án là ${"①②③④"[q.answer - 1]}. ${section.audio ? "Nghe lại" : "Đọc lại"} rồi thử hiểu vì sao nhé.`}
+                {items.length === 1
+                  ? groupRight.length
+                    ? `Đúng rồi — +${points} điểm.`
+                    : `Chưa đúng — đáp án là ${MARKS[items[0].answer - 1]}. ${section.audio ? "Nghe lại" : "Đọc lại"} rồi thử hiểu vì sao nhé.`
+                  : `Đúng ${groupRight.length}/${items.length} câu · +${groupRight.reduce((n, q) => n + q.points, 0)} điểm.`}
               </span>
               <button
                 type="button"
-                onClick={() => reset(exam.id, [key(q.no)])}
+                onClick={() => reset(exam.id, items.map((q) => key(q.no)))}
                 className="inline-flex items-center gap-1 text-xs font-medium underline-offset-2 hover:underline"
               >
                 <RotateCcw className="size-3" aria-hidden />
-                Làm lại
+                {items.length === 1 ? "Làm lại" : "Làm lại khối"}
               </button>
             </div>
           </Verdict>
         )}
-      </article>
+      </section>
 
       <ActionBar>
-        <Button variant="ghost" size="icon-lg" onClick={() => go(index - 1)} disabled={index === 0} aria-label="Câu trước">
+        <Button variant="ghost" size="icon-lg" onClick={() => goGroup(gi - 1)} disabled={gi === 0} aria-label="Khối trước">
           <ChevronLeft className="size-5" aria-hidden />
         </Button>
-        <QuestionGridSheet items={grid} current={index} onPick={go} count={`${doneCount}/${questions.length}`} />
+        <QuestionGridSheet items={grid} current={currentIndex} onPick={goQuestion} count={`${doneCount}/${questions.length}`} />
         <div className="flex flex-1 justify-end gap-2 sm:flex-none">
-          {isChecked ? (
-            <Button onClick={() => go(index + 1)} disabled={isLast} size="lg" className="min-w-28">
-              {isLast ? "Câu cuối" : "Câu sau"}
-              {!isLast && <ChevronRight className="size-4" aria-hidden />}
+          {groupDone ? (
+            <Button size="lg" onClick={() => goGroup(gi + 1)} disabled={isLastGroup} className="min-w-32">
+              {isLastGroup ? "Hết phần" : "Khối sau"}
+              {!isLastGroup && <ChevronRight className="size-4" aria-hidden />}
             </Button>
           ) : (
-            <Button onClick={doCheck} disabled={value === undefined} size="lg" className="min-w-28">
+            <Button size="lg" onClick={checkGroup} disabled={toCheck.length === 0} className="min-w-32">
               Kiểm tra
+              {items.length > 1 && (
+                <span className="tabular-nums opacity-70" aria-label={`đã chọn ${chosenCount} trên ${items.length} câu`}>
+                  {chosenCount}/{items.length}
+                </span>
+              )}
             </Button>
           )}
         </div>
-        <Button variant="ghost" size="icon-lg" onClick={() => go(index + 1)} disabled={isLast} aria-label="Câu sau">
+        <Button
+          variant="ghost"
+          size="icon-lg"
+          onClick={() => goGroup(gi + 1)}
+          disabled={isLastGroup}
+          aria-label="Khối sau"
+        >
           <ChevronRight className="size-5" aria-hidden />
         </Button>
       </ActionBar>
+      {!groupDone && toCheck.length > 0 && toCheck.length < pending.length && (
+        <p className="-mt-3 text-xs text-muted-foreground sm:text-right">
+          Còn {pending.length - toCheck.length} câu chưa chọn — kiểm tra bây giờ thì chỉ chấm các câu đã chọn.
+        </p>
+      )}
 
       <section aria-label="Bảng câu" className="hidden flex-col gap-3 border-t border-border pt-5 sm:flex">
-        <QuestionGrid items={grid} current={index} onPick={go} />
+        <QuestionGrid items={grid} current={currentIndex} onPick={goQuestion} />
         <div className="flex flex-wrap items-center justify-between gap-2">
           <GridLegend />
           <KeyHint>
-            Phím tắt: <kbd>1</kbd>–<kbd>4</kbd> chọn, <kbd>Enter</kbd> kiểm tra / sang câu, <kbd>←</kbd>{" "}
-            <kbd>→</kbd> chuyển câu.
+            Phím tắt: <kbd>1</kbd>–<kbd>4</kbd> chọn cho câu đang tô, <kbd>Enter</kbd> kiểm tra / sang khối,{" "}
+            <kbd>←</kbd> <kbd>→</kbd> đổi khối.
           </KeyHint>
         </div>
       </section>
+    </div>
+  );
+}
+
+/** Một câu trong khối: số câu, đề, nút nghe riêng, bốn lựa chọn, kết quả. */
+function QuestionItem({
+  exam,
+  section,
+  question: q,
+  value,
+  checked,
+  active,
+  audio,
+  onChoose,
+  onFocus,
+}: {
+  exam: Exam;
+  section: ExamSection;
+  question: ExamQuestion;
+  value: number | undefined;
+  checked: boolean;
+  active: boolean;
+  audio: ReturnType<typeof useExamAudio>;
+  onChoose: (choice: number) => void;
+  onFocus: () => void;
+}) {
+  const segments = questionAudio(section, q);
+  const playingThis =
+    audio.playing &&
+    audio.segment !== null &&
+    segments.length > 0 &&
+    audio.segment[1] === segments[segments.length - 1][1];
+  const right = checked && value === q.answer;
+
+  return (
+    <div
+      id={`q-${q.no}`}
+      onFocusCapture={onFocus}
+      className={cn(
+        "-mx-3 flex scroll-mt-32 flex-col gap-3 rounded-xl border-l-2 px-3 py-3 transition-colors",
+        active ? "border-foreground/60 bg-muted/40" : "border-transparent"
+      )}
+    >
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="flex items-baseline gap-2">
+          <span className="font-semibold tabular-nums">{q.no}.</span>
+          <span className="text-xs text-muted-foreground">{q.points} điểm</span>
+          {checked && (
+            <span
+              className={cn(
+                "text-xs font-medium",
+                right ? "text-emerald-700 dark:text-emerald-400" : "text-red-700 dark:text-red-400"
+              )}
+            >
+              {right ? "· đúng" : value === undefined ? "· bỏ trống" : `· sai, đáp án ${MARKS[q.answer - 1]}`}
+            </span>
+          )}
+        </p>
+        {segments.length > 0 && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => (playingThis ? audio.pause() : audio.playSegments(segments))}
+          >
+            {playingThis ? <Pause className="size-3.5" aria-hidden /> : <Play className="size-3.5" aria-hidden />}
+            {playingThis ? "Tạm dừng" : `Nghe câu ${q.no}`}
+          </Button>
+        )}
+      </div>
+      <PromptView exam={exam} question={q} />
+      <OptionList exam={exam} question={q} value={value} onChange={onChoose} reveal={checked} disabled={checked} />
     </div>
   );
 }

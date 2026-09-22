@@ -74,12 +74,20 @@ export function PromptView({ exam, question, className }: { exam: Exam; question
  * Khối "※ [a~b]": lời chỉ dẫn, câu mẫu <보기> (đã có sẵn đáp án, tô đen như
  * đề in) và đoạn văn dùng chung cho các câu trong khối.
  */
-export function GroupBlock({ group }: { exam: Exam; group: ExamGroup }) {
+export function GroupBlock({
+  group,
+  showRange = true,
+}: {
+  exam: Exam;
+  group: ExamGroup;
+  /** Hiện nhãn "Câu a–b" (tắt khi tiêu đề trang đã ghi khoảng câu). */
+  showRange?: boolean;
+}) {
   const { range, text } = splitInstruction(group.instruction);
   return (
     <div className="flex flex-col gap-3">
       <p className="font-korean text-[0.95rem] leading-relaxed break-keep text-foreground/85">
-        {range && (
+        {range && showRange && (
           <span className="mr-2 inline-block rounded bg-muted px-1.5 py-0.5 align-[1px] font-sans text-xs font-medium text-muted-foreground tabular-nums">
             Câu {range}
           </span>

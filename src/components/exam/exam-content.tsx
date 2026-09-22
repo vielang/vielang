@@ -1,7 +1,16 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { examAssetUrl, isImage, type Content, type Exam, type ExamGroup } from "@/lib/exams";
+import {
+  examAssetUrl,
+  isImage,
+  questionPrompt,
+  splitInstruction,
+  type Content,
+  type Exam,
+  type ExamGroup,
+  type ExamQuestion,
+} from "@/lib/exams";
 
 const MARKS = ["①", "②", "③", "④"];
 const FILLED = ["❶", "❷", "❸", "❹"];
@@ -19,7 +28,7 @@ export function ExamHtml({ html, className }: { html: string; className?: string
     <div
       className={cn(
         "font-korean leading-relaxed break-keep",
-        "[&_.exam-box]:my-2 [&_.exam-box]:rounded-md [&_.exam-box]:border [&_.exam-box]:border-foreground/25 [&_.exam-box]:px-3 [&_.exam-box]:py-2",
+        "[&_.exam-box]:my-2 [&_.exam-box]:rounded-md [&_.exam-box]:border [&_.exam-box]:border-border [&_.exam-box]:px-3 [&_.exam-box]:py-2",
         "[&_img]:mx-auto [&_img]:my-2 [&_img]:h-auto [&_img]:max-w-full [&_img]:rounded-md [&_img]:bg-white",
         className
       )}
@@ -54,16 +63,31 @@ export function ContentView({
   return <ExamHtml html={content.html} className={className} />;
 }
 
+/** Đề câu hỏi (đã bỏ "(N점)" lặp lại — xem `questionPrompt`); không có gì thì không hiện. */
+export function PromptView({ exam, question, className }: { exam: Exam; question: ExamQuestion; className?: string }) {
+  const content = questionPrompt(question.prompt);
+  if (!content) return null;
+  return <ContentView exam={exam} content={content} alt={`Câu ${question.no}`} className={className} />;
+}
+
 /**
  * Khối "※ [a~b]": lời chỉ dẫn, câu mẫu <보기> (đã có sẵn đáp án, tô đen như
  * đề in) và đoạn văn dùng chung cho các câu trong khối.
  */
 export function GroupBlock({ group }: { exam: Exam; group: ExamGroup }) {
+  const { range, text } = splitInstruction(group.instruction);
   return (
     <div className="flex flex-col gap-3">
-      <p className="font-korean text-[0.95rem] font-semibold leading-relaxed break-keep">{group.instruction}</p>
+      <p className="font-korean text-[0.95rem] leading-relaxed break-keep text-foreground/85">
+        {range && (
+          <span className="mr-2 inline-block rounded bg-muted px-1.5 py-0.5 align-[1px] font-sans text-xs font-medium text-muted-foreground tabular-nums">
+            Câu {range}
+          </span>
+        )}
+        {text}
+      </p>
       {group.example && (
-        <div className="relative rounded-lg border border-foreground/25 px-4 pt-5 pb-3">
+        <div className="relative rounded-lg border border-border px-4 pt-5 pb-3">
           <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-background px-2 text-xs font-korean text-muted-foreground">
             〈보 기〉
           </span>
@@ -78,7 +102,7 @@ export function GroupBlock({ group }: { exam: Exam; group: ExamGroup }) {
         </div>
       )}
       {group.passage && (
-        <div className="rounded-lg border border-foreground/25 px-4 py-3">
+        <div className="rounded-lg border border-border px-4 py-3">
           <ExamHtml html={group.passage} className="text-[0.95rem]" />
         </div>
       )}

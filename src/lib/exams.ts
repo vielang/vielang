@@ -122,7 +122,34 @@ export function questionAudio(section: ExamSection, q: ExamQuestion): [number, n
  * còn câu nghe thì nội dung nằm trong file nghe.
  */
 export function isPointsOnly(c: Content): boolean {
-  return !isImage(c) && /^\s*(\(\d+점\))?\s*$/.test(c.html);
+  return questionPrompt(c) === null;
+}
+
+/** "(3점)" ở đầu đề câu hỏi, kèm các dòng trống theo sau. */
+const POINTS_HEAD = /^\s*\(\d+점\)\s*(?:<br\s*\/?>\s*)*/;
+/** "(3점)" đứng riêng thành dòng cuối. */
+const POINTS_LAST_LINE = /(?:<br\s*\/?>\s*)+\(\d+점\)\s*$/;
+
+/**
+ * Đề câu hỏi để HIỂN THỊ: bỏ "(N점)" ở đầu hoặc đứng riêng ở dòng cuối — số
+ * điểm đã có ở tiêu đề câu, lặp lại chỉ thêm nhiễu. "…고르십시오. (3점)" thì
+ * giữ nguyên vì nó nằm trong câu hỏi in. `null` khi không còn gì để hiện.
+ */
+export function questionPrompt(c: Content): Content | null {
+  if (isImage(c)) return c;
+  const html = c.html.replace(POINTS_HEAD, "").replace(POINTS_LAST_LINE, "");
+  if (!html.trim()) return null;
+  return html === c.html ? c : { html };
+}
+
+/**
+ * Tách lời chỉ dẫn "※ [1～4] 다음을 듣고 …" thành khoảng câu ("1–4") và
+ * phần chữ, để khoảng câu hiện thành nhãn nhỏ thay vì chữ đậm dài.
+ */
+export function splitInstruction(text: string): { range: string | null; text: string } {
+  const m = /^※?\s*\[([^\]]+)\]\s*/.exec(text);
+  if (!m) return { range: null, text: text.replace(/^※\s*/, "") };
+  return { range: m[1].replace(/\s*[～~]\s*/, "–").trim(), text: text.slice(m[0].length) };
 }
 
 // ---------------------------------------------------------------------------

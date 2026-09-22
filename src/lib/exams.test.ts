@@ -11,6 +11,8 @@ import {
   maxScore,
   qKey,
   questionAudio,
+  questionPrompt,
+  splitInstruction,
   scoreExam,
   sectionMax,
   type Answers,
@@ -84,6 +86,31 @@ describe("đề câu hỏi chỉ ghi điểm", () => {
     expect(isPointsOnly({ html: "(4점)" })).toBe(true);
     expect(isPointsOnly({ html: "" })).toBe(true);
     expect(isPointsOnly({ html: "여자가 왜 이 이야기를 하고 있는지 고르십시오. (3점)" })).toBe(false);
+  });
+
+  it('bỏ "(N점)" ở đầu đề hoặc đứng riêng dòng cuối, giữ khi nằm trong câu hỏi', () => {
+    const box = '<div class="exam-box">저는 일이 많습니다.</div>';
+    expect(questionPrompt({ html: `(2점)<br><br>${box}` })).toEqual({ html: box });
+    expect(questionPrompt({ html: `${box}<br>(3점)` })).toEqual({ html: box });
+    const inline = { html: "알맞은 것을 고르십시오. (3점)" };
+    expect(questionPrompt(inline)).toBe(inline);
+  });
+
+  it("không đề nào còn hiện (N점) ở đầu", () => {
+    for (const e of listExams())
+      for (const s of e.sections)
+        for (const q of s.questions) {
+          const p = questionPrompt(q.prompt);
+          if (p && !isImage(p)) expect(p.html).not.toMatch(/^\s*\(\d+점\)/);
+        }
+  });
+});
+
+describe("lời chỉ dẫn", () => {
+  it("tách khoảng câu thành nhãn", () => {
+    expect(splitInstruction("※ [1～4] 다음을 듣고 고르십시오.")).toEqual({ range: "1–4", text: "다음을 듣고 고르십시오." });
+    expect(splitInstruction("※ [44~45] 다음을 읽고")).toEqual({ range: "44–45", text: "다음을 읽고" });
+    expect(splitInstruction("※ 다음을 읽고")).toEqual({ range: null, text: "다음을 읽고" });
   });
 });
 

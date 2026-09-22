@@ -9,7 +9,6 @@ import {
   examAudioUrl,
   examTitle,
   groupOf,
-  isPointsOnly,
   qKey,
   questionAudio,
   scoreExam,
@@ -18,7 +17,7 @@ import {
   type ExamSection,
 } from "@/lib/exams";
 import { useExamStore, type MockAttempt } from "@/lib/exam-store";
-import { ContentView, GroupBlock } from "@/components/exam/exam-content";
+import { GroupBlock, PromptView } from "@/components/exam/exam-content";
 import { OptionList } from "@/components/exam/option-list";
 import { useExamAudio } from "@/components/exam/use-exam-audio";
 import { SelfGrade, WritingImage, WritingInput, hasWritten } from "@/components/exam/writing-parts";
@@ -35,7 +34,7 @@ function duration(a: MockAttempt): string {
 export function ResultView({ exam, attemptId }: { exam: Exam; attemptId?: string }) {
   const isClient = useSyncExternalStore(NO_SUBSCRIBE, () => true, () => false);
   const attempts = useExamStore((s) => s.attempts);
-  const [onlyWrong, setOnlyWrong] = useState(true);
+  const [filter, setFilter] = useState<ReviewFilter>("wrong");
   if (!isClient) return null;
 
   const attempt = attempts.find((a) => a.id === attemptId && a.examId === exam.id && a.finishedAt);
@@ -119,41 +118,69 @@ export function ResultView({ exam, attemptId }: { exam: Exam; attemptId?: string
 
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-base font-semibold">Xem lại bài làm</h2>
-        <label className="flex items-center gap-2 text-sm">
-          <input type="checkbox" checked={onlyWrong} onChange={(e) => setOnlyWrong(e.target.checked)} />
-          Chỉ câu sai
-        </label>
+        <div role="radiogroup" aria-label="Lọc câu" className="flex gap-0.5 rounded-lg bg-muted p-0.5 text-sm">
+          {FILTERS.map((f) => (
+            <button
+              key={f.id}
+              type="button"
+              role="radio"
+              aria-checked={filter === f.id}
+              onClick={() => setFilter(f.id)}
+              className={cn(
+                "rounded-md px-3 py-1 transition-colors",
+                filter === f.id ? "bg-background font-medium shadow-sm" : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
       </div>
       {exam.sections.map((s) =>
         s.writing ? (
           <WritingReview key={s.id} exam={exam} section={s} attempt={attempt} />
         ) : (
-          <ReviewSection key={s.id} exam={exam} section={s} attempt={attempt} onlyWrong={onlyWrong} />
+          <ReviewSection key={s.id} exam={exam} section={s} attempt={attempt} filter={filter} />
         )
       )}
     </div>
   );
 }
 
+type ReviewFilter = "all" | "wrong" | "blank";
+const FILTERS: { id: ReviewFilter; label: string }[] = [
+  { id: "wrong", label: "Câu sai" },
+  { id: "blank", label: "Bỏ trống" },
+  { id: "all", label: "Tất cả" },
+];
+
 function ReviewSection({
   exam,
   section,
   attempt,
-  onlyWrong,
+  filter,
 }: {
   exam: Exam;
   section: ExamSection;
   attempt: MockAttempt;
-  onlyWrong: boolean;
+  filter: ReviewFilter;
 }) {
   const audio = useExamAudio(section.audio ? examAudioUrl(exam, section.audio) : undefined);
-  const shown = section.questions.filter((q) => !onlyWrong || attempt.answers[qKey(section.id, q.no)] !== q.answer);
+  const shown = section.questions.filter((q) => {
+    const a = attempt.answers[qKey(section.id, q.no)];
+    // "Câu sai" gồm cả câu bỏ trống — đều là câu mất điểm.
+    return filter === "all" || (filter === "blank" ? a === undefined : a !== q.answer);
+  });
   return (
     <section className="flex flex-col gap-4">
       <h3 className="text-sm font-medium text-muted-foreground">
         {sectionVi(section.id)} · {shown.length} câu
       </h3>
-      {shown.length === 0 && <p className="text-sm text-muted-foreground">Không có câu nào sai. Tuyệt vời!</p>}
+      {shown.length === 0 && (
+        <p className="text-sm text-muted-foreground">
+          {filter === "blank" ? "Không bỏ trống câu nào." : "Không có câu nào sai. Tuyệt vời!"}
+        </p>
+      )}
       {shown.map((q, i) => {
         // Khối chỉ dẫn chỉ hiện ở câu ĐẦU của khối trong danh sách đang xem —
         // lặp lại ở mọi câu thì [1~4] xuất hiện bốn lần liền nhau.
@@ -165,15 +192,24 @@ function ReviewSection({
           audio.playing && audio.segment !== null && segments.length > 0 && audio.segment[1] === segments[segments.length - 1][1];
         const chosen = attempt.answers[qKey(section.id, q.no)];
         return (
-          <div key={q.no} className="flex flex-col gap-3 rounded-xl border border-border p-3">
-            <p className="text-sm font-medium">
-              Câu {q.no}{" "}
-              <span className="font-normal text-muted-foreground">
-                · {chosen === q.answer ? `đúng, +${q.points} điểm` : chosen ? "sai" : "bỏ trống"}
+          <div key={q.no} className="flex flex-col gap-3 border-t border-border pt-5">
+            {showGroup && <GroupBlock exam={exam} group={group} />}
+            <p className="flex items-baseline gap-2">
+              <span className="font-semibold tabular-nums">Câu {q.no}</span>
+              <span
+                className={cn(
+                  "text-xs",
+                  chosen === q.answer
+                    ? "text-emerald-700 dark:text-emerald-400"
+                    : chosen
+                      ? "text-red-700 dark:text-red-400"
+                      : "text-muted-foreground"
+                )}
+              >
+                {chosen === q.answer ? `đúng · +${q.points} điểm` : chosen ? `sai · ${q.points} điểm` : `bỏ trống · ${q.points} điểm`}
               </span>
             </p>
-            {showGroup && <GroupBlock exam={exam} group={group} />}
-            {!isPointsOnly(q.prompt) && <ContentView exam={exam} content={q.prompt} alt={`Câu ${q.no}`} />}
+            <PromptView exam={exam} question={q} />
             {segments.length > 0 && (
               <Button
                 variant="outline"
@@ -212,7 +248,7 @@ function WritingReview({ exam, section, attempt }: { exam: Exam; section: ExamSe
       <h3 className="text-sm font-medium text-muted-foreground">
         {sectionVi(section.id)} · {section.writing!.tasks.length} câu — tự chấm theo đáp án mẫu
       </h3>
-      <details className="rounded-xl border border-border p-3">
+      <details className="rounded-xl bg-muted/60 p-3">
         <summary className="cursor-pointer text-sm font-medium">Đáp án mẫu và tiêu chí chấm chính thức</summary>
         <div className="mt-3 flex flex-col gap-3">
           {section.writing!.modelAnswers.map((src, i) => (
@@ -221,7 +257,7 @@ function WritingReview({ exam, section, attempt }: { exam: Exam; section: ExamSe
         </div>
       </details>
       {section.writing!.tasks.map((t) => (
-        <div key={t.no} className="flex flex-col gap-3 rounded-xl border border-border p-3">
+        <div key={t.no} className="flex flex-col gap-3 border-t border-border pt-5">
           <p className="text-sm font-medium">
             Câu {t.no}{" "}
             <span className="font-normal text-muted-foreground">

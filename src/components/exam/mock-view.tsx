@@ -17,7 +17,6 @@ import { cn } from "@/lib/utils";
 import {
   examAudioUrl,
   examTitle,
-  isPointsOnly,
   qKey,
   scoreExam,
   sectionCount,
@@ -28,7 +27,8 @@ import {
 } from "@/lib/exams";
 import { activeAttempt, useExamStore, type MockAttempt } from "@/lib/exam-store";
 import { useActiveTime } from "@/lib/use-study-tracker";
-import { ContentView, GroupBlock } from "@/components/exam/exam-content";
+import { GroupBlock, PromptView } from "@/components/exam/exam-content";
+import { ProgressBar, SectionStepper } from "@/components/exam/exam-chrome";
 import { OptionList } from "@/components/exam/option-list";
 import { useExamAudio } from "@/components/exam/use-exam-audio";
 import { WritingImage, WritingInput, hasWritten } from "@/components/exam/writing-parts";
@@ -169,14 +169,11 @@ function MockRunning({ exam, attempt }: { exam: Exam; attempt: MockAttempt }) {
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-5 pb-28">
-      <div className="sticky top-14 z-30 -mx-4 flex items-center justify-between gap-3 border-b border-border bg-background/95 px-4 py-2 backdrop-blur">
+      <div className="sticky top-14 z-30 -mx-4 flex flex-col gap-2 border-b border-border bg-background/95 px-4 pt-2 pb-2.5 backdrop-blur">
+        <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
-          <p className="truncate text-sm font-medium">
-            {examTitle(exam)} · {sectionVi(section.id)}
-          </p>
-          <p className="text-xs text-muted-foreground tabular-nums">
-            {section.writing ? "Đã viết" : "Đã chọn"} {answered}/{total} câu
-          </p>
+          <p className="truncate text-sm font-medium">{examTitle(exam)}</p>
+          <SectionStepper exam={exam} current={attempt.sectionIndex} />
         </div>
         <span
           className={cn(
@@ -191,6 +188,13 @@ function MockRunning({ exam, attempt }: { exam: Exam; attempt: MockAttempt }) {
         <Button size="sm" onClick={() => setConfirm(true)}>
           {isLast ? "Nộp bài" : "Xong phần này"}
         </Button>
+        </div>
+        <div className="flex items-center gap-3">
+          <ProgressBar value={answered} max={total} className="flex-1" />
+          <span className="shrink-0 text-xs text-muted-foreground tabular-nums">
+            {section.writing ? "đã viết" : "đã chọn"} {answered}/{total}
+          </span>
+        </div>
       </div>
 
       {section.writing ? (
@@ -324,9 +328,9 @@ function SectionQuestions({
   }, [current]);
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
       {section.audio && (
-        <div className="flex items-center gap-3 rounded-xl border border-border p-4">
+        <div className="flex items-center gap-3 rounded-xl bg-muted/60 p-4">
           <Headphones className="size-5 shrink-0" aria-hidden />
           {started && audio.playing ? (
             <p className="text-sm">
@@ -343,8 +347,8 @@ function SectionQuestions({
         </div>
       )}
 
-      {section.groups.map((g) => (
-        <section key={g.from} className="flex flex-col gap-4">
+      {section.groups.map((g, gi) => (
+        <section key={g.from} className={cn("flex flex-col gap-5", gi > 0 && "border-t border-border pt-8")}>
           <GroupBlock exam={exam} group={g} />
           {section.questions
             .filter((q) => q.no >= g.from && q.no <= g.to)
@@ -353,14 +357,15 @@ function SectionQuestions({
                 key={q.no}
                 id={`q-${q.no}`}
                 className={cn(
-                  "flex scroll-mt-32 flex-col gap-3 rounded-xl border p-3 transition-colors",
-                  current === q.no ? "border-primary ring-2 ring-primary/30" : "border-border"
+                  "-mx-3 flex scroll-mt-36 flex-col gap-3 rounded-xl border-l-2 px-3 py-1 transition-colors",
+                  current === q.no ? "border-foreground bg-muted/50 py-3" : "border-transparent"
                 )}
               >
-                <p className="text-sm font-semibold">
-                  {q.no}. <span className="font-normal text-muted-foreground">({q.points} điểm)</span>
+                <p className="flex items-baseline gap-2">
+                  <span className="font-semibold tabular-nums">{q.no}.</span>
+                  <span className="text-xs text-muted-foreground">{q.points} điểm</span>
                 </p>
-                {!isPointsOnly(q.prompt) && <ContentView exam={exam} content={q.prompt} alt={`Câu ${q.no}`} />}
+                <PromptView exam={exam} question={q} />
                 <OptionList
                   exam={exam}
                   question={q}

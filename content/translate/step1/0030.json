@@ -1,0 +1,46 @@
+[
+  {
+    "id": "p30-culture",
+    "rect": [
+      0.12,
+      0.115,
+      0.415,
+      0.16
+    ],
+    "label": "Văn hoá và thông tin",
+    "ko": "한국인의 이름\n여러분의 이름은 뭐예요? 한국 사람의 이름은 보통 세 글자예요. '박민수'라는 사람은 '박'이 성이에요. 성은 가족 이름이에요. 그리고 '민수'는 이름이에요. 처음 만나면 '박민수 씨', 또는 '민수 씨'라고 불러요.",
+    "vi": "Tên của người Hàn\nTên của bạn là gì? Tên người Hàn thường có ba chữ. Với người tên là \"Park Min-su\" (박민수) thì \"Park\" là họ. Họ là tên của gia đình, dòng tộc. Còn \"Min-su\" là tên. Khi mới gặp nhau, người ta gọi là \"Park Min-su ssi\" hoặc \"Min-su ssi\" (씨 là cách gọi lịch sự, đặt sau tên).",
+    "dot": [
+      0.47,
+      0.276
+    ]
+  },
+  {
+    "id": "p30-questions",
+    "rect": [
+      0.13,
+      0.31,
+      0.39,
+      0.085
+    ],
+    "label": "Câu hỏi thảo luận",
+    "ko": "1) 한국 사람 '박민수'의 성과 이름은 뭐예요?\n2) 한국에서는 이름을 어떻게 불러요?\n3) 여러분 고향에서는 이름을 어떻게 불러요?",
+    "vi": "1) Họ và tên của người Hàn \"Park Min-su\" là gì?\n2) Ở Hàn Quốc, người ta gọi tên nhau thế nào?\n3) Ở quê bạn, người ta gọi tên nhau thế nào?"
+  },
+  {
+    "id": "p30-cards",
+    "rect": [
+      0.125,
+      0.41,
+      0.83,
+      0.52
+    ],
+    "label": "Danh thiếp và các loại thẻ",
+    "ko": "[명함]\n한국 편의점\n사장 박민수\n전화번호: 02-2711-5384\n휴대 전화: 010-875-9064\n이메일: mspark@hankook.co.kr\n\n[학생증]\n학생증 체크 카드\n박수진 / 한국고등학교\n9440 1234 5678 1234\n유효 기간 02/24\n대한은행 1230-4560-89010\n위 학생은 본교 학생임을 증명합니다.\n\n[외국인 등록증]\n외국인등록번호 123456-1234567 / 성별 F\n성명 NGUYEN THI HUYEN\n국가/지역 VIETNAM\n체류자격 결혼이민(F-6)\n발급일자 2020.1.1\n서울출입국·외국인청장",
+    "vi": "[Danh thiếp]\nCửa hàng tiện lợi Hàn Quốc\nChủ cửa hàng: Park Min-su\nSố điện thoại: 02-2711-5384\nĐiện thoại di động: 010-875-9064\nEmail: mspark@hankook.co.kr\n\n[Thẻ học sinh]\nThẻ học sinh kiêm thẻ ghi nợ\nPark Su-jin / Trường THPT Hàn Quốc\nSố thẻ: 9440 1234 5678 1234\nHạn dùng: 02/24\nNgân hàng Daehan 1230-4560-89010\nXác nhận học sinh trên là học sinh của trường.\n\n[Thẻ đăng ký người nước ngoài]\nSố đăng ký người nước ngoài: 123456-1234567 / Giới tính: nữ (F)\nHọ tên: NGUYEN THI HUYEN\nQuốc gia: VIỆT NAM\nTư cách lưu trú: kết hôn di trú (F-6)\nNgày cấp: 2020.1.1\nCục trưởng Cục Xuất nhập cảnh và Người nước ngoài Seoul",
+    "dot": [
+      0.76,
+      0.78
+    ]
+  }
+]

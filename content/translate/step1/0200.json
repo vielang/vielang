@@ -1,0 +1,50 @@
+[
+  {
+    "id": "p200-culture",
+    "rect": [
+      0.12,
+      0.115,
+      0.435,
+      0.26
+    ],
+    "label": "Văn hoá và thông tin",
+    "ko": "한국어 줄임말\n“아주머니, 여기 물냉 하나, 비냉 하나 주세요!” 여러분은 식당에서 이런 말을 들었습니까? ‘물냉’은 ‘물냉면’, ‘비냉’은 ‘비빔냉면’을 의미합니다. 한국 사람들은 어떤 단어를 짧게 말합니다. ‘뚝불’는 ‘뚝배기 불고기’, ‘치맥’은 ‘치킨과 맥주’를 의미합니다. 음식 이름만이 아니라 다른 단어도 짧게 말합니다. ‘아르바이트’는 ‘알바’, ‘셀프 카메라’는 ‘셀카’입니다. 줄임말은 짧고 간편해서 좋은데 가끔 의미를 몰라서 불편하기도 합니다.",
+    "vi": "Từ viết tắt trong tiếng Hàn\n“Cô ơi, cho một mul-naeng, một bi-naeng!” Bạn đã từng nghe câu này ở quán ăn chưa? ‘Mul-naeng’ nghĩa là ‘mul-naengmyeon’ (mì lạnh nước), ‘bi-naeng’ là ‘bibim-naengmyeon’ (mì lạnh trộn). Người Hàn hay nói tắt một số từ. ‘Ttuk-bul’ là ‘ttukbaegi bulgogi’ (bulgogi nấu nồi đất), ‘chi-maek’ là ‘chicken và maekju’ (gà rán và bia). Không chỉ tên món ăn, các từ khác cũng được nói tắt: ‘areubaiteu’ (việc làm thêm) thành ‘alba’, ‘selpeu kamera’ (tự chụp ảnh) thành ‘selka’. Từ viết tắt ngắn gọn, tiện lợi, nhưng đôi khi không hiểu nghĩa nên cũng bất tiện.",
+    "dot": [
+      0.375,
+      0.371
+    ]
+  },
+  {
+    "id": "p200-questions",
+    "rect": [
+      0.13,
+      0.415,
+      0.455,
+      0.078
+    ],
+    "label": "Câu hỏi thảo luận",
+    "ko": "1) ‘물냉’, ‘비냉’은 무엇을 의미해요?\n2) 줄임말은 왜 불편해요?\n3) 여러분이 알고 있는 줄임말에는 어떤 것이 있어요?",
+    "vi": "1) ‘Mul-naeng’, ‘bi-naeng’ nghĩa là gì?\n2) Vì sao từ viết tắt lại bất tiện?\n3) Bạn biết những từ viết tắt nào?",
+    "dot": [
+      0.605,
+      0.484
+    ]
+  },
+  {
+    "id": "p200-comic",
+    "rect": [
+      0.06,
+      0.535,
+      0.94,
+      0.39
+    ],
+    "label": "Tranh minh hoạ",
+    "ko": "비빔냉면 7,000 / 물냉면 7,000 / 고기만두 3,000\n아주머니, 여기 물냉 하나, 비냉 하나 주세요!\n오늘 치맥 어때?",
+    "vi": "Mì lạnh trộn 7.000 won / Mì lạnh nước 7.000 won / Bánh bao nhân thịt 3.000 won\nCô ơi, cho một mì lạnh nước, một mì lạnh trộn!\nHôm nay đi ăn gà rán uống bia không?",
+    "dot": [
+      0.35,
+      0.865
+    ]
+  }
+]

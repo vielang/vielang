@@ -6,11 +6,15 @@
  * vùng đó — KHÔNG có OCR hay dịch máy lúc chạy, mọi thứ tĩnh.
  *
  * PHẠM VI: CHỈ đặt vùng cho phần VĂN BẢN của bài — bài đọc (읽기), hội thoại
- * (말하기), và từ Trung cấp trở đi thêm 문화와 정보 (trang này ở Sơ cấp chỉ là
- * ảnh với vài dòng chú thích, nhưng lên Trung cấp thành một bài văn xuôi viết
- * bằng 한다체, thuộc loại khó nhất cả bài). Kèm theo là mấy trang in nguyên
- * văn bản đời thật — đơn từ, thông báo tuyển dụng, quy định đổi trả, áp
- * phích — vì đó đúng là thứ người học phải đọc được ngoài đời.
+ * (말하기), và 문화와 정보. Ở Trung cấp, 문화와 정보 là một bài văn xuôi viết
+ * bằng 한다체, thuộc loại khó nhất cả bài. Ở Sơ cấp nó ngắn hơn nhưng KHÔNG
+ * chỉ là ảnh: gần như trang nào cũng có một đoạn giới thiệu 5–8 dòng cộng ô
+ * câu hỏi thảo luận — đúng phần người mới học khó đọc nhất (bản đầu bỏ qua vì
+ * nhận định nhầm là "chỉ có ảnh và vài dòng chú thích"). Câu hỏi thảo luận ở
+ * đây mỗi trang một khác, không phải câu đề bài lặp lại, nên cũng được dịch.
+ * Kèm theo là mấy trang in nguyên văn bản đời thật — đơn từ, thông báo tuyển
+ * dụng, quy định đổi trả, áp phích, tin nhắn cảnh báo — vì đó đúng là thứ
+ * người học phải đọc được ngoài đời.
  *
  * Câu đề bài, câu hỏi, dòng thay từ, gợi ý, bảng từ vựng có hình minh hoạ...
  * thì KHÔNG: đều là câu ngắn lặp đi lặp lại, người học quen rất nhanh — dịch
@@ -39,6 +43,17 @@ export interface TranslationRegion {
   ko?: string;
   /** Bản dịch tiếng Việt — đã dịch sẵn. */
   vi: string;
+  /**
+   * Chỗ đặt chấm dịch [x, y] (tâm chấm, tỉ lệ 0–1), khi chỗ mặc định —
+   * ngay dưới mép dưới `rect`, canh giữa — bị chữ khác chiếm.
+   *
+   * Hay gặp ở trang 문화와 정보 Sơ cấp: ô câu hỏi nằm sát ngay dưới đoạn văn.
+   * Trước khi có trường này, cách duy nhất là kéo giãn `rect` cho tâm của nó
+   * dời sang chỗ trống — chấm rơi xuống dưới một bức ảnh bên cạnh, xa hẳn
+   * đoạn nó dịch. Giờ `rect` luôn khớp đúng khối chữ, còn chấm đặt ở chỗ tự
+   * nhiên nhất (thường là cuối dòng cuối của đoạn).
+   */
+  dot?: [number, number];
 }
 
 /**

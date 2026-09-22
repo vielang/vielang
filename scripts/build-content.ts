@@ -217,6 +217,16 @@ function validateTranslations(source: string, data: unknown): TranslationRegion[
     seen.add(region.id);
     if (!region.vi?.trim()) throw new Error(`${at}: thiếu bản dịch "vi"`);
     validateRect(at, region.rect);
+    if (region.dot !== undefined) {
+      const d = region.dot as unknown;
+      if (
+        !Array.isArray(d) ||
+        d.length !== 2 ||
+        d.some((n) => typeof n !== "number" || !Number.isFinite(n) || n < 0 || n > 1)
+      ) {
+        throw new Error(`${at}: "dot" phải là [x, y] trong khoảng 0–1`);
+      }
+    }
   }
 
   return data as TranslationRegion[];

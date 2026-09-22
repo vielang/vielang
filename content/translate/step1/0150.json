@@ -1,0 +1,34 @@
+[
+  {
+    "id": "p150-culture",
+    "rect": [
+      0.12,
+      0.115,
+      0.46,
+      0.235
+    ],
+    "label": "Văn hoá và thông tin",
+    "ko": "한국의 대중교통 수단\n한국에는 대중교통 수단이 많습니다. 시내버스, 광역 버스/시외버스, 지하철, 택시, 고속버스, 기차가 있습니다. 사람들이 도시 안에서 이동할 때에는 시내버스, 지하철, 택시를 탑니다. 도시 밖으로 나갈 때에는 지하철을 타거나 광역 버스/시외버스를 탑니다. 먼 곳에 갈 때에는 기차나 고속버스를 탑니다. 한국에는 교통 카드가 있어서 버스, 지하철, 택시를 탈 때 편리합니다.",
+    "vi": "Phương tiện giao thông công cộng ở Hàn Quốc\nỞ Hàn Quốc có nhiều phương tiện giao thông công cộng: xe buýt nội thành, xe buýt liên vùng/xe buýt ngoại thành, tàu điện ngầm, taxi, xe buýt cao tốc và tàu hoả. Khi đi lại trong thành phố, mọi người đi xe buýt nội thành, tàu điện ngầm hoặc taxi. Khi ra ngoài thành phố thì đi tàu điện ngầm hoặc xe buýt liên vùng/ngoại thành. Khi đi xa thì đi tàu hoả hoặc xe buýt cao tốc. Ở Hàn Quốc có thẻ giao thông nên đi xe buýt, tàu điện ngầm, taxi rất tiện.",
+    "dot": [
+      0.29,
+      0.348
+    ]
+  },
+  {
+    "id": "p150-questions",
+    "rect": [
+      0.13,
+      0.39,
+      0.41,
+      0.083
+    ],
+    "label": "Câu hỏi thảo luận",
+    "ko": "1) 한국의 대중교통 수단은 무엇이 있어요?\n2) 한국 사람들이 먼 곳에 갈 때 무엇을 타요?\n3) 여러분은 주로 무엇을 타요?",
+    "vi": "1) Hàn Quốc có những phương tiện giao thông công cộng nào?\n2) Người Hàn đi gì khi đi xa?\n3) Bạn thường đi phương tiện gì?",
+    "dot": [
+      0.44,
+      0.462
+    ]
+  }
+]

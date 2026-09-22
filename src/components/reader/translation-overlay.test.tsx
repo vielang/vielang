@@ -153,3 +153,28 @@ describe("vùng bấm", () => {
     expect(screen.queryByText("Xin chào?")).toBeNull();
   });
 });
+
+describe("chỗ đặt chấm tuỳ chỉnh (`dot`)", () => {
+  const withDot: TranslationRegion[] = [
+    { id: "d1", rect: [0.1, 0.1, 0.5, 0.2], label: "Văn hoá và thông tin", vi: "…", dot: [0.62, 0.28] },
+  ];
+
+  it("chấm canh TÂM vào đúng điểm đã chọn, không nằm dưới mép vùng chữ", () => {
+    render(<TranslationOverlay regions={withDot} />);
+    const button = screen.getByLabelText("Xem bản dịch: Văn hoá và thông tin");
+    const frame = button.parentElement as HTMLElement;
+
+    expect(parseFloat(frame.style.left)).toBeCloseTo(62);
+    expect(parseFloat(frame.style.top)).toBeCloseTo(28);
+    expect(button.className).toMatch(/-translate-y-1\/2/);
+    expect(button.className).not.toMatch(/top-full/);
+  });
+
+  it("không có `dot` thì vẫn nằm dưới mép vùng chữ như cũ", () => {
+    render(<TranslationOverlay regions={REGIONS} />);
+    const button = screen.getByLabelText("Xem bản dịch: Hội thoại");
+
+    expect(button.className).toMatch(/top-full/);
+    expect((button.parentElement as HTMLElement).style.width).toBe("30%");
+  });
+});

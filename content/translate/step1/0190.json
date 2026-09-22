@@ -1,0 +1,46 @@
+[
+  {
+    "id": "p190-culture",
+    "rect": [
+      0.12,
+      0.115,
+      0.415,
+      0.235
+    ],
+    "label": "Văn hoá và thông tin",
+    "ko": "한국의 공공 예절\n한국에서는 버스나 지하철에서 공공 예절을 지켜야 합니다. 버스나 지하철에는 교통 약자석이 있습니다. 여기에는 노인, 임산부, 장애가 있는 사람들이 앉습니다. 버스와 지하철에서는 음료수와 음식을 먹지 않습니다. 그리고 큰 소리로 통화하지 않습니다. 그리고 다리를 벌리고 앉지 마십시오. 공공장소에서는 다른 사람들을 배려해야 합니다.",
+    "vi": "Phép lịch sự nơi công cộng ở Hàn Quốc\nỞ Hàn Quốc, trên xe buýt hay tàu điện ngầm phải giữ phép lịch sự nơi công cộng. Trên xe buýt và tàu điện ngầm có ghế ưu tiên cho người yếu thế. Người già, phụ nữ mang thai và người khuyết tật ngồi ở đây. Trên xe buýt và tàu điện ngầm không ăn uống. Không nói điện thoại to tiếng. Và đừng ngồi dạng chân. Ở nơi công cộng cần biết nghĩ cho người khác.",
+    "dot": [
+      0.415,
+      0.348
+    ]
+  },
+  {
+    "id": "p190-questions",
+    "rect": [
+      0.13,
+      0.375,
+      0.44,
+      0.083
+    ],
+    "label": "Câu hỏi thảo luận",
+    "ko": "1) 한국 지하철과 버스의 교통 약자석에는 누가 앉아요?\n2) 한국 지하철과 버스에서 무엇을 하지 않아요?\n3) 공공 예절에는 또 어떤 것이 있어요?",
+    "vi": "1) Ai ngồi ghế ưu tiên trên tàu điện ngầm và xe buýt ở Hàn Quốc?\n2) Trên tàu điện ngầm và xe buýt ở Hàn Quốc không làm những gì?\n3) Phép lịch sự nơi công cộng còn có những gì nữa?",
+    "dot": [
+      0.5,
+      0.446
+    ]
+  },
+  {
+    "id": "p190-pink-seat",
+    "rect": [
+      0.41,
+      0.505,
+      0.235,
+      0.16
+    ],
+    "label": "Biển ghế dành cho bà bầu",
+    "ko": "내일의 주인공을 맞이하는 핑크카펫\n서울 지하철 임산부 배려석",
+    "vi": "Thảm hồng đón chào nhân vật chính của ngày mai\nGhế ưu tiên dành cho phụ nữ mang thai trên tàu điện ngầm Seoul"
+  }
+]

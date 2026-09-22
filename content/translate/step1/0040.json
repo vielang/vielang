@@ -1,0 +1,34 @@
+[
+  {
+    "id": "p40-culture",
+    "rect": [
+      0.12,
+      0.115,
+      0.545,
+      0.16
+    ],
+    "label": "Văn hoá và thông tin",
+    "ko": "한국의 인사말 2\n한국 사람들은 다른 사람에게 고마울 때, '고맙습니다', '감사합니다'라고 말해요. 그리고 다른 사람에게 사과할 때, '죄송합니다', '미안합니다'라고 말해요. 이 말들은 비슷한 뜻이에요. 그러나 '미안합니다'는 나이가 많은 사람이나 윗사람에게 잘 쓰지 않아요. '죄송합니다'가 더 좋아요.",
+    "vi": "Lời chào của người Hàn 2\nKhi biết ơn người khác, người Hàn nói \"고맙습니다\" hoặc \"감사합니다\" (cảm ơn). Còn khi xin lỗi người khác, họ nói \"죄송합니다\" hoặc \"미안합니다\" (xin lỗi). Các câu này có nghĩa giống nhau. Nhưng với người lớn tuổi hoặc người bề trên thì ít khi dùng \"미안합니다\" — nói \"죄송합니다\" sẽ tốt hơn.",
+    "dot": [
+      0.64,
+      0.268
+    ]
+  },
+  {
+    "id": "p40-questions",
+    "rect": [
+      0.125,
+      0.31,
+      0.46,
+      0.085
+    ],
+    "label": "Câu hỏi và chú thích",
+    "ko": "1) 한국 사람은 언제 '고맙습니다'를 말해요?\n2) '미안합니다'와 비슷한 인사말은 뭐예요?\n3) 여러분 나라 말로 '고맙습니다', '미안합니다'는 뭐예요?\n\n고마울 때 어떻게 인사해요? — \"고맙습니다.\"\n사과할 때 어떻게 말해요? — \"미안합니다.\"",
+    "vi": "1) Người Hàn nói \"고맙습니다\" khi nào?\n2) Lời chào nào có nghĩa giống \"미안합니다\"?\n3) Trong tiếng nước bạn, \"고맙습니다\" và \"미안합니다\" nói thế nào?\n\nKhi biết ơn thì chào thế nào? — \"고맙습니다.\" (Cảm ơn.)\nKhi xin lỗi thì nói thế nào? — \"미안합니다.\" (Xin lỗi.)",
+    "dot": [
+      0.62,
+      0.378
+    ]
+  }
+]

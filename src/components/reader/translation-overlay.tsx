@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Languages, X } from "lucide-react";
 import type { TranslationRegion } from "@/lib/page-translation";
 import { HintBubble } from "@/components/reader/hint-bubble";
+import { cn } from "@/lib/utils";
 
 interface ActiveBubble {
   region: TranslationRegion;
@@ -42,6 +43,16 @@ export function TranslationOverlay({ regions }: { regions: TranslationRegion[] }
       {regions.map((region) => {
         const [x, y, w, h] = region.rect;
         const isOpen = active?.region.id === region.id;
+        // Có `dot` thì khung thu về đúng một điểm và chấm canh TÂM vào đó;
+        // không thì khung là cả vùng chữ và chấm nằm ngay dưới mép dưới.
+        const frame = region.dot
+          ? { left: `${region.dot[0] * 100}%`, top: `${region.dot[1] * 100}%`, width: 0, height: 0 }
+          : {
+              left: `${x * 100}%`,
+              top: `${y * 100}%`,
+              width: `${w * 100}%`,
+              height: `${h * 100}%`,
+            };
         const what = region.label ?? "đoạn này";
         return (
           // Khung này CHỈ để định vị cái chấm vào đúng mép dưới của đoạn —
@@ -60,12 +71,7 @@ export function TranslationOverlay({ regions }: { regions: TranslationRegion[] }
           <div
             key={region.id}
             className="pointer-events-none absolute"
-            style={{
-              left: `${x * 100}%`,
-              top: `${y * 100}%`,
-              width: `${w * 100}%`,
-              height: `${h * 100}%`,
-            }}
+            style={frame}
           >
             {/* Dấu hiệu DUY NHẤT cho biết đoạn này có bản dịch. Vùng bấm vẫn
                 trong suốt như cũ để trang giữ nguyên dáng bản in — chỉ một
@@ -114,7 +120,10 @@ export function TranslationOverlay({ regions }: { regions: TranslationRegion[] }
               }
               aria-label={isOpen ? `Đóng bản dịch: ${what}` : `Xem bản dịch: ${what}`}
               aria-expanded={isOpen}
-              className="group pointer-events-auto absolute top-full left-1/2 -mt-2 flex size-11 -translate-x-1/2 cursor-help items-center justify-center"
+              className={cn(
+                "group pointer-events-auto absolute flex size-11 -translate-x-1/2 cursor-help items-center justify-center",
+                region.dot ? "top-0 left-0 -translate-y-1/2" : "top-full left-1/2 -mt-2"
+              )}
             >
               <span
                 className="flex size-5 items-center justify-center text-neutral-900 transition-transform group-hover:scale-110"

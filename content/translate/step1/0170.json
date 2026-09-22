@@ -1,0 +1,50 @@
+[
+  {
+    "id": "p170-culture",
+    "rect": [
+      0.12,
+      0.115,
+      0.455,
+      0.185
+    ],
+    "label": "Văn hoá và thông tin",
+    "ko": "재난, 안전 안내 문자\n한국 정부는 재난 시에 모든 국민에게 문자를 보냅니다. 봄에는 미세 먼지, 여름에는 폭염과 호우를 미리 알려 줍니다. 겨울에는 한파, 폭설, 건조 주의보를 알립니다. 여러분도 휴대 전화에서 이런 문자 메시지를 받았습니까? 앞으로 날씨와 재난, 안전 문자를 잘 확인하세요.",
+    "vi": "Tin nhắn thông báo thiên tai và an toàn\nKhi có thiên tai, chính phủ Hàn Quốc gửi tin nhắn cho toàn dân. Mùa xuân thì báo trước về bụi mịn, mùa hè báo trước về nắng nóng gay gắt và mưa lớn. Mùa đông thì thông báo rét đậm, tuyết rơi dày và cảnh báo khô hanh. Bạn đã từng nhận được những tin nhắn như thế này trên điện thoại chưa? Từ nay hãy chú ý đọc kỹ các tin nhắn về thời tiết, thiên tai và an toàn nhé.",
+    "dot": [
+      0.42,
+      0.298
+    ]
+  },
+  {
+    "id": "p170-questions",
+    "rect": [
+      0.09,
+      0.36,
+      0.42,
+      0.095
+    ],
+    "label": "Câu hỏi thảo luận",
+    "ko": "1) 정부에서 언제 문자 메시지를 보내요?\n2) 어느 계절에 어떤 메시지가 자주 와요?\n3) 여러분은 어떤 재난, 안전 문자를 받았어요?",
+    "vi": "1) Khi nào chính phủ gửi tin nhắn?\n2) Mùa nào thường có tin nhắn gì?\n3) Bạn đã nhận được tin nhắn thiên tai, an toàn nào?",
+    "dot": [
+      0.545,
+      0.433
+    ]
+  },
+  {
+    "id": "p170-alerts",
+    "rect": [
+      0.615,
+      0.3,
+      0.36,
+      0.33
+    ],
+    "label": "Tin nhắn cảnh báo thiên tai",
+    "ko": "3월 5일 화요일\n긴급 재난 문자\n[서울시] 오늘 07시 서울지역 미세 먼지 경보 발령. 야외 활동 자제, 실외 활동 금지, 마스크 착용 바랍니다. (오전 6:50)\n\n12월 11일 수요일\n긴급 재난 문자\n[행정안전부] 내일 아침 수도권을 중심으로 폭설 예상되므로, 출근길 대중교통 이용 등 안전에 유의 바랍니다. (오후 9:18)",
+    "vi": "Thứ Ba, ngày 5 tháng 3\nTin nhắn thiên tai khẩn cấp\n[Thành phố Seoul] Hôm nay lúc 7 giờ đã ban bố cảnh báo bụi mịn ở khu vực Seoul. Đề nghị hạn chế ra ngoài, không tổ chức hoạt động ngoài trời và đeo khẩu trang. (6:50 sáng)\n\nThứ Tư, ngày 11 tháng 12\nTin nhắn thiên tai khẩn cấp\n[Bộ Hành chính và An toàn] Sáng mai dự báo có tuyết rơi dày, tập trung ở vùng thủ đô, vì vậy đề nghị chú ý an toàn, chẳng hạn đi làm bằng phương tiện giao thông công cộng. (9:18 tối)",
+    "dot": [
+      0.58,
+      0.55
+    ]
+  }
+]

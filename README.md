@@ -100,17 +100,20 @@ Nguồn: bộ dữ liệu chính thức lấy từ dịch vụ "토픽 기출문
 topik.go.kr (bản v2: JSON + ảnh + mp3), đặt ở `../topik/Chinh-thuc-v2`.
 
 ```bash
-npm run import-topik                       # nhập mọi kỳ (TOPIK I)
+npm run import-topik                       # nhập mọi kỳ (TOPIK I và II)
 npm run import-topik -- --round 102       # chỉ một kỳ
 npm run prepare-exams                      # đẩy ảnh + file nghe lên R2
 ```
 
-- `import-topik` làm sạch HTML của đề, ghi `content/exams/<kỳ>-topik1.json`
+- `import-topik` làm sạch HTML của đề, ghi `content/exams/<kỳ>-topik{1,2}.json`
   (COMMIT vào git) và chép tài nguyên sang `public/img/exams/<kỳ>/` (ảnh đổi
   sang WebP, KHÔNG commit). Lúc `npm run dev` app đọc thẳng từ `public/`.
 - Mốc thời gian từng câu nghe (để nghe lại riêng một câu) nằm ở
   `content/exams/marks/<id>-listening.json`; đề chưa có file này thì trang
   luyện tập cho nghe cả bài.
+- TOPIK II có thêm phần viết (câu 51–54): đề chỉ có ảnh trang in, người học
+  viết vào ô chữ (có đếm ký tự), rồi đối chiếu trang đáp án mẫu chính thức và
+  TỰ CHẤM — điểm tự chấm cộng vào tổng 300 để quy ra cấp.
 
 ## 7. Deploy lên Vercel
 

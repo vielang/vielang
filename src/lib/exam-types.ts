@@ -54,6 +54,21 @@ export interface ExamQuestion {
   audio?: [number, number];
 }
 
+/**
+ * Một câu VIẾT (TOPIK II, câu 51–54). Không chấm tự động được: người học
+ * xem đáp án mẫu chính thức rồi tự chấm theo thang điểm của câu.
+ */
+export interface WritingTask {
+  no: number;
+  points: number;
+  /** 51–52: điền hai chỗ trống ㉠ ㉡ (mỗi câu một dòng). 53–54: viết đoạn/bài. */
+  kind: "blanks" | "essay";
+  /** Bài viết: độ dài yêu cầu, ký tự (tính cả dấu cách như ô 원고지). */
+  chars?: [number, number];
+  /** Ảnh trang đề có câu này (đề viết chỉ có bản in, không có chữ). */
+  page: string;
+}
+
 export interface ExamSection {
   id: SectionId;
   /** Tên như trang gốc: "TOPIKⅠ 듣기 (1번 ～ 30번)". */
@@ -65,7 +80,29 @@ export interface ExamSection {
   /** Đoạn hướng dẫn chung ở đầu file nghe, giây (nếu đã đo). */
   intro?: [number, number];
   groups: ExamGroup[];
+  /** Câu trắc nghiệm — phần viết thì rỗng, câu nằm ở `writing.tasks`. */
   questions: ExamQuestion[];
+  /** Chỉ phần viết. */
+  writing?: {
+    tasks: WritingTask[];
+    /** Ảnh trang đáp án mẫu + tiêu chí chấm chính thức. */
+    modelAnswers: string[];
+  };
+}
+
+/**
+ * Khoá của một câu trong bài làm: "<phần>:<số câu>". Không dùng số câu trơn
+ * vì TOPIK II đánh số LẠI từ 1 ở phần đọc — câu 1 nghe và câu 1 đọc trùng số.
+ */
+export type QuestionKey = `${SectionId}:${number}`;
+
+export function qKey(section: SectionId, no: number): QuestionKey {
+  return `${section}:${no}`;
+}
+
+/** Khoá ô chữ của câu viết: câu 51–52 có hai ô (㉠ = 0, ㉡ = 1), bài viết một ô. */
+export function textKey(no: number, blank = 0): string {
+  return `${no}:${blank}`;
 }
 
 export type ExamLevel = "TOPIK I" | "TOPIK II";
@@ -82,7 +119,6 @@ export interface Exam {
   source: string;
   sections: ExamSection[];
 }
-
 
 /**
  * Gốc URL tài nguyên của một kỳ thi. Ảnh đi qua CÙNG ORIGIN (`/img/exams/…`,

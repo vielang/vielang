@@ -10,9 +10,11 @@ import {
   examTitle,
   groupOf,
   isPointsOnly,
+  qKey,
   questionAudio,
   sectionVi,
   type Exam,
+  type ExamSection,
   type SectionId,
 } from "@/lib/exams";
 import { useExamStore } from "@/lib/exam-store";
@@ -21,6 +23,7 @@ import { useActiveTime } from "@/lib/use-study-tracker";
 import { ContentView, GroupBlock } from "@/components/exam/exam-content";
 import { OptionList } from "@/components/exam/option-list";
 import { useExamAudio } from "@/components/exam/use-exam-audio";
+import { WritingPractice } from "@/components/exam/writing-practice";
 
 const NO_SUBSCRIBE = () => () => {};
 
@@ -42,9 +45,60 @@ export function PracticeView({
   sectionId: SectionId;
   initialNo?: number;
 }) {
-  const isClient = useSyncExternalStore(NO_SUBSCRIBE, () => true, () => false);
   const section = exam.sections.find((s) => s.id === sectionId) ?? exam.sections[0];
+  if (section.writing) {
+    return (
+      <div className="mx-auto flex w-full max-w-2xl flex-col gap-5 pb-24">
+        <PracticeHeader exam={exam} section={section} />
+        <WritingPractice exam={exam} section={section} initialNo={initialNo} />
+      </div>
+    );
+  }
+  return <ChoicePractice exam={exam} section={section} initialNo={initialNo} />;
+}
+
+/** Về trang đề + chuyển phần (Nghe / Viết / Đọc). */
+function PracticeHeader({ exam, section }: { exam: Exam; section: ExamSection }) {
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-3">
+      <Link
+        href={`/exam/${exam.id}`}
+        className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+      >
+        <ArrowLeft className="size-4" aria-hidden />
+        {examTitle(exam)}
+      </Link>
+      <div className="flex gap-1 rounded-lg bg-muted p-1 text-sm">
+        {exam.sections.map((s) => (
+          <Link
+            key={s.id}
+            href={`/exam/${exam.id}/practice?section=${s.id}`}
+            className={cn(
+              "rounded-md px-3 py-1",
+              s.id === section.id ? "bg-background font-medium shadow-sm" : "text-muted-foreground"
+            )}
+          >
+            {sectionVi(s.id)}
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** Luyện câu trắc nghiệm (nghe, đọc). */
+function ChoicePractice({
+  exam,
+  section,
+  initialNo,
+}: {
+  exam: Exam;
+  section: ExamSection;
+  initialNo?: number;
+}) {
+  const isClient = useSyncExternalStore(NO_SUBSCRIBE, () => true, () => false);
   const questions = section.questions;
+  const key = (no: number) => qKey(section.id, no);
   const [index, setIndex] = useState(() => {
     const i = questions.findIndex((q) => q.no === initialNo);
     return i >= 0 ? i : 0;
@@ -60,8 +114,8 @@ export function PracticeView({
 
   const answers = isClient ? (practice?.answers ?? {}) : {};
   const checked = new Set(isClient ? (practice?.checked ?? []) : []);
-  const value = answers[q.no];
-  const isChecked = checked.has(q.no);
+  const value = answers[key(q.no)];
+  const isChecked = checked.has(key(q.no));
   const isRight = isChecked && value === q.answer;
 
   const audioSrc = section.audio ? examAudioUrl(exam, section.audio) : undefined;
@@ -71,8 +125,8 @@ export function PracticeView({
   // Đang nghe thì vẫn là đang học, dù không chạm gì — xem `useActiveTime`.
   useActiveTime(() => audio.playing || fullPlaying);
 
-  const doneCount = questions.filter((x) => checked.has(x.no)).length;
-  const rightCount = questions.filter((x) => checked.has(x.no) && answers[x.no] === x.answer).length;
+  const doneCount = questions.filter((x) => checked.has(key(x.no))).length;
+  const rightCount = questions.filter((x) => checked.has(key(x.no)) && answers[key(x.no)] === x.answer).length;
 
   const go = useCallback(
     (to: number) => {
@@ -85,16 +139,16 @@ export function PracticeView({
 
   const doCheck = useCallback(() => {
     if (value === undefined || isChecked) return;
-    check(exam.id, q.no);
+    check(exam.id, qKey(section.id, q.no));
     recordQuizCheck(value === q.answer);
-  }, [value, isChecked, check, exam.id, q.no, q.answer, recordQuizCheck]);
+  }, [value, isChecked, check, exam.id, section.id, q.no, q.answer, recordQuizCheck]);
 
   // Phím tắt: 1–4 chọn, Enter kiểm tra, ← → sang câu.
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       const tag = (e.target as HTMLElement | null)?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "AUDIO") return;
-      if (["1", "2", "3", "4"].includes(e.key)) setAnswer(exam.id, q.no, Number(e.key));
+      if (["1", "2", "3", "4"].includes(e.key)) setAnswer(exam.id, qKey(section.id, q.no), Number(e.key));
       else if (e.key === "Enter") doCheck();
       else if (e.key === "ArrowRight") go(index + 1);
       else if (e.key === "ArrowLeft") go(index - 1);
@@ -103,7 +157,7 @@ export function PracticeView({
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [exam.id, q.no, index, doCheck, go, setAnswer]);
+  }, [exam.id, section.id, q.no, index, doCheck, go, setAnswer]);
 
   const segments = useMemo(() => questionAudio(section, q), [section, q]);
   const playingThis =
@@ -114,29 +168,7 @@ export function PracticeView({
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-5 pb-24">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <Link
-          href={`/exam/${exam.id}`}
-          className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-        >
-          <ArrowLeft className="size-4" aria-hidden />
-          {examTitle(exam)}
-        </Link>
-        <div className="flex gap-1 rounded-lg bg-muted p-1 text-sm">
-          {exam.sections.map((s) => (
-            <Link
-              key={s.id}
-              href={`/exam/${exam.id}/practice?section=${s.id}`}
-              className={cn(
-                "rounded-md px-3 py-1",
-                s.id === section.id ? "bg-background font-medium shadow-sm" : "text-muted-foreground"
-              )}
-            >
-              {sectionVi(s.id)}
-            </Link>
-          ))}
-        </div>
-      </div>
+      <PracticeHeader exam={exam} section={section} />
 
       {section.audio && !hasMarks && audioSrc && (
         // Đề chưa chia theo từng câu: nghe cả bài, tua tới đoạn cần nghe.
@@ -190,7 +222,7 @@ export function PracticeView({
         exam={exam}
         question={q}
         value={value}
-        onChange={(c) => setAnswer(exam.id, q.no, c)}
+        onChange={(c) => setAnswer(exam.id, key(q.no), c)}
         reveal={isChecked}
       />
 
@@ -220,7 +252,7 @@ export function PracticeView({
           Câu trước
         </Button>
         {isChecked && (
-          <Button variant="ghost" size="sm" onClick={() => reset(exam.id, [q.no])}>
+          <Button variant="ghost" size="sm" onClick={() => reset(exam.id, [key(q.no)])}>
             <RotateCcw className="size-3.5" aria-hidden />
             Làm lại câu này
           </Button>
@@ -234,8 +266,8 @@ export function PracticeView({
       {/* Bảng số câu: xanh = đúng, đỏ = sai, đậm = đã chọn chưa kiểm tra. */}
       <nav aria-label="Chọn câu" className="flex flex-wrap gap-1.5">
         {questions.map((x, i) => {
-          const done = checked.has(x.no);
-          const right = done && answers[x.no] === x.answer;
+          const done = checked.has(key(x.no));
+          const right = done && answers[key(x.no)] === x.answer;
           return (
             <button
               key={x.no}
@@ -249,7 +281,7 @@ export function PracticeView({
                   ? right
                     ? "border-emerald-600 bg-emerald-600 text-white"
                     : "border-red-600 bg-red-600 text-white"
-                  : answers[x.no] !== undefined
+                  : answers[key(x.no)] !== undefined
                     ? "border-foreground/40 bg-muted"
                     : "border-border",
                 i === index && "ring-2 ring-primary ring-offset-2 ring-offset-background"

@@ -1,10 +1,29 @@
 import { describe, expect, it } from "vitest";
 import { existsSync } from "node:fs";
 import path from "node:path";
-import { getExam, isImage, isPointsOnly, levelFor, listExams, questionAudio, scoreExam, type Exam } from "./exams";
+import {
+  countChars,
+  getExam,
+  isImage,
+  isPointsOnly,
+  levelFor,
+  listExams,
+  maxScore,
+  qKey,
+  questionAudio,
+  scoreExam,
+  sectionMax,
+  type Answers,
+  type Exam,
+} from "./exams";
 import { tagsIn } from "./exam-html";
 
 const exam = getExam("102-topik1")!;
+const exam2 = getExam("102-topik2")!;
+
+/** Chọn đúng hết mọi câu trắc nghiệm. */
+const allRight = (e: Exam): Answers =>
+  Object.fromEntries(e.sections.flatMap((s) => s.questions.map((q) => [qKey(s.id, q.no), q.answer])));
 
 describe("chấm điểm và quy ra cấp", () => {
   it("ngưỡng cấp theo quy định TOPIK", () => {
@@ -17,17 +36,46 @@ describe("chấm điểm và quy ra cấp", () => {
   });
 
   it("làm đúng hết thì được điểm tối đa", () => {
-    const all = Object.fromEntries(exam.sections.flatMap((s) => s.questions.map((q) => [q.no, q.answer])));
-    const r = scoreExam(exam, all);
+    const r = scoreExam(exam, allRight(exam));
     expect(r.score).toBe(200);
     expect(r.level).toBe("Cấp 2");
   });
 
   it("câu bỏ trống hay sai thì không có điểm, điểm tính theo đúng hệ số từng câu", () => {
     // Câu 1 (4 điểm) đúng, câu 3 (3 điểm) sai, còn lại bỏ trống.
-    const r = scoreExam(exam, { 1: 1, 3: 1 });
+    const r = scoreExam(exam, { "listening:1": 1, "listening:3": 1 });
     expect(r.score).toBe(4);
     expect(r.sections[0]).toMatchObject({ score: 4, correct: 1, total: 30 });
+  });
+});
+
+describe("TOPIK II", () => {
+  it("ba phần theo thứ tự buổi thi: nghe → viết → đọc, tổng 300 điểm", () => {
+    expect(exam2.sections.map((s) => s.id)).toEqual(["listening", "writing", "reading"]);
+    expect(maxScore(exam2)).toBe(300);
+  });
+
+  it("câu 1 nghe và câu 1 đọc trùng số nhưng chấm riêng", () => {
+    const r1 = exam2.sections[2].questions[0];
+    const r = scoreExam(exam2, { [qKey("reading", 1)]: r1.answer });
+    expect(r.sections.map((s) => s.score)).toEqual([0, 0, r1.points]);
+  });
+
+  it("phần viết tính theo điểm tự chấm; chưa chấm câu nào thì báo còn chưa chấm", () => {
+    const mc = scoreExam(exam2, allRight(exam2));
+    expect(mc).toMatchObject({ score: 200, ungraded: 4, level: "Cấp 5" });
+
+    const full = scoreExam(exam2, allRight(exam2), { 51: 10, 52: 10, 53: 30, 54: 50 });
+    expect(full).toMatchObject({ score: 300, ungraded: 0, level: "Cấp 6" });
+    expect(full.sections[1]).toMatchObject({ id: "writing", score: 100, correct: 4, total: 4 });
+  });
+
+  it("điểm tự chấm vượt thang của câu thì bị kẹp lại", () => {
+    expect(scoreExam(exam2, {}, { 51: 99, 53: -5 }).score).toBe(10);
+  });
+
+  it("đếm chữ như ô 원고지: tính dấu cách, bỏ xuống dòng", () => {
+    expect(countChars("가 나\n다")).toBe(4);
   });
 });
 
@@ -49,7 +97,7 @@ describe("nghe lại một câu", () => {
   });
 
   it("đề chưa đo mốc thời gian thì không có đoạn riêng (giao diện cho nghe cả bài)", () => {
-    const old = getExam("35-topik1")!.sections[0];
+    const old = getExam("102-topik2")!.sections[0];
     expect(questionAudio(old, old.questions[0])).toEqual([]);
   });
 
@@ -60,17 +108,18 @@ describe("nghe lại một câu", () => {
 });
 
 /** Soát dữ liệu MỌI đề — đề nhập sau này cũng phải qua được. */
-it("đủ 12 kỳ TOPIK I", () => {
-  expect(listExams().map((e) => e.round)).toEqual([102, 96, 91, 83, 64, 60, 52, 47, 41, 37, 36, 35]);
+it("đủ 12 kỳ, mỗi kỳ cả TOPIK I và TOPIK II", () => {
+  const rounds = [102, 96, 91, 83, 64, 60, 52, 47, 41, 37, 36, 35];
+  expect(listExams().map((e) => e.id)).toEqual(rounds.flatMap((r) => [`${r}-topik1`, `${r}-topik2`]));
 });
 
 describe.each(listExams().map((e) => [e.id, e] as [string, Exam]))("dữ liệu đề %s", (_id, e) => {
-  it("số câu liền mạch, đáp án 1–4, mỗi phần đủ 100 điểm", () => {
-    const nos = e.sections.flatMap((s) => s.questions.map((q) => q.no));
-    expect(nos).toEqual(nos.map((_, i) => nos[0] + i));
+  it("số câu liền mạch trong từng phần, đáp án 1–4, mỗi phần đủ 100 điểm", () => {
     for (const s of e.sections) {
+      const nos = s.writing ? s.writing.tasks.map((t) => t.no) : s.questions.map((q) => q.no);
+      expect(nos).toEqual(nos.map((_, i) => nos[0] + i));
       expect(s.questions.every((q) => [1, 2, 3, 4].includes(q.answer))).toBe(true);
-      expect(s.questions.reduce((n, q) => n + q.points, 0)).toBe(100);
+      expect(sectionMax(s)).toBe(100);
     }
   });
 
@@ -100,7 +149,7 @@ describe.each(listExams().map((e) => [e.id, e] as [string, Exam]))("dữ liệu 
   it("ảnh nào đề trỏ tới cũng có file (khi đã nhập tài nguyên về máy)", () => {
     const dir = path.resolve("public/img/exams", e.assetDir);
     if (!existsSync(dir)) return; // máy chưa chạy import-topik — không có gì để soát
-    const refs = JSON.stringify(e).match(/images\/[^"\\]+?\.webp/g) ?? [];
+    const refs = JSON.stringify(e).match(/(?:images|writing|answer-key)\/[^"\\]+?\.webp/g) ?? [];
     for (const r of new Set(refs)) expect(existsSync(path.join(dir, r)), r).toBe(true);
   });
 

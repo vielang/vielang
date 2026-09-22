@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Clock, Headphones, ListChecks, Play } from "lucide-react";
+import { ArrowLeft, Clock, Headphones, ListChecks, PenLine, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -18,7 +18,9 @@ import {
   examAudioUrl,
   examTitle,
   isPointsOnly,
+  qKey,
   scoreExam,
+  sectionCount,
   sectionVi,
   totalMinutes,
   type Exam,
@@ -29,6 +31,7 @@ import { useActiveTime } from "@/lib/use-study-tracker";
 import { ContentView, GroupBlock } from "@/components/exam/exam-content";
 import { OptionList } from "@/components/exam/option-list";
 import { useExamAudio } from "@/components/exam/use-exam-audio";
+import { WritingImage, WritingInput, hasWritten } from "@/components/exam/writing-parts";
 
 const NO_SUBSCRIBE = () => () => {};
 
@@ -80,10 +83,16 @@ function MockIntro({ exam, onStart }: { exam: Exam; onStart: () => void }) {
         <ul className="flex flex-col gap-2 text-sm">
           {exam.sections.map((s) => (
             <li key={s.id} className="flex items-center gap-2">
-              {s.audio ? <Headphones className="size-4" aria-hidden /> : <ListChecks className="size-4" aria-hidden />}
+              {s.audio ? (
+                <Headphones className="size-4" aria-hidden />
+              ) : s.writing ? (
+                <PenLine className="size-4" aria-hidden />
+              ) : (
+                <ListChecks className="size-4" aria-hidden />
+              )}
               <span className="font-medium">{sectionVi(s.id)}</span>
               <span className="text-muted-foreground">
-                {s.questions.length} câu · {s.minutes} phút
+                {sectionCount(s)} câu · {s.minutes} phút
               </span>
             </li>
           ))}
@@ -93,6 +102,9 @@ function MockIntro({ exam, onStart }: { exam: Exam; onStart: () => void }) {
           <li>Phần nghe phát liền một lần như phòng thi — không tạm dừng, không tua lại được.</li>
           <li>Đã sang phần sau thì không quay lại phần trước.</li>
           <li>Lỡ tải lại trang thì vẫn làm tiếp được, đồng hồ không dừng.</li>
+          {exam.sections.some((s) => s.writing) && (
+            <li>Phần viết không chấm tự động: nộp bài xong, bạn đối chiếu đáp án mẫu chính thức rồi tự chấm.</li>
+          )}
         </ul>
         <Button onClick={onStart} className="self-start">
           <Play className="size-4" aria-hidden />
@@ -106,6 +118,7 @@ function MockIntro({ exam, onStart }: { exam: Exam; onStart: () => void }) {
 function MockRunning({ exam, attempt }: { exam: Exam; attempt: MockAttempt }) {
   const router = useRouter();
   const setAnswer = useExamStore((s) => s.setMockAnswer);
+  const setText = useExamStore((s) => s.setMockText);
   const nextSection = useExamStore((s) => s.nextMockSection);
   const finish = useExamStore((s) => s.finishMock);
 
@@ -148,7 +161,11 @@ function MockRunning({ exam, attempt }: { exam: Exam; attempt: MockAttempt }) {
     return () => window.clearInterval(t);
   }, [attempt.deadline]);
 
-  const answered = section.questions.filter((q) => attempt.answers[q.no] !== undefined).length;
+  const texts = attempt.texts ?? {};
+  const total = sectionCount(section);
+  const answered = section.writing
+    ? section.writing.tasks.filter((t) => hasWritten(t, texts)).length
+    : section.questions.filter((q) => attempt.answers[qKey(section.id, q.no)] !== undefined).length;
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-5 pb-28">
@@ -158,7 +175,7 @@ function MockRunning({ exam, attempt }: { exam: Exam; attempt: MockAttempt }) {
             {examTitle(exam)} · {sectionVi(section.id)}
           </p>
           <p className="text-xs text-muted-foreground tabular-nums">
-            Đã chọn {answered}/{section.questions.length} câu
+            {section.writing ? "Đã viết" : "Đã chọn"} {answered}/{total} câu
           </p>
         </div>
         <span
@@ -176,13 +193,23 @@ function MockRunning({ exam, attempt }: { exam: Exam; attempt: MockAttempt }) {
         </Button>
       </div>
 
-      <SectionQuestions
-        key={section.id}
-        exam={exam}
-        section={section}
-        attempt={attempt}
-        onAnswer={(no, c) => setAnswer(attempt.id, no, c)}
-      />
+      {section.writing ? (
+        <WritingSection
+          key={section.id}
+          exam={exam}
+          section={section}
+          texts={texts}
+          onChange={(key, text) => setText(attempt.id, key, text)}
+        />
+      ) : (
+        <SectionQuestions
+          key={section.id}
+          exam={exam}
+          section={section}
+          attempt={attempt}
+          onAnswer={(no, c) => setAnswer(attempt.id, qKey(section.id, no), c)}
+        />
+      )}
 
       <Button
         variant="outline"
@@ -190,7 +217,7 @@ function MockRunning({ exam, attempt }: { exam: Exam; attempt: MockAttempt }) {
         onClick={() => setSheetOpen(true)}
       >
         <ListChecks className="size-4" aria-hidden />
-        Phiếu trả lời {answered}/{section.questions.length}
+        Phiếu trả lời {answered}/{total}
       </Button>
 
       <Dialog open={sheetOpen} onOpenChange={setSheetOpen}>
@@ -200,8 +227,22 @@ function MockRunning({ exam, attempt }: { exam: Exam; attempt: MockAttempt }) {
             <DialogDescription>Bấm vào số câu để tới câu đó.</DialogDescription>
           </DialogHeader>
           <div className="grid grid-cols-5 gap-2 sm:grid-cols-6">
+            {section.writing?.tasks.map((t) => (
+              <a
+                key={t.no}
+                href={`#q-${t.no}`}
+                onClick={() => setSheetOpen(false)}
+                className={cn(
+                  "flex flex-col items-center rounded-md border py-1 text-xs tabular-nums",
+                  hasWritten(t, texts) ? "border-primary bg-primary text-primary-foreground" : "border-border"
+                )}
+              >
+                <span>{t.no}</span>
+                <span className="text-sm">{hasWritten(t, texts) ? "✎" : "·"}</span>
+              </a>
+            ))}
             {section.questions.map((q) => {
-              const a = attempt.answers[q.no];
+              const a = attempt.answers[qKey(section.id, q.no)];
               return (
                 <a
                   key={q.no}
@@ -226,8 +267,8 @@ function MockRunning({ exam, attempt }: { exam: Exam; attempt: MockAttempt }) {
           <DialogHeader>
             <DialogTitle>{isLast ? "Nộp bài?" : `Kết thúc phần ${sectionVi(section.id)}?`}</DialogTitle>
             <DialogDescription>
-              {answered < section.questions.length
-                ? `Còn ${section.questions.length - answered} câu chưa chọn. `
+              {answered < total
+                ? `Còn ${total - answered} câu chưa ${section.writing ? "viết" : "chọn"}. `
                 : ""}
               {isLast
                 ? "Nộp rồi thì không sửa được nữa."
@@ -323,11 +364,42 @@ function SectionQuestions({
                 <OptionList
                   exam={exam}
                   question={q}
-                  value={attempt.answers[q.no]}
+                  value={attempt.answers[qKey(section.id, q.no)]}
                   onChange={(c) => onAnswer(q.no, c)}
                 />
               </div>
             ))}
+        </section>
+      ))}
+    </div>
+  );
+}
+
+/** Phần viết khi thi thử: trang đề (ảnh) và ô viết từng câu. */
+function WritingSection({
+  exam,
+  section,
+  texts,
+  onChange,
+}: {
+  exam: Exam;
+  section: ExamSection;
+  texts: Record<string, string>;
+  onChange: (key: string, text: string) => void;
+}) {
+  const tasks = section.writing!.tasks;
+  return (
+    <div className="flex flex-col gap-6">
+      {tasks.map((t, i) => (
+        <section key={t.no} id={`q-${t.no}`} className="flex scroll-mt-32 flex-col gap-3">
+          {/* Mỗi trang đề có hai câu — hiện trang ở câu đầu của trang. */}
+          {(i === 0 || tasks[i - 1].page !== t.page) && (
+            <WritingImage exam={exam} src={t.page} alt={`Đề câu ${t.no}–${t.no + 1}`} />
+          )}
+          <p className="text-sm font-semibold">
+            {t.no}. <span className="font-normal text-muted-foreground">({t.points} điểm)</span>
+          </p>
+          <WritingInput task={t} texts={texts} onChange={onChange} />
         </section>
       ))}
     </div>

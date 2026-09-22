@@ -3,25 +3,34 @@
  * Nhập đề TOPIK từ bộ dữ liệu chính thức (bản v2: JSON + ảnh + mp3, lấy từ
  * dịch vụ "토픽 기출문제 풀어보기" của topik.go.kr) vào app.
  *
- *   npm run import-topik                              # mọi kỳ, TOPIK I
+ *   npm run import-topik                              # mọi kỳ, TOPIK I và II
  *   npm run import-topik -- --src ../topik/Chinh-thuc-v2 --round 102
  *
  * Làm gì:
- * 1. Đọc <src>/<kỳ>/topik1-listening.json + topik1-reading.json, làm sạch
+ * 1. Đọc <src>/<kỳ>/topik{1,2}-listening.json + -reading.json, làm sạch
  *    HTML (xem `lib/exam-html`), suy ra khoảng câu của từng khối "※ [a~b]",
  *    ghép mốc thời gian từng câu nghe nếu có (content/exams/marks/…), rồi
- *    ghi content/exams/<kỳ>-topik1.json — file này COMMIT vào git.
+ *    ghi content/exams/<kỳ>-topik{1,2}.json — file này COMMIT vào git.
+ *    TOPIK II thêm phần viết (topik2-writing.json): đề chỉ có ảnh trang in,
+ *    kèm trang đáp án mẫu; thứ tự các phần như buổi thi thật: nghe → viết
+ *    (tiết 1) → đọc (tiết 2).
  * 2. Chép tài nguyên sang public/img/exams/<kỳ>/: ảnh đổi sang WebP, file
  *    nghe giữ nguyên — thư mục này KHÔNG commit; đẩy lên R2 bằng
  *    `npm run prepare-exams`.
- *
- * TOPIK II chưa nhập: cần làm phần viết (câu 51–54) mới chấm đủ 300 điểm.
  */
 import { copyFile, mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
 import { sanitizeExamHtml, webpName } from "../src/lib/exam-html";
-import { examAssetBase, type Content, type Exam, type ExamGroup, type ExamQuestion, type ExamSection } from "../src/lib/exam-types";
+import {
+  examAssetBase,
+  type Content,
+  type Exam,
+  type ExamGroup,
+  type ExamQuestion,
+  type ExamSection,
+  type WritingTask,
+} from "../src/lib/exam-types";
 
 const args = process.argv.slice(2);
 const argOf = (name: string) => {
@@ -56,6 +65,10 @@ interface SrcQuestion {
 interface SrcSection {
   section: "listening" | "reading"; title: string; durationMinutes: number;
   audio: string | null; groups: SrcGroup[]; questions: SrcQuestion[];
+}
+interface SrcWriting {
+  title: string; durationMinutes: number; questions: number[];
+  pages: { image: string }[]; answerKey: { image: string }[];
 }
 interface Marks {
   intro?: [number, number];
@@ -134,13 +147,45 @@ async function convertSection(src: SrcSection, round: number, marksFile: string)
   };
 }
 
-async function copyAssets(round: number, sections: SrcSection[]) {
+/**
+ * Câu viết theo khung đề TOPIK II (từ kỳ 35, 2014): 51–52 điền ㉠ ㉡ (10
+ * điểm), 53 đoạn 200–300 chữ (30 điểm), 54 bài 600–700 chữ (50 điểm).
+ */
+const WRITING: Omit<WritingTask, "page">[] = [
+  { no: 51, points: 10, kind: "blanks" },
+  { no: 52, points: 10, kind: "blanks" },
+  { no: 53, points: 30, kind: "essay", chars: [200, 300] },
+  { no: 54, points: 50, kind: "essay", chars: [600, 700] },
+];
+
+const webpPath = (p: string) => p.replace(/\.(png|jpe?g|gif)$/i, ".webp");
+
+function convertWriting(src: SrcWriting): ExamSection {
+  if (src.pages.length !== 2) throw new Error(`phần viết có ${src.pages.length} trang đề`);
+  // Trang đáp án TOPIK II: trang đầu là đáp án nghe, trang cuối là đáp án
+  // đọc, (các) trang giữa là đáp án mẫu + tiêu chí chấm phần viết.
+  if (src.answerKey.length < 3) throw new Error(`đáp án TOPIK II chỉ có ${src.answerKey.length} trang`);
+  return {
+    id: "writing",
+    title: src.title,
+    minutes: src.durationMinutes,
+    groups: [],
+    questions: [],
+    writing: {
+      // Trang 1 có câu 51–52, trang 2 có câu 53–54.
+      tasks: WRITING.map((t) => ({ ...t, page: webpPath(src.pages[t.no <= 52 ? 0 : 1].image) })),
+      modelAnswers: src.answerKey.slice(1, -1).map((a) => webpPath(a.image)),
+    },
+  };
+}
+
+async function copyAssets(round: number, sections: SrcSection[], pages: string[] = []) {
   const srcDir = path.join(SRC, String(round));
   const outDir = path.join(OUT_ASSETS, String(round));
   await mkdir(path.join(outDir, "images"), { recursive: true });
   await mkdir(path.join(outDir, "audio"), { recursive: true });
 
-  // Chỉ chép ảnh mà đề TOPIK I thật sự dùng (thư mục gốc có cả ảnh TOPIK II).
+  // Chỉ chép ảnh mà đề thật sự dùng (thư mục gốc có ảnh của cả hai cấp).
   const used = new Set<string>();
   for (const s of sections) {
     const all = JSON.stringify(s);
@@ -154,6 +199,17 @@ async function copyAssets(round: number, sections: SrcSection[]) {
     await sharp(from).webp({ quality: 85 }).toFile(path.join(outDir, "images", webpName(file)));
     converted++;
   }
+  // Trang đề viết / đáp án mẫu: cắt lề trắng, giữ chữ đủ nét để phóng to.
+  for (const page of pages) {
+    const to = path.join(outDir, webpPath(page));
+    await mkdir(path.dirname(to), { recursive: true });
+    await sharp(path.join(srcDir, page))
+      .trim({ background: "#ffffff", threshold: 20 })
+      .extend({ top: 24, bottom: 24, left: 24, right: 24, background: "#ffffff" })
+      .webp({ quality: 85 })
+      .toFile(to);
+    converted++;
+  }
   return converted;
 }
 
@@ -164,33 +220,44 @@ async function main() {
     .sort((a, b) => a - b);
 
   for (const round of rounds) {
-    const dir = path.join(SRC, String(round));
-    const src = await Promise.all(
-      (["topik1-listening", "topik1-reading"] as const).map(
-        async (f) => JSON.parse(await readFile(path.join(dir, `${f}.json`), "utf8")) as SrcSection
-      )
-    );
-    const id = `${round}-topik1`;
-    const sections = await Promise.all(
-      src.map((s) => convertSection(s, round, path.join(MARKS, `${id}-${s.section}.json`)))
-    );
-    const exam: Exam = {
-      id,
-      round,
-      year: YEAR[round] ?? 0,
-      level: "TOPIK I",
-      assetDir: String(round),
-      source: `Đề thi và đáp án chính thức kỳ ${round}${YEAR[round] ? ` (${YEAR[round]})` : ""} — Viện Giáo dục Quốc tế Quốc gia Hàn Quốc (NIIED), topik.go.kr`,
-      sections,
-    };
-    await writeFile(path.join(OUT_JSON, `${id}.json`), JSON.stringify(exam, null, 1) + "\n");
-    const images = await copyAssets(round, src);
-    const marked = sections[0].questions.filter((q) => q.audio).length;
-    console.log(
-      `  ${id}: ${sections.map((s) => `${s.id} ${s.questions.length} câu`).join(", ")}, ${images} ảnh` +
-        (marked ? `, ${marked} câu nghe có mốc thời gian` : "")
-    );
+    for (const level of [1, 2] as const) await importExam(round, level);
   }
+}
+
+async function importExam(round: number, level: 1 | 2) {
+  const dir = path.join(SRC, String(round));
+  const src = await Promise.all(
+    (["listening", "reading"] as const).map(
+      async (f) => JSON.parse(await readFile(path.join(dir, `topik${level}-${f}.json`), "utf8")) as SrcSection
+    )
+  );
+  const id = `${round}-topik${level}`;
+  const [listening, reading] = await Promise.all(
+    src.map((s) => convertSection(s, round, path.join(MARKS, `${id}-${s.section}.json`)))
+  );
+  let sections = [listening, reading];
+  let pages: string[] = [];
+  if (level === 2) {
+    const w = JSON.parse(await readFile(path.join(dir, "topik2-writing.json"), "utf8")) as SrcWriting;
+    sections = [listening, convertWriting(w), reading];
+    pages = [...w.pages, ...w.answerKey.slice(1, -1)].map((p) => p.image);
+  }
+  const exam: Exam = {
+    id,
+    round,
+    year: YEAR[round] ?? 0,
+    level: level === 1 ? "TOPIK I" : "TOPIK II",
+    assetDir: String(round),
+    source: `Đề thi và đáp án chính thức kỳ ${round}${YEAR[round] ? ` (${YEAR[round]})` : ""} — Viện Giáo dục Quốc tế Quốc gia Hàn Quốc (NIIED), topik.go.kr`,
+    sections,
+  };
+  await writeFile(path.join(OUT_JSON, `${id}.json`), JSON.stringify(exam, null, 1) + "\n");
+  const images = await copyAssets(round, src, pages);
+  const marked = listening.questions.filter((q) => q.audio).length;
+  console.log(
+    `  ${id}: ${sections.map((s) => `${s.id} ${s.questions.length || s.writing?.tasks.length} câu`).join(", ")}, ${images} ảnh` +
+      (marked ? `, ${marked} câu nghe có mốc thời gian` : "")
+  );
 }
 
 main().catch((err) => {

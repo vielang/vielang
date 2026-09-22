@@ -2,9 +2,9 @@
 
 import { useSyncExternalStore } from "react";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Headphones, ListChecks, Timer } from "lucide-react";
+import { ArrowLeft, ArrowRight, Headphones, ListChecks, PenLine, Timer } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { examTitle, sectionVi, totalMinutes, type Exam } from "@/lib/exams";
+import { examTitle, qKey, sectionCount, sectionVi, totalMinutes, type Exam, type Grades } from "@/lib/exams";
 import { activeAttempt, finishedAttempts, useExamStore } from "@/lib/exam-store";
 
 const NO_SUBSCRIBE = () => () => {};
@@ -17,6 +17,7 @@ export function ExamOverview({ exam, source }: { exam: Exam; source?: string }) 
   const active = isClient ? activeAttempt(attempts, exam.id) : undefined;
   const history = isClient ? finishedAttempts(attempts, exam.id) : [];
   const checked = new Set(isClient ? (practice?.checked ?? []) : []);
+  const grades: Grades = isClient ? (practice?.grades ?? {}) : {};
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-8">
@@ -29,7 +30,7 @@ export function ExamOverview({ exam, source }: { exam: Exam; source?: string }) 
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">{examTitle(exam)}</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Năm {exam.year} · {exam.sections.map((s) => `${sectionVi(s.id)} ${s.questions.length} câu`).join(" · ")} ·{" "}
+            Năm {exam.year} · {exam.sections.map((s) => `${sectionVi(s.id)} ${sectionCount(s)} câu`).join(" · ")} ·{" "}
             {totalMinutes(exam)} phút
           </p>
         </div>
@@ -46,7 +47,10 @@ export function ExamOverview({ exam, source }: { exam: Exam; source?: string }) 
         <h2 className="text-base font-semibold">Luyện từng câu</h2>
         <div className="grid gap-3 sm:grid-cols-2">
           {exam.sections.map((s) => {
-            const done = s.questions.filter((q) => checked.has(q.no)).length;
+            const done = s.writing
+              ? s.writing.tasks.filter((t) => grades[t.no] !== undefined).length
+              : s.questions.filter((q) => checked.has(qKey(s.id, q.no))).length;
+            const count = sectionCount(s);
             return (
               <Link
                 key={s.id}
@@ -54,12 +58,20 @@ export function ExamOverview({ exam, source }: { exam: Exam; source?: string }) 
                 className="flex flex-col gap-2 rounded-xl border border-border p-4 transition-colors hover:bg-muted/60"
               >
                 <span className="flex items-center gap-2 font-medium">
-                  {s.audio ? <Headphones className="size-4" aria-hidden /> : <ListChecks className="size-4" aria-hidden />}
+                  {s.audio ? (
+                    <Headphones className="size-4" aria-hidden />
+                  ) : s.writing ? (
+                    <PenLine className="size-4" aria-hidden />
+                  ) : (
+                    <ListChecks className="size-4" aria-hidden />
+                  )}
                   {sectionVi(s.id)} <span className="font-korean text-sm text-muted-foreground">{s.title}</span>
                 </span>
                 <span className="text-sm text-muted-foreground tabular-nums">
-                  {done > 0 ? `Đã làm ${done}/${s.questions.length} câu` : `${s.questions.length} câu`} — chấm ngay
-                  từng câu{s.audio ? ", nghe lại từng câu" : ""}
+                  {done > 0 ? `Đã ${s.writing ? "chấm" : "làm"} ${done}/${count} câu` : `${count} câu`} —{" "}
+                  {s.writing
+                    ? "viết rồi tự chấm theo đáp án mẫu"
+                    : `chấm ngay từng câu${s.audio ? ", nghe lại từng câu" : ""}`}
                 </span>
               </Link>
             );

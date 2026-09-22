@@ -13,21 +13,34 @@
  * Output File Tracing của Next không lần được file đọc qua path dựng động.
  */
 import e35 from "../../content/exams/35-topik1.json";
+import e35b from "../../content/exams/35-topik2.json";
 import e36 from "../../content/exams/36-topik1.json";
+import e36b from "../../content/exams/36-topik2.json";
 import e37 from "../../content/exams/37-topik1.json";
+import e37b from "../../content/exams/37-topik2.json";
 import e41 from "../../content/exams/41-topik1.json";
+import e41b from "../../content/exams/41-topik2.json";
 import e47 from "../../content/exams/47-topik1.json";
+import e47b from "../../content/exams/47-topik2.json";
 import e52 from "../../content/exams/52-topik1.json";
+import e52b from "../../content/exams/52-topik2.json";
 import e60 from "../../content/exams/60-topik1.json";
+import e60b from "../../content/exams/60-topik2.json";
 import e64 from "../../content/exams/64-topik1.json";
+import e64b from "../../content/exams/64-topik2.json";
 import e83 from "../../content/exams/83-topik1.json";
+import e83b from "../../content/exams/83-topik2.json";
 import e91 from "../../content/exams/91-topik1.json";
+import e91b from "../../content/exams/91-topik2.json";
 import e96 from "../../content/exams/96-topik1.json";
+import e96b from "../../content/exams/96-topik2.json";
 import e102 from "../../content/exams/102-topik1.json";
+import e102b from "../../content/exams/102-topik2.json";
 import { mediaOriginBase } from "@/lib/books";
 import {
   examAssetBase,
   isImage,
+  qKey,
   type Content,
   type Exam,
   type ExamGroup,
@@ -39,7 +52,9 @@ import {
 
 export * from "@/lib/exam-types";
 
-const EXAMS = [e102, e96, e91, e83, e64, e60, e52, e47, e41, e37, e36, e35] as unknown as Exam[];
+const EXAMS = [
+  e102, e102b, e96, e96b, e91, e91b, e83, e83b, e64, e64b, e60, e60b, e52, e52b, e47, e47b, e41, e41b, e37, e37b, e36, e36b, e35, e35b,
+] as unknown as Exam[];
 
 export function listExams(): Exam[] {
   return [...EXAMS].sort((a, b) => b.round - a.round || a.level.localeCompare(b.level));
@@ -61,8 +76,28 @@ export function totalMinutes(exam: Exam): number {
   return exam.sections.reduce((n, s) => n + s.minutes, 0);
 }
 
+/** Điểm tối đa của một phần (câu trắc nghiệm + câu viết). */
+export function sectionMax(s: ExamSection): number {
+  return (
+    s.questions.reduce((m, q) => m + q.points, 0) + (s.writing?.tasks.reduce((m, t) => m + t.points, 0) ?? 0)
+  );
+}
+
+/** Số câu của một phần, kể cả câu viết. */
+export function sectionCount(s: ExamSection): number {
+  return s.questions.length + (s.writing?.tasks.length ?? 0);
+}
+
 export function maxScore(exam: Exam): number {
-  return exam.sections.reduce((n, s) => n + s.questions.reduce((m, q) => m + q.points, 0), 0);
+  return exam.sections.reduce((n, s) => n + sectionMax(s), 0);
+}
+
+/**
+ * Số ký tự của bài viết như cách đếm ô 원고지: tính cả dấu cách, không tính
+ * xuống dòng.
+ */
+export function countChars(text: string): number {
+  return text.replace(/\r?\n/g, "").length;
 }
 
 /** Khối "※ [a~b]" chứa câu `no`. */
@@ -93,12 +128,18 @@ export function isPointsOnly(c: Content): boolean {
 // ---------------------------------------------------------------------------
 // Chấm điểm
 
-export type Answers = Record<number, number>;
+/** Đáp án trắc nghiệm đã chọn, theo `qKey` ("reading:12" → 3). */
+export type Answers = Record<string, number>;
+/** Chữ đã viết ở câu viết, theo `textKey` ("51:0" → "…"). */
+export type Texts = Record<string, string>;
+/** Điểm TỰ CHẤM từng câu viết, theo số câu (53 → 24). */
+export type Grades = Record<number, number>;
 
 export interface SectionScore {
   id: SectionId;
   score: number;
   max: number;
+  /** Trắc nghiệm: số câu đúng. Phần viết: số câu đã tự chấm. */
   correct: number;
   total: number;
 }
@@ -108,6 +149,8 @@ export interface ExamScore {
   score: number;
   max: number;
   level: string | null;
+  /** Còn câu viết chưa tự chấm — điểm và cấp hiện tại chưa phải cuối cùng. */
+  ungraded: number;
 }
 
 /**
@@ -132,23 +175,28 @@ export function levelFor(examLevel: ExamLevel, score: number): string | null {
   return LEVEL_CUTS[examLevel].find(([cut]) => score >= cut)?.[1] ?? null;
 }
 
-export function scoreExam(exam: Exam, answers: Answers): ExamScore {
+export function scoreExam(exam: Exam, answers: Answers, grades: Grades = {}): ExamScore {
+  let ungraded = 0;
   const sections = exam.sections.map((s) => {
     let score = 0;
     let correct = 0;
     for (const q of s.questions) {
-      if (answers[q.no] === q.answer) {
+      if (answers[qKey(s.id, q.no)] === q.answer) {
         score += q.points;
         correct++;
       }
     }
-    return {
-      id: s.id,
-      score,
-      max: s.questions.reduce((n, q) => n + q.points, 0),
-      correct,
-      total: s.questions.length,
-    };
+    for (const t of s.writing?.tasks ?? []) {
+      const g = grades[t.no];
+      if (g === undefined) {
+        ungraded++;
+        continue;
+      }
+      // Điểm tự chấm lưu trên máy người dùng — kẹp lại cho chắc.
+      score += Math.max(0, Math.min(t.points, g));
+      correct++;
+    }
+    return { id: s.id, score, max: sectionMax(s), correct, total: sectionCount(s) };
   });
   const score = sections.reduce((n, s) => n + s.score, 0);
   return {
@@ -156,6 +204,7 @@ export function scoreExam(exam: Exam, answers: Answers): ExamScore {
     score,
     max: sections.reduce((n, s) => n + s.max, 0),
     level: levelFor(exam.level, score),
+    ungraded,
   };
 }
 

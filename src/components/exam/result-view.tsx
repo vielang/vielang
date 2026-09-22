@@ -10,6 +10,7 @@ import {
   examTitle,
   groupOf,
   isPointsOnly,
+  qKey,
   questionAudio,
   scoreExam,
   sectionVi,
@@ -20,6 +21,7 @@ import { useExamStore, type MockAttempt } from "@/lib/exam-store";
 import { ContentView, GroupBlock } from "@/components/exam/exam-content";
 import { OptionList } from "@/components/exam/option-list";
 import { useExamAudio } from "@/components/exam/use-exam-audio";
+import { SelfGrade, WritingImage, WritingInput, hasWritten } from "@/components/exam/writing-parts";
 
 const NO_SUBSCRIBE = () => () => {};
 
@@ -48,7 +50,7 @@ export function ResultView({ exam, attemptId }: { exam: Exam; attemptId?: string
     );
   }
 
-  const result = scoreExam(exam, attempt.answers);
+  const result = scoreExam(exam, attempt.answers, attempt.grades);
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-8 pb-16">
@@ -79,6 +81,14 @@ export function ResultView({ exam, attemptId }: { exam: Exam; attemptId?: string
             {result.level ? `Đạt ${exam.level} ${result.level}` : "Chưa đạt cấp nào"}
           </span>
         </div>
+        {result.ungraded > 0 && (
+          <p className="rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-900 dark:bg-amber-950/40 dark:text-amber-200">
+            Còn {result.ungraded} câu viết chưa tự chấm — điểm và cấp trên đây mới là tạm tính.{" "}
+            <a href="#writing" className="font-medium underline underline-offset-2">
+              Chấm phần viết
+            </a>
+          </p>
+        )}
         <ul className="flex flex-col gap-2">
           {result.sections.map((s) => (
             <li key={s.id} className="grid grid-cols-[3.5rem_1fr_auto] items-center gap-3 text-sm">
@@ -87,7 +97,7 @@ export function ResultView({ exam, attemptId }: { exam: Exam; attemptId?: string
                 <span className="block h-full rounded-full bg-primary" style={{ width: `${(s.score / s.max) * 100}%` }} />
               </span>
               <span className="tabular-nums text-muted-foreground">
-                {s.score}/{s.max} điểm · đúng {s.correct}/{s.total}
+                {s.score}/{s.max} điểm · {s.id === "writing" ? "đã chấm" : "đúng"} {s.correct}/{s.total}
               </span>
             </li>
           ))}
@@ -114,9 +124,13 @@ export function ResultView({ exam, attemptId }: { exam: Exam; attemptId?: string
           Chỉ câu sai
         </label>
       </div>
-      {exam.sections.map((s) => (
-        <ReviewSection key={s.id} exam={exam} section={s} attempt={attempt} onlyWrong={onlyWrong} />
-      ))}
+      {exam.sections.map((s) =>
+        s.writing ? (
+          <WritingReview key={s.id} exam={exam} section={s} attempt={attempt} />
+        ) : (
+          <ReviewSection key={s.id} exam={exam} section={s} attempt={attempt} onlyWrong={onlyWrong} />
+        )
+      )}
     </div>
   );
 }
@@ -133,7 +147,7 @@ function ReviewSection({
   onlyWrong: boolean;
 }) {
   const audio = useExamAudio(section.audio ? examAudioUrl(exam, section.audio) : undefined);
-  const shown = section.questions.filter((q) => !onlyWrong || attempt.answers[q.no] !== q.answer);
+  const shown = section.questions.filter((q) => !onlyWrong || attempt.answers[qKey(section.id, q.no)] !== q.answer);
   return (
     <section className="flex flex-col gap-4">
       <h3 className="text-sm font-medium text-muted-foreground">
@@ -149,7 +163,7 @@ function ReviewSection({
         const segments = questionAudio(section, q);
         const playingThis =
           audio.playing && audio.segment !== null && segments.length > 0 && audio.segment[1] === segments[segments.length - 1][1];
-        const chosen = attempt.answers[q.no];
+        const chosen = attempt.answers[qKey(section.id, q.no)];
         return (
           <div key={q.no} className="flex flex-col gap-3 rounded-xl border border-border p-3">
             <p className="text-sm font-medium">
@@ -175,6 +189,55 @@ function ReviewSection({
           </div>
         );
       })}
+    </section>
+  );
+}
+
+/**
+ * Phần viết sau khi nộp: bài đã viết (không sửa được nữa), đáp án mẫu chính
+ * thức, và thanh tự chấm từng câu — chấm đến đâu điểm tổng và cấp cập nhật
+ * đến đó (cả trong danh sách các lần thi).
+ */
+function WritingReview({ exam, section, attempt }: { exam: Exam; section: ExamSection; attempt: MockAttempt }) {
+  const gradeMock = useExamStore((s) => s.gradeMock);
+  const texts = attempt.texts ?? {};
+  const grades = attempt.grades ?? {};
+  const grade = (no: number, points: number) => {
+    const next = { ...grades, [no]: points };
+    const r = scoreExam(exam, attempt.answers, next);
+    gradeMock(attempt.id, no, points, r.score, r.level);
+  };
+  return (
+    <section id="writing" className="flex scroll-mt-20 flex-col gap-4">
+      <h3 className="text-sm font-medium text-muted-foreground">
+        {sectionVi(section.id)} · {section.writing!.tasks.length} câu — tự chấm theo đáp án mẫu
+      </h3>
+      <details className="rounded-xl border border-border p-3">
+        <summary className="cursor-pointer text-sm font-medium">Đáp án mẫu và tiêu chí chấm chính thức</summary>
+        <div className="mt-3 flex flex-col gap-3">
+          {section.writing!.modelAnswers.map((src, i) => (
+            <WritingImage key={src} exam={exam} src={src} alt={`Đáp án mẫu phần viết, trang ${i + 1}`} />
+          ))}
+        </div>
+      </details>
+      {section.writing!.tasks.map((t) => (
+        <div key={t.no} className="flex flex-col gap-3 rounded-xl border border-border p-3">
+          <p className="text-sm font-medium">
+            Câu {t.no}{" "}
+            <span className="font-normal text-muted-foreground">
+              · {hasWritten(t, texts) ? `tối đa ${t.points} điểm` : "bỏ trống"}
+            </span>
+          </p>
+          <details>
+            <summary className="cursor-pointer text-sm text-muted-foreground">Xem đề</summary>
+            <div className="mt-2">
+              <WritingImage exam={exam} src={t.page} alt={`Đề câu ${t.no}`} />
+            </div>
+          </details>
+          {hasWritten(t, texts) && <WritingInput task={t} texts={texts} onChange={() => {}} readOnly />}
+          <SelfGrade task={t} value={grades[t.no]} onChange={(p) => grade(t.no, p)} />
+        </div>
+      ))}
     </section>
   );
 }

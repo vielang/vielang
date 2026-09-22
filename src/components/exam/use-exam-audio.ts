@@ -3,6 +3,28 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 /**
+ * Tua tới `to` rồi phát. Nếu file chưa tải xong thông tin (lần bấm đầu tiên
+ * trên trang), một số trình duyệt — nhất là Safari/iOS — BỎ QUA lệnh tua và
+ * phát từ đầu file (phần giới thiệu chung của bài thi). Khi đó: tắt tiếng,
+ * vẫn gọi play() ngay (còn trong lượt bấm của người dùng, iOS mới cho phát),
+ * tua lại khi đã có thông tin file, bật tiếng khi tua xong.
+ */
+function seekAndPlay(audio: HTMLAudioElement, to: number) {
+  if (audio.readyState < HTMLMediaElement.HAVE_METADATA) {
+    audio.muted = true;
+    audio.addEventListener("loadedmetadata", () => (audio.currentTime = to), { once: true });
+    const unmute = () => {
+      if (Math.abs(audio.currentTime - to) > 1) return; // còn đang ở chỗ cũ
+      audio.muted = false;
+      audio.removeEventListener("seeked", unmute);
+    };
+    audio.addEventListener("seeked", unmute);
+  }
+  audio.currentTime = to;
+  void audio.play();
+}
+
+/**
  * Một thẻ <audio> dùng chung cho cả phần nghe, phát được TỪNG ĐOẠN
  * (một câu, hay lời chỉ dẫn) hoặc cả file liền mạch như thi thật.
  *
@@ -80,8 +102,7 @@ export function useExamAudio(src: string | undefined) {
     queue.current = rest;
     stopAt.current = first[1];
     setSegment([first[0], segments[segments.length - 1][1]]);
-    audio.currentTime = first[0];
-    void audio.play();
+    seekAndPlay(audio, first[0]);
   }, []);
 
   /** Phát liền mạch từ `from` tới hết file (chế độ thi thử). */
@@ -91,8 +112,7 @@ export function useExamAudio(src: string | undefined) {
     stopAt.current = null;
     queue.current = [];
     setSegment(null);
-    audio.currentTime = from;
-    void audio.play();
+    seekAndPlay(audio, from);
   }, []);
 
   const pause = useCallback(() => ref.current?.pause(), []);

@@ -169,25 +169,30 @@ describe("nghe lại một câu", () => {
     expect(groupAudio(bare, bare.groups[0])).toEqual([]);
   });
 
-  it("nghe cả khối: lời chỉ dẫn + lời đọc từng câu, bỏ các khoảng dừng trả lời", () => {
+  it("audio của khối như đề thật: một đoạn liền từ lời chỉ dẫn tới hết khoảng dừng câu cuối", () => {
     const listening = exam.sections[0];
     const g = listening.groups[0]; // [1~4]
-    const segs = groupAudio(listening, g);
     const items = listening.questions.filter((q) => q.no >= g.from && q.no <= g.to);
-    expect(segs[0][0]).toBe(g.audio![0]); // bắt đầu từ lời chỉ dẫn
-    expect(segs).toHaveLength(items.length); // lời chỉ dẫn liền câu 1 → gộp; giữa các câu là khoảng dừng
-    for (const q of items) {
-      // Khoảng dừng trả lời của câu (sau phần lời đọc) không nằm trong đoạn nào.
-      const pauseMid = (q.replay![1] + q.audio![1]) / 2;
-      expect(segs.some(([a, b]) => pauseMid >= a && pauseMid <= b)).toBe(false);
-    }
+    expect(groupAudio(listening, g)).toEqual([[g.audio![0], items.at(-1)!.audio![1]]]);
+  });
+
+  it("mọi khối của mọi đề là MỘT đoạn liền (không lấn sang khối sau)", () => {
+    for (const e of listExams())
+      for (const s of e.sections.filter((x) => x.questions.some((q) => q.audio)))
+        for (const g of s.groups) {
+          const segs = groupAudio(s, g);
+          expect(segs, `${e.id} khối ${g.from}`).toHaveLength(1);
+          const next = s.groups.find((x) => x.from > g.to);
+          const nextStart = next && (next.audio ?? s.questions.find((q) => q.no === next.from)!.audio!)[0];
+          if (nextStart !== undefined) expect(segs[0][1]).toBeLessThanOrEqual(nextStart + 0.2);
+        }
   });
 
   it("TOPIK II khối hai câu: hội thoại phát một lần, rồi tới câu sau", () => {
     const listening = exam2.sections[0];
     const g = listening.groups.find((x) => x.from === 21)!;
     const [q21, q22] = listening.questions.filter((q) => q.no === 21 || q.no === 22);
-    expect(groupAudio(listening, g)).toEqual([q21.replay, q22.replay]);
+    expect(groupAudio(listening, g)).toEqual([[q21.audio![0], q22.audio![1]]]);
     expect(questionAudio(listening, q22)).toEqual([g.dialogue, q22.replay]);
   });
 

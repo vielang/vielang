@@ -119,15 +119,15 @@ export function questionAudio(section: ExamSection, q: ExamQuestion): [number, n
 }
 
 /**
- * Các đoạn cần phát để NGHE CẢ KHỐI: lời chỉ dẫn (+ câu mẫu) của khối nếu có
- * mốc riêng, rồi phần lời đọc của từng câu — bỏ các khoảng dừng trả lời.
- * Hội thoại dùng chung đã nằm trong đoạn của câu đầu khối nên chỉ phát một
- * lần. Các đoạn sát nhau được gộp lại cho khỏi phải tua. Rỗng khi đề chưa
+ * Audio của CẢ KHỐI, giữ nguyên như đề thật: lời chỉ dẫn (+ câu mẫu) rồi
+ * từng câu kèm KHOẢNG DỪNG trả lời sau câu — nghe xong có thời gian chọn đáp
+ * án, thời lượng khớp với đề. Các đoạn nối liền nhau nên thường gộp thành
+ * một đoạn duy nhất; hội thoại dùng chung chỉ phát một lần. Rỗng khi đề chưa
  * có mốc thời gian.
  */
 export function groupAudio(section: ExamSection, group: ExamGroup): [number, number][] {
   const items = section.questions.filter((q) => q.no >= group.from && q.no <= group.to);
-  const parts = [...(group.audio ? [group.audio] : []), ...items.map((q) => q.replay ?? q.audio)].filter(
+  const parts = [...(group.audio ? [group.audio] : []), ...items.map((q) => q.audio)].filter(
     (p): p is [number, number] => !!p
   );
   if (parts.length < items.length) return [];

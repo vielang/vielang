@@ -12,10 +12,9 @@ function mmss(s: number): string {
 }
 
 /**
- * Trình phát MỘT audio cho cả khối: lời chỉ dẫn + lời đọc từng câu, đã bỏ
- * các khoảng dừng trả lời. Các đoạn ấy nằm rời nhau trong file nghe của cả
- * phần, nhưng người học thấy một bài liền mạch: một nút phát/tạm dừng, một
- * thanh thời gian kéo được, nút lùi 5 giây.
+ * Trình phát MỘT audio cho cả khối (xem `groupAudio`): một nút phát/tạm
+ * dừng, một thanh thời gian kéo được, nút lùi 5 giây. Audio có thể gồm vài
+ * đoạn rời nhau trong file nghe của cả phần, người học vẫn thấy một bài liền.
  *
  * "Thời gian khối" là tổng độ dài các đoạn; đổi qua lại với thời gian thật
  * trong file bằng `toReal` / `toBlock`.

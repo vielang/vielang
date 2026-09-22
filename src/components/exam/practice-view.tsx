@@ -42,8 +42,8 @@ const MARKS = "①②③④";
  * đoạn văn dùng chung hiện một lần, các câu của khối xếp bên dưới, một nút
  * kiểm tra cả khối. Phần viết luyện từng câu (mỗi câu một bài).
  *
- * Nghe: mỗi khối MỘT audio (lời chỉ dẫn + lời đọc các câu, bỏ khoảng dừng
- * trả lời) có thanh điều khiển — xem `BlockPlayer`. Đề chưa đo mốc thời gian
+ * Nghe: mỗi khối MỘT audio như đề thật (lời chỉ dẫn + từng câu kèm khoảng
+ * dừng trả lời) có thanh điều khiển — xem `BlockPlayer`. Đề chưa đo mốc thời gian
  * thì hiện trình phát cả bài (tua được).
  *
  * Bài làm lưu trong `exam-store` theo từng câu, nên đóng trang mở lại vẫn
@@ -183,12 +183,12 @@ function GroupPractice({ exam, section, initialNo }: { exam: Exam; section: Exam
     return () => window.removeEventListener("keydown", onKey);
   });
 
-  // Một audio cho cả khối: lời chỉ dẫn + lời đọc từng câu, bỏ khoảng dừng trả lời.
+  // Một audio cho cả khối như đề thật: lời chỉ dẫn + từng câu kèm khoảng dừng trả lời.
   const blockSegments = groupAudio(section, group);
   // Câu đang được đọc (tô trong khối khi đang nghe).
   const playingNo = audio.playing
     ? items.find((q) => {
-        const seg = q.replay ?? q.audio;
+        const seg = q.audio;
         return seg && audio.time >= seg[0] && audio.time < seg[1];
       })?.no
     : undefined;

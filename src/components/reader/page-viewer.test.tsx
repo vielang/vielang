@@ -181,11 +181,26 @@ describe("hai đầu sách", () => {
 });
 
 describe("chạm", () => {
-  it("chạm nhẹ thì bật/tắt thanh công cụ", () => {
+  it("chạm nhẹ thì bật/tắt thanh công cụ (sau một nhịp chờ)", () => {
     const { onTap } = view();
     drag(3);
+    // Chờ xem có phải bấm đúp không đã rồi mới bật/tắt.
+    expect(onTap).not.toHaveBeenCalled();
+    act(() => void vi.advanceTimersByTime(250));
 
     expect(onTap).toHaveBeenCalledTimes(1);
+  });
+
+  it("bấm đúp (để phóng to) thì KHÔNG bật/tắt thanh công cụ", () => {
+    // Trước đây mỗi lần nhấc tay là một lần bật/tắt: bấm đúp làm thanh công
+    // cụ nháy, có khi dừng ở trạng thái ẩn — kéo theo thanh phóng to biến
+    // mất đúng lúc vừa phóng to.
+    const { onTap } = view();
+    drag(2, { ms: 40 });
+    drag(2, { ms: 40 });
+    act(() => void vi.advanceTimersByTime(500));
+
+    expect(onTap).not.toHaveBeenCalled();
   });
 });
 
@@ -269,6 +284,7 @@ describe("chạm trúng chấm trên trang", () => {
   it("chạm vào chỗ trống trên trang thì vẫn bật/tắt như thường", () => {
     const { onTap } = view({ pages: [15], prevPages: [14], nextPages: [16] });
     drag(2);
+    act(() => void vi.advanceTimersByTime(250));
 
     expect(onTap).toHaveBeenCalledTimes(1);
   });

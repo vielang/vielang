@@ -35,7 +35,11 @@ import { useReaderPrefsStore } from "@/lib/reader-prefs-store";
 const GESTURES: { Icon: typeof Hand; what: string; how: string }[] = [
   { Icon: Pointer, what: "Chạm giữa trang", how: "ẩn hoặc hiện thanh công cụ" },
   { Icon: MoveHorizontal, what: "Vuốt ngang", how: "lật sang trang trước / trang sau" },
-  { Icon: ZoomIn, what: "Chụm 2 ngón, hoặc chạm 2 lần", how: "phóng to để soi chữ" },
+  {
+    Icon: ZoomIn,
+    what: "Chụm 2 ngón, hoặc chạm 2 lần",
+    how: "phóng to để soi chữ — chạm 2 lần nữa là về như cũ",
+  },
   {
     Icon: Languages,
     what: "Chạm vào một đoạn chữ Hàn",
@@ -62,6 +66,8 @@ const SHORTCUTS: { keys: string[]; what: string }[] = [
   { keys: ["Home", "End"], what: "Trang đầu / trang cuối" },
   { keys: ["N"], what: "Bài giảng" },
   { keys: ["D"], what: "Bật/tắt chế độ vẽ" },
+  { keys: ["+", "−"], what: "Phóng to / thu nhỏ" },
+  { keys: ["0"], what: "Về 100%" },
   { keys: ["B"], what: "Đánh dấu trang" },
   { keys: ["?"], what: "Mở lại bảng này" },
   { keys: ["Esc"], what: "Đóng sách" },

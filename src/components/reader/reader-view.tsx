@@ -24,6 +24,8 @@ import { AnnotationToolbar } from "@/components/reader/annotation-toolbar";
 import { RecorderWidget } from "@/components/reader/recorder-widget";
 import { ReaderHelp } from "@/components/reader/reader-help";
 import { useStudyTracker } from "@/lib/use-study-tracker";
+import { nextZoom, useZoomStore } from "@/lib/zoom-store";
+import { ZoomBar } from "@/components/reader/zoom-bar";
 import { useNoteWidgetStore } from "@/lib/note-widget-store";
 import {
   useAnnotationHydration,
@@ -315,6 +317,20 @@ export function ReaderView({
         case "?":
           setHelpOpen(true);
           break;
+        // Phóng to/thu nhỏ từng nấc 25% và về 100%. Có Ctrl/⌘ thì là phóng to
+        // CẢ TRÌNH DUYỆT — để nguyên cho trình duyệt xử lý.
+        case "+":
+        case "=":
+        case "-":
+        case "_":
+        case "0": {
+          if (e.ctrlKey || e.metaKey) return;
+          const scale = useZoomStore.getState().scale;
+          const target =
+            e.key === "0" ? 1 : nextZoom(scale, e.key === "-" || e.key === "_" ? -1 : 1);
+          viewerRef.current?.zoomTo(target);
+          break;
+        }
         default:
           return;
       }
@@ -347,6 +363,7 @@ export function ReaderView({
 
       <PageViewer
         ref={viewerRef}
+        wide={isWideScreen}
         book={book}
         pages={pages}
         prevPages={prevPages}
@@ -369,6 +386,12 @@ export function ReaderView({
       {/* Tự hiện một lần ở lần mở sách đầu tiên — xem ReaderHelp. */}
       <ReaderHelp open={helpOpen} onOpenChange={setHelpOpen} />
 
+      {isWideScreen && (
+        <ZoomBar
+          visible={toolbarVisible}
+          onZoomTo={(scale) => viewerRef.current?.zoomTo(scale)}
+        />
+      )}
       <ReaderControls
         visible={toolbarVisible}
         book={book}

@@ -16,8 +16,8 @@ import { DRAG_MARGIN, type DragPos } from "@/lib/use-draggable";
  * đây chỉ là chỗ ĐẦU TIÊN chúng xuất hiện.
  *
  * Bố cục: cột PHẢI dành cho công cụ nhỏ (nút audio dưới cùng, thanh vẽ ngay
- * trên), bên TRÁI dành cho hai khung làm việc lớn (panel bài giảng ở trên,
- * bảng ghi âm ở dưới).
+ * trên, thanh phóng to ở phần TRÊN của cột — chỉ màn rộng), bên TRÁI dành cho
+ * hai khung làm việc lớn (panel bài giảng ở trên, bảng ghi âm ở dưới).
  *
  * Bảo đảm được: mấy nút nhỏ bên phải không bao giờ bị che, vì đó chính là
  * thứ cần bấm trong lúc một panel đang mở.
@@ -42,6 +42,15 @@ const AUDIO_BOTTOM_OFFSET = 84;
 
 /** Thanh công cụ trên cùng của trang đọc. */
 const TOP_BAR = 64;
+
+/**
+ * Thanh phóng to: sát mép phải, ngay dưới thanh công cụ trên. Không kéo được.
+ *
+ * Ở phần TRÊN của cột phải chứ không canh giữa: nửa dưới cột đã có thanh vẽ
+ * (dựng dọc ngay trên nút audio), canh giữa thì bật chế độ vẽ là hai thanh
+ * đè lên nhau.
+ */
+export const ZOOM_BAR_TOP = TOP_BAR + GAP;
 
 /** Mép TRÊN của nút audio khi nó còn ở chỗ mặc định. */
 export function audioTop(): number {

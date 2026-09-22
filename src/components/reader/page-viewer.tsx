@@ -31,9 +31,18 @@ import { GrammarOverlay } from "@/components/reader/grammar-overlay";
 import { AnswerOverlay } from "@/components/reader/answer-overlay";
 import { AnnotationLayer } from "@/components/reader/annotation-layer";
 import { useAnnotationStore } from "@/lib/annotation-store";
+import {
+  DOUBLE_TAP_STEP_NARROW,
+  DOUBLE_TAP_STEP_WIDE,
+  MAX_ZOOM,
+  MIN_ZOOM,
+  useZoomStore,
+} from "@/lib/zoom-store";
 
 export interface PageViewerHandle {
   resetZoom: () => void;
+  /** Phóng tới đúng mức `scale` (1–4), giữ nguyên tâm vùng đang xem. */
+  zoomTo: (scale: number) => void;
   /**
    * Lật sang spread liền kề kèm hiệu ứng trượt.
    *
@@ -53,6 +62,17 @@ const SPREAD_GAP = 4;
  * theo kịp hướng lật, đủ nhanh để lật liền vài trang không thấy phải chờ.
  */
 const TURN_MS = 260;
+
+/**
+ * Chạm một cái thì chờ chừng này mới bật/tắt thanh công cụ, để phân biệt với
+ * bấm đúp (phóng to).
+ *
+ * Trước đây bật/tắt ngay ở mỗi lần nhấc tay, nên bấm đúp là thanh công cụ
+ * nháy hai lần — và nếu thư viện phóng to nuốt mất lần thứ hai thì dừng ở
+ * trạng thái ẩn, kéo theo thanh phóng to biến mất đúng lúc vừa phóng to.
+ * 250ms: đủ cho một cú bấm đúp bình thường, mà chạm đơn vẫn không thấy trễ.
+ */
+const TAP_DELAY_MS = 250;
 
 /** Kéo quá bấy nhiêu phần bề ngang màn hình thì thả tay ra là lật. */
 const COMMIT_RATIO = 0.22;
@@ -85,6 +105,11 @@ interface PageViewerProps {
   onTap: () => void;
   onSwipePrev: () => void;
   onSwipeNext: () => void;
+  /**
+   * Màn rộng (máy tính) hay hẹp (điện thoại) — quyết định bấm đúp phóng lên
+   * bao nhiêu (xem `DOUBLE_TAP_STEP_*`). `ReaderView` vốn đã đo sẵn.
+   */
+  wide?: boolean;
 }
 
 /**
@@ -251,11 +276,25 @@ function prefersReducedMotion(): boolean {
 }
 
 export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function PageViewer(
-  { book, pages, prevPages, nextPages, onTap, onSwipePrev, onSwipeNext },
+  { book, pages, prevPages, nextPages, onTap, onSwipePrev, onSwipeNext, wide = false },
   ref
 ) {
   const transformRef = useRef<ReactZoomPanPinchContentRef>(null);
   const scaleRef = useRef(1);
+  const tapTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => {
+    if (tapTimer.current) clearTimeout(tapTimer.current);
+  }, []);
+  const setZoomScale = useZoomStore((s) => s.setScale);
+  // Chỉ đổi khi vượt qua ngưỡng "đang phóng" — không phải mỗi khung hình.
+  const [zoomed, setZoomed] = useState(false);
+  // Lật trang là dựng lại khung phóng từ 100% (xem `key` của TransformWrapper)
+  // mà không bắn `onTransform` nào — tự đưa con số trên thanh phóng to về
+  // 100%. `zoomed` thì không cần: cả trang đọc được dựng lại khi đổi trang.
+  const pagesKey = pages.join("-");
+  useEffect(() => {
+    setZoomScale(1);
+  }, [pagesKey, setZoomScale]);
   const aspectRatio = getPageAspectRatio(book);
   // Đang vẽ lên trang: một ngón/chuột thuộc về cây bút, không còn là chạm để
   // ẩn thanh công cụ, vuốt lật trang hay kéo di chuyển trang nữa.
@@ -347,6 +386,18 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
     ref,
     () => ({
       resetZoom: () => transformRef.current?.resetTransform(),
+      zoomTo: (target) => {
+        const t = transformRef.current;
+        if (!t) return;
+        const clamped = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, target));
+        const delta = clamped - t.instance.state.scale;
+        if (Math.abs(delta) < 0.001) return;
+        // zoomIn/zoomOut phóng quanh TÂM khung nhìn và tự giữ trong mép ảnh;
+        // `step` ở bản thư viện này là số CỘNG thêm, nên đưa đúng hiệu số.
+        if (clamped <= MIN_ZOOM) t.resetTransform(150);
+        else if (delta > 0) t.zoomIn(delta, 150);
+        else t.zoomOut(-delta, 150);
+      },
       turn: commit,
     }),
     [commit]
@@ -480,7 +531,19 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
       }
       if (g.axis === "off") return;
 
-      if (Math.abs(dx) < 10 && Math.abs(dy) < 10 && !g.onControl) onTap();
+      if (Math.abs(dx) < 10 && Math.abs(dy) < 10 && !g.onControl) {
+        // Chạm lần hai trong lúc còn chờ = bấm đúp để phóng to — huỷ lần
+        // bật/tắt thanh công cụ đang chờ, không bật/tắt gì cả.
+        if (tapTimer.current) {
+          clearTimeout(tapTimer.current);
+          tapTimer.current = null;
+          return;
+        }
+        tapTimer.current = setTimeout(() => {
+          tapTimer.current = null;
+          onTap();
+        }, TAP_DELAY_MS);
+      }
     },
     [commit, onTap, place]
   );
@@ -522,15 +585,24 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
             ref={transformRef}
             key={pages.join("-")}
             initialScale={1}
-            minScale={1}
-            maxScale={4}
+            minScale={MIN_ZOOM}
+            maxScale={MAX_ZOOM}
             limitToBounds
             centerOnInit
             // Chế độ vẽ: khoá kéo-thả và bấm đúp (chúng nuốt mất nét bút),
             // nhưng CỐ Ý để nguyên pinch 2 ngón và cuộn trackpad — phóng to
             // rồi khoanh chú thích vào chữ nhỏ là chuyện thường xuyên nhất.
             panning={{ disabled: drawing }}
-            doubleClick={{ mode: "toggle", step: 1.8, disabled: drawing }}
+            // Bấm đúp: đang ở 100% thì phóng lên (máy tính 150%, điện thoại
+            // 250% — xem `DOUBLE_TAP_STEP_*`); đang phóng ở MỨC NÀO thì cũng về
+            // 100%. Chế độ "toggle" của thư viện chỉ trừ đi đúng `step`, nên
+            // chụm tay lên 350% rồi bấm đúp chỉ về 300% — không phải thứ người
+            // ta chờ đợi khi bấm đúp để "thoát phóng to".
+            doubleClick={{
+              mode: zoomed ? "reset" : "zoomIn",
+              step: wide ? DOUBLE_TAP_STEP_WIDE : DOUBLE_TAP_STEP_NARROW,
+              disabled: drawing,
+            }}
             // Trackpad 2 ngón vuốt (không giữ Ctrl) = di chuyển vùng xem khi
             // đã phóng to, giống các trình đọc ảnh/PDF thông thường —
             // Ctrl+vuốt (pinch thật) vẫn zoom như cũ.
@@ -538,6 +610,9 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
             trackPadPanning={{ disabled: false }}
             onTransform={(_ref, state) => {
               scaleRef.current = state.scale;
+              setZoomScale(state.scale);
+              const nowZoomed = state.scale > 1.02;
+              setZoomed((was) => (was === nowZoomed ? was : nowZoomed));
             }}
           >
             <TransformComponent

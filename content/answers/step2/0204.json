@@ -1,0 +1,23 @@
+[
+  {
+    "id": "p204-vocab",
+    "rect": [0.93, 0.188, 0.03, 0.024],
+    "section": "어휘",
+    "source": 215,
+    "answers": [
+      { "label": "9.", "text": "①" },
+      { "label": "10.", "text": "②" }
+    ]
+  },
+  {
+    "id": "p204-grammar",
+    "rect": [0.93, 0.564, 0.03, 0.024],
+    "section": "문법",
+    "source": 215,
+    "answers": [
+      { "label": "1.", "text": "②" },
+      { "label": "2.", "text": "②" },
+      { "label": "3.", "text": "④" }
+    ]
+  }
+]

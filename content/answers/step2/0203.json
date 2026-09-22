@@ -1,0 +1,16 @@
+[
+  {
+    "id": "p203-vocab",
+    "rect": [0.93, 0.188, 0.03, 0.024],
+    "section": "어휘",
+    "source": 215,
+    "answers": [
+      { "label": "3.", "text": "①" },
+      { "label": "4.", "text": "④" },
+      { "label": "5.", "text": "②" },
+      { "label": "6.", "text": "④" },
+      { "label": "7.", "text": "③" },
+      { "label": "8.", "text": "②" }
+    ]
+  }
+]

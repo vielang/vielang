@@ -1,0 +1,16 @@
+[
+  {
+    "id": "p105-grammar",
+    "rect": [0.93, 0.188, 0.03, 0.024],
+    "section": "문법",
+    "source": 213,
+    "answers": [
+      { "label": "4.", "text": "④" },
+      { "label": "5.", "text": "④" },
+      { "label": "6.", "text": "①" },
+      { "label": "7.", "text": "④" },
+      { "label": "8.", "text": "④" },
+      { "label": "9.", "text": "②" }
+    ]
+  }
+]

@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
+import { syncAcrossTabs } from "@/lib/cross-tab-sync";
 import { noteKey } from "@/lib/note-store";
 
 /** Bài làm của người dùng cho 1 trang. */
@@ -93,6 +94,10 @@ export const useQuizStore = create<QuizState>()(
     }
   )
 );
+
+// Nhiều tab cùng mở thì tab ghi sau không được xoá mất dữ liệu tab kia vừa
+// ghi — xem `cross-tab-sync`.
+syncAcrossTabs(useQuizStore);
 
 /** Bài làm của 1 trang; luôn trả về object hợp lệ để component khỏi phải kiểm. */
 export function usePageAnswers(bookId: string, page: number): PageAnswers {

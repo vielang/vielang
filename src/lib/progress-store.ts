@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
+import { syncAcrossTabs } from "@/lib/cross-tab-sync";
 
 export interface BookProgress {
   lastPage: number;
@@ -92,6 +93,10 @@ export const useProgressStore = create<ProgressState>()(
     }
   )
 );
+
+// Nhiều tab cùng mở thì tab ghi sau không được xoá mất dữ liệu tab kia vừa
+// ghi — xem `cross-tab-sync`.
+syncAcrossTabs(useProgressStore);
 
 export function getBookProgress(
   books: Record<string, BookProgress>,

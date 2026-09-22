@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
+import { syncAcrossTabs } from "@/lib/cross-tab-sync";
 
 export type PageLayout = "single" | "double";
 
@@ -63,3 +64,7 @@ export const useReaderPrefsStore = create<ReaderPrefsState>()(
     }
   )
 );
+
+// Nhiều tab cùng mở thì tab ghi sau không được xoá mất dữ liệu tab kia vừa
+// ghi — xem `cross-tab-sync`.
+syncAcrossTabs(useReaderPrefsStore);

@@ -26,7 +26,7 @@ import {
  * nạp dữ liệu cũ vào bộ nhớ lúc mở trang, không tải lại thì lần ghi kế tiếp
  * của chúng sẽ đè mất bản vừa nhập.
  */
-export function BackupPanel() {
+export function BackupPanel({ canExport = true }: { canExport?: boolean }) {
   const fileInput = useRef<HTMLInputElement>(null);
   const [pending, setPending] = useState<{ name: string; text: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -65,16 +65,18 @@ export function BackupPanel() {
   return (
     <div className="flex flex-col gap-3">
       <p className="text-sm text-muted-foreground">
-        Dữ liệu học chỉ lưu trên trình duyệt này. Xoá dữ liệu duyệt web hay đổi máy là
-        mất — hãy xuất file sao lưu định kỳ và nhập lại khi cần. File gồm tiến độ, bài
-        làm, lịch sử học, ghi chú và tuỳ chọn; <strong>không</strong> gồm bản ghi âm và
-        nét vẽ.
+        {canExport
+          ? "Dữ liệu học chỉ nằm trên trình duyệt này. Thỉnh thoảng lưu một bản ra file để không mất khi đổi máy hay xoá dữ liệu trình duyệt."
+          : "Đã học trên máy khác? Nhập file sao lưu từ máy đó để học tiếp."}{" "}
+        <span className="text-xs">(Không gồm bản ghi âm và nét vẽ.)</span>
       </p>
       <div className="flex flex-wrap gap-2">
-        <Button size="sm" variant="outline" onClick={exportFile}>
-          <Download className="size-4" aria-hidden />
-          Xuất file sao lưu
-        </Button>
+        {canExport && (
+          <Button size="sm" variant="outline" onClick={exportFile}>
+            <Download className="size-4" aria-hidden />
+            Lưu ra file
+          </Button>
+        )}
         <Button size="sm" variant="outline" onClick={() => fileInput.current?.click()}>
           <Upload className="size-4" aria-hidden />
           Nhập từ file

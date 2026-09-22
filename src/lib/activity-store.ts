@@ -134,3 +134,15 @@ export const useActivityStore = create<ActivityState>()(
     }
   )
 );
+
+/**
+ * Hai tab cùng mở (vd trang đọc và My page) thì mỗi tab giữ một bản trong
+ * bộ nhớ, và lần ghi nào cũng GHI ĐÈ cả khối — tab này lặng lẽ xoá phút học
+ * vừa ghi của tab kia. Nghe sự kiện `storage` (chỉ bắn ở các tab KHÁC tab vừa
+ * ghi) rồi nạp lại, để tab nào cũng ghi tiếp trên bản mới nhất.
+ */
+if (typeof window !== "undefined") {
+  window.addEventListener("storage", (e) => {
+    if (e.key === "kiip-activity-v1") void useActivityStore.persist.rehydrate();
+  });
+}

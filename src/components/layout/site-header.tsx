@@ -48,8 +48,8 @@ export function SiteHeader() {
             asChild
             variant="ghost"
             size="icon"
-            aria-label="Quá trình học của tôi"
-            title="Quá trình học của tôi"
+            aria-label="Góc học tập của bạn"
+            title="Góc học tập của bạn"
           >
             <Link href="/my">
               <ChartNoAxesColumn className="size-5" aria-hidden />

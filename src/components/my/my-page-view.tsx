@@ -1,121 +1,139 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useState, useSyncExternalStore } from "react";
 import Link from "next/link";
+import { ArrowRight, ChevronDown, Flame, Lightbulb } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import type { Book } from "@/lib/books";
-import {
-  bestStreak,
-  countStudyDays,
-  currentStreak,
-  minutesThisWeek,
-} from "@/lib/activity";
+import { countStudyDays, currentStreak, minutesThisWeek } from "@/lib/activity";
 import { useActivityStore } from "@/lib/activity-store";
-import { useProgressStore } from "@/lib/progress-store";
+import { computeAbility } from "@/lib/ability";
+import { buildSuggestions, companionMessage, greeting, shortBookName } from "@/lib/companion";
+import { useProgressStore, resumePage } from "@/lib/progress-store";
 import { useQuizStore } from "@/lib/quiz-store";
-import { useRecordingStore } from "@/lib/recording-store";
+import { useRecordingHydration, useRecordingStore } from "@/lib/recording-store";
 import { StudyHeatmap } from "@/components/my/study-heatmap";
+import { WeekStrip } from "@/components/my/week-strip";
+import { SuggestionList } from "@/components/my/suggestion-list";
 import { BookProgressCard, booksInProgress } from "@/components/my/book-progress";
 import { summarizeQuiz, WrongList } from "@/components/my/quiz-review";
+import { RedoList, SkillBars, WeakGrammarList } from "@/components/my/ability-panel";
 import { BackupPanel } from "@/components/my/backup-panel";
-import { AbilityPanel } from "@/components/my/ability-panel";
-import { computeAbility } from "@/lib/ability";
 
 const NO_SUBSCRIBE = () => () => {};
 const GOAL_CHOICES = [30, 60, 90, 150, 300];
 
 /**
- * My page: tiến độ và lịch sử học, tính hoàn toàn từ dữ liệu trên trình
- * duyệt.
+ * My page — viết như một người bạn đồng hành, không phải bảng báo cáo.
+ *
+ * Thứ tự theo câu hỏi người học mang tới trang này:
+ * 1. "Hôm nay mình thế nào, giờ làm gì?" → lời nhắn + nút học tiếp.
+ * 2. "Tuần này có đều không?" → 7 ngày và số phút so với mục tiêu.
+ * 3. "Nên ôn gì?" → tối đa 3 gợi ý cụ thể.
+ * 4. Sách đang học, kỹ năng.
+ * 5. Mọi thứ chi tiết (lịch 12 tuần, danh sách đầy đủ, sao lưu) gập lại ở
+ *    cuối — có khi cần, nhưng không đứng chắn đường.
  *
  * Chỉ vẽ sau khi đã ở trình duyệt: server không biết gì về localStorage, vẽ
- * luôn thì server ra "0 ngày" rồi trình duyệt nhảy sang số thật (và React báo
- * lệch hydration). Trước đó hiện khung chờ.
+ * luôn thì server ra "0 ngày" rồi nhảy sang số thật (lệch hydration).
  */
 export function MyPageView({ books }: { books: readonly Book[] }) {
   const isClient = useSyncExternalStore(NO_SUBSCRIBE, () => true, () => false);
   const days = useActivityStore((s) => s.days);
   const studied = useActivityStore((s) => s.studied);
   const goal = useActivityStore((s) => s.weeklyGoalMinutes);
-  const grades = useActivityStore((s) => s.grades);
   const setGoal = useActivityStore((s) => s.setWeeklyGoal);
+  const grades = useActivityStore((s) => s.grades);
   const progressByBook = useProgressStore((s) => s.books);
   const quizPages = useQuizStore((s) => s.pages);
   const recordings = useRecordingStore((s) => s.recordings);
-  const recordingsReady = useRecordingStore((s) => s.hasHydrated);
+  // Bản ghi âm nằm ở IndexedDB và chỉ nạp khi có người gọi — trước đây chỉ
+  // trang đọc gọi, nên số bản ghi ở đây quay mãi không ra.
+  const recordingsReady = useRecordingHydration();
+  const [editingGoal, setEditingGoal] = useState(false);
 
   if (!isClient) return <MyPageSkeleton />;
 
-  const today = new Date();
-  const streak = currentStreak(days, today);
-  const weekMinutes = minutesThisWeek(days, today);
+  const now = new Date();
+  const streak = currentStreak(days, now);
+  const weekMinutes = minutesThisWeek(days, now);
   const goalPercent = Math.min(100, Math.round((weekMinutes / goal) * 100));
-  const studiedTotal = Object.values(studied).reduce((n, pages) => n + pages.length, 0);
-  const recordingTotal = Object.values(recordings).reduce((n, list) => n + list.length, 0);
   const rows = booksInProgress(books, progressByBook, studied);
   const quiz = summarizeQuiz(quizPages);
   const ability = computeAbility(grades, quizPages);
-  const hasAnyData = rows.length > 0 || countStudyDays(days) > 0 || ability.total > 0;
+  const suggestions = buildSuggestions(ability, quiz.wrong, books);
+  const studyDays = countStudyDays(days);
+  const studiedTotal = Object.values(studied).reduce((n, pages) => n + pages.length, 0);
+  const recordingTotal = Object.values(recordings).reduce((n, list) => n + list.length, 0);
 
-  if (!hasAnyData) {
-    return (
-      <section className="flex flex-col items-start gap-3 rounded-lg border border-dashed border-border p-6">
-        <p className="font-medium">Chưa có dữ liệu học nào trên trình duyệt này.</p>
-        <p className="text-sm text-muted-foreground">
-          Mở một cuốn sách và học vài trang — thời gian học, trang đã học và kết quả bài
-          tập sẽ hiện ở đây. Có file sao lưu từ máy khác thì nhập ở cuối trang.
-        </p>
-        <Button asChild size="sm">
-          <Link href="/">Chọn sách để học</Link>
-        </Button>
-        <div className="mt-4 w-full border-t border-border pt-4">
-          <BackupPanel />
-        </div>
-      </section>
-    );
+  if (rows.length === 0 && studyDays === 0 && ability.total === 0) {
+    return <Welcome />;
   }
+
+  const message = companionMessage({ days, now, streak, weekMinutes, goal });
+  const current = rows[0];
 
   return (
     <div className="flex flex-col gap-8">
-      {/* Mấy con số đầu trang: mỗi số một ô, không vẽ biểu đồ cho một con số. */}
-      <section aria-label="Tóm tắt" className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        <StatTile
-          label="Chuỗi ngày học"
-          value={`${streak} ngày`}
-          hint={`Dài nhất: ${bestStreak(days)} ngày`}
-        />
-        <div className="flex flex-col gap-2 rounded-lg border border-border p-4">
-          <span className="text-xs text-muted-foreground">Tuần này</span>
-          <span className="text-2xl font-semibold tabular-nums">
-            {weekMinutes}
-            <span className="text-sm font-normal text-muted-foreground"> / {goal} phút</span>
-          </span>
-          <Progress
-            value={goalPercent}
-            className="h-1.5"
-            aria-label={`Đạt ${goalPercent}% mục tiêu tuần`}
-          />
+      {/* 1. Lời nhắn + việc làm ngay */}
+      <section className="flex flex-col gap-4 rounded-2xl bg-muted/60 p-5 sm:p-6">
+        <div className="flex flex-col gap-1">
+          <p className="text-sm text-muted-foreground">{greeting(now)} 👋</p>
+          <h2 className="text-xl font-semibold tracking-tight text-balance">{message.title}</h2>
+          <p className="text-sm text-muted-foreground text-pretty">{message.body}</p>
         </div>
-        <StatTile
-          label="Trang đã học"
-          value={String(studiedTotal)}
-          hint={`${countStudyDays(days)} ngày có học`}
-        />
-        <StatTile
-          label="Luyện nói"
-          value={recordingsReady ? `${recordingTotal} bản ghi` : "…"}
-          hint="Bản ghi âm đã lưu"
-        />
+        {current && (
+          <Button asChild className="self-start">
+            <Link href={`/read/${current.book.id}/${resumePage(current.progress)}`}>
+              Học tiếp {shortBookName(current.book)} · trang {resumePage(current.progress)}
+              <ArrowRight className="size-4" aria-hidden />
+            </Link>
+          </Button>
+        )}
       </section>
 
-      <section className="flex flex-col gap-3">
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <h2 className="text-lg font-semibold tracking-tight">Lịch học</h2>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span>Mục tiêu mỗi tuần</span>
+      {/* 2. Tuần này */}
+      <section className="flex flex-col gap-4" aria-labelledby="week-title">
+        <div className="flex items-baseline justify-between gap-3">
+          <h2 id="week-title" className="text-base font-semibold">
+            Tuần này
+          </h2>
+          {streak > 1 && (
+            <span className="inline-flex items-center gap-1 text-sm text-muted-foreground">
+              <Flame className="size-4 text-orange-500" aria-hidden />
+              {streak} ngày liên tiếp
+            </span>
+          )}
+        </div>
+        <WeekStrip days={days} today={now} />
+        <div className="flex flex-col gap-2">
+          <div className="flex items-baseline justify-between gap-3 text-sm">
+            <span>
+              <span className="text-lg font-semibold tabular-nums">{weekMinutes}</span>
+              <span className="text-muted-foreground"> / {goal} phút</span>
+            </span>
+            <button
+              type="button"
+              onClick={() => setEditingGoal((v) => !v)}
+              aria-expanded={editingGoal}
+              className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+            >
+              {editingGoal ? "Xong" : "Đổi mục tiêu"}
+            </button>
+          </div>
+          <div
+            className="h-1.5 overflow-hidden rounded-full bg-muted"
+            role="progressbar"
+            aria-valuenow={goalPercent}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label={`Đạt ${goalPercent}% mục tiêu tuần`}
+          >
+            <div className="h-full rounded-full bg-primary" style={{ width: `${goalPercent}%` }} />
+          </div>
+          {editingGoal && (
             <ToggleGroup
               type="single"
               size="sm"
@@ -123,31 +141,50 @@ export function MyPageView({ books }: { books: readonly Book[] }) {
               value={String(goal)}
               onValueChange={(v) => v && setGoal(Number(v))}
               aria-label="Mục tiêu phút học mỗi tuần"
+              className="flex-wrap self-start"
             >
               {GOAL_CHOICES.map((m) => (
                 <ToggleGroupItem key={m} value={String(m)} className="tabular-nums">
-                  {m}′
+                  {m} phút
                 </ToggleGroupItem>
               ))}
             </ToggleGroup>
-          </div>
+          )}
         </div>
-        <StudyHeatmap days={days} today={today} />
         <p className="text-xs text-muted-foreground">
-          Chỉ tính lúc trang sách đang mở trên màn hình và bạn có thao tác trong khoảng
-          1,5 phút gần nhất. Học từ 1 phút trở lên mới tính là một ngày học.
+          Tổng cộng {studyDays} ngày học · {studiedTotal} trang
+          {recordingsReady && recordingTotal > 0 ? ` · ${recordingTotal} bản ghi luyện nói` : ""}
         </p>
       </section>
 
-      {rows.length > 0 && (
-        <section className="flex flex-col gap-3">
-          <h2 className="text-lg font-semibold tracking-tight">Sách đang học</h2>
-          <p className="text-xs text-muted-foreground">
-            &quot;Đã học&quot; là trang bạn ở lại đọc ít nhất 12 giây; &quot;đã xem&quot; là mọi
-            trang từng mở ra. Mỗi ô số là một bài — càng đậm là học càng nhiều trang
-            của bài đó.
+      {/* 3. Gợi ý */}
+      <section className="flex flex-col gap-3" aria-labelledby="next-title">
+        <h2 id="next-title" className="text-base font-semibold">
+          Gợi ý cho bạn
+        </h2>
+        {suggestions.length > 0 ? (
+          <SuggestionList items={suggestions} />
+        ) : (
+          <p className="flex gap-3 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">
+            <Lightbulb className="mt-0.5 size-4 shrink-0" aria-hidden />
+            <span>
+              Làm bài xong, mở chấm đáp án trên trang sách rồi chọn{" "}
+              <span className="text-foreground">Đúng hết</span>,{" "}
+              <span className="text-foreground">Sai vài câu</span> hoặc{" "}
+              <span className="text-foreground">Sai nhiều</span> — mình sẽ gợi ý bài nào
+              nên ôn lại.
+            </span>
           </p>
-          <div className="flex flex-col gap-3">
+        )}
+      </section>
+
+      {/* 4. Sách đang học */}
+      {rows.length > 0 && (
+        <section className="flex flex-col gap-3" aria-labelledby="books-title">
+          <h2 id="books-title" className="text-base font-semibold">
+            Sách đang học
+          </h2>
+          <div className="grid gap-3 sm:grid-cols-2">
             {rows.map((row) => (
               <BookProgressCard key={row.book.id} row={row} />
             ))}
@@ -155,74 +192,108 @@ export function MyPageView({ books }: { books: readonly Book[] }) {
         </section>
       )}
 
-      <section className="flex flex-col gap-3">
-        <h2 className="text-lg font-semibold tracking-tight">Năng lực theo kỹ năng</h2>
-        {ability.total > 0 ? (
-          <>
-            <p className="text-xs text-muted-foreground">
-              Tính từ những bài bạn <strong>tự chấm</strong> sau khi xem đáp án (đúng hết =
-              100%, sai vài câu = 50%, sai nhiều = 0%) và các câu quiz đã kiểm tra. Đây là
-              số tự báo để biết kỹ năng nào cần luyện thêm, không phải điểm thi.
-            </p>
-            <AbilityPanel ability={ability} />
-          </>
-        ) : (
-          <p className="text-sm text-muted-foreground">
-            Làm bài xong, bấm chấm đáp án trên trang sách rồi chọn &quot;Đúng hết&quot;,
-            &quot;Sai vài câu&quot; hoặc &quot;Sai nhiều&quot; — năng lực theo từ vựng, ngữ pháp,
-            nghe, đọc, viết sẽ hiện ở đây.
+      {/* 5. Kỹ năng */}
+      {ability.total > 0 && (
+        <section className="flex flex-col gap-3" aria-labelledby="skills-title">
+          <h2 id="skills-title" className="text-base font-semibold">
+            Kỹ năng của bạn
+          </h2>
+          <SkillBars skills={ability.skills} />
+          <p className="text-xs text-muted-foreground">
+            Tính từ các bài bạn tự chấm và câu quiz đã kiểm tra — để biết nên luyện thêm
+            phần nào, không phải điểm thi.
           </p>
-        )}
-      </section>
-
-      {quiz.checked > 0 && (
-        <section className="flex flex-col gap-3">
-          <h2 className="text-lg font-semibold tracking-tight">Bài tập tự chấm</h2>
-          <p className="text-sm">
-            Đúng{" "}
-            <span className="font-semibold tabular-nums">
-              {quiz.correct}/{quiz.checked}
-            </span>{" "}
-            câu đã kiểm tra (
-            <span className="tabular-nums">
-              {Math.round((quiz.correct / quiz.checked) * 100)}%
-            </span>
-            ).{" "}
-            {quiz.wrong.length > 0
-              ? "Những câu còn sai — bấm để làm lại:"
-              : "Không còn câu nào sai."}
-          </p>
-          <WrongList wrong={quiz.wrong} />
         </section>
       )}
 
-      <section className="flex flex-col gap-3 border-t border-border pt-6">
-        <h2 className="text-lg font-semibold tracking-tight">Sao lưu dữ liệu học</h2>
-        <BackupPanel />
+      {/* 6. Chi tiết — gập lại */}
+      <section className="flex flex-col divide-y divide-border border-y border-border">
+        <Disclosure title="Lịch học 12 tuần">
+          <StudyHeatmap days={days} today={now} />
+        </Disclosure>
+        {ability.weakGrammar.length > 0 && (
+          <Disclosure title="Điểm ngữ pháp nên ôn" count={ability.weakGrammar.length}>
+            <WeakGrammarList items={ability.weakGrammar} />
+          </Disclosure>
+        )}
+        {ability.redo.length > 0 && (
+          <Disclosure title="Bài tự chấm còn sai" count={ability.redo.length}>
+            <RedoList items={ability.redo} />
+          </Disclosure>
+        )}
+        {quiz.wrong.length > 0 && (
+          <Disclosure title="Câu quiz còn sai" count={quiz.wrong.length}>
+            <WrongList wrong={quiz.wrong} />
+          </Disclosure>
+        )}
+        <Disclosure title="Sao lưu & chuyển sang máy khác">
+          <BackupPanel />
+        </Disclosure>
       </section>
     </div>
   );
 }
 
-function StatTile({ label, value, hint }: { label: string; value: string; hint?: string }) {
+/** Mục gập/mở, dùng `<details>` gốc — bàn phím và trình đọc màn hình tự lo. */
+function Disclosure({
+  title,
+  count,
+  children,
+}: {
+  title: string;
+  count?: number;
+  children: React.ReactNode;
+}) {
   return (
-    <div className="flex flex-col gap-1 rounded-lg border border-border p-4">
-      <span className="text-xs text-muted-foreground">{label}</span>
-      <span className="text-2xl font-semibold tabular-nums">{value}</span>
-      {hint && <span className="text-xs text-muted-foreground">{hint}</span>}
-    </div>
+    <details className="group py-1">
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 py-3 text-sm font-medium [&::-webkit-details-marker]:hidden">
+        <span>
+          {title}
+          {count !== undefined && (
+            <span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-xs font-normal text-muted-foreground tabular-nums">
+              {count}
+            </span>
+          )}
+        </span>
+        <ChevronDown
+          className="size-4 text-muted-foreground transition-transform group-open:rotate-180"
+          aria-hidden
+        />
+      </summary>
+      <div className="pb-4">{children}</div>
+    </details>
+  );
+}
+
+/** Lần đầu vào, chưa có gì — mời bắt đầu, không vẽ một trang toàn số 0. */
+function Welcome() {
+  return (
+    <section className="flex flex-col gap-5 rounded-2xl bg-muted/60 p-6">
+      <div className="flex flex-col gap-2">
+        <h2 className="text-xl font-semibold tracking-tight">Bắt đầu hành trình nào 🌱</h2>
+        <p className="text-sm text-muted-foreground text-pretty">
+          Mở một cuốn sách và học vài trang. Mình sẽ ghi lại thời gian học, trang đã học,
+          và gợi ý bài nên ôn — tất cả ngay trên máy của bạn, không cần tài khoản.
+        </p>
+      </div>
+      <Button asChild className="self-start">
+        <Link href="/">
+          Chọn sách để học
+          <ArrowRight className="size-4" aria-hidden />
+        </Link>
+      </Button>
+      <div className="border-t border-border pt-4">
+        <BackupPanel canExport={false} />
+      </div>
+    </section>
   );
 }
 
 function MyPageSkeleton() {
   return (
     <div className="flex flex-col gap-8" aria-busy="true">
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        {Array.from({ length: 4 }, (_, i) => (
-          <Skeleton key={i} className="h-24" />
-        ))}
-      </div>
-      <Skeleton className="h-40" />
+      <Skeleton className="h-40 rounded-2xl" />
+      <Skeleton className="h-28" />
       <Skeleton className="h-32" />
     </div>
   );

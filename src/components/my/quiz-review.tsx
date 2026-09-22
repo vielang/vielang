@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { getBook } from "@/lib/books";
+import { shortBookName } from "@/lib/companion";
 import { getPageQuiz, isCorrect, isGradable } from "@/lib/quiz";
 import type { PageAnswers } from "@/lib/quiz-store";
 
@@ -54,22 +55,26 @@ export function summarizeQuiz(pages: Record<string, PageAnswers>): QuizSummary {
 export function WrongList({ wrong }: { wrong: WrongItem[] }) {
   if (wrong.length === 0) return null;
   return (
-    <ul className="flex flex-col divide-y divide-border rounded-lg border border-border">
+    <ul className="flex flex-col divide-y divide-border">
       {wrong.slice(0, 10).map((w, i) => (
         <li key={i}>
           <Link
             href={`/read/${w.bookId}/${w.page}`}
-            className="flex flex-col gap-0.5 px-3 py-2 text-sm hover:bg-muted"
+            className="flex flex-col gap-0.5 py-2 text-sm hover:text-primary"
           >
-            <span className="text-xs text-muted-foreground">
-              {getBook(w.bookId)?.titleVi ?? w.bookId} · trang {w.page} · {w.where}
-            </span>
             <span className="font-korean truncate">{w.prompt}</span>
+            <span className="truncate text-xs text-muted-foreground">
+              Trang {w.page} · {w.where} ·{" "}
+              {(() => {
+                const book = getBook(w.bookId);
+                return book ? shortBookName(book) : w.bookId;
+              })()}
+            </span>
           </Link>
         </li>
       ))}
       {wrong.length > 10 && (
-        <li className="px-3 py-2 text-xs text-muted-foreground">
+        <li className="py-2 text-xs text-muted-foreground">
           …và {wrong.length - 10} câu nữa.
         </li>
       )}

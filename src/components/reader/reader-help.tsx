@@ -44,7 +44,7 @@ const GESTURES: { Icon: typeof Hand; what: string; how: string }[] = [
   {
     Icon: ListChecks,
     what: "Chạm vào dấu danh sách cạnh bài tập",
-    how: "xem đáp án của sách rồi tự chấm — kết quả gom về trang Quá trình học",
+    how: "xem đáp án của sách rồi tự chấm — mình sẽ gợi ý bài nên ôn ở Góc học tập",
   },
   { Icon: Hand, what: "Kéo các bảng công cụ", how: "đặt chúng vào chỗ vừa tay" },
 ];

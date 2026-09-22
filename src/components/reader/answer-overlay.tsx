@@ -131,7 +131,13 @@ export function AnswerOverlay({
               app không biết người học viết gì vào sách, chỉ họ biết. Ba mức
               thôi, bấm được ngay trong một giây; bấm lại mức khác thì đè. */}
           <span className="mt-2 flex flex-col gap-1 border-t border-white/25 pt-2">
-            <span className="text-xs text-white/70">Bạn làm thế nào?</span>
+            {/* Chấm rồi thì nói lại một câu: bấm mà không thấy gì đổi ngoài màu
+                nút thì người ta không chắc đã lưu chưa. */}
+            <span className="text-xs text-white/70" aria-live="polite">
+              {grades[gradeKey(bookId, page, active.answerKey.id)]
+                ? "Đã ghi lại — bấm mức khác nếu muốn chấm lại."
+                : "Bạn làm thế nào?"}
+            </span>
             <span className="flex flex-wrap gap-1" role="group" aria-label="Tự chấm bài này">
               {GRADES.map(({ value, label }) => {
                 const key = gradeKey(bookId, page, active.answerKey.id);

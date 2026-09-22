@@ -42,3 +42,17 @@ describe("lịch sử học", () => {
     });
   });
 });
+
+describe("nhiều tab cùng mở", () => {
+  it("tab khác ghi thì tab này nạp lại, không ghi đè bằng bản cũ", async () => {
+    const fromOtherTab = {
+      state: { days: { "2025-09-08": { ...useActivityStore.getState().days["2025-09-08"], activeMs: 999_000, pages: [], quizChecked: 0, quizCorrect: 0, answersOpened: 0, recordings: 0 } }, studied: {}, weeklyGoalMinutes: 90, grades: {} },
+      version: 0,
+    };
+    localStorage.setItem("kiip-activity-v1", JSON.stringify(fromOtherTab));
+    window.dispatchEvent(new StorageEvent("storage", { key: "kiip-activity-v1" }));
+    await Promise.resolve();
+
+    expect(useActivityStore.getState().days["2025-09-08"].activeMs).toBe(999_000);
+  });
+});

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { BOOKS } from "@/lib/books";
 import { MyPageView } from "@/components/my/my-page-view";
 
-export const metadata: Metadata = { title: "Quá trình học của tôi" };
+export const metadata: Metadata = { title: "Góc học tập của bạn" };
 
 /**
  * My page: tiến độ, lịch học và kết quả bài tập của người dùng.
@@ -12,13 +12,9 @@ export const metadata: Metadata = { title: "Quá trình học của tôi" };
  */
 export default function MyPage() {
   return (
-    <div className="flex flex-col gap-6">
+    <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Quá trình học của tôi</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Thời gian học, sách đang học và kết quả bài tập — lưu ngay trên trình duyệt
-          này, không cần tài khoản.
-        </p>
+        <h1 className="text-2xl font-semibold tracking-tight">Góc học tập của bạn</h1>
       </div>
       <MyPageView books={BOOKS} />
     </div>

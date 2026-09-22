@@ -1,11 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import type { Book } from "@/lib/books";
 import { getChapters } from "@/lib/chapters";
+import { shortBookName } from "@/lib/companion";
 import { getBookProgress, resumePage, type BookProgress } from "@/lib/progress-store";
 import { HEAT_CLASSES } from "@/components/my/heat";
 
@@ -40,36 +39,37 @@ export function booksInProgress(
 }
 
 /**
- * Tiến độ một cuốn: số trang ĐÃ HỌC (ở lại đủ lâu) là con số chính, số trang
- * đã xem để phụ. Dưới là một hàng ô, mỗi ô một bài, đậm theo phần trang đã
- * học của bài đó — nhìn là biết bài nào còn bỏ dở.
+ * Tiến độ một cuốn: số trang ĐÃ HỌC (ở lại đọc đủ lâu) và một hàng ô, mỗi ô
+ * một bài, đậm theo phần trang đã học của bài đó — nhìn là biết bài nào còn
+ * dở. Cả thẻ bấm được để học tiếp đúng trang đang dở.
  */
 export function BookProgressCard({ row }: { row: BookRow }) {
   const { book, progress, studied } = row;
   const studiedSet = new Set(studied);
   const percent = Math.round((studied.length / book.totalPages) * 100);
   const chapters = getChapters(book.id, book.totalPages);
+  const resume = resumePage(progress);
 
   return (
-    <div className="flex flex-col gap-3 rounded-lg border border-border p-4">
-      <div className="flex flex-wrap items-start justify-between gap-2">
-        <div className="min-w-0">
-          <h3 className="font-medium leading-snug">{book.titleVi}</h3>
-          <p className="mt-0.5 text-xs text-muted-foreground tabular-nums">
-            Đã học {studied.length}/{book.totalPages} trang · đã xem{" "}
-            {progress.readPages.length} trang
-          </p>
-        </div>
-        <Button asChild size="sm" variant="outline">
-          <Link href={`/read/${book.id}/${resumePage(progress)}`}>
-            Đọc tiếp — trang {resumePage(progress)}
-          </Link>
-        </Button>
+    <div className="flex flex-col gap-3 rounded-xl border border-border p-4">
+      <div className="flex items-baseline justify-between gap-3">
+        <h3 className="min-w-0 truncate font-medium" title={book.titleVi}>
+          {shortBookName(book)}
+        </h3>
+        <span className="shrink-0 text-sm tabular-nums text-muted-foreground">
+          {studied.length}/{book.totalPages} trang
+        </span>
       </div>
 
-      <div className="flex items-center gap-3">
-        <Progress value={percent} className="h-1.5 flex-1" aria-label={`Đã học ${percent}%`} />
-        <span className="w-10 text-right text-sm font-medium tabular-nums">{percent}%</span>
+      <div
+        className="h-1.5 overflow-hidden rounded-full bg-muted"
+        role="progressbar"
+        aria-valuenow={percent}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label={`Đã học ${percent}% cuốn này`}
+      >
+        <div className="h-full rounded-full bg-primary" style={{ width: `${percent}%` }} />
       </div>
 
       {chapters.length > 0 && (
@@ -78,6 +78,7 @@ export function BookProgressCard({ row }: { row: BookRow }) {
             const total = ch.endPage - ch.startPage + 1;
             let done = 0;
             for (let p = ch.startPage; p <= ch.endPage; p++) if (studiedSet.has(p)) done++;
+            const level = lessonLevel(done, total);
             return (
               <Link
                 key={ch.lesson}
@@ -85,9 +86,9 @@ export function BookProgressCard({ row }: { row: BookRow }) {
                 title={`Bài ${ch.lesson}: đã học ${done}/${total} trang`}
                 aria-label={`Bài ${ch.lesson}: đã học ${done}/${total} trang`}
                 className={cn(
-                  "flex h-6 min-w-6 items-center justify-center rounded px-1 text-[10px] tabular-nums transition-opacity hover:opacity-80",
-                  HEAT_CLASSES[lessonLevel(done, total)],
-                  lessonLevel(done, total) >= 3 ? "text-primary-foreground" : "text-foreground/70"
+                  "flex size-6 items-center justify-center rounded-md text-[10px] tabular-nums transition-opacity hover:opacity-80",
+                  HEAT_CLASSES[level],
+                  level >= 3 ? "text-primary-foreground" : "text-foreground/60"
                 )}
               >
                 {ch.lesson}
@@ -96,6 +97,13 @@ export function BookProgressCard({ row }: { row: BookRow }) {
           })}
         </div>
       )}
+
+      <Link
+        href={`/read/${book.id}/${resume}`}
+        className="self-start text-sm font-medium text-primary underline-offset-4 hover:underline"
+      >
+        Học tiếp trang {resume} →
+      </Link>
     </div>
   );
 }

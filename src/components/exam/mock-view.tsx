@@ -31,6 +31,7 @@ import { GroupBlock, PromptView } from "@/components/exam/exam-content";
 import { ProgressBar, SectionStepper } from "@/components/exam/exam-chrome";
 import { OptionList } from "@/components/exam/option-list";
 import { useExamAudio } from "@/components/exam/use-exam-audio";
+import { useLeaveGuard } from "@/components/exam/use-leave-guard";
 import { WritingImage, WritingInput, hasWritten } from "@/components/exam/writing-parts";
 
 const NO_SUBSCRIBE = () => () => {};
@@ -127,6 +128,8 @@ function MockRunning({ exam, attempt }: { exam: Exam; attempt: MockAttempt }) {
   const [confirm, setConfirm] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
   const remaining = attempt.deadline - now;
+  // Rời trang giữa lượt thi thì hỏi lại — đồng hồ vẫn chạy khi đi chỗ khác.
+  const leaveGuard = useLeaveGuard(!attempt.finishedAt, `/exam/${exam.id}`);
 
   const submitSection = useCallback(() => {
     setConfirm(false);
@@ -250,6 +253,24 @@ function MockRunning({ exam, attempt }: { exam: Exam; attempt: MockAttempt }) {
           </Dialog>
         </>
       )}
+
+      <Dialog open={leaveGuard.pending} onOpenChange={(open) => !open && leaveGuard.stay()}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Rời khỏi bài thi thử?</DialogTitle>
+            <DialogDescription>
+              Bài làm đã được lưu, nhưng đồng hồ vẫn chạy — còn {mmss(remaining)} cho phần {sectionVi(section.id)}.
+              Hết giờ khi bạn đang ở trang khác thì phần này sẽ tự nộp.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={leaveGuard.leave}>
+              Vẫn thoát
+            </Button>
+            <Button onClick={leaveGuard.stay}>Ở lại làm bài</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={confirm} onOpenChange={setConfirm}>
         <DialogContent>

@@ -1,14 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { ChevronLeft, ChevronRight, Pause, Play, RotateCcw, Volume2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, RotateCcw, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
   examAudioUrl,
   groupAudio,
   qKey,
-  questionAudio,
   type Exam,
   type ExamQuestion,
   type ExamSection,
@@ -30,6 +29,7 @@ import {
 } from "@/components/exam/exam-chrome";
 import { OptionList } from "@/components/exam/option-list";
 import { useExamAudio } from "@/components/exam/use-exam-audio";
+import { BlockPlayer } from "@/components/exam/block-player";
 import { WritingPractice } from "@/components/exam/writing-practice";
 
 const NO_SUBSCRIBE = () => () => {};
@@ -42,41 +42,34 @@ const MARKS = "①②③④";
  * đoạn văn dùng chung hiện một lần, các câu của khối xếp bên dưới, một nút
  * kiểm tra cả khối. Phần viết luyện từng câu (mỗi câu một bài).
  *
- * Nghe: đề nào đã đo mốc thời gian từng câu thì có nút "Nghe câu N" phát
- * đúng phần lời đọc của câu; đề chưa đo thì hiện trình phát cả bài (tua được).
+ * Nghe: mỗi khối MỘT audio (lời chỉ dẫn + lời đọc các câu, bỏ khoảng dừng
+ * trả lời) có thanh điều khiển — xem `BlockPlayer`. Đề chưa đo mốc thời gian
+ * thì hiện trình phát cả bài (tua được).
  *
  * Bài làm lưu trong `exam-store` theo từng câu, nên đóng trang mở lại vẫn
  * thấy câu nào đã làm, đúng hay sai.
  */
-export function PracticeView({
-  exam,
-  sectionId,
-  initialNo,
-}: {
-  exam: Exam;
-  sectionId: SectionId;
-  initialNo?: number;
-}) {
+export function PracticeView({ exam, sectionId, initialNo }: { exam: Exam; sectionId: SectionId; initialNo?: number }) {
   const section = exam.sections.find((s) => s.id === sectionId) ?? exam.sections[0];
   if (section.writing) return <WritingPractice exam={exam} section={section} initialNo={initialNo} />;
   return <GroupPractice exam={exam} section={section} initialNo={initialNo} />;
 }
 
 /** Luyện trắc nghiệm (nghe, đọc) theo khối. */
-function GroupPractice({
-  exam,
-  section,
-  initialNo,
-}: {
-  exam: Exam;
-  section: ExamSection;
-  initialNo?: number;
-}) {
-  const isClient = useSyncExternalStore(NO_SUBSCRIBE, () => true, () => false);
+function GroupPractice({ exam, section, initialNo }: { exam: Exam; section: ExamSection; initialNo?: number }) {
+  const isClient = useSyncExternalStore(
+    NO_SUBSCRIBE,
+    () => true,
+    () => false
+  );
   const { groups, questions } = section;
   const key = useCallback((no: number) => qKey(section.id, no), [section.id]);
   const groupIndexOf = useCallback(
-    (no: number) => Math.max(0, groups.findIndex((g) => no >= g.from && no <= g.to)),
+    (no: number) =>
+      Math.max(
+        0,
+        groups.findIndex((g) => no >= g.from && no <= g.to)
+      ),
     [groups]
   );
   const [gi, setGi] = useState(() => (initialNo ? groupIndexOf(initialNo) : 0));
@@ -190,14 +183,8 @@ function GroupPractice({
     return () => window.removeEventListener("keydown", onKey);
   });
 
-  // Nghe cả khối: lời chỉ dẫn + lời đọc từng câu, bỏ khoảng dừng trả lời.
+  // Một audio cho cả khối: lời chỉ dẫn + lời đọc từng câu, bỏ khoảng dừng trả lời.
   const blockSegments = groupAudio(section, group);
-  const playingBlock =
-    audio.playing &&
-    audio.segment !== null &&
-    blockSegments.length > 0 &&
-    audio.segment[0] === blockSegments[0][0] &&
-    audio.segment[1] === blockSegments[blockSegments.length - 1][1];
   // Câu đang được đọc (tô trong khối khi đang nghe).
   const playingNo = audio.playing
     ? items.find((q) => {
@@ -238,30 +225,19 @@ function GroupPractice({
       )}
 
       <section className="flex flex-col gap-4" aria-label={range}>
-        <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-          <h1 className="flex items-baseline gap-2">
-            <span className="text-xl font-semibold tabular-nums">{range}</span>
-            <span className="text-sm text-muted-foreground">{points} điểm</span>
-          </h1>
-          {blockSegments.length > 0 && (
-            <div className="flex flex-wrap items-center gap-1">
-              {group.audio && (
-                <Button variant="ghost" size="sm" onClick={() => audio.playSegments([group.audio!])}>
-                  <Volume2 className="size-4" aria-hidden />
-                  Lời chỉ dẫn
-                </Button>
-              )}
-              <Button
-                size="sm"
-                variant={playingBlock ? "secondary" : "default"}
-                onClick={() => (playingBlock ? audio.pause() : audio.playSegments(blockSegments))}
-              >
-                {playingBlock ? <Pause className="size-3.5" aria-hidden /> : <Play className="size-3.5" aria-hidden />}
-                {playingBlock ? "Tạm dừng" : items.length > 1 ? "Nghe cả khối" : "Nghe"}
-              </Button>
-            </div>
-          )}
-        </div>
+        <h1 className="flex items-baseline gap-2">
+          <span className="text-xl font-semibold tabular-nums">{range}</span>
+          <span className="text-sm text-muted-foreground">{points} điểm</span>
+        </h1>
+
+        {blockSegments.length > 0 && (
+          <BlockPlayer
+            key={`${section.id}-${group.from}`}
+            audio={audio}
+            segments={blockSegments}
+            label={`Bài nghe ${range}`}
+          />
+        )}
 
         <GroupBlock exam={exam} group={group} showRange={false} />
 
@@ -270,13 +246,11 @@ function GroupPractice({
             <QuestionItem
               key={q.no}
               exam={exam}
-              section={section}
               question={q}
               value={answerOf(q)}
               checked={isChecked(q)}
               active={items.length > 1 && active?.no === q.no}
               playing={items.length > 1 && playingNo === q.no}
-              audio={audio}
               onChoose={(c) => choose(q, c)}
               onFocus={() => setActiveNo(q.no)}
             />
@@ -295,7 +269,12 @@ function GroupPractice({
               </span>
               <button
                 type="button"
-                onClick={() => reset(exam.id, items.map((q) => key(q.no)))}
+                onClick={() =>
+                  reset(
+                    exam.id,
+                    items.map((q) => key(q.no))
+                  )
+                }
                 className="inline-flex items-center gap-1 text-xs font-medium underline-offset-2 hover:underline"
               >
                 <RotateCcw className="size-3" aria-hidden />
@@ -307,10 +286,21 @@ function GroupPractice({
       </section>
 
       <ActionBar>
-        <Button variant="ghost" size="icon-lg" onClick={() => goGroup(gi - 1)} disabled={gi === 0} aria-label="Khối trước">
+        <Button
+          variant="ghost"
+          size="icon-lg"
+          onClick={() => goGroup(gi - 1)}
+          disabled={gi === 0}
+          aria-label="Khối trước"
+        >
           <ChevronLeft className="size-5" aria-hidden />
         </Button>
-        <QuestionGridSheet items={grid} current={currentIndex} onPick={goQuestion} count={`${doneCount}/${questions.length}`} />
+        <QuestionGridSheet
+          items={grid}
+          current={currentIndex}
+          onPick={goQuestion}
+          count={`${doneCount}/${questions.length}`}
+        />
         <div className="flex flex-1 justify-end gap-2 sm:flex-none">
           {groupDone ? (
             <Button size="lg" onClick={() => goGroup(gi + 1)} disabled={isLastGroup} className="min-w-32">
@@ -321,7 +311,10 @@ function GroupPractice({
             <Button size="lg" onClick={checkGroup} disabled={toCheck.length === 0} className="min-w-32">
               Kiểm tra
               {items.length > 1 && (
-                <span className="tabular-nums opacity-70" aria-label={`đã chọn ${chosenCount} trên ${items.length} câu`}>
+                <span
+                  className="tabular-nums opacity-70"
+                  aria-label={`đã chọn ${chosenCount} trên ${items.length} câu`}
+                >
                   {chosenCount}/{items.length}
                 </span>
               )}
@@ -361,33 +354,23 @@ function GroupPractice({
 /** Một câu trong khối: số câu, đề, nút nghe riêng, bốn lựa chọn, kết quả. */
 function QuestionItem({
   exam,
-  section,
   question: q,
   value,
   checked,
   active,
   playing,
-  audio,
   onChoose,
   onFocus,
 }: {
   exam: Exam;
-  section: ExamSection;
   question: ExamQuestion;
   value: number | undefined;
   checked: boolean;
   active: boolean;
   playing: boolean;
-  audio: ReturnType<typeof useExamAudio>;
   onChoose: (choice: number) => void;
   onFocus: () => void;
 }) {
-  const segments = questionAudio(section, q);
-  const playingThis =
-    audio.playing &&
-    audio.segment !== null &&
-    segments.length > 0 &&
-    audio.segment[1] === segments[segments.length - 1][1];
   const right = checked && value === q.answer;
 
   return (
@@ -420,16 +403,6 @@ function QuestionItem({
             </span>
           )}
         </p>
-        {segments.length > 0 && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => (playingThis ? audio.pause() : audio.playSegments(segments))}
-          >
-            {playingThis ? <Pause className="size-3.5" aria-hidden /> : <Play className="size-3.5" aria-hidden />}
-            {playingThis ? "Tạm dừng" : `Nghe câu ${q.no}`}
-          </Button>
-        )}
       </div>
       <PromptView exam={exam} question={q} />
       <OptionList exam={exam} question={q} value={value} onChange={onChoose} reveal={checked} disabled={checked} />

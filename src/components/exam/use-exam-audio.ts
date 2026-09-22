@@ -97,5 +97,17 @@ export function useExamAudio(src: string | undefined) {
 
   const pause = useCallback(() => ref.current?.pause(), []);
 
-  return { playing, time, segment, playSegments, playFrom, pause, audioRef: ref };
+  /** Tua tới `to` (giây) mà không phát — kéo thanh thời gian lúc đang dừng. */
+  const seek = useCallback((to: number) => {
+    const audio = ref.current;
+    if (!audio) return;
+    // Bỏ các đoạn còn chờ của lần phát trước — không thì vừa tua qua mốc
+    // dừng cũ là trình phát tự nhảy sang đoạn kế tiếp.
+    stopAt.current = null;
+    queue.current = [];
+    audio.currentTime = to;
+    setTime(to);
+  }, []);
+
+  return { playing, time, segment, playSegments, playFrom, pause, seek, audioRef: ref };
 }

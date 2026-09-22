@@ -1,0 +1,34 @@
+[
+  {
+    "id": "p50-culture",
+    "rect": [
+      0.12,
+      0.11,
+      0.765,
+      0.19
+    ],
+    "label": "Văn hoá và thông tin",
+    "ko": "한국 생활에 도움이 되는 스마트폰 앱(App)\n스마트폰 앱(App)에는 유용한 것들이 많습니다. 여러분은 명함 앱을 사용해 봤습니까? 휴대 전화 카메라로 명함을 찍으면 명함의 이름, 이메일 주소, 전화번호가 자동으로 입력됩니다.\n다음으로, ‘구해줘’ 앱이 있습니다. 어두운 밤길, 등산이나 낚시 등의 야외 활동 중 위험한 상황에서 112나 119로 전화하지 않아도 됩니다. 위험할 때 이 앱으로 자신의 위치를 문자나 채팅으로 알립니다. 그러면 빨리 도움을 받을 수 있습니다.",
+    "vi": "Ứng dụng điện thoại hữu ích cho cuộc sống ở Hàn Quốc\nCó rất nhiều ứng dụng điện thoại hữu ích. Bạn đã từng dùng ứng dụng danh thiếp chưa? Chỉ cần chụp danh thiếp bằng camera điện thoại là tên, địa chỉ email và số điện thoại trên danh thiếp được tự động nhập vào máy.\nTiếp theo là ứng dụng ‘구해줘’ (‘Cứu tôi với’). Khi gặp nguy hiểm, chẳng hạn lúc đi đường tối ban đêm hay khi leo núi, câu cá ngoài trời, bạn không cần gọi 112 (cảnh sát) hay 119 (cứu hoả, cấp cứu). Khi nguy hiểm, ứng dụng này báo vị trí của bạn bằng tin nhắn hoặc chat. Nhờ vậy bạn sẽ nhanh chóng được giúp đỡ.",
+    "dot": [
+      0.6,
+      0.288
+    ]
+  },
+  {
+    "id": "p50-questions",
+    "rect": [
+      0.13,
+      0.328,
+      0.42,
+      0.09
+    ],
+    "label": "Câu hỏi thảo luận",
+    "ko": "1) 명함 앱에는 무슨 정보가 있어요?\n2) ‘구해줘’ 앱은 언제 사용해요?\n3) 여러분이 알고 있는 스마트폰 앱을 소개해 보세요.",
+    "vi": "1) Ứng dụng danh thiếp có những thông tin gì?\n2) Khi nào thì dùng ứng dụng ‘구해줘’?\n3) Hãy giới thiệu một ứng dụng điện thoại mà bạn biết.",
+    "dot": [
+      0.585,
+      0.395
+    ]
+  }
+]

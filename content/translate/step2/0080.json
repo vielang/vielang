@@ -1,0 +1,34 @@
+[
+  {
+    "id": "p80-culture",
+    "rect": [
+      0.12,
+      0.108,
+      0.435,
+      0.212
+    ],
+    "label": "Văn hoá và thông tin",
+    "ko": "집들이 선물\n한국에서는 새집으로 이사하면 가족이나 친구, 친척들을 집으로 초대합니다. 이것을 ‘집들이’라고 합니다. 집들이에 갈 때 사람들은 휴지, 세제 같은 생활용품을 선물합니다. 세제는 “세제의 거품처럼 돈을 많이 벌어서 부자가 되세요.”라는 뜻이 있습니다. 휴지는 잘 풀리기 때문에 모든 일이 잘 풀리기를 바라는 마음으로 휴지를 선물합니다.",
+    "vi": "Quà tân gia\nỞ Hàn Quốc, khi chuyển đến nhà mới, người ta mời gia đình, bạn bè và họ hàng đến nhà chơi. Việc này gọi là ‘집들이’ (tiệc tân gia). Khi đi dự tân gia, mọi người thường tặng đồ dùng sinh hoạt như giấy vệ sinh, bột giặt. Bột giặt mang ý nghĩa “Chúc bạn kiếm được thật nhiều tiền, giàu có như bọt xà phòng nở ra”. Còn giấy cuộn thì dễ gỡ ra (풀리다), nên người ta tặng giấy với mong muốn mọi việc đều suôn sẻ (잘 풀리다).",
+    "dot": [
+      0.495,
+      0.324
+    ]
+  },
+  {
+    "id": "p80-questions",
+    "rect": [
+      0.13,
+      0.378,
+      0.46,
+      0.078
+    ],
+    "label": "Câu hỏi thảo luận",
+    "ko": "1) 한국에서는 새집으로 이사하고 무엇을 해요?\n2) 집들이에 갈 때 사람들이 왜 휴지와 세제를 선물해요?\n3) 여러분 고향에서는 다른 사람 집에 갈 때 무엇을 선물해요?",
+    "vi": "1) Ở Hàn Quốc, chuyển đến nhà mới xong người ta làm gì?\n2) Khi đi dự tân gia, vì sao mọi người tặng giấy vệ sinh và bột giặt?\n3) Ở quê bạn, khi đến nhà người khác, người ta thường tặng gì?",
+    "dot": [
+      0.66,
+      0.443
+    ]
+  }
+]

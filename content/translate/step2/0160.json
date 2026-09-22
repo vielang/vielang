@@ -1,0 +1,50 @@
+[
+  {
+    "id": "p160-culture",
+    "rect": [
+      0.12,
+      0.113,
+      0.462,
+      0.31
+    ],
+    "label": "Văn hoá và thông tin",
+    "ko": "출입국·외국인청(사무소)\n외국인이 국내에서 비자 연장 신청을 하거나 외국인 등록증을 발급받으려면 출입국·외국인청이나 출입국·외국인사무소에 가야 합니다.\n출입국·외국인청과 출입국·외국인사무소는 전국에 19개소(출입국·외국인청 6개소, 출입국·외국인사무소 13개소)가 있습니다. 이곳에서 업무를 보려면 인터넷으로 사전 예약을 하고 방문해야 합니다. 그러나 증명서를 발급받거나 외국인 등록증을 받으러 갈 때는 예약하지 않아도 됩니다.\n인터넷 사전 예약 방문 서비스를 이용하려면 먼저 하이코리아(www.hikorea.go.kr)에 접속해야 합니다.",
+    "vi": "Cục / Văn phòng Xuất nhập cảnh và Người nước ngoài (출입국·외국인청/사무소)\nNgười nước ngoài muốn xin gia hạn visa hay xin cấp thẻ đăng ký người nước ngoài ở Hàn Quốc thì phải đến Cục Xuất nhập cảnh và Người nước ngoài (출입국·외국인청) hoặc Văn phòng Xuất nhập cảnh và Người nước ngoài (출입국·외국인사무소).\nTrên cả nước có 19 nơi như vậy (6 Cục và 13 Văn phòng). Muốn làm thủ tục ở đây thì phải đặt lịch trước qua mạng rồi mới đến. Tuy nhiên, khi đi xin cấp giấy chứng nhận hoặc đi nhận thẻ đăng ký người nước ngoài thì không cần đặt lịch.\nMuốn dùng dịch vụ đặt lịch hẹn qua mạng, trước hết bạn phải vào trang HiKorea (www.hikorea.go.kr).",
+    "dot": [
+      0.458,
+      0.419
+    ]
+  },
+  {
+    "id": "p160-questions",
+    "rect": [
+      0.104,
+      0.442,
+      0.5,
+      0.093
+    ],
+    "label": "Câu hỏi thảo luận",
+    "ko": "1) 언제 출입국·외국인청을 방문해요?\n2) 출입국·외국인청에 사전 예약을 하려면 어떻게 해야 돼요?\n3) 여러분은 어느 출입국·외국인청에 가 봤어요?",
+    "vi": "1) Khi nào thì cần đến Cục Xuất nhập cảnh và Người nước ngoài?\n2) Muốn đặt lịch trước với Cục Xuất nhập cảnh và Người nước ngoài thì phải làm thế nào?\n3) Bạn đã từng đến Cục/Văn phòng Xuất nhập cảnh nào?",
+    "dot": [
+      0.545,
+      0.526
+    ]
+  },
+  {
+    "id": "p160-offices",
+    "rect": [
+      0.61,
+      0.13,
+      0.34,
+      0.43
+    ],
+    "label": "Các văn phòng xuất nhập cảnh",
+    "ko": "서울, 서울 남부, 인천, 인천공항, 김포공항, 양주, 수원, 춘천, 청주, 대전, 전주, 광주, 여수, 대구, 울산, 부산, 김해공항, 창원, 제주",
+    "vi": "19 nơi có Cục/Văn phòng Xuất nhập cảnh trên bản đồ: Seoul (서울), Nam Seoul (서울 남부), Incheon (인천), sân bay Incheon (인천공항), sân bay Gimpo (김포공항), Yangju (양주), Suwon (수원), Chuncheon (춘천), Cheongju (청주), Daejeon (대전), Jeonju (전주), Gwangju (광주), Yeosu (여수), Daegu (대구), Ulsan (울산), Busan (부산), sân bay Gimhae (김해공항), Changwon (창원), Jeju (제주).",
+    "dot": [
+      0.883,
+      0.269
+    ]
+  }
+]

@@ -1,0 +1,50 @@
+[
+  {
+    "id": "p150-culture",
+    "rect": [
+      0.12,
+      0.11,
+      0.435,
+      0.215
+    ],
+    "label": "Văn hoá và thông tin",
+    "ko": "한국의 주소\n한국은 도로명 주소를 사용합니다. 도로명 주소는 도로 이름과 건물 번호로 표기합니다. 한국의 주소를 쓸 때는 ‘도시 이름, 도로명과 건물 번호’처럼 큰 장소에서 작은 장소의 순서로 씁니다. 예를 들어 서울출입국·외국인청의 주소는 ‘서울특별시 양천구 목동동로 151 서울출입국·외국인청’입니다.",
+    "vi": "Địa chỉ ở Hàn Quốc\nHàn Quốc dùng địa chỉ theo tên đường (도로명 주소). Địa chỉ theo tên đường được ghi bằng tên đường và số toà nhà. Khi viết địa chỉ ở Hàn Quốc, người ta viết theo thứ tự từ nơi lớn đến nơi nhỏ, như ‘tên thành phố, tên đường và số toà nhà’. Ví dụ, địa chỉ của Cục Xuất nhập cảnh và Người nước ngoài Seoul là ‘서울특별시 양천구 목동동로 151 서울출입국·외국인청’ (Thành phố Seoul, quận Yangcheon, đường Mokdongdong-ro số 151, Cục Xuất nhập cảnh và Người nước ngoài Seoul).",
+    "dot": [
+      0.235,
+      0.319
+    ]
+  },
+  {
+    "id": "p150-questions",
+    "rect": [
+      0.125,
+      0.37,
+      0.43,
+      0.088
+    ],
+    "label": "Câu hỏi thảo luận",
+    "ko": "1) 한국의 도로명 주소는 무엇으로 표기해요?\n2) 한국의 주소를 쓰는 순서는 무엇이에요?\n3) 여러분 고향에서는 주소를 어떻게 써요?",
+    "vi": "1) Địa chỉ theo tên đường ở Hàn Quốc được ghi bằng gì?\n2) Thứ tự viết địa chỉ ở Hàn Quốc là thế nào?\n3) Ở quê bạn, người ta viết địa chỉ thế nào?",
+    "dot": [
+      0.51,
+      0.4385
+    ]
+  },
+  {
+    "id": "p150-addresses",
+    "rect": [
+      0.035,
+      0.47,
+      0.915,
+      0.415
+    ],
+    "label": "Ví dụ địa chỉ",
+    "ko": "우리집 주소\n김해시 장유면 반룡로 87-12, □동 □호\n\n우체국 택배\n보내는 분: 한국서점 / 02-1234-5678 / 서울특별시 종로구 세종대로 123\n받는 분: 후엔 님 / 010-9876-5432 / 경기도 안산시 신길중앙로 3길 11\n\n48←1 한남대로28길 (Hannam-daero 28-gil)",
+    "vi": "Biển ‘Địa chỉ nhà tôi’ (우리집 주소)\nThành phố Gimhae, xã Jangyu, đường Banryong-ro 87-12, toà (동) □, phòng (호) □ — viết từ nơi lớn đến nơi nhỏ: thành phố → xã → tên đường và số nhà → toà, phòng.\n\nPhiếu gửi hàng của bưu điện (우체국 택배)\nNgười gửi (보내는 분): Hiệu sách Hàn Quốc (한국서점) / 02-1234-5678 / Thành phố Seoul, quận Jongno, đường Sejong-daero 123\nNgười nhận (받는 분): Huyền (후엔 님 — 님 là cách gọi lịch sự) / 010-9876-5432 / tỉnh Gyeonggi, thành phố Ansan, đường Singiljungang-ro nhánh 3 (3길) số 11\n\nBiển tên đường: 한남대로28길 (Hannam-daero 28-gil) — đường nhánh số 28 của đại lộ Hannam-daero. ‘48←1’ nghĩa là chỗ biển đặt là số 1, đi theo hướng mũi tên thì số nhà tăng dần đến 48.",
+    "dot": [
+      0.28,
+      0.9
+    ]
+  }
+]

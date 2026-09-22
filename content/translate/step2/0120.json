@@ -1,0 +1,50 @@
+[
+  {
+    "id": "p120-culture",
+    "rect": [
+      0.12,
+      0.108,
+      0.8,
+      0.152
+    ],
+    "label": "Văn hoá và thông tin",
+    "ko": "교통 표지판\n여러분은 길에서 이런 것(△, ⊘)을 자주 봅니까? 이것을 교통 표지판이라고 합니다. 교통 표지판은 모양, 색깔, 이미지, 글자로 구성됩니다. △는 주의하라는 의미입니다. 그리고 ⊘는 금지의 의미이고 ▲는 가능하다는 것을 나타냅니다. 이렇게 교통 표지판의 모양과 색깔을 보면 의미를 알 수 있습니다.",
+    "vi": "Biển báo giao thông\nBạn có hay thấy những thứ như thế này (△, ⊘) trên đường không? Đây gọi là biển báo giao thông. Biển báo giao thông gồm hình dạng, màu sắc, hình ảnh và chữ. Hình tam giác vàng viền đỏ (△) nghĩa là phải chú ý. Hình tròn có gạch chéo đỏ (⊘) nghĩa là cấm, còn hình tam giác xanh (▲) cho biết việc đó được phép làm. Như vậy, chỉ cần nhìn hình dạng và màu sắc của biển báo là hiểu được ý nghĩa.",
+    "dot": [
+      0.858,
+      0.262
+    ]
+  },
+  {
+    "id": "p120-questions",
+    "rect": [
+      0.14,
+      0.285,
+      0.385,
+      0.075
+    ],
+    "label": "Câu hỏi thảo luận",
+    "ko": "1) △는 무슨 뜻이에요?\n2) ⊘는 무슨 뜻이에요?\n3) 여러분 나라의 교통 표지판을 소개해 보세요.",
+    "vi": "1) Biển tam giác vàng viền đỏ (△) nghĩa là gì?\n2) Biển tròn có gạch chéo đỏ (⊘) nghĩa là gì?\n3) Hãy giới thiệu biển báo giao thông ở nước bạn.",
+    "dot": [
+      0.56,
+      0.345
+    ]
+  },
+  {
+    "id": "p120-signs",
+    "rect": [
+      0.115,
+      0.419,
+      0.752,
+      0.503
+    ],
+    "label": "Biển báo giao thông",
+    "ko": "조심하세요 (노란색 바탕 + 빨간색 테두리)\n· 위험 DANGER — 위험하니까 조심하세요\n· 어린이와 다닐 때 조심하세요\n· 공사 중이니까 조심하세요\n\n이렇게 하지 마세요 (흰색이나 파란색 바탕 + 빨간색 테두리)\n· 통행금지 — 여기로 다니지 마세요\n· 주차금지 — 주차하지 마세요\n· 자전거를 타고 가지 마세요\n\n이렇게 하세요 (파란색 바탕 + 흰색 테두리)\n· 보행자 전용 도로 — 걸어 다니는 사람만 갈 수 있어요\n· 자전거 전용 — 자전거만 다닐 수 있어요\n· 횡단보도 — 길을 건널 수 있어요",
+    "vi": "Hãy cẩn thận (nền vàng + viền đỏ)\n· 위험 (Nguy hiểm) — Nguy hiểm, hãy cẩn thận\n· Hãy cẩn thận khi đi cùng trẻ em\n· Đang thi công, hãy cẩn thận\n\nĐừng làm thế này (nền trắng hoặc xanh + viền đỏ)\n· 통행금지 (Cấm đi lại) — Đừng đi qua đây\n· 주차금지 (Cấm đỗ xe) — Đừng đỗ xe ở đây\n· Cấm đi xe đạp\n\nHãy làm thế này (nền xanh + viền trắng)\n· 보행자 전용 도로 (Đường dành riêng cho người đi bộ) — Chỉ người đi bộ được đi\n· 자전거 전용 (Dành riêng cho xe đạp) — Chỉ xe đạp được đi\n· 횡단보도 (Vạch sang đường) — Được sang đường ở đây",
+    "dot": [
+      0.905,
+      0.46
+    ]
+  }
+]

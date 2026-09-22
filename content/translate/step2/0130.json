@@ -1,0 +1,34 @@
+[
+  {
+    "id": "p130-culture",
+    "rect": [
+      0.12,
+      0.108,
+      0.435,
+      0.29
+    ],
+    "label": "Văn hoá và thông tin",
+    "ko": "한국의 명절\n요즘 한국 사람들은 설과 추석을 대표적인 명절이라고 생각합니다. 그러나 옛날에는 정월 대보름, 한식, 단오, 동지도 큰 명절이었습니다. 정월 대보름은 음력 1월 15일로 한 해의 첫 보름달이 뜨는 날입니다. 대보름에는 오곡밥과 나물, 호두나 땅콩 같은 부럼을 먹습니다. 한식은 양력 4월 5일이나 6일이고 찬 음식을 먹습니다. 단오는 한 해 농사의 풍년을 바라는 날로 음력 5월 5일입니다. 동지는 일 년 중 밤이 가장 긴 날입니다. 양력 12월 22일이나 23일이고 팥죽을 먹습니다.",
+    "vi": "Các ngày lễ truyền thống của Hàn Quốc\nNgày nay người Hàn coi Tết (설) và Trung thu (추석) là hai ngày lễ tiêu biểu. Nhưng ngày xưa, Rằm tháng Giêng (정월 대보름), Hàn thực (한식), Tết Đoan ngọ (단오) và Đông chí (동지) cũng là những ngày lễ lớn. Rằm tháng Giêng là ngày 15 tháng 1 âm lịch, ngày trăng tròn đầu tiên của năm. Vào ngày này người ta ăn cơm ngũ cốc (오곡밥), các món rau (나물) và các loại hạt cứng như óc chó, lạc (부럼). Hàn thực là ngày 5 hoặc 6 tháng 4 dương lịch, người ta ăn đồ nguội. Tết Đoan ngọ là ngày 5 tháng 5 âm lịch, ngày cầu mong một năm được mùa. Đông chí là ngày có đêm dài nhất trong năm, rơi vào ngày 22 hoặc 23 tháng 12 dương lịch, người ta ăn cháo đậu đỏ (팥죽).",
+    "dot": [
+      0.3,
+      0.398
+    ]
+  },
+  {
+    "id": "p130-questions",
+    "rect": [
+      0.14,
+      0.435,
+      0.36,
+      0.068
+    ],
+    "label": "Câu hỏi thảo luận",
+    "ko": "1) 정월 대보름에는 무엇을 먹어요?\n2) 단오는 언제예요?\n3) 여러분 고향에는 어떤 명절이 있어요?",
+    "vi": "1) Vào Rằm tháng Giêng người ta ăn gì?\n2) Tết Đoan ngọ là khi nào?\n3) Ở quê bạn có những ngày lễ truyền thống nào?",
+    "dot": [
+      0.479,
+      0.49
+    ]
+  }
+]

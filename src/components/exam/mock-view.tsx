@@ -232,7 +232,7 @@ function MockRunning({ exam, attempt }: { exam: Exam; attempt: MockAttempt }) {
       )}
 
       {!section.writing && (
-        <MobileAnswerSheet key={section.id} section={section} answers={attempt.answers} onAnswer={onAnswer} />
+        <MobileAnswerSheet section={section} answers={attempt.answers} onAnswer={onAnswer} />
       )}
 
       <Dialog open={leaveGuard.pending} onOpenChange={(open) => !open && leaveGuard.stay()}>

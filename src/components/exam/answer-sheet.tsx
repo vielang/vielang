@@ -134,26 +134,19 @@ function useReadingQuestion(nos: number[], topInset: number): number | undefined
 
 type Snap = "peek" | "half" | "full";
 const PEEK = 92;
-const SNAP_KEY = "kiip-exam-sheet-v1";
 
 function heightOf(snap: Snap, vh: number): number {
   return snap === "peek" ? PEEK : snap === "half" ? Math.round(vh * 0.42) : Math.round(vh * 0.8);
-}
-
-function loadSnap(): Snap {
-  try {
-    const v = localStorage.getItem(SNAP_KEY);
-    return v === "peek" || v === "full" ? v : "half";
-  } catch {
-    return "half";
-  }
 }
 
 /**
  * Phiếu trả lời trên ĐIỆN THOẠI: gắn ở đáy màn hình, kéo tay cầm lên xuống
  * giữa ba nấc — thu gọn (một dòng: câu đang đọc + bốn ô tròn), nửa màn hình
  * (đề cuộn ở trên, phiếu ở dưới — vừa đọc vừa tô), mở hết. Thả tay thì hít
- * về nấc gần nhất; bấm tay cầm thì mở / thu gọn. Nấc đã chọn được nhớ.
+ * về nấc gần nhất; bấm tay cầm thì mở / thu gọn.
+ *
+ * Vào thi thử thì phiếu THU GỌN — nhường chỗ cho đề; cần thì người học tự
+ * kéo lên. Nấc đã chọn giữ nguyên suốt lượt thi (kể cả khi sang phần sau).
  *
  * Phiếu tự theo câu đang đọc (tô hàng, cuộn tới hàng đó); bấm số câu thì đề
  * cuộn tới câu. Trang được chừa khoảng trống dưới cùng bằng chiều cao phiếu
@@ -171,7 +164,7 @@ export function MobileAnswerSheet({
   /** Chiều cao thanh dính trên đầu trang (để biết câu nào đang đọc). */
   topInset?: number;
 }) {
-  const [snap, setSnapState] = useState<Snap>(loadSnap);
+  const [snap, setSnap] = useState<Snap>("peek");
   const [vh, setVh] = useState(() => window.innerHeight);
   const [drag, setDrag] = useState<number | null>(null);
   const start = useRef<{ y: number; h: number; moved: boolean } | null>(null);
@@ -184,13 +177,6 @@ export function MobileAnswerSheet({
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, []);
-
-  const setSnap = (s: Snap) => {
-    setSnapState(s);
-    try {
-      localStorage.setItem(SNAP_KEY, s);
-    } catch {}
-  };
 
   const height = drag ?? heightOf(snap, vh);
 

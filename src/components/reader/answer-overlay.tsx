@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ListChecks, X } from "lucide-react";
 import type { AnswerKey } from "@/lib/page-answers";
 import { HintBubble } from "@/components/reader/hint-bubble";
+import { useActivityStore } from "@/lib/activity-store";
 
 interface ActiveBubble {
   answerKey: AnswerKey;
@@ -25,6 +26,7 @@ interface ActiveBubble {
  */
 export function AnswerOverlay({ answerKeys }: { answerKeys: AnswerKey[] }) {
   const [active, setActive] = useState<ActiveBubble | null>(null);
+  const recordAnswerOpened = useActivityStore((s) => s.recordAnswerOpened);
 
   if (answerKeys.length === 0) return null;
 
@@ -50,9 +52,10 @@ export function AnswerOverlay({ answerKeys }: { answerKeys: AnswerKey[] }) {
             <button
               type="button"
               data-answer-key
-              onClick={(e) =>
-                setActive(isOpen ? null : { answerKey, x: e.clientX, y: e.clientY })
-              }
+              onClick={(e) => {
+                if (!isOpen) recordAnswerOpened();
+                setActive(isOpen ? null : { answerKey, x: e.clientX, y: e.clientY });
+              }}
               aria-label={
                 isOpen
                   ? `Đóng đáp án: ${answerKey.section}`

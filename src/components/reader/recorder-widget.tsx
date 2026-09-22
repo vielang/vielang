@@ -32,6 +32,7 @@ import {
 import { clampToViewport, useDraggable } from "@/lib/use-draggable";
 import { recorderAnchor } from "@/lib/widget-dock";
 import { cn } from "@/lib/utils";
+import { useActivityStore } from "@/lib/activity-store";
 
 /** Nhịp cập nhật đồng hồ lúc đang thu. */
 const TICK_MS = 200;
@@ -56,6 +57,7 @@ export function RecorderWidget({ bookId, page }: { bookId: string; page: number 
   const setPos = useRecordingStore((s) => s.setPanelPos);
   const list = useRecordingStore((s) => s.recordings[recordingKey(bookId, page)]);
   const addRecording = useRecordingStore((s) => s.addRecording);
+  const recordRecording = useActivityStore((s) => s.recordRecording);
   const removeRecording = useRecordingStore((s) => s.removeRecording);
   const renameRecording = useRecordingStore((s) => s.renameRecording);
   const quotaExceeded = useRecordingStore((s) => s.quotaExceeded);
@@ -167,10 +169,11 @@ export function RecorderWidget({ bookId, page }: { bookId: string; page: number 
         mimeType,
         createdAt: new Date().toISOString(),
       });
+      recordRecording();
     } finally {
       setBusy(false);
     }
-  }, [addRecording, bookId, page]);
+  }, [addRecording, recordRecording, bookId, page]);
 
   const play = useCallback(
     async (rec: Recording) => {

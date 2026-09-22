@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Bookmark, BookOpenText, Download } from "lucide-react";
+import { Bookmark, BookOpenText, ChartNoAxesColumn, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LanguageNav } from "@/components/layout/language-nav";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
@@ -42,6 +42,17 @@ export function SiteHeader() {
           >
             <Link href="/install">
               <Download className="size-5" aria-hidden />
+            </Link>
+          </Button>
+          <Button
+            asChild
+            variant="ghost"
+            size="icon"
+            aria-label="Quá trình học của tôi"
+            title="Quá trình học của tôi"
+          >
+            <Link href="/my">
+              <ChartNoAxesColumn className="size-5" aria-hidden />
             </Link>
           </Button>
           <Button

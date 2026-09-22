@@ -23,6 +23,7 @@ import { NoteSheet } from "@/components/reader/note-sheet";
 import { AnnotationToolbar } from "@/components/reader/annotation-toolbar";
 import { RecorderWidget } from "@/components/reader/recorder-widget";
 import { ReaderHelp } from "@/components/reader/reader-help";
+import { useStudyTracker } from "@/lib/use-study-tracker";
 import { useNoteWidgetStore } from "@/lib/note-widget-store";
 import {
   useAnnotationHydration,
@@ -252,6 +253,10 @@ export function ReaderView({
   // `toolbarVisible` không cần reset thủ công ở đây — page.tsx render
   // <ReaderView key={page}/>, remount mỗi khi đổi trang nên state cục bộ
   // (toolbar, dialog...) tự về mặc định.
+  // Lịch sử học cho My page: thời gian học thật và trang ở lại đủ lâu —
+  // khác `markPageRead` ngay dưới, vốn ghi ngay khi trang vừa hiện ra.
+  useStudyTracker(book.id, pages);
+
   const pagesKey = pages.join(",");
   useEffect(() => {
     pages.forEach((p) => markPageRead(book.id, p));

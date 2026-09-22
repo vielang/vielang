@@ -63,3 +63,9 @@ describe("tên cache của service worker", () => {
     );
   });
 });
+
+describe("khoá lịch sử học", () => {
+  it("giữ nguyên tên, nếu không thì mất chuỗi ngày và lịch học của người đang dùng", () => {
+    expect(source("src", "lib", "activity-store.ts")).toContain('name: "kiip-activity-v1"');
+  });
+});

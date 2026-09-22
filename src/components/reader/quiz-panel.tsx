@@ -15,6 +15,7 @@ import {
   type QuizSection,
 } from "@/lib/quiz";
 import { usePageAnswers, useQuizStore } from "@/lib/quiz-store";
+import { useActivityStore } from "@/lib/activity-store";
 
 /** Đề dạng "______" thì không cần in ra — ô nhập bên dưới CHÍNH LÀ chỗ trống. */
 const BLANK_ONLY = /^[_\s]+$/;
@@ -44,6 +45,7 @@ export function QuizPanel({
   const setAnswer = useQuizStore((s) => s.setAnswer);
   const markChecked = useQuizStore((s) => s.markChecked);
   const resetPage = useQuizStore((s) => s.resetPage);
+  const recordQuizCheck = useActivityStore((s) => s.recordQuizCheck);
 
   const gradable = sections.flatMap((s) => s.items.filter(isGradable));
   const done = gradable.filter((i) => checked.includes(i.id));
@@ -93,7 +95,11 @@ export function QuizPanel({
                 value={answers[item.id]}
                 checked={checked.includes(item.id)}
                 onAnswer={(v) => setAnswer(bookId, page, item.id, v)}
-                onCheck={() => markChecked(bookId, page, item.id)}
+                onCheck={() => {
+                  markChecked(bookId, page, item.id);
+                  // Lịch sử học cho My page — chỉ câu chấm được mới có đúng/sai.
+                  if (isGradable(item)) recordQuizCheck(isCorrect(item, answers[item.id]));
+                }}
               />
             ))}
           </section>

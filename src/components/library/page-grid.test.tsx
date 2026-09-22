@@ -16,6 +16,7 @@ const BASE = {
   audioPages: [] as number[],
   translatedPages: [] as number[],
   grammarPages: [] as number[],
+  answerPages: [] as number[],
 };
 
 function grid(overrides: Partial<typeof BASE> = {}) {
@@ -65,5 +66,19 @@ describe("các huy hiệu sẵn có", () => {
     expect(screen.getByTitle("Có bài giảng")).toBeTruthy();
     expect(screen.getByTitle("Có audio")).toBeTruthy();
     expect(screen.getByTitle("Có bản dịch tiếng Việt")).toBeTruthy();
+  });
+});
+
+describe("huy hiệu đáp án sách", () => {
+  it("hiện ở đúng trang có đáp án, kể cả khi trang không có gì khác", () => {
+    grid({ answerPages: [2] });
+
+    expect(screen.getAllByTitle("Có đáp án sách")).toHaveLength(1);
+  });
+
+  it("không hiện ở trang không có", () => {
+    grid({ answerPages: [] });
+
+    expect(screen.queryByTitle("Có đáp án sách")).toBeNull();
   });
 });

@@ -6,6 +6,7 @@ import {
   Hand,
   Keyboard,
   Languages,
+  ListChecks,
   Mic,
   MoveHorizontal,
   NotebookText,
@@ -39,6 +40,11 @@ const GESTURES: { Icon: typeof Hand; what: string; how: string }[] = [
     Icon: Languages,
     what: "Chạm vào một đoạn chữ Hàn",
     how: "hiện bản dịch tiếng Việt của đoạn đó — kéo bong bóng đi chỗ khác được",
+  },
+  {
+    Icon: ListChecks,
+    what: "Chạm vào dấu danh sách cạnh bài tập",
+    how: "xem đáp án của sách, khỏi phải lật xuống cuối sách",
   },
   { Icon: Hand, what: "Kéo các bảng công cụ", how: "đặt chúng vào chỗ vừa tay" },
 ];

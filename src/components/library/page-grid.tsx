@@ -8,6 +8,7 @@ import {
   Bookmark,
   Check,
   Languages,
+  ListChecks,
   NotebookText,
   Volume2,
 } from "lucide-react";
@@ -64,6 +65,7 @@ export function PageGrid({
   audioPages,
   translatedPages,
   grammarPages,
+  answerPages,
 }: {
   bookId: string;
   totalPages: number;
@@ -77,6 +79,8 @@ export function PageGrid({
   translatedPages: number[];
   /** Số trang có sẵn nghĩa ngữ pháp (xem lib/page-grammar.ts) */
   grammarPages: number[];
+  /** Số trang có đáp án sách (xem lib/page-answers.ts) */
+  answerPages: number[];
 }) {
   const books = useProgressStore((s) => s.books);
   const toggleBookmark = useProgressStore((s) => s.toggleBookmark);
@@ -86,6 +90,7 @@ export function PageGrid({
   const audioedPages = new Set(audioPages);
   const translatedSet = new Set(translatedPages);
   const grammarSet = new Set(grammarPages);
+  const answerSet = new Set(answerPages);
   const chapterByStartPage = new Map(chapters.map((ch) => [ch.startPage, ch]));
 
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
@@ -102,6 +107,7 @@ export function PageGrid({
           const hasAudio = audioedPages.has(page);
           const hasTranslation = translatedSet.has(page);
           const hasGrammar = grammarSet.has(page);
+          const hasAnswers = answerSet.has(page);
           const chapter = chapterByStartPage.get(page);
 
           return (
@@ -143,7 +149,7 @@ export function PageGrid({
                         <Check className="size-3" aria-hidden />
                       </span>
                     )}
-                    {(hasNote || hasAudio || hasTranslation || hasGrammar) && (
+                    {(hasNote || hasAudio || hasTranslation || hasGrammar || hasAnswers) && (
                       <div className="absolute top-1 left-1 flex gap-1">
                         {hasNote && (
                           <span
@@ -178,6 +184,14 @@ export function PageGrid({
                             title="Có giải nghĩa ngữ pháp"
                           >
                             <BookOpen className="size-3" aria-hidden />
+                          </span>
+                        )}
+                        {hasAnswers && (
+                          <span
+                            className="rounded-full bg-background/95 p-1 text-primary shadow ring-1 ring-border"
+                            title="Có đáp án sách"
+                          >
+                            <ListChecks className="size-3" aria-hidden />
                           </span>
                         )}
                       </div>

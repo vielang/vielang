@@ -1,0 +1,15 @@
+[
+  {
+    "id": "p204-grammar",
+    "rect": [0.918, 0.296, 0.03, 0.024],
+    "section": "문법",
+    "source": 215,
+    "answers": [
+      { "label": "1.", "text": "④" },
+      { "label": "2.", "text": "①" },
+      { "label": "3.", "text": "①" },
+      { "label": "4.", "text": "②" },
+      { "label": "5.", "text": "①" }
+    ]
+  }
+]

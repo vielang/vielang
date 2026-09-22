@@ -63,3 +63,12 @@ const ANSWERS = {
 export function getPageAnswers(bookId: string, page: number): AnswerKey[] {
   return ANSWERS[bookId]?.[String(page)] ?? [];
 }
+
+/** Danh sách số trang có đáp án sách của 1 sách, sắp xếp tăng dần. */
+export function getAnswerPages(bookId: string): number[] {
+  const book = ANSWERS[bookId];
+  if (!book) return [];
+  return Object.keys(book)
+    .map(Number)
+    .sort((a, b) => a - b);
+}

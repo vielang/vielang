@@ -21,6 +21,8 @@ import { StudyHeatmap } from "@/components/my/study-heatmap";
 import { BookProgressCard, booksInProgress } from "@/components/my/book-progress";
 import { summarizeQuiz, WrongList } from "@/components/my/quiz-review";
 import { BackupPanel } from "@/components/my/backup-panel";
+import { AbilityPanel } from "@/components/my/ability-panel";
+import { computeAbility } from "@/lib/ability";
 
 const NO_SUBSCRIBE = () => () => {};
 const GOAL_CHOICES = [30, 60, 90, 150, 300];
@@ -38,6 +40,7 @@ export function MyPageView({ books }: { books: readonly Book[] }) {
   const days = useActivityStore((s) => s.days);
   const studied = useActivityStore((s) => s.studied);
   const goal = useActivityStore((s) => s.weeklyGoalMinutes);
+  const grades = useActivityStore((s) => s.grades);
   const setGoal = useActivityStore((s) => s.setWeeklyGoal);
   const progressByBook = useProgressStore((s) => s.books);
   const quizPages = useQuizStore((s) => s.pages);
@@ -54,7 +57,8 @@ export function MyPageView({ books }: { books: readonly Book[] }) {
   const recordingTotal = Object.values(recordings).reduce((n, list) => n + list.length, 0);
   const rows = booksInProgress(books, progressByBook, studied);
   const quiz = summarizeQuiz(quizPages);
-  const hasAnyData = rows.length > 0 || countStudyDays(days) > 0;
+  const ability = computeAbility(grades, quizPages);
+  const hasAnyData = rows.length > 0 || countStudyDays(days) > 0 || ability.total > 0;
 
   if (!hasAnyData) {
     return (
@@ -150,6 +154,26 @@ export function MyPageView({ books }: { books: readonly Book[] }) {
           </div>
         </section>
       )}
+
+      <section className="flex flex-col gap-3">
+        <h2 className="text-lg font-semibold tracking-tight">Năng lực theo kỹ năng</h2>
+        {ability.total > 0 ? (
+          <>
+            <p className="text-xs text-muted-foreground">
+              Tính từ những bài bạn <strong>tự chấm</strong> sau khi xem đáp án (đúng hết =
+              100%, sai vài câu = 50%, sai nhiều = 0%) và các câu quiz đã kiểm tra. Đây là
+              số tự báo để biết kỹ năng nào cần luyện thêm, không phải điểm thi.
+            </p>
+            <AbilityPanel ability={ability} />
+          </>
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            Làm bài xong, bấm chấm đáp án trên trang sách rồi chọn &quot;Đúng hết&quot;,
+            &quot;Sai vài câu&quot; hoặc &quot;Sai nhiều&quot; — năng lực theo từ vựng, ngữ pháp,
+            nghe, đọc, viết sẽ hiện ở đây.
+          </p>
+        )}
+      </section>
 
       {quiz.checked > 0 && (
         <section className="flex flex-col gap-3">

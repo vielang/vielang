@@ -4,7 +4,15 @@ import { useState } from "react";
 import { ListChecks, X } from "lucide-react";
 import type { AnswerKey } from "@/lib/page-answers";
 import { HintBubble } from "@/components/reader/hint-bubble";
-import { useActivityStore } from "@/lib/activity-store";
+import { cn } from "@/lib/utils";
+import { gradeKey, useActivityStore, type GradeValue } from "@/lib/activity-store";
+
+/** Ba mức tự chấm — đủ để thấy xu hướng, ít đến mức bấm được trong một giây. */
+const GRADES: { value: GradeValue; label: string }[] = [
+  { value: 1, label: "Đúng hết" },
+  { value: 0.5, label: "Sai vài câu" },
+  { value: 0, label: "Sai nhiều" },
+];
 
 interface ActiveBubble {
   answerKey: AnswerKey;
@@ -24,9 +32,20 @@ interface ActiveBubble {
  * được là cái chấm 20px với lề chạm 44px — xem lý do đầy đủ ở
  * `translation-overlay`.
  */
-export function AnswerOverlay({ answerKeys }: { answerKeys: AnswerKey[] }) {
+export function AnswerOverlay({
+  answerKeys,
+  bookId,
+  page,
+}: {
+  answerKeys: AnswerKey[];
+  /** Sách và trang — để lưu lượt tự chấm đúng chỗ (xem `gradeKey`). */
+  bookId: string;
+  page: number;
+}) {
   const [active, setActive] = useState<ActiveBubble | null>(null);
   const recordAnswerOpened = useActivityStore((s) => s.recordAnswerOpened);
+  const grades = useActivityStore((s) => s.grades);
+  const setGrade = useActivityStore((s) => s.setGrade);
 
   if (answerKeys.length === 0) return null;
 
@@ -86,6 +105,8 @@ export function AnswerOverlay({ answerKeys }: { answerKeys: AnswerKey[] }) {
           y={active.y}
           onClose={() => setActive(null)}
           ownTriggerSelector="[data-answer-key]"
+          role="dialog"
+          label={`Đáp án: ${active.answerKey.section}`}
         >
           <span className="font-heading mb-1 block font-semibold">
             Đáp án · {active.answerKey.section}
@@ -105,6 +126,34 @@ export function AnswerOverlay({ answerKeys }: { answerKeys: AnswerKey[] }) {
                 <span>{line.text}</span>
               </span>
             ))}
+          </span>
+          {/* Tự chấm: nguồn dữ liệu năng lực duy nhất phủ được cả tám cuốn —
+              app không biết người học viết gì vào sách, chỉ họ biết. Ba mức
+              thôi, bấm được ngay trong một giây; bấm lại mức khác thì đè. */}
+          <span className="mt-2 flex flex-col gap-1 border-t border-white/25 pt-2">
+            <span className="text-xs text-white/70">Bạn làm thế nào?</span>
+            <span className="flex flex-wrap gap-1" role="group" aria-label="Tự chấm bài này">
+              {GRADES.map(({ value, label }) => {
+                const key = gradeKey(bookId, page, active.answerKey.id);
+                const selected = grades[key]?.grade === value;
+                return (
+                  <button
+                    key={value}
+                    type="button"
+                    aria-pressed={selected}
+                    onClick={() => setGrade(key, value)}
+                    className={cn(
+                      "rounded-md border px-2 py-1 text-xs transition-colors",
+                      selected
+                        ? "border-white bg-white text-neutral-900"
+                        : "border-white/40 text-white hover:bg-white/15"
+                    )}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </span>
           </span>
           {/* Ghi rõ nguồn: đây là đáp án của sách, không phải app tự nghĩ ra,
               và người học muốn thì tự lật tới đúng trang mà đối chiếu. */}

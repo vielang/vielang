@@ -180,7 +180,7 @@ function PageImage({
       />
       <TranslationOverlay regions={regions} />
       <GrammarOverlay points={grammar} />
-      <AnswerOverlay answerKeys={answerKeys} />
+      <AnswerOverlay answerKeys={answerKeys} bookId={bookId} page={page} />
       {/* Nằm SAU vùng dịch: đang bật chế độ vẽ thì nét vẽ phải nhận được
           chạm trước, nếu không bấm trúng vùng dịch là bật bản dịch thay vì
           vẽ. Tắt chế độ vẽ thì lớp này `pointer-events: none` nên vùng dịch

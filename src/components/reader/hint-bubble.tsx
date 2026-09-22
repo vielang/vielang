@@ -32,8 +32,10 @@ function clampToViewport(
  * phần định vị và kéo thả tinh vi ở dưới sẽ trôi khỏi nhau.
  *
  * Cả bong bóng là vùng kéo, không có thanh tiêu đề hay tay cầm riêng: thêm
- * thanh vào thì mất luôn cái gọn gàng, mà nội dung ở đây cũng chẳng có gì để
- * bấm bên trong. Vì vậy đừng nhét nút hay liên kết vào `children`.
+ * thanh vào thì mất luôn cái gọn gàng. Nút/liên kết bên trong vẫn bấm được —
+ * nhấn trúng chúng thì KHÔNG bắt đầu kéo (xem `onPointerDown`). Có nút bên
+ * trong thì truyền `role="dialog"` kèm `label`: "tooltip" là thứ chỉ để đọc,
+ * trình đọc màn hình sẽ không cho người dùng đi vào các nút đó.
  *
  * Dựng qua portal ra `document.body` chứ KHÔNG render tại chỗ: lớp phủ nằm
  * trong cây đã bị `react-zoom-pan-pinch` gắn `transform`, mà phần tử tổ tiên
@@ -47,6 +49,8 @@ export function HintBubble({
   y,
   onClose,
   ownTriggerSelector,
+  role = "tooltip",
+  label,
 }: {
   children: React.ReactNode;
   x: number;
@@ -60,6 +64,9 @@ export function HintBubble({
    * hiệu ứng bên dưới.
    */
   ownTriggerSelector: string;
+  role?: "tooltip" | "dialog";
+  /** Tên cho `role="dialog"` (aria-label). */
+  label?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [pos, setPos] = useState<{ left: number; top: number } | null>(null);
@@ -106,6 +113,10 @@ export function HintBubble({
    */
   function onPointerDown(e: React.PointerEvent) {
     e.stopPropagation();
+    // Nhấn trúng nút bên trong thì để nút nhận cú bấm, đừng bắt đầu kéo:
+    // `setPointerCapture` sẽ dồn mọi sự kiện về bong bóng, và cú click không
+    // bao giờ tới được nút.
+    if ((e.target as HTMLElement).closest?.("button, a, input, select, textarea")) return;
     const el = ref.current;
     if (!el) return;
     el.setPointerCapture(e.pointerId);
@@ -173,7 +184,8 @@ export function HintBubble({
   return createPortal(
     <div
       ref={ref}
-      role="tooltip"
+      role={role}
+      aria-label={label}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}

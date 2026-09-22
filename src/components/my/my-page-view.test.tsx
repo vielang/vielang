@@ -10,7 +10,7 @@ import { getPageQuiz, isGradable } from "@/lib/quiz";
 
 beforeEach(() => {
   localStorage.clear();
-  useActivityStore.setState({ days: {}, studied: {}, weeklyGoalMinutes: 60 });
+  useActivityStore.setState({ days: {}, studied: {}, weeklyGoalMinutes: 60, grades: {} });
   useProgressStore.setState({ books: {}, hasHydrated: true });
   useQuizStore.setState({ pages: {} });
 });
@@ -56,5 +56,27 @@ describe("My page", () => {
     expect(screen.getByText(/0\/1/)).toBeTruthy();
     const link = screen.getByText(item.prompt).closest("a");
     expect(link?.getAttribute("href")).toBe("/read/step1/19");
+  });
+});
+
+describe("năng lực trên My page", () => {
+  it("chưa tự chấm gì thì hướng dẫn cách có dữ liệu", () => {
+    useActivityStore.setState({
+      days: { [dayKey(new Date())]: { ...EMPTY_DAY, activeMs: 5 * 60_000 } },
+    });
+    render(<MyPageView books={BOOKS} />);
+
+    expect(screen.getByText(/năng lực theo từ vựng, ngữ pháp/)).toBeTruthy();
+  });
+
+  it("có lượt tự chấm thì hiện thống kê và nói rõ đây là số tự báo", () => {
+    useActivityStore.setState({ grades: { "wb-step1:12:p12-1": { grade: 0, at: "" } } });
+    render(<MyPageView books={BOOKS} />);
+
+    expect(screen.getByText(/không phải điểm thi/)).toBeTruthy();
+    expect(screen.getByText("Điểm ngữ pháp nên ôn lại")).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Xem giải thích" }).getAttribute("href")).toBe(
+      "/read/step1/15"
+    );
   });
 });

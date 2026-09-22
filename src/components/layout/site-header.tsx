@@ -9,18 +9,17 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="mx-auto flex h-14 max-w-5xl items-center justify-between gap-4 px-4">
         <div className="flex min-w-0 items-center gap-3">
+          {/* Màn điện thoại ẩn hẳn logo (và vạch ngăn) để nhường chỗ cho nav
+              ngôn ngữ và các nút bên phải — về trang chủ vẫn được qua mục
+              "Tiếng Hàn" của nav ngôn ngữ (trỏ tới "/"). */}
           <Link
             href="/"
-            className="flex shrink-0 items-center gap-2 font-semibold tracking-tight"
+            className="hidden shrink-0 items-center gap-2 font-semibold tracking-tight sm:flex"
           >
             <BookOpenText className="size-5 text-primary" aria-hidden />
-            {/* Màn điện thoại nhường chỗ cho nav ngôn ngữ và các nút bên
-                phải — chỉ giữ lại logo. Dùng `sr-only` chứ không phải
-                `hidden`: ẩn hẳn thì liên kết này mất luôn tên gọi, vì cái
-                icon đã `aria-hidden`. */}
-            <span className="sr-only sm:not-sr-only">VieTopik</span>
+            VieTopik
           </Link>
-          <span className="h-4 w-px shrink-0 bg-border" aria-hidden />
+          <span className="hidden h-4 w-px shrink-0 bg-border sm:block" aria-hidden />
           <LanguageNav />
         </div>
         <div className="flex items-center gap-1">

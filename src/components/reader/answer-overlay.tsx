@@ -88,8 +88,14 @@ export function AnswerOverlay({ answerKeys }: { answerKeys: AnswerKey[] }) {
             Đáp án · {active.answerKey.section}
           </span>
           {/* Số câu và đáp án xếp thành hai cột thẳng hàng, giống bảng đáp án
-              in trong sách — dò từ câu hỏi trên trang sang dễ hơn. */}
-          <span className="grid grid-cols-[auto_1fr] gap-x-2 gap-y-0.5">
+              in trong sách — dò từ câu hỏi trên trang sang dễ hơn.
+
+              Chặn chiều cao và cho cuộn bên trong: bảng chia động từ của sách
+              bài tập có bài dài 15–18 dòng, điện thoại cầm ngang chỉ cao
+              ~390px — không chặn thì đuôi bong bóng tràn khỏi màn hình và
+              không có cách nào xem. `touch-pan-y` mở lại cử chỉ cuộn mà
+              `HintBubble` đã tắt (`touch-none`) để kéo bong bóng. */}
+          <span className="grid max-h-[calc(100dvh-8rem)] touch-pan-y grid-cols-[auto_1fr] gap-x-2 gap-y-0.5 overflow-y-auto overscroll-contain">
             {active.answerKey.answers.map((line, i) => (
               <span key={i} className="contents">
                 <span className="text-white/70">{line.label}</span>

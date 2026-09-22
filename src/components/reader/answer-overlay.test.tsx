@@ -89,6 +89,17 @@ describe("bong bóng đáp án", () => {
     expect(screen.getByRole("tooltip").textContent).toContain("tr.212");
   });
 
+  it("danh sách đáp án dài thì cuộn bên trong, không tràn khỏi màn hình", () => {
+    // Bảng chia động từ của sách bài tập có bài 15–18 dòng; điện thoại cầm
+    // ngang chỉ cao ~390px.
+    render(<AnswerOverlay answerKeys={KEYS} />);
+    tap(trigger());
+    const list = screen.getByText("네 ✓").parentElement!.parentElement!;
+
+    expect(list.className).toMatch(/max-h-/);
+    expect(list.className).toMatch(/\boverflow-y-auto\b/);
+  });
+
   it("bấm lại chính chấm đó thì đóng", () => {
     render(<AnswerOverlay answerKeys={KEYS} />);
     tap(trigger());

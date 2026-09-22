@@ -10,6 +10,10 @@
  * của sách cũng chia theo mục ("듣기 p.18", "읽기 p.19"), và mỗi câu một chấm
  * thì trang chi chít nút.
  *
+ * Sách bài tập (익힘책) thì khác: mỗi trang có vài bài (1., 2.), bài nào
+ * cũng có đáp án. Gộp cả trang vào một chấm thì bong bóng dài 15–20 dòng, nên
+ * ở đó mỗi BÀI một chấm, đặt cạnh chính bài đó.
+ *
  * CHỈ chép nguyên văn đáp án của sách, không tự soạn thêm. Chỗ sách đánh dấu
  * ✓ vào ô trống thì ghi "네 ✓". Bài tự làm có chấm điểm đã có ở `lib/quiz.ts`
  * — hai thứ khác nhau: một bên là "xem đáp án sách", một bên là "làm bài".
@@ -21,6 +25,10 @@ import step1 from "../../content/answers/step1.json";
 import step2 from "../../content/answers/step2.json";
 import step3 from "../../content/answers/step3.json";
 import step4 from "../../content/answers/step4.json";
+import wbStep1 from "../../content/answers/wb-step1.json";
+import wbStep2 from "../../content/answers/wb-step2.json";
+import wbStep3 from "../../content/answers/wb-step3.json";
+import wbStep4 from "../../content/answers/wb-step4.json";
 import type { Rect } from "@/lib/page-translation";
 
 export interface AnswerLine {
@@ -58,6 +66,10 @@ const ANSWERS = {
   step2,
   step3,
   step4,
+  "wb-step1": wbStep1,
+  "wb-step2": wbStep2,
+  "wb-step3": wbStep3,
+  "wb-step4": wbStep4,
 } as unknown as Record<string, Record<string, AnswerKey[]>>;
 
 export function getPageAnswers(bookId: string, page: number): AnswerKey[] {

@@ -109,6 +109,18 @@ describe("bong bóng đáp án", () => {
   });
 });
 
+describe("dữ liệu đáp án sách bài tập", () => {
+  // Sách bài tập dùng mã sách có gạch ngang ("wb-step1") — quên nối file dữ
+  // liệu của nó vào `page-answers` thì trang vẫn mở bình thường, chỉ lặng lẽ
+  // không có chấm nào.
+  it("nạp được, và mỗi bài trên trang là một chấm riêng", () => {
+    const keys = getPageAnswers("wb-step1", 10);
+
+    expect(keys.length).toBeGreaterThanOrEqual(2);
+    expect(new Set(keys.map((k) => k.section)).size).toBe(keys.length);
+  });
+});
+
 describe("dữ liệu đáp án Sơ cấp 1, bài 1", () => {
   // Chép từ bảng 모범 답안 trang 212. Test này giữ cho dữ liệu khỏi trôi
   // khỏi sách khi có người sửa tay file JSON.

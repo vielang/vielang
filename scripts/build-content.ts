@@ -6,6 +6,7 @@
  *   content/notes/<bookId>/<page>.md   -> content/notes/<bookId>.json  (HTML)
  *   content/quiz/<bookId>/<page>.json  -> content/quiz/<bookId>.json
  *   content/grammar/<bookId>/<page>.json -> content/grammar/<bookId>.json
+ *   content/answers/<bookId>/<page>.json -> content/answers/<bookId>.json
  *
  * Vì sao Markdown -> HTML ngay ở bước build: note hiển thị/sửa bằng Tiptap
  * (xem components/reader/note-editor.tsx), mà Tiptap đọc/ghi HTML. Convert
@@ -28,12 +29,14 @@ import { BOOKS } from "../src/lib/books";
 import type { QuizItem, QuizSection } from "../src/lib/quiz";
 import type { TranslationRegion } from "../src/lib/page-translation";
 import type { GrammarPoint } from "../src/lib/page-grammar";
+import type { AnswerKey } from "../src/lib/page-answers";
 
 const CONTENT_ROOT = path.resolve(process.cwd(), "content");
 const NOTES_ROOT = path.join(CONTENT_ROOT, "notes");
 const QUIZ_ROOT = path.join(CONTENT_ROOT, "quiz");
 const TRANSLATE_ROOT = path.join(CONTENT_ROOT, "translate");
 const GRAMMAR_ROOT = path.join(CONTENT_ROOT, "grammar");
+const ANSWERS_ROOT = path.join(CONTENT_ROOT, "answers");
 
 /** Định nghĩa ngữ pháp dài tối đa bao nhiêu ký tự — xem `validateGrammar`. */
 const MAX_GRAMMAR_VI = 200;
@@ -326,15 +329,83 @@ async function buildGrammar(bookId: string): Promise<number> {
   return Object.values(pages).reduce((n, points) => n + points.length, 0);
 }
 
+/**
+ * Đáp án sách gắn vào mục bài tập.
+ *
+ * `source` phải là một trang có thật trong sách: nó là thứ người dùng dựa vào
+ * để tự lật ra đối chiếu, gõ nhầm là chỉ sai chỗ.
+ */
+function validateAnswers(
+  source: string,
+  data: unknown,
+  totalPages: number
+): AnswerKey[] {
+  if (!Array.isArray(data)) {
+    throw new Error(`${source}: phải là 1 mảng mục đáp án`);
+  }
+
+  const seen = new Set<string>();
+  for (const key of data as AnswerKey[]) {
+    const at = `${source} (id=${key?.id ?? "?"})`;
+    if (!key?.id) throw new Error(`${at}: thiếu "id"`);
+    if (seen.has(key.id)) throw new Error(`${at}: trùng "id" trong cùng trang`);
+    seen.add(key.id);
+
+    if (!key.section?.trim()) throw new Error(`${at}: thiếu tên mục "section"`);
+    if (!Number.isInteger(key.source) || key.source < 1 || key.source > totalPages) {
+      throw new Error(
+        `${at}: "source" phải là số trang bảng đáp án, 1–${totalPages} ` +
+          `(đang là ${JSON.stringify(key.source)})`
+      );
+    }
+    if (!Array.isArray(key.answers) || key.answers.length === 0) {
+      throw new Error(`${at}: "answers" phải là mảng có ít nhất 1 dòng`);
+    }
+    for (const [i, line] of key.answers.entries()) {
+      if (!line?.label?.trim() || !line?.text?.trim()) {
+        throw new Error(`${at}: dòng đáp án thứ ${i + 1} thiếu "label" hoặc "text"`);
+      }
+    }
+
+    validateRect(at, key.rect);
+  }
+
+  return data as AnswerKey[];
+}
+
+async function buildAnswers(bookId: string, totalPages: number): Promise<number> {
+  const dir = path.join(ANSWERS_ROOT, bookId);
+  const pages: Record<string, AnswerKey[]> = {};
+
+  for (const file of await listFiles(dir, ".json")) {
+    const raw = await readFile(path.join(dir, file), "utf8");
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(raw);
+    } catch (err) {
+      throw new Error(`${bookId}/${file}: JSON hỏng — ${(err as Error).message}`);
+    }
+    pages[pageKey(file)] = validateAnswers(`${bookId}/${file}`, parsed, totalPages);
+  }
+
+  await writeFile(
+    path.join(ANSWERS_ROOT, `${bookId}.json`),
+    JSON.stringify(pages, null, 2) + "\n",
+    "utf8"
+  );
+  return Object.values(pages).reduce((n, keys) => n + keys.length, 0);
+}
+
 async function main() {
   for (const book of BOOKS) {
     const notes = await buildNotes(book.id);
     const questions = await buildQuiz(book.id);
     const regions = await buildTranslations(book.id);
     const grammar = await buildGrammar(book.id);
+    const answers = await buildAnswers(book.id, book.totalPages);
     console.log(
       `  ${book.id}: ${notes} note, ${questions} câu hỏi, ` +
-        `${regions} vùng dịch, ${grammar} điểm ngữ pháp`
+        `${regions} vùng dịch, ${grammar} điểm ngữ pháp, ${answers} mục đáp án`
     );
   }
 }

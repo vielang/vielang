@@ -42,13 +42,14 @@ yarn-error.log*
 next-env.d.ts
 
 # nội dung: build-content.ts sinh ra từ content/notes/<bookId>/*.md,
-# content/quiz/<bookId>/*.json, content/translate/<bookId>/*.json và
-# content/grammar/<bookId>/*.json, luôn chạy lại qua predev/prebuild —
-# không commit các file .json gộp này
+# content/quiz/<bookId>/*.json, content/translate/<bookId>/*.json,
+# content/grammar/<bookId>/*.json và content/answers/<bookId>/*.json, luôn
+# chạy lại qua predev/prebuild — không commit các file .json gộp này
 /content/notes/*.json
 /content/quiz/*.json
 /content/translate/*.json
 /content/grammar/*.json
+/content/answers/*.json
 
 # font Excalidraw: copy-excalidraw-fonts.ts chép từ node_modules, luôn chạy
 # lại qua predev/prebuild — không commit ~14MB nhị phân trùng với dependency

@@ -24,8 +24,10 @@ import {
 import { getPageUrl, getPageAspectRatio, type Book } from "@/lib/books";
 import { getPageTranslations } from "@/lib/page-translation";
 import { getPageGrammar } from "@/lib/page-grammar";
+import { getPageAnswers } from "@/lib/page-answers";
 import { TranslationOverlay } from "@/components/reader/translation-overlay";
 import { GrammarOverlay } from "@/components/reader/grammar-overlay";
+import { AnswerOverlay } from "@/components/reader/answer-overlay";
 import { AnnotationLayer } from "@/components/reader/annotation-layer";
 import { useAnnotationStore } from "@/lib/annotation-store";
 
@@ -145,6 +147,7 @@ function PageImage({
 }) {
   const regions = getPageTranslations(bookId, page);
   const grammar = getPageGrammar(bookId, page);
+  const answerKeys = getPageAnswers(bookId, page);
   const { attempt, status, retrying, onLoad, onError, retry } = useRetryingMedia();
 
   return (
@@ -173,6 +176,7 @@ function PageImage({
       />
       <TranslationOverlay regions={regions} />
       <GrammarOverlay points={grammar} />
+      <AnswerOverlay answerKeys={answerKeys} />
       {/* Nằm SAU vùng dịch: đang bật chế độ vẽ thì nét vẽ phải nhận được
           chạm trước, nếu không bấm trúng vùng dịch là bật bản dịch thay vì
           vẽ. Tắt chế độ vẽ thì lớp này `pointer-events: none` nên vùng dịch
@@ -391,10 +395,12 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
         lastT: performance.now(),
         speed: 0,
         axis: "undecided",
-        // Chạm trúng chấm dịch hay chấm ngữ pháp thì để nút đó tự xử: tính
-        // thêm là tap nữa thì vừa mở bong bóng vừa ẩn thanh công cụ.
+        // Chạm trúng chấm dịch, chấm ngữ pháp hay chấm đáp án thì để nút đó
+        // tự xử: tính thêm là tap nữa thì vừa mở bong bóng vừa ẩn thanh công cụ.
         onControl: Boolean(
-          el.closest("[data-translate-region]") || el.closest("[data-grammar-point]")
+          el.closest("[data-translate-region]") ||
+            el.closest("[data-grammar-point]") ||
+            el.closest("[data-answer-key]")
         ),
       };
     },

@@ -3,52 +3,60 @@ title: Method và tham số
 minutes: 11
 ---
 
-Bạn truyền một object vào method, sửa property của nó, ra ngoài thấy đổi thật.
-Lần sau cũng method đó, bạn gán hẳn object mới vào tham số — ra ngoài không đổi
-gì cả. Cùng một chữ ký hàm, hai kết quả khác nhau.
+Bạn truyền một object vào method rồi sửa property của nó. Ra ngoài, thay đổi
+còn nguyên.
 
-> **Học xong bài này bạn sẽ:** biết method sửa được gì của người gọi và không
-> sửa được gì; viết chữ ký hàm mà người đọc hiểu ngay không cần tra; chọn đúng
-> giữa `out`, tuple và một kiểu trả về riêng.
+Lần sau cũng method ấy, bạn gán hẳn object mới vào tham số. Ra ngoài không đổi
+gì cả. Cùng một chữ ký hàm, hai kết quả khác hẳn nhau.
+
+> **Học xong bài này bạn sẽ:** biết method sửa được gì của người gọi; viết chữ
+> ký hàm mà người đọc hiểu ngay không cần tra; chọn đúng giữa `out`, tuple và
+> một kiểu trả về riêng.
 >
-> **Cần biết trước:** biến, kiểu dữ liệu, `class` ở mức biết `Person` có
-> property `Name`.
+> **Cần biết trước:** biến, kiểu dữ liệu, `class` ở mức biết object có
+> property.
 
-## Khai báo và giá trị trả về
+## Khai báo, và ba quy ước đặt tên
 
 ```csharp
-public decimal TinhThanhTien(decimal gia, int soLuong)
+public decimal CalculateTotal(decimal price, int qty)
 {
-    return gia * soLuong;
+    return price * qty;
 }
 
 // Thân chỉ một biểu thức — viết gọn
-public decimal TinhThue(decimal tien) => tien * 0.1m;
+public decimal CalculateTax(decimal amount)
+    => amount * 0.1m;
 
-public void GhiLog(string mess)   // void: không trả gì
+public void Log(string message)   // void: không trả gì
 {
-    Console.WriteLine($"[{DateTime.Now:HH:mm}] {mess}");
+    Console.WriteLine(message);
 }
 ```
 
-Tên method nên là **động từ** (`TinhThanhTien`, `SaveOrder`), tên biến là danh
-từ. Quy ước .NET: method và property viết `PascalCase`, tham số và biến cục bộ
-viết `camelCase`.
+| Thành phần | Quy ước .NET |
+|---|---|
+| Method, property | `PascalCase`, tên là **động từ** cho method |
+| Tham số, biến cục bộ | `camelCase` |
+| Field private | `_camelCase` |
+
+Tên method nói việc, tên biến nói vật. `CalculateTotal` thì rõ, còn
+`ProcessData` thì chẳng nói gì — "xử lý" là xử lý cái gì?
 
 ## Thử ngay: method sửa được gì của bạn
 
 ```csharp
 public class Person { public string Name = "Huy"; }
 
-void Doi(Person p) => p.Name = "Nam";
-void ThayThe(Person p) => p = new Person();
+void Rename(Person p) => p.Name = "Nam";
+void Replace(Person p) => p = new Person();
 
 var a = new Person();
-Doi(a);
+Rename(a);
 Console.WriteLine(a.Name);
 
 var b = new Person();
-ThayThe(b);
+Replace(b);
 Console.WriteLine(b.Name);
 ```
 
@@ -62,58 +70,66 @@ Nam
 Huy
 ```
 
-`Doi` sửa **object mà cả hai bên cùng trỏ tới** nên bên ngoài thấy. `ThayThe`
-chỉ gán lại **biến tham số** — bản chép cục bộ nằm trong method — còn biến `b`
-bên ngoài vẫn trỏ object cũ.
+`Rename` sửa **object mà cả hai bên cùng trỏ tới**, nên bên ngoài thấy ngay.
+
+`Replace` thì chỉ gán lại **biến tham số**. Biến ấy là bản chép nằm trong
+method. Còn `b` ở ngoài vẫn trỏ object cũ.
 
 </details>
 
-Muốn thay hẳn object của người gọi thì `return` object mới, đừng gán vào tham
-số. Cách này cũng dễ đọc hơn, vì chỗ gọi nhìn thấy rõ giá trị đang được thay.
+Muốn thay hẳn object của người gọi thì `return` object mới. Cách đó cũng dễ
+đọc hơn, vì chỗ gọi nhìn thấy rõ giá trị đang được thay.
 
-## Tham số tuỳ chọn và named argument
+## Named argument làm chỗ gọi tự giải thích
 
 ```csharp
 public string Format(
-    decimal tien,
-    string donVi = "VND",
-    bool hienDonVi = true) =>
-        hienDonVi ? $"{tien:N0} {donVi}" : $"{tien:N0}";
+    decimal amount,
+    string currency = "VND",
+    bool showSymbol = true)
+        => showSymbol ? $"{amount:N0} {currency}"
+                      : $"{amount:N0}";
 
 Format(150000);
-Format(150000, hienDonVi: false);
+Format(150000, showSymbol: false);
 ```
 
-**Named argument** làm chỗ gọi tự giải thích. Thấy `Save(order, true, false)`
-thì không ai đoán được hai `bool` kia nghĩa gì; `Save(order, guiMail: true,
-ghiDe: false)` thì rõ ngay.
+Nhìn `Save(order, true, false)` thì không ai đoán được hai `bool` kia nghĩa
+gì. Viết `Save(order, sendMail: true, overwrite: false)` là hết phải đoán.
 
-## ref, out và in
+Tham số tuỳ chọn thì đặt ở cuối, và chỉ dùng cho giá trị mặc định thật sự hợp
+lý với đa số trường hợp.
+
+## ref, out, in: ba cách truyền tham chiếu
+
+| Từ khoá | Ai gán giá trị | Gặp ở đâu |
+|---|---|---|
+| `out` | method **phải** gán trước khi trả về | `TryParse`, `TryGetValue` |
+| `ref` | cả hai bên, sửa thẳng biến của người gọi | hiếm |
+| `in` | chỉ đọc, tránh chép struct lớn | tối ưu hiệu năng |
 
 ```csharp
-// out: method phải gán giá trị trước khi trả về
-if (int.TryParse(input, out int soLuong)) { }
+if (int.TryParse(input, out int qty)) { }
 
-// ref: sửa được chính biến của người gọi
-void GapDoi(ref int x) => x *= 2;
+void Double(ref int x) => x *= 2;
 
-// in: truyền tham chiếu nhưng CHỈ ĐỌC
-decimal Tong(in HoaDon hd) => hd.Tien + hd.Thue;
+decimal Total(in Invoice invoice)
+    => invoice.Amount + invoice.Tax;
 ```
 
-Thực tế `out` chủ yếu gặp ở mẫu `TryParse`/`TryGetValue`, còn `ref` thì hiếm.
-Cần trả nhiều giá trị thì ưu tiên **tuple** hoặc một kiểu riêng:
+Cần trả về nhiều giá trị thì đừng rải `out`. Dùng **tuple** hoặc một kiểu
+riêng, đọc xuôi hơn nhiều:
 
 ```csharp
-public (bool Ok, string? Loi) KiemTra(Order o)
+public (bool Ok, string? Error) Validate(Order order)
 {
-    if (o.Items.Count == 0)
+    if (order.Items.Count == 0)
         return (false, "Đơn hàng trống");
 
     return (true, null);
 }
 
-var (ok, loi) = KiemTra(order);   // deconstruction
+var (ok, error) = Validate(order);   // deconstruction
 ```
 
 ## Overload, params và local function
@@ -122,52 +138,63 @@ var (ok, loi) = KiemTra(order);   // deconstruction
 public void Log(string message) { }
 public void Log(string message, Exception ex) { }
 public void Log(Exception ex) => Log(ex.Message, ex);
-```
 
-**Overload** là nhiều method cùng tên, khác danh sách tham số. Chỉ overload khi
-các bản làm *cùng một việc*; khác việc thì đặt tên khác.
-
-```csharp
-public int Tong(params int[] so)  // gọi: Tong(1, 2, 3)
+public int Sum(params int[] numbers)   // Sum(1, 2, 3)
 {
-    int t = 0;
-    foreach (var n in so) t += n;
-    return t;
+    int total = 0;
+    foreach (var n in numbers) total += n;
+    return total;
 }
 
-public string Chuan(string raw)
+public string Normalize(string raw)
 {
-    return Sach(raw).ToUpperInvariant();
+    return Clean(raw).ToUpperInvariant();
 
     // hàm phụ chỉ dùng trong method này
-    static string Sach(string s) => s.Trim();
+    static string Clean(string s) => s.Trim();
 }
 ```
+
+**Overload** là nhiều method cùng tên, khác danh sách tham số. Compiler chọn
+bản phù hợp lúc compile.
+
+Chỉ overload khi các bản làm *cùng một việc*. Khác việc thì đặt tên khác, đừng
+bắt người đọc tự đoán.
+
+`params` cho phép gọi `Sum(1, 2, 3)` mà không cần gõ `new[]`. Tiện, nhưng chỉ
+đặt nó ở tham số cuối cùng, và mỗi method chỉ một cái.
+
+**Local function** là hàm phụ nằm hẳn bên trong method. Nó không lọt ra ngoài
+class, nên người đọc biết ngay phạm vi dùng của nó chỉ có bấy nhiêu. Trước đây
+người ta phải viết một `private` method riêng, và rồi ai cũng ngại xoá vì
+không chắc còn ai gọi.
 
 ## Dấu hiệu trong code của bạn
 
 - Method nhận tham số rồi **gán lại** chính tham số đó → người gọi không thấy gì, gần như luôn là hiểu nhầm.
 - Chỗ gọi có hai `bool` trở lên đứng cạnh nhau → dùng named argument, hoặc đổi sang `enum`.
-- Chữ ký hàm quá 4 tham số → gom thành một `record` tham số, vừa dễ đọc vừa dễ thêm về sau.
+- Chữ ký hàm quá bốn tham số → gom thành một `record` tham số.
 - Method dài hơn một màn hình → bên trong đang có vài việc khác nhau, tách ra.
 
 ## Ghi nhớ
 
 - Sửa **property** của tham số thì người gọi thấy; **gán lại** tham số thì không.
 - Một method làm một việc, tên là động từ.
-- Cần nhiều giá trị trả về → tuple hoặc kiểu riêng, đừng rải `out`.
-- Tham số `bool` trong lời gọi luôn mờ nghĩa — dùng `enum` hoặc named argument.
+- Nhiều giá trị trả về → tuple hoặc kiểu riêng, đừng rải `out`.
+- Tham số `bool` ở chỗ gọi luôn mờ nghĩa.
 
 ## Bước tiếp theo
 
-Bài sau — **Chuỗi và định dạng** — đi vào thứ mọi backend dùng suốt ngày: nối
-chuỗi, định dạng số và ngày, cùng cái bẫy culture chỉ lộ ra trên production.
+Method đã gọn gàng. Nhưng thứ chúng xử lý nhiều nhất là chuỗi.
+
+Bài sau, **Chuỗi và định dạng**, mở bằng một API gửi số tiền sang đối tác.
+Máy dev gửi `1.5`, server gửi `1,5`, và đối tác đọc thành mười lăm.
 
 ```quiz
 [
   {
-    "prompt": "Sau khi gọi ThayThe(b), biến b ở ngoài ra sao?",
-    "code": "void ThayThe(Person p) => p = new Person();\n\nvar b = new Person();\nThayThe(b);",
+    "prompt": "Sau khi gọi Replace(b), biến b ở ngoài ra sao?",
+    "code": "void Replace(Person p) => p = new Person();\n\nvar b = new Person();\nReplace(b);",
     "options": [
       "Trỏ tới object mới vừa tạo",
       "Vẫn trỏ object cũ, không đổi gì",
@@ -192,12 +219,12 @@ chuỗi, định dạng số và ngày, cùng cái bẫy culture chỉ lộ ra t
     "prompt": "Method cần trả về cả kết quả kiểm tra lẫn thông báo lỗi. Cách nào hợp lý nhất trong C# hiện đại?",
     "options": [
       "Hai tham số out",
-      "Trả về tuple (bool Ok, string? Loi)",
+      "Trả về tuple (bool Ok, string? Error)",
       "Trả về object rồi ép kiểu ở chỗ gọi",
       "Dùng biến static để truyền thông báo"
     ],
     "answer": 2,
-    "explain": "Tuple (hoặc một record riêng) đọc xuôi và dùng deconstruction được. out chỉ nên giữ cho mẫu TryParse/TryGetValue."
+    "explain": "Tuple hoặc một record riêng đọc xuôi và dùng deconstruction được. out chỉ nên giữ cho mẫu TryParse và TryGetValue."
   },
   {
     "prompt": "Ba method cùng tên Log nhưng khác danh sách tham số. Compiler chọn bản nào lúc nào?",

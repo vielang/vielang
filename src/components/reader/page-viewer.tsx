@@ -441,6 +441,15 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
     lastT: number;
     speed: number;
     axis: "undecided" | "x" | "off";
+    /**
+     * Cử chỉ này bị chuyển sang "off" vì đang phóng to (kéo = di chuyển vùng
+     * xem). Vẫn theo dõi tiếp: kéo tới lúc chạm mép ảnh thì đổi sang lật
+     * trang NGAY TRONG cùng cú vuốt — không thì người dùng phải nhấc tay
+     * vuốt thêm lần nữa, cảm giác như bị khựng.
+     */
+    panning: boolean;
+    /** Toạ độ x lúc vùng xem vừa chạm mép ảnh. */
+    edgeX: number | null;
     onControl: boolean;
   } | null>(null);
   const pointers = useRef(new Set<number>());
@@ -464,6 +473,8 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
         lastT: performance.now(),
         speed: 0,
         axis: "undecided",
+        panning: false,
+        edgeX: null,
         // Chạm trúng chấm dịch, chấm ngữ pháp hay chấm đáp án thì để nút đó
         // tự xử: tính thêm là tap nữa thì vừa mở bong bóng vừa ẩn thanh công cụ.
         onControl: Boolean(
@@ -501,6 +512,7 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
           // xem đã chạm mép ảnh theo đúng hướng đang kéo, lúc đó lật trang.
           if (scaleRef.current > 1.02 && !atPanEdge(dx < 0 ? 1 : -1)) {
             g.axis = "off";
+            g.panning = true;
             return;
           }
           g.axis = "x";
@@ -510,6 +522,25 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
           g.axis = "off";
         }
         return;
+      }
+      // Đang di chuyển vùng xem: tới mép ảnh rồi mà tay vẫn kéo tiếp theo
+      // hướng đó thì chuyển thành lật trang, tính quãng từ đúng lúc chạm mép.
+      if (g.axis === "off" && g.panning) {
+        const dir: 1 | -1 = dx < 0 ? 1 : -1;
+        if (!atPanEdge(dir)) {
+          g.edgeX = null;
+          return;
+        }
+        if (g.edgeX === null) {
+          g.edgeX = e.clientX;
+          return;
+        }
+        const past = e.clientX - g.edgeX;
+        if (Math.abs(past) < 12 || Math.sign(past) !== (dir === 1 ? -1 : 1)) return;
+        g.axis = "x";
+        g.panning = false;
+        g.originX = g.edgeX;
+        e.currentTarget.setPointerCapture?.(e.pointerId);
       }
       if (g.axis !== "x") return;
 

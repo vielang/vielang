@@ -197,8 +197,8 @@ Bạn dùng composition rất nhiều rồi, có thể chỉ chưa gọi tên n�
 Hết chương **Đóng gói và trừu tượng**. Bạn đã có đủ công cụ để giấu chi tiết và
 dùng lại code cho an toàn.
 
-Chương sau, **Đa hình trong thực tế**, dùng `virtual`, `abstract` và interface
-để thay những chuỗi `if` phân loại theo kiểu.
+Chương sau, **Đa hình trong thực tế**, mở bằng một dòng review: sao bản export
+PDF lại ra file CSV, trong khi lớp con có method `Export` hẳn hoi?
 
 ```quiz
 [

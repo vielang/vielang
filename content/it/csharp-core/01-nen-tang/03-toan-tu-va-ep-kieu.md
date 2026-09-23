@@ -1,86 +1,167 @@
 ---
 title: Toán tử và ép kiểu
-minutes: 8
+minutes: 10
 ---
 
-Phần lớn bug "số ra sai" trong code backend không nằm ở công thức, mà ở chỗ hai
-số khác kiểu gặp nhau và compiler tự quyết thay bạn.
+Báo cáo tỉ lệ đơn hàng thành công hiện `0%` suốt cả tuần, dù rõ ràng có 47
+đơn thành công trên 100. Công thức đúng, dữ liệu đúng. Sai ở chỗ hai số đem
+chia đều là `int`.
 
-## Toán tử số học
+> **Học xong bài này bạn sẽ:** đọc một biểu thức số và biết kết quả ra kiểu
+> gì; chọn đúng giữa ép kiểu, làm tròn và `TryParse`; nhận ra chỗ code có thể
+> tràn số.
+>
+> **Cần biết trước:** `int`, `double`, `decimal` (bài trước).
 
-```csharp
-int a = 7, b = 2;
-
-int q = a / b;        // 3  — chia hai int là chia lấy nguyên
-int r = a % b;        // 1  — modulo, phần dư
-double d = a / 2.0;   // 3.5 — có một vế là double thì kết quả là double
-```
-
-Chia hai `int` ra `int`: `7 / 2` bằng `3`, không phải `3.5`. Muốn ra số thực thì
-một vế phải là số thực — đây là lỗi kinh điển khi tính trung bình hay phần trăm.
-
-## Ép kiểu tường minh và ngầm định
+## Thử ngay: phép chia làm hỏng báo cáo
 
 ```csharp
-int small = 100;
-long big = small;          // implicit — int lọt gọn vào long, không mất gì
+int thanhCong = 47, tong = 100;
 
-double price = 19.99;
-int rounded = (int)price;  // explicit — 19, CẮT phần thập phân chứ không làm tròn
-
-int correct = (int)Math.Round(price);  // 20
+Console.WriteLine(thanhCong / tong);
+Console.WriteLine(thanhCong / tong * 100);
+Console.WriteLine(thanhCong * 100 / tong);
+Console.WriteLine((double)thanhCong / tong);
 ```
 
-Compiler tự chuyển (**implicit conversion**) khi chắc chắn không mất dữ liệu.
-Ngược lại bạn phải tự ép (**explicit cast**) và tự chịu trách nhiệm: `(int)` cắt
-cụt phần thập phân, muốn làm tròn phải gọi `Math.Round`.
+**Đoán trước khi chạy:** bốn dòng này in ra gì?
 
-## Tràn số và checked
+<details>
+<summary>Đoán xong rồi — xem kết quả</summary>
+
+```text
+0
+0
+47
+0.47
+```
+
+Chia hai `int` là **chia lấy nguyên**: `47 / 100` bằng `0`, nhân bao nhiêu
+cũng vẫn là `0`. Đổi thứ tự phép tính hoặc ép một vế sang số thực thì mới ra
+kết quả mong đợi.
+
+</details>
+
+Quy tắc: kết quả mang kiểu của **vế rộng hơn**. `int / int` ra `int`;
+`int / double` ra `double`.
+
+## Ép kiểu ngầm định và tường minh
+
+```csharp
+int nho = 100;
+long to = nho;             // implicit — không mất gì
+
+double gia = 19.99;
+int catCut = (int)gia;     // explicit — 19, CẮT phần lẻ
+int lamTron = (int)Math.Round(gia);   // 20
+```
+
+Compiler tự chuyển khi chắc chắn không mất dữ liệu (**implicit conversion**).
+Ngược lại bạn phải tự ép (**explicit cast**) và tự chịu trách nhiệm: `(int)`
+cắt cụt chứ không làm tròn.
+
+- `Math.Round(x)` — làm tròn về số gần nhất.
+- `Math.Floor(x)` / `Math.Ceiling(x)` — làm tròn xuống / lên.
+
+## Tràn số
 
 ```csharp
 int max = int.MaxValue;
-int overflow = max + 1;           // -2147483648, âm thầm quay vòng
+int tran = max + 1;   // -2147483648, âm thầm quay vòng
 
 checked
 {
-    int boom = max + 1;           // ném OverflowException
+    int no = max + 1;      // ném OverflowException
 }
 ```
 
-Mặc định C# **không** báo tràn số. Với tiền tệ, số lượng tồn kho hay id tự tăng,
-hãy dùng kiểu đủ rộng (`long`, `decimal`) chứ đừng trông chờ vào may mắn.
+Mặc định C# **không** báo tràn. Với id tự tăng, số tiền cộng dồn hay số lượng
+tồn kho, hãy dùng kiểu đủ rộng (`long`, `decimal`) chứ đừng trông vào may mắn.
 
 ## Đổi chuỗi sang số
 
 ```csharp
-int ok = int.Parse("42");                  // 42
-int bad = int.Parse("bốn hai");            // ném FormatException
+int ok = int.Parse("42");
+int loi = int.Parse("bốn hai");   // FormatException
 
-if (int.TryParse(input, out int value))    // không ném, trả về false
+if (int.TryParse(input, out int so))
 {
-    Console.WriteLine(value * 2);
+    Console.WriteLine(so * 2);
 }
 ```
 
-Dữ liệu từ người dùng, từ query string hay từ file CSV thì luôn dùng `TryParse`.
-`Parse` chỉ dành cho chuỗi mà bạn tự sinh ra và chắc chắn đúng định dạng.
+`Parse` chỉ dành cho chuỗi mà bạn tự sinh ra và chắc chắn đúng định dạng. Dữ
+liệu từ người dùng, từ query string, từ file CSV thì luôn `TryParse`.
 
-## Toán tử logic và rút gọn
+## Toán tử logic ngắn mạch
 
 ```csharp
-if (user != null && user.IsActive) { }   // && ngắn mạch: user == null thì bỏ qua vế sau
-bool both = Check(a) & Check(b);          // & luôn chạy CẢ HAI vế
+if (user != null && user.IsActive) { }
+bool ca2 = Kiem(a) & Kiem(b);   // chạy CẢ HAI vế
 
-int port = configPort ?? 8080;            // null thì lấy 8080
-name ??= "Khách";                          // gán khi đang null
+int port = cauHinh ?? 8080;     // null thì lấy 8080
+ten ??= "Khách";                 // gán khi đang null
 ```
 
-`&&` và `||` là **short-circuit**: vế phải chỉ chạy khi cần. Nhờ vậy mẫu
-`x != null && x.Prop` mới an toàn. `&` và `|` thì chạy hết cả hai vế — hiếm khi
-bạn muốn điều đó.
+`&&` và `||` là **short-circuit**: vế phải chỉ chạy khi cần, nhờ vậy mẫu
+`x != null && x.Prop` mới an toàn. `&` và `|` chạy hết cả hai vế — hiếm khi
+bạn muốn thế.
+
+## Dấu hiệu trong code của bạn
+
+- Phép chia giữa hai biến `int` mà kết quả gán vào `double`/`decimal` → phần lẻ đã mất trước khi gán.
+- `(int)` đứng trước một biến tiền hoặc biến tỉ lệ → đang cắt cụt, kiểm tra xem có định làm tròn không.
+- `int.Parse` nhận dữ liệu từ request, file, hay biến môi trường → đổi sang `TryParse`.
+- Cộng dồn vào một biến `int` trong vòng lặp chạy rất nhiều lần → cân nhắc `long`.
 
 ## Ghi nhớ
 
-- `decimal` cho tiền, `double` cho đo lường khoa học. Đừng cộng tiền bằng `double`.
-- `(int)x` cắt cụt, `Math.Round(x)` làm tròn, `Math.Floor`/`Math.Ceiling` làm tròn xuống/lên.
-- So sánh chuỗi bằng `==` là so sánh nội dung, nhưng phân biệt hoa thường — cần bỏ qua thì dùng `string.Equals(a, b, StringComparison.OrdinalIgnoreCase)`.
+- Kết quả mang kiểu của vế rộng hơn; `int / int` luôn ra `int`.
+- `(int)x` cắt cụt, `Math.Round(x)` mới làm tròn.
+- C# không báo tràn số trừ khi bạn bọc trong `checked` — chọn kiểu đủ rộng ngay từ đầu.
+- Dữ liệu ngoài vào thì `TryParse`, không `Parse`.
+- So sánh chuỗi bỏ qua hoa thường: `string.Equals(a, b, StringComparison.OrdinalIgnoreCase)`.
+
+## Bước tiếp theo
+
+Bài sau — **Rẽ nhánh và vòng lặp** — dùng chính các toán tử này để điều khiển
+luồng chạy, kèm `switch expression` mà code C# hiện đại dùng khắp nơi.
+
+```quiz
+[
+  {
+    "prompt": "double tiLe = daXong / tongSo; với daXong = 47, tongSo = 100, cả hai là int. tiLe bằng bao nhiêu?",
+    "options": ["0.47", "0", "47", "Lỗi compile"],
+    "answer": 2,
+    "explain": "Phép chia thực hiện trước khi gán, mà hai vế đều là int nên ra 0. Ép kiểu một vế: (double)daXong / tongSo."
+  },
+  {
+    "prompt": "decimal gia = 19.99m; int x = (int)gia; — x bằng mấy?",
+    "options": ["20", "19", "19.99", "Lỗi compile vì phải dùng Math.Round"],
+    "answer": 2,
+    "explain": "Ép kiểu tường minh cắt cụt phần thập phân. Muốn 20 thì (int)Math.Round(gia)."
+  },
+  {
+    "prompt": "Biến đếm kiểu int cộng dồn vượt quá int.MaxValue. Mặc định chuyện gì xảy ra?",
+    "options": [
+      "Ném OverflowException",
+      "Giá trị quay vòng thành số âm, không báo gì",
+      "Tự chuyển sang long",
+      "Chương trình dừng"
+    ],
+    "answer": 2,
+    "explain": "C# không kiểm tra tràn số nếu không bọc checked. Số âm bất ngờ trong báo cáo thường là dấu vết của chuyện này."
+  },
+  {
+    "prompt": "Vì sao if (user != null && user.IsActive) an toàn?",
+    "options": [
+      "Vì C# tự kiểm tra null cho mọi phép truy cập",
+      "Vì && ngắn mạch: user null thì vế phải không chạy",
+      "Vì && kiểm tra cả hai vế rồi mới quyết định",
+      "Không an toàn, phải dùng dấu &"
+    ],
+    "answer": 2,
+    "explain": "&& chỉ chạy vế phải khi vế trái đúng. Đổi sang & là cả hai vế đều chạy và bạn nhận NullReferenceException."
+  }
+]
+```

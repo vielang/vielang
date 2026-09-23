@@ -10,10 +10,12 @@ import {
   CircleQuestionMark,
   Columns2,
   Mic,
+  MoreVertical,
   NotebookText,
   Pen,
   RotateCcw,
   X,
+  type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,13 +25,68 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { useZoomStore } from "@/lib/zoom-store";
 import type { Book } from "@/lib/books";
 import type { Chapter } from "@/lib/chapters";
 
+/** Một công cụ của trang đọc — hiện thành icon (máy tính) hoặc dòng có chữ (menu). */
+interface Tool {
+  icon: LucideIcon;
+  label: string;
+  onSelect: () => void;
+  /** Đang bật (vẽ, ghi âm, đã đánh dấu) — nút sáng lên. */
+  active?: boolean;
+  /** Trang này đã có nội dung (bài giảng, nét vẽ, bản ghi) — chấm báo. */
+  dot?: boolean;
+}
+
+const BAR = "bg-black/55 text-white backdrop-blur";
+const GHOST = "text-white hover:bg-white/10 hover:text-white";
+
+function ToolButton({ tool }: { tool: Tool }) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          variant="ghost"
+          size="icon"
+          className={cn(
+            "relative",
+            GHOST,
+            tool.active && "bg-white text-neutral-900 hover:bg-white hover:text-neutral-900"
+          )}
+          onClick={tool.onSelect}
+          aria-label={tool.label}
+          aria-pressed={tool.active}
+        >
+          <tool.icon className="size-5" aria-hidden />
+          {tool.dot && !tool.active && (
+            <span className="absolute top-1.5 right-1.5 size-1.5 rounded-full bg-sky-400" aria-hidden />
+          )}
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent>{tool.label}</TooltipContent>
+    </Tooltip>
+  );
+}
+
+/**
+ * Thanh điều khiển trang đọc — chỉ hai thanh, mỗi thanh một việc:
+ *
+ * - TRÊN: thoát, tên sách, và công cụ. Máy tính hiện thẳng mấy công cụ hay
+ *   dùng thành icon; điện thoại gom hết vào nút "⋮" (menu có CHỮ, khỏi đoán
+ *   icon) — màn hẹp mà bày 6 icon thì vừa chật vừa dễ bấm nhầm.
+ * - DƯỚI: chỉ điều hướng trang. Nút đặt lại phóng to chỉ hiện khi đang
+ *   phóng to; "Cách dùng" nằm trong menu.
+ *
+ * Nền thanh là một dải mờ đặc (không phải gradient trong suốt): chữ của
+ * trang sách hay lọt vào sau icon, nhìn như icon đè lên bài.
+ */
 export function ReaderControls({
   visible,
   book,
@@ -98,171 +155,132 @@ export function ReaderControls({
   onTogglePageLayout: () => void;
 }) {
   const [pendingPage, setPendingPage] = useState(page);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const zoomed = useZoomStore((s) => Math.abs(s.scale - 1) > 0.01);
 
   function openJumpDialog() {
     setPendingPage(page);
     onJumpOpenChange(true);
   }
 
+  const tools: Tool[] = [
+    { icon: NotebookText, label: noteLabel, onSelect: onNoteToggle, dot: noteHasContent },
+    {
+      icon: Pen,
+      label: drawActive ? "Tắt chế độ vẽ" : "Vẽ lên trang này",
+      onSelect: onDrawToggle,
+      active: drawActive,
+      dot: drawHasContent,
+    },
+    {
+      icon: Mic,
+      label: recordOpen ? "Đóng bảng ghi âm" : "Ghi âm trang này",
+      onSelect: onRecordToggle,
+      active: recordOpen,
+      dot: recordHasContent,
+    },
+    {
+      icon: Bookmark,
+      label: isBookmarked ? "Bỏ đánh dấu trang" : "Đánh dấu trang",
+      onSelect: onToggleBookmark,
+      active: isBookmarked,
+    },
+  ];
+  const layoutTool: Tool | null = showLayoutToggle
+    ? {
+        icon: pageLayout === "double" ? Columns2 : BookOpen,
+        label: pageLayout === "double" ? "Xem 1 trang" : "Xem 2 trang",
+        onSelect: onTogglePageLayout,
+      }
+    : null;
+
   return (
     <>
-      {/* Top bar */}
+      {/* Thanh trên */}
       <div
         className={cn(
-          "fixed inset-x-0 top-0 z-20 flex items-center justify-between gap-2 bg-gradient-to-b from-black/70 to-transparent p-3 pt-[max(0.75rem,env(safe-area-inset-top))] text-white transition-transform duration-200",
+          "fixed inset-x-0 top-0 z-20 flex items-center justify-between gap-2 p-2 pt-[max(0.5rem,env(safe-area-inset-top))] transition-transform duration-200",
+          BAR,
           visible ? "translate-y-0" : "pointer-events-none -translate-y-full"
         )}
       >
-        <Button asChild variant="ghost" size="icon" className="text-white hover:bg-white/10 hover:text-white">
+        <Button asChild variant="ghost" size="icon" className={GHOST}>
           <Link
-            href={
-              currentLesson
-                ? `/books/${book.id}#bai-${currentLesson}`
-                : `/books/${book.id}`
-            }
+            href={currentLesson ? `/books/${book.id}#bai-${currentLesson}` : `/books/${book.id}`}
             aria-label="Về danh sách trang"
           >
             <X className="size-5" aria-hidden />
           </Link>
         </Button>
-        <div className="min-w-0 flex-1 truncate text-center text-sm font-medium">
-          {book.titleVi}
-        </div>
+
+        <div className="min-w-0 flex-1 truncate text-center text-sm font-medium">{book.titleVi}</div>
+
         <div className="flex items-center gap-1">
-          <Tooltip>
-            <TooltipTrigger asChild>
+          {/* Máy tính: công cụ hay dùng bày sẵn. Điện thoại: nằm trong menu. */}
+          <span className="hidden items-center gap-1 sm:flex">
+            {tools.map((tool) => (
+              <ToolButton key={tool.label} tool={tool} />
+            ))}
+            {layoutTool && <ToolButton tool={layoutTool} />}
+          </span>
+
+          <Popover open={menuOpen} onOpenChange={setMenuOpen}>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" size="icon" className={GHOST} aria-label="Công cụ trang đọc">
+                <MoreVertical className="size-5" aria-hidden />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-56 p-1">
+              <span className="flex flex-col sm:hidden">
+                {[...tools, ...(layoutTool ? [layoutTool] : [])].map((tool) => (
+                  <Button
+                    key={tool.label}
+                    variant="ghost"
+                    size="sm"
+                    className="w-full justify-start"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      tool.onSelect();
+                    }}
+                  >
+                    <tool.icon className="size-4" aria-hidden />
+                    {tool.label}
+                    {tool.dot && !tool.active && (
+                      <span className="ml-auto size-1.5 rounded-full bg-sky-500" aria-hidden />
+                    )}
+                  </Button>
+                ))}
+                <span className="my-1 h-px bg-border" aria-hidden />
+              </span>
               <Button
                 variant="ghost"
-                size="icon"
-                className="relative text-white hover:bg-white/10 hover:text-white"
-                onClick={onNoteToggle}
-                aria-label={noteLabel}
+                size="sm"
+                className="w-full justify-start"
+                onClick={() => {
+                  setMenuOpen(false);
+                  onOpenHelp();
+                }}
               >
-                <NotebookText className="size-5" aria-hidden />
-                {/* Chấm báo trang đã có bài giảng — nút không bao giờ bị
-                    disable nữa vì trang trống vẫn mở được để tự soạn. */}
-                {noteHasContent && (
-                  <span
-                    className="absolute right-1.5 top-1.5 size-1.5 rounded-full bg-sky-400"
-                    aria-hidden
-                  />
-                )}
+                <CircleQuestionMark className="size-4" aria-hidden />
+                Cách dùng trang đọc
               </Button>
-            </TooltipTrigger>
-            <TooltipContent>{noteLabel}</TooltipContent>
-          </Tooltip>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className={cn(
-                  "relative text-white hover:bg-white/10 hover:text-white",
-                  // Đang vẽ thì nút sáng hẳn lên: thanh công cụ vẽ nằm mãi
-                  // dưới đáy màn, cần một dấu hiệu ngay chỗ vừa bấm để biết
-                  // chế độ đang bật.
-                  drawActive && "bg-white text-neutral-900 hover:bg-white hover:text-neutral-900"
-                )}
-                onClick={onDrawToggle}
-                aria-label={drawActive ? "Tắt chế độ vẽ" : "Vẽ lên trang này"}
-                aria-pressed={drawActive}
-              >
-                <Pen className="size-5" aria-hidden />
-                {drawHasContent && !drawActive && (
-                  <span
-                    className="absolute right-1.5 top-1.5 size-1.5 rounded-full bg-sky-400"
-                    aria-hidden
-                  />
-                )}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              {drawActive ? "Tắt chế độ vẽ" : "Vẽ lên trang này"}
-            </TooltipContent>
-          </Tooltip>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className={cn(
-                  "relative text-white hover:bg-white/10 hover:text-white",
-                  recordOpen &&
-                    "bg-white text-neutral-900 hover:bg-white hover:text-neutral-900"
-                )}
-                onClick={onRecordToggle}
-                aria-label={recordOpen ? "Đóng bảng ghi âm" : "Ghi âm trang này"}
-                aria-pressed={recordOpen}
-              >
-                <Mic className="size-5" aria-hidden />
-                {recordHasContent && !recordOpen && (
-                  <span
-                    className="absolute right-1.5 top-1.5 size-1.5 rounded-full bg-sky-400"
-                    aria-hidden
-                  />
-                )}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              {recordOpen ? "Đóng bảng ghi âm" : "Ghi âm trang này"}
-            </TooltipContent>
-          </Tooltip>
-
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-white hover:bg-white/10 hover:text-white"
-            onClick={onToggleBookmark}
-            aria-label={isBookmarked ? "Bỏ đánh dấu trang" : "Đánh dấu trang"}
-            aria-pressed={isBookmarked}
-          >
-            <Bookmark
-              className={cn("size-5", isBookmarked && "fill-current")}
-              aria-hidden
-            />
-          </Button>
-
-          {showLayoutToggle && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-white hover:bg-white/10 hover:text-white"
-                  onClick={onTogglePageLayout}
-                  aria-label={
-                    pageLayout === "double" ? "Xem 1 trang" : "Xem 2 trang"
-                  }
-                  aria-pressed={pageLayout === "double"}
-                >
-                  {pageLayout === "double" ? (
-                    <Columns2 className="size-5" aria-hidden />
-                  ) : (
-                    <BookOpen className="size-5" aria-hidden />
-                  )}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                {pageLayout === "double" ? "Xem 1 trang" : "Xem 2 trang"}
-              </TooltipContent>
-            </Tooltip>
-          )}
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
 
-      {/* Bottom bar */}
+      {/* Thanh dưới: chỉ điều hướng trang. */}
       <div
         className={cn(
-          "fixed inset-x-0 bottom-0 z-20 flex items-center justify-center gap-1 bg-gradient-to-t from-black/70 to-transparent p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] text-white transition-transform duration-200",
+          "fixed inset-x-0 bottom-0 z-20 flex items-center justify-center gap-1 p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] transition-transform duration-200",
+          BAR,
           visible ? "translate-y-0" : "pointer-events-none translate-y-full"
         )}
       >
         <Button
           variant="ghost"
           size="icon"
-          className="text-white hover:bg-white/10 hover:text-white disabled:opacity-30"
+          className={cn(GHOST, "disabled:opacity-30")}
           onClick={onPrev}
           disabled={page <= 1}
           aria-label="Trang trước"
@@ -270,22 +288,15 @@ export function ReaderControls({
           <ChevronLeft className="size-5" aria-hidden />
         </Button>
 
-        <Button
-          variant="ghost"
-          className="text-white hover:bg-white/10 hover:text-white tabular-nums"
-          onClick={openJumpDialog}
-        >
-          {currentLesson && (
-            <span className="text-white/70">Bài {currentLesson} ·</span>
-          )}
-          Trang {pages.length === 2 ? `${pages[0]}–${pages[1]}` : pages[0]}/
-          {book.totalPages}
+        <Button variant="ghost" className={cn(GHOST, "tabular-nums")} onClick={openJumpDialog}>
+          {currentLesson && <span className="text-white/70">Bài {currentLesson} ·</span>}
+          Trang {pages.length === 2 ? `${pages[0]}–${pages[1]}` : pages[0]}/{book.totalPages}
         </Button>
 
         <Button
           variant="ghost"
           size="icon"
-          className="text-white hover:bg-white/10 hover:text-white disabled:opacity-30"
+          className={cn(GHOST, "disabled:opacity-30")}
           onClick={onNext}
           disabled={page >= book.totalPages}
           aria-label="Trang sau"
@@ -293,33 +304,23 @@ export function ReaderControls({
           <ChevronRight className="size-5" aria-hidden />
         </Button>
 
-        <Button
-          variant="ghost"
-          size="icon"
-          className="ml-2 text-white hover:bg-white/10 hover:text-white"
-          onClick={onResetZoom}
-          aria-label="Đặt lại độ phóng to"
-        >
-          <RotateCcw className="size-4" aria-hidden />
-        </Button>
-
-        {/* Nút hướng dẫn nằm ở thanh DƯỚI chứ không phải thanh trên: thanh
-            trên đã 6 nút, trên màn điện thoại là kín chỗ, còn dưới này chỉ
-            có 4 nút và rất rộng. */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-white hover:bg-white/10 hover:text-white"
-              onClick={onOpenHelp}
-              aria-label="Cách dùng trang đọc"
-            >
-              <CircleQuestionMark className="size-4" aria-hidden />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Cách dùng trang đọc</TooltipContent>
-        </Tooltip>
+        {/* Chỉ hiện khi đang phóng to — lúc xem cỡ thường thì nút này vô nghĩa. */}
+        {zoomed && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className={cn("ml-2", GHOST)}
+                onClick={onResetZoom}
+                aria-label="Đặt lại độ phóng to"
+              >
+                <RotateCcw className="size-4" aria-hidden />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Đặt lại độ phóng to</TooltipContent>
+          </Tooltip>
+        )}
       </div>
 
       <Dialog open={jumpOpen} onOpenChange={onJumpOpenChange}>
@@ -372,9 +373,7 @@ export function ReaderControls({
                 }}
                 className="w-24"
               />
-              <span className="text-sm text-muted-foreground">
-                / {book.totalPages} trang
-              </span>
+              <span className="text-sm text-muted-foreground">/ {book.totalPages} trang</span>
             </div>
           </div>
           <DialogFooter>

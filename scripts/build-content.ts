@@ -7,6 +7,7 @@
  *   content/quiz/<bookId>/<page>.json  -> content/quiz/<bookId>.json
  *   content/grammar/<bookId>/<page>.json -> content/grammar/<bookId>.json
  *   content/answers/<bookId>/<page>.json -> content/answers/<bookId>.json
+ *   content/it/<khoá>/<chương>/<bài>.md  -> content/it/courses.json
  *
  * Vì sao Markdown -> HTML ngay ở bước build: note hiển thị/sửa bằng Tiptap
  * (xem components/reader/note-editor.tsx), mà Tiptap đọc/ghi HTML. Convert
@@ -22,7 +23,7 @@
  * File .json sinh ra KHÔNG commit vào git (xem .gitignore) — luôn sinh lại từ
  * nguồn qua npm lifecycle hook (`predev`, `prebuild`), nên không bao giờ lệch.
  */
-import { readdir, readFile, writeFile } from "node:fs/promises";
+import { readdir, readFile, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { Marked } from "marked";
 import { BOOKS } from "../src/lib/books";
@@ -37,6 +38,7 @@ const QUIZ_ROOT = path.join(CONTENT_ROOT, "quiz");
 const TRANSLATE_ROOT = path.join(CONTENT_ROOT, "translate");
 const GRAMMAR_ROOT = path.join(CONTENT_ROOT, "grammar");
 const ANSWERS_ROOT = path.join(CONTENT_ROOT, "answers");
+const IT_ROOT = path.join(CONTENT_ROOT, "it");
 
 /** Định nghĩa ngữ pháp dài tối đa bao nhiêu ký tự — xem `validateGrammar`. */
 const MAX_GRAMMAR_VI = 200;
@@ -406,6 +408,118 @@ async function buildAnswers(bookId: string, totalPages: number): Promise<number>
   return Object.values(pages).reduce((n, keys) => n + keys.length, 0);
 }
 
+// ---------------------------------------------------------------------------
+// Khoá học IT (mảng "IT" của thư viện — xem src/lib/courses.ts)
+
+/**
+ * Phần khai báo ở đầu file Markdown, giữa hai dòng "---". Tự đọc thay vì
+ * thêm thư viện: chỉ cần `khoá: giá trị` một dòng, giá trị là chữ hoặc số.
+ */
+function frontMatter(raw: string): { meta: Record<string, string>; body: string } {
+  const m = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?/.exec(raw);
+  if (!m) return { meta: {}, body: raw };
+  const meta: Record<string, string> = {};
+  for (const line of m[1].split(/\r?\n/)) {
+    const at = line.indexOf(":");
+    if (at > 0) meta[line.slice(0, at).trim()] = line.slice(at + 1).trim();
+  }
+  return { meta, body: raw.slice(m[0].length) };
+}
+
+/** "01-oop" -> "oop" (số đầu chỉ để sắp thứ tự trong thư mục). */
+const unprefix = (name: string) => name.replace(/^\d+[-_]/, "");
+
+/** Bỏ đuôi .md và số thứ tự. */
+const lessonSlug = (file: string) => unprefix(file.replace(/\.md$/i, ""));
+
+/**
+ * Mục lục trong bài: lấy h2/h3 của HTML vừa dựng và gắn `id` cho chúng để
+ * mục lục bấm được. Làm ngay lúc build, phía app không phải đụng vào HTML.
+ */
+function withHeadingIds(html: string): { html: string; headings: { id: string; text: string; level: 2 | 3 }[] } {
+  const headings: { id: string; text: string; level: 2 | 3 }[] = [];
+  const used = new Set<string>();
+  const out = html.replace(/<h([23])>([\s\S]*?)<\/h\1>/g, (_all, lv: string, inner: string) => {
+    const text = inner.replace(/<[^>]+>/g, "").trim();
+    const base =
+      text
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/đ/g, "d")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "") || "muc";
+    let id = base;
+    for (let i = 2; used.has(id); i++) id = `${base}-${i}`;
+    used.add(id);
+    headings.push({ id, text, level: Number(lv) as 2 | 3 });
+    return `<h${lv} id="${id}">${inner}</h${lv}>`;
+  });
+  return { html: out, headings };
+}
+
+/** Thời gian đọc ước lượng: ~180 từ/phút, code tính gấp đôi thời gian. */
+function readingMinutes(body: string): number {
+  const code = (body.match(/```[\s\S]*?```/g) ?? []).join(" ");
+  const words = body.split(/\s+/).length + code.split(/\s+/).length;
+  return Math.max(1, Math.round(words / 180));
+}
+
+async function buildCourses(): Promise<number> {
+  if (!(await exists(IT_ROOT))) return 0;
+  const courses = [];
+  for (const courseDir of (await readdir(IT_ROOT)).sort()) {
+    const courseRoot = path.join(IT_ROOT, courseDir);
+    if (!(await stat(courseRoot)).isDirectory()) continue;
+    const info = frontMatter(await readFile(path.join(courseRoot, "course.md"), "utf8"));
+    const modules = [];
+    for (const moduleDir of (await readdir(courseRoot)).sort()) {
+      const moduleRoot = path.join(courseRoot, moduleDir);
+      if (!(await stat(moduleRoot)).isDirectory()) continue;
+      const moduleInfo = frontMatter(await readFile(path.join(moduleRoot, "_module.md"), "utf8"));
+      const lessons = [];
+      for (const file of (await readdir(moduleRoot)).sort()) {
+        if (!file.endsWith(".md") || file === "_module.md") continue;
+        const { meta, body } = frontMatter(await readFile(path.join(moduleRoot, file), "utf8"));
+        const { html, headings } = withHeadingIds((marked.parse(body) as string).trim());
+        lessons.push({
+          slug: `${unprefix(moduleDir)}/${lessonSlug(file)}`,
+          title: meta.title ?? lessonSlug(file),
+          minutes: Number(meta.minutes) || readingMinutes(body),
+          html,
+          headings,
+        });
+      }
+      if (lessons.length === 0) continue;
+      modules.push({
+        slug: unprefix(moduleDir),
+        title: moduleInfo.meta.title ?? unprefix(moduleDir),
+        ...(moduleInfo.meta.summary ? { summary: moduleInfo.meta.summary } : {}),
+        lessons,
+      });
+    }
+    courses.push({
+      id: courseDir,
+      title: info.meta.title ?? courseDir,
+      summary: info.meta.summary ?? "",
+      level: info.meta.level ?? "Nền tảng",
+      order: Number(info.meta.order) || 99,
+      modules,
+    });
+  }
+  await writeFile(path.join(IT_ROOT, "courses.json"), JSON.stringify(courses, null, 2) + "\n", "utf8");
+  return courses.reduce((n, c) => n + c.modules.reduce((m, mod) => m + mod.lessons.length, 0), 0);
+}
+
+async function exists(p: string): Promise<boolean> {
+  try {
+    await stat(p);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 async function main() {
   for (const book of BOOKS) {
     const notes = await buildNotes(book.id);
@@ -418,6 +532,8 @@ async function main() {
         `${regions} vùng dịch, ${grammar} điểm ngữ pháp, ${answers} mục đáp án`
     );
   }
+  const lessons = await buildCourses();
+  if (lessons) console.log(`  IT: ${lessons} bài học`);
 }
 
 main().catch((err) => {

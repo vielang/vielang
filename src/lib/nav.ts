@@ -1,15 +1,15 @@
 import { Bookmark, ChartNoAxesColumn, GraduationCap, Library, type LucideIcon } from "lucide-react";
-import { LANGUAGES } from "@/lib/languages";
+import { TRACKS } from "@/lib/tracks";
 
 /**
  * Điều hướng chính của app — NGUỒN DUY NHẤT cho thanh tab dưới đáy (điện
  * thoại) và nav trong header (máy tính).
  *
  * Bốn mục này cố ý đặt theo VIỆC người học làm, không theo nội dung: thêm
- * giáo trình mới, thêm ngôn ngữ mới (lib/languages) hay thêm kỳ thi mới
+ * giáo trình mới, thêm mảng kiến thức mới (lib/tracks) hay thêm kỳ thi mới
  * (IELTS… bên cạnh TOPIK) đều nằm gọn trong "Thư viện" / "Luyện thi", không
- * phải đụng vào thanh điều hướng. Chọn ngôn ngữ nằm trong trang thư viện vì
- * nó chỉ áp dụng cho thư viện.
+ * phải đụng vào thanh điều hướng. Chọn mảng kiến thức nằm trong trang thư
+ * viện vì nó chỉ áp dụng cho thư viện.
  */
 export interface NavTab {
   href: string;
@@ -29,7 +29,11 @@ export const NAV_TABS: NavTab[] = [
     match: (p) =>
       p === "/" ||
       startsWith(p, "/books") ||
-      LANGUAGES.some((l) => l.slug && startsWith(p, `/${l.slug}`)),
+      TRACKS.some(
+        (t) =>
+          (t.slug && startsWith(p, `/${t.slug}`)) ||
+          (t.paths?.some((base) => startsWith(p, base)) ?? false)
+      ),
   },
   { href: "/exam", label: "Luyện thi", icon: GraduationCap, match: (p) => startsWith(p, "/exam") },
   { href: "/my", label: "Góc học tập", icon: ChartNoAxesColumn, match: (p) => startsWith(p, "/my") },

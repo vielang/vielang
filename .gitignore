@@ -61,3 +61,4 @@ next-env.d.ts
 
 # đề thi: tài nguyên sinh ra từ PDF/MP3 gốc, đưa lên R2 bằng prepare-exams — không commit
 /public/img/exams/
+/content/it/courses.json

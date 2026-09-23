@@ -18,8 +18,11 @@ cả hai class chẳng liên quan gì tới tính năng mới.
 
 ## Interface nói làm gì, class nói làm thế nào
 
-Mười bốn method trong một interface là dấu hiệu của chuyện khác: người viết
-chưa hỏi interface dùng để làm gì.
+**Interface** là danh sách những gì một kiểu hứa làm được, không kèm cách làm.
+Nó chỉ có chữ ký method, không có thân.
+
+Mười bốn method trong một interface là dấu hiệu của chuyện khác. Người viết chưa
+hỏi interface ấy dùng để làm gì.
 
 ```csharp
 public interface INotifier

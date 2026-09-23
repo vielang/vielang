@@ -101,8 +101,11 @@ cho họ đỡ mất công.
 
 ## Value type chép giá trị, reference type chép tham chiếu
 
-Mọi kiểu trong C# chia làm hai nhóm, và cái nhóm quyết định chuyện gì xảy ra
-khi bạn gán biến này sang biến khác.
+**Value type** là kiểu mà biến giữ chính giá trị. **Reference type** là kiểu mà
+biến chỉ giữ địa chỉ của một object nằm ở chỗ khác.
+
+Mọi kiểu trong C# thuộc một trong hai nhóm ấy, và cái nhóm quyết định chuyện gì
+xảy ra khi bạn gán biến này sang biến khác.
 
 ```csharp
 int quantity = 5;       // value type — giá trị ở trong biến

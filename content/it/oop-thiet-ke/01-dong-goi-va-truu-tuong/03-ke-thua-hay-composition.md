@@ -18,8 +18,14 @@ Ba module bạn chưa từng mở ra xem.
 
 ## Đọc to lên: "là một" thì kế thừa, "có một" thì composition
 
-Ba module hỏng vì một lớp cha. Nhưng kế thừa không sai — sai là dùng nó cho
-việc của composition.
+**Kế thừa (inheritance)** là khai một class dựa trên một class khác, và nhận sẵn
+mọi thành viên của class đó.
+
+**Composition** là dựng một class bằng cách giữ những object khác bên trong, rồi
+nhờ chúng làm phần việc của chúng.
+
+Ba module hỏng vì một lớp cha. Nhưng kế thừa không sai — sai là dùng nó cho việc
+của composition.
 
 ```csharp
 // Kế thừa — FullTimeEmployee LÀ MỘT Employee

@@ -18,8 +18,12 @@ Chỉ có điều lúc chạy, cái chạy là `Export` của lớp cha.
 
 ## virtual mở cửa, override thay hành vi, abstract bắt buộc
 
-**Đa hình (polymorphism)** là gọi một method qua biến kiểu cha, mà chạy đúng
-bản của kiểu con đang nằm trong biến đó.
+**Đa hình (polymorphism)** là gọi một method qua biến kiểu cha, mà chạy đúng bản
+của kiểu con trong biến đó.
+
+**Abstract class** là class không `new` trực tiếp được, chỉ dùng làm lớp cha.
+
+Nó được phép bỏ trống thân một số method, để lớp con viết.
 
 Bảy từ khoá dưới đây là toàn bộ công cụ để làm việc ấy.
 
@@ -136,8 +140,9 @@ class PdfReport : Report
 }
 ```
 
-Method `abstract` không có thân. Class chứa nó cũng phải `abstract`, và không ai
-`new Report()` được nữa.
+Method `abstract` không có thân. Class chứa nó cũng phải `abstract`.
+
+Và không ai `new Report()` được nữa.
 
 Quên viết `Render` trong lớp con là **lỗi compile**, không phải lỗi lúc chạy.
 Đó chính là điểm mạnh của nó.
@@ -172,8 +177,9 @@ class AuditReport : PdfReport
 `base.Render()` gọi bản của lớp cha, rồi lớp con làm tiếp phần của mình.
 
 Nhưng để ý một điều. `PdfReport.Render` phải là `virtual` hoặc `override` thì
-`AuditReport` mới override được — và trong ví dụ trên nó là `override`, nên
-vẫn còn mở.
+`AuditReport` mới override được.
+
+Trong ví dụ trên nó là `override`, nên vẫn còn mở.
 
 Muốn đóng lại thì có `sealed override`:
 
@@ -185,8 +191,9 @@ class FinalReport : PdfReport
 }
 ```
 
-Từ đây trở xuống không ai override `Render` được nữa. Dùng nó khi hành vi ấy là
-cam kết, không phải chỗ để mở rộng.
+Từ đây trở xuống không ai override `Render` được nữa.
+
+Dùng nó khi hành vi ấy là cam kết, không phải chỗ để mở rộng.
 
 ## Dấu hiệu trong code của bạn
 
@@ -208,8 +215,8 @@ cam kết, không phải chỗ để mở rộng.
 
 Bạn đã có công cụ. Câu hỏi kế là dùng nó vào việc gì.
 
-Bài sau, **Thay chuỗi if theo kiểu bằng đa hình**, mở bằng một lần `grep`: thêm
-một hình thức thanh toán mới, mà phải sửa bốn chỗ ở bốn file khác nhau.
+Bài sau, **Thay chuỗi if bằng đa hình**, mở bằng một lần `grep`. Thêm một hình
+thức thanh toán mới, mà phải sửa bốn chỗ ở bốn file.
 
 ```quiz
 [

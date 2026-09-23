@@ -171,7 +171,10 @@ Console.WriteLine("Đã chuẩn bị xong");  // vẫn chạy
 var texts = contents.ToList();           // nổ Ở ĐÂY
 ```
 
-Stack trace khi đó trông như dưới đây. Chỗ ném lỗi là `ToList()`. Còn dòng
+**Stack trace** là danh sách các lời gọi hàm đang lồng nhau lúc exception được
+ném, xếp từ chỗ ném lên tới điểm vào chương trình.
+
+Stack trace ở đây trông như dưới đây. Chỗ ném lỗi là `ToList()`. Còn dòng
 `Select` viết sai thì không hề xuất hiện.
 
 ```text

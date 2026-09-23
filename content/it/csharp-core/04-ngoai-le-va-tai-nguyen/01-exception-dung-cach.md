@@ -185,9 +185,11 @@ Câu hỏi đứng trước mọi câu hỏi khác: có nên bắt lỗi này kh
 | Biên hệ thống | biến lỗi thành phản hồi HTTP |
 | Mọi trường hợp còn lại | **không bắt**, để lỗi bay lên |
 
-Trong ASP.NET Core, biên ấy là một middleware duy nhất.
+**Middleware** là một mắt xích trong đường ống xử lý request của ASP.NET Core:
+nó nhận request, làm phần việc của mình, rồi chuyển cho mắt xích sau.
 
-Không phải `try/catch` rải đều trong từng controller.
+Trong ASP.NET Core, biên ấy là một middleware duy nhất. Không phải `try/catch`
+rải đều trong từng controller.
 
 Một chỗ duy nhất biết cách biến lỗi thành mã HTTP thì dễ sửa và dễ test. Rải
 ra khắp nơi thì mỗi chỗ xử lý một kiểu, và thế nào cũng có chỗ nuốt mất lỗi.

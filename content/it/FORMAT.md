@@ -134,6 +134,7 @@ Bốn lỗi này viết tay không ai thấy, nên `check-prose` và `check-code
 2. **Dấu `|` trong bảng phải escape thành `\|`, kể cả khi nằm trong backtick.** Markdown vẫn cắt ô, nên `` `Read|Write` `` làm mất nửa sau của ô — lỗi chỉ lộ ra trên web, đọc file không thấy.
 3. **Không mục nào mở thẳng bằng code hay bảng.** Một câu bản lề trước đã, nối vào mục trên hoặc vào sự cố mở bài. Thiếu nó thì văn xuôi tụt xuống vai thuyết minh lại thứ người đọc vừa thấy.
 4. **Đáp án trắc nghiệm phải rải đều 1–4.** Dồn về một vị trí là người học đoán được mà không cần đọc đề. Và câu hỏi không được chép lại code của thân bài.
+5. **Thuật ngữ cốt lõi phải có định nghĩa chính thức trước khi dùng nhiều.** Viết dạng `**Thuật ngữ (english)** là …` — in đậm để phân biệt định nghĩa với cách nói ví von. Danh sách thuật ngữ nằm ở `THUAT_NGU` trong `scripts/check-prose.ts`; thêm khái niệm mới vào đó khi viết chương mới. Cả khoá từng dùng "kế thừa" 39 lần và "composition" 25 lần mà không định nghĩa lần nào, còn bài **Interface là hợp đồng** thì chỉ có ẩn dụ "Interface là một lời hứa" — người học phải tự đoán, và không phép đo nào báo.
 
 Bài học rút ra từ lần kiểm trước: `check-prose` chỉ đo nhịp câu, nên nó báo
 "22/22 đạt chuẩn" trong khi 30 khối code không biên dịch được, 80% đáp án nằm ở

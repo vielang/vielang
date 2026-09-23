@@ -190,6 +190,88 @@ function dat(k: KetQua): boolean {
   );
 }
 
+/**
+ * Thuật ngữ cốt lõi: khái niệm mà cả khoá dựa lên, nên phải có định nghĩa
+ * chính thức trước khi dùng nhiều.
+ *
+ * Vì sao cần danh sách này: FORMAT.md đòi "định nghĩa một câu, chính xác, không
+ * ẩn dụ", nhưng các phép đo khác chỉ thấy nhịp câu và bảng. Nên cả khoá từng
+ * dùng "kế thừa" 39 lần, "composition" 25 lần mà không định nghĩa lần nào —
+ * người học phải tự đoán, và không công cụ nào báo.
+ */
+const THUAT_NGU = [
+  "đóng gói",
+  "trừu tượng",
+  "kế thừa",
+  "composition",
+  "đa hình",
+  "interface",
+  "abstract class",
+  "value type",
+  "reference type",
+  "stack trace",
+  "middleware",
+  "pattern matching",
+];
+
+/** Dùng từ ngần này lần trong một bài thì bài đó đang dựa vào khái niệm ấy. */
+const LAN_COI_LA_DUA_VAO = 3;
+
+const thoat = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+/**
+ * Định nghĩa chính thức: thuật ngữ in đậm, ngay sau là "là" hoặc dấu hai chấm.
+ * Cố ý không nhận ẩn dụ kiểu "Interface là một lời hứa" — FORMAT cấm ẩn dụ, nên
+ * mẫu này đòi thuật ngữ được in đậm để phân biệt định nghĩa với cách nói ví von.
+ */
+function coDinhNghia(than: string, tu: string): boolean {
+  // Phần in đậm phải gần như CHÍNH thuật ngữ, cho phép thêm tối đa một cụm ngắn
+  // như "(encapsulation)". Nếu nới ra thì "**Interface Segregation Principle**:"
+  // cũng bị tính là định nghĩa của "interface" — một lần báo đạt sai.
+  // Dùng `là\s` chứ không `là\b`: \b của JavaScript dựa trên [A-Za-z0-9_], nên
+  // chữ "à" bị coi là không phải ký tự từ và `là\b` không bao giờ khớp.
+  for (const m of than.matchAll(/\*\*([^*]+)\*\*\s*(?:là\s|:)/gi)) {
+    const dam = m[1].trim();
+    if (!new RegExp(`\\b${thoat(tu)}\\b`, "i").test(dam)) continue;
+    if (dam.length - tu.length <= 18) return true;
+  }
+  return false;
+}
+
+/** Trả về số thuật ngữ còn thiếu định nghĩa đúng chỗ. */
+async function soatDinhNghia(files: string[]): Promise<number> {
+  const than = new Map<string, string>();
+  for (const f of files) {
+    const raw = (await readFile(f, "utf8")).split("\r\n").join("\n");
+    than.set(f, raw.replace(/```quiz[\s\S]*?```/, ""));
+  }
+
+  const loi: string[] = [];
+  for (const tu of THUAT_NGU) {
+    const re = new RegExp(`\\b${thoat(tu)}\\b`, "gi");
+    let duaVao: string | null = null;
+    let dinhNghia: string | null = null;
+
+    for (const f of files) {
+      const t = than.get(f)!;
+      if (!dinhNghia && coDinhNghia(t, tu)) dinhNghia = f;
+      if (!duaVao && (t.match(re) ?? []).length >= LAN_COI_LA_DUA_VAO) duaVao = f;
+      if (duaVao) break; // chỉ cần biết bài đầu tiên dựa vào nó
+    }
+
+    if (!duaVao) continue;
+    if (dinhNghia) continue; // định nghĩa nằm ở bài đó hoặc trước đó
+
+    loi.push(`${tu} — bài ${path.basename(duaVao)} dùng ${(than.get(duaVao)!.match(re) ?? []).length} lần`);
+  }
+
+  if (loi.length) {
+    console.log("\nThuật ngữ dùng nhiều mà chưa định nghĩa chính thức trước đó:");
+    for (const d of loi) console.log(`  ${d}`);
+  }
+  return loi.length;
+}
+
 async function main() {
   const loc = process.argv[2];
   const files = (await lietKe(ROOT)).filter((f) => !loc || f.includes(loc));
@@ -229,9 +311,11 @@ async function main() {
     if (loi.length) console.log("    " + loi.join(" · "));
   }
 
+  const thieu = await soatDinhNghia(files);
+
   const xong = ketQua.filter(dat).length;
   console.log(`\n${xong}/${ketQua.length} bài đạt chuẩn.`);
-
+  if (thieu > 0) console.log(`${thieu} thuật ngữ cốt lõi chưa có định nghĩa đúng chỗ.`);
 }
 
 main();

@@ -74,6 +74,13 @@ function drag(dx: number, { ms = 400, dy = 0, release = true } = {}) {
   if (release) pointer(el, "pointerup", 200 + dx, 200 + dy);
 }
 
+/** Chạm một cái ở toạ độ x rồi chờ qua nhịp phân biệt bấm đúp. */
+function tap(x: number) {
+  pointer(surface(), "pointerdown", x, 200);
+  pointer(surface(), "pointerup", x, 200);
+  act(() => void vi.advanceTimersByTime(600));
+}
+
 /** Quãng trang thật sự trôi được: tính từ mốc, tức là trừ đi nhịp đầu. */
 const travelled = (dx: number) => dx - dx / STEPS;
 
@@ -188,6 +195,31 @@ describe("chạm", () => {
     expect(onTap).not.toHaveBeenCalled();
     act(() => void vi.advanceTimersByTime(250));
 
+    expect(onTap).toHaveBeenCalledTimes(1);
+  });
+
+  // Dải mép rộng 25% của 300px = 75px: chạm ở 280 là trang sau, 20 là trang trước.
+  it("chạm mép phải thì sang trang sau", () => {
+    const { onSwipeNext, onTap } = view();
+    tap(280);
+
+    expect(onSwipeNext).toHaveBeenCalledTimes(1);
+    expect(onTap).not.toHaveBeenCalled();
+  });
+
+  it("chạm mép trái thì về trang trước", () => {
+    const { onSwipePrev, onTap } = view();
+    tap(20);
+
+    expect(onSwipePrev).toHaveBeenCalledTimes(1);
+    expect(onTap).not.toHaveBeenCalled();
+  });
+
+  it("hết trang thì chạm mép chỉ bật/tắt thanh công cụ", () => {
+    const { onSwipeNext, onTap } = view({ nextPages: null });
+    tap(280);
+
+    expect(onSwipeNext).not.toHaveBeenCalled();
     expect(onTap).toHaveBeenCalledTimes(1);
   });
 

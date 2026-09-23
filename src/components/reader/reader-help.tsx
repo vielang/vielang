@@ -8,6 +8,7 @@ import {
   Languages,
   ListChecks,
   Mic,
+  Mouse,
   MoveHorizontal,
   NotebookText,
   Pen,
@@ -33,12 +34,18 @@ import { useReaderPrefsStore } from "@/lib/reader-prefs-store";
  * giờ tự tìm ra.
  */
 const GESTURES: { Icon: typeof Hand; what: string; how: string }[] = [
+  { Icon: Pointer, what: "Chạm mép trái / mép phải", how: "lật về trang trước / sang trang sau" },
   { Icon: Pointer, what: "Chạm giữa trang", how: "ẩn hoặc hiện thanh công cụ" },
   { Icon: MoveHorizontal, what: "Vuốt ngang", how: "lật sang trang trước / trang sau" },
   {
     Icon: ZoomIn,
     what: "Chụm 2 ngón, hoặc chạm 2 lần",
-    how: "phóng to để soi chữ — chạm 2 lần nữa là về như cũ",
+    how: "phóng to để soi chữ — chạm 2 lần nữa là về như cũ. Đang phóng thì kéo để xem quanh trang, kéo tới mép rồi kéo tiếp là lật trang; mức phóng giữ nguyên khi lật",
+  },
+  {
+    Icon: Mouse,
+    what: "Trên máy tính: lăn chuột",
+    how: "lật trang; Ctrl (hoặc ⌘) + lăn để phóng to; đang phóng thì lăn để cuộn trong trang, Shift + lăn để cuộn ngang",
   },
   {
     Icon: Languages,

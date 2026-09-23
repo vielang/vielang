@@ -59,6 +59,20 @@ const SPREAD_GAP = 4;
 const TURN_GAP = 24;
 
 /**
+ * Chạm/bấm vào dải mép trái–phải rộng bấy nhiêu phần màn hình thì lật trang
+ * (giữa màn là ẩn/hiện thanh công cụ) — cách lật quen thuộc của mọi app đọc
+ * sách, và là cách duy nhất dùng được khi cầm điện thoại một tay.
+ *
+ * Máy tính hẹp hơn vì con trỏ nhắm chính xác hơn ngón tay, mà dải rộng thì
+ * dễ bấm nhầm khi định bấm vào chữ trong trang.
+ */
+const EDGE_TAP_NARROW = 0.25;
+const EDGE_TAP_WIDE = 0.2;
+
+/** Lăn chuột dồn quá bấy nhiêu thì lật một trang (lúc đang xem 100%). */
+const WHEEL_TURN_DELTA = 120;
+
+/**
  * Thời gian trang trượt hẳn sang bên, tính bằng ms.
  *
  * Quanh 250ms là khoảng các trình đọc lớn đều rơi vào: đủ chậm để mắt
@@ -312,15 +326,15 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
     if (tapTimer.current) clearTimeout(tapTimer.current);
   }, []);
   const setZoomScale = useZoomStore((s) => s.setScale);
+  /**
+   * GIỮ nguyên mức phóng khi lật trang: đang phóng 200% đọc dở một cột chữ
+   * mà lật sang trang sau lại về 100% thì phải phóng lại từ đầu. Mức phóng
+   * sống trong store (không bị dựng lại cùng component), nên chỉ cần lấy nó
+   * làm mức khởi tạo cho trang mới.
+   */
+  const [initialScale] = useState(() => useZoomStore.getState().scale);
   // Chỉ đổi khi vượt qua ngưỡng "đang phóng" — không phải mỗi khung hình.
-  const [zoomed, setZoomed] = useState(false);
-  // Lật trang là dựng lại khung phóng từ 100% (xem `key` của TransformWrapper)
-  // mà không bắn `onTransform` nào — tự đưa con số trên thanh phóng to về
-  // 100%. `zoomed` thì không cần: cả trang đọc được dựng lại khi đổi trang.
-  const pagesKey = pages.join("-");
-  useEffect(() => {
-    setZoomScale(1);
-  }, [pagesKey, setZoomScale]);
+  const [zoomed, setZoomed] = useState(initialScale > 1.02);
   const aspectRatio = getPageAspectRatio(book);
   // Đang vẽ lên trang: một ngón/chuột thuộc về cây bút, không còn là chạm để
   // ẩn thanh công cụ, vuốt lật trang hay kéo di chuyển trang nữa.
@@ -341,24 +355,31 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
   const [step, setStep] = useState(0);
   const stepRef = useRef(0);
   /**
-   * Đang kéo/đang trượt lật — chỉ lúc đó mới hiện trang kế bên. Trang kế nằm
-   * ngay sát cạnh trang đang đọc, nên để hiện sẵn là màn rộng thấy lú một
-   * mẩu trang trước và trang sau ở hai mép.
+   * Trang kế đang được hiện: 1 = trang sau (bên phải), -1 = trang trước
+   * (bên trái), null = không hiện cái nào.
+   *
+   * Trang kế nằm ngay sát cạnh trang đang đọc nên phải giấu khi không kéo
+   * (màn rộng sẽ thấy lú ra ở hai mép), và chỉ hiện ĐÚNG phía đang kéo tới —
+   * kéo sang trái mà bên trái cũng lòi trang trước ra thì rối mắt.
    */
-  const [sliding, setSliding] = useState(false);
+  const [slide, setSlide] = useState<1 | -1 | null>(null);
+  const slideRef = useRef<1 | -1 | null>(null);
   const slideOff = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const startSlide = useCallback(() => {
+  const startSlide = useCallback((direction: 1 | -1) => {
     if (slideOff.current) {
       clearTimeout(slideOff.current);
       slideOff.current = null;
     }
-    setSliding(true);
+    if (slideRef.current === direction) return;
+    slideRef.current = direction;
+    setSlide(direction);
   }, []);
   /** Hết kéo mà không lật: giấu lại sau khi trang trôi về chỗ cũ. */
   const endSlide = useCallback((after: number) => {
     slideOff.current = setTimeout(() => {
       slideOff.current = null;
-      setSliding(false);
+      slideRef.current = null;
+      setSlide(null);
     }, after);
   }, []);
   useEffect(
@@ -429,7 +450,7 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
       if (width <= 0) return false;
 
       committed.current = true;
-      startSlide();
+      startSlide(direction);
       const go = () => (direction === 1 ? onSwipeNext() : onSwipePrev());
 
       if (prefersReducedMotion()) {
@@ -594,7 +615,7 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
           }
           g.axis = "x";
           g.originX = e.clientX;
-          startSlide();
+          startSlide(dx < 0 ? 1 : -1);
           e.currentTarget.setPointerCapture?.(e.pointerId);
         } else if (Math.abs(dy) > 10) {
           g.axis = "off";
@@ -618,12 +639,13 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
         g.axis = "x";
         g.panning = false;
         g.originX = g.edgeX;
-        startSlide();
+        startSlide(dir);
         e.currentTarget.setPointerCapture?.(e.pointerId);
       }
       if (g.axis !== "x") return;
 
       const moved = e.clientX - g.originX;
+      if (moved !== 0) startSlide(moved < 0 ? 1 : -1);
       const blocked = (moved < 0 && !nextPages) || (moved > 0 && !prevPages);
       place(blocked ? moved * EDGE_RESISTANCE : moved, false);
     },
@@ -666,13 +688,48 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
           tapTimer.current = null;
           return;
         }
+        // Chạm mép trái/phải = lật trang, chạm giữa = ẩn/hiện thanh. Đang
+        // phóng to thì cả màn là vùng xem chi tiết — chạm mép chỉ ẩn/hiện
+        // thanh, khỏi lật nhầm khi đang dò chữ.
+        const width = widthRef.current;
+        const x = e.clientX - e.currentTarget.getBoundingClientRect().left;
+        const edge = (wide ? EDGE_TAP_WIDE : EDGE_TAP_NARROW) * width;
+        const zone: 1 | -1 | 0 =
+          scaleRef.current > 1.02 || width <= 0 ? 0 : x < edge ? -1 : x > width - edge ? 1 : 0;
         tapTimer.current = setTimeout(() => {
           tapTimer.current = null;
-          onTap();
+          if (zone === 0 || !commit(zone)) onTap();
         }, TAP_DELAY_MS);
       }
     },
-    [commit, onTap, place, endSlide]
+    [commit, onTap, place, endSlide, wide]
+  );
+
+  /**
+   * Lăn chuột / vuốt hai ngón trên trackpad, theo lệ của trình đọc tài liệu:
+   * đang xem 100% thì lật trang, đã phóng to thì cuộn trong trang (Shift để
+   * cuộn ngang). Ctrl/⌘ + lăn là phóng to — để nguyên cho thư viện zoom.
+   */
+  const wheelDelta = useRef(0);
+  const onWheel = useCallback(
+    (e: React.WheelEvent) => {
+      if (e.ctrlKey || e.metaKey || drawing) return;
+      const t = transformRef.current;
+      if (!t) return;
+      if (scaleRef.current > 1.02) {
+        const [dx, dy] = e.shiftKey ? [e.deltaY, 0] : [e.deltaX, e.deltaY];
+        t.panBy(-dx, -dy);
+        return;
+      }
+      if (committed.current) return;
+      // Dồn lại rồi mới lật: một cú lăn chuột bắn ra cả chục sự kiện nhỏ.
+      wheelDelta.current += e.deltaY + e.deltaX;
+      if (Math.abs(wheelDelta.current) < WHEEL_TURN_DELTA) return;
+      const direction: 1 | -1 = wheelDelta.current > 0 ? 1 : -1;
+      wheelDelta.current = 0;
+      commit(direction);
+    },
+    [commit, drawing]
   );
 
   const onPointerCancel = useCallback(
@@ -697,6 +754,7 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerCancel}
+      onWheel={onWheel}
     >
       <div
         ref={trackRef}
@@ -707,7 +765,7 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
         {box && prevPages && (
           <div
             className="absolute inset-0"
-            style={{ transform: `translate3d(${-step}px, 0, 0)`, visibility: sliding ? "visible" : "hidden" }}
+            style={{ transform: `translate3d(${-step}px, 0, 0)`, visibility: slide === -1 ? "visible" : "hidden" }}
           >
             <NeighbourSpread bookId={book.id} pages={prevPages} box={box} />
           </div>
@@ -717,7 +775,7 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
           <TransformWrapper
             ref={transformRef}
             key={pages.join("-")}
-            initialScale={1}
+            initialScale={initialScale}
             minScale={MIN_ZOOM}
             maxScale={MAX_ZOOM}
             limitToBounds
@@ -736,11 +794,19 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
               step: wide ? DOUBLE_TAP_STEP_WIDE : DOUBLE_TAP_STEP_NARROW,
               disabled: drawing,
             }}
-            // Trackpad 2 ngón vuốt (không giữ Ctrl) = di chuyển vùng xem khi
-            // đã phóng to, giống các trình đọc ảnh/PDF thông thường —
-            // Ctrl+vuốt (pinch thật) vẫn zoom như cũ.
-            wheel={{ wheelDisabled: true }}
-            trackPadPanning={{ disabled: false }}
+            // Lăn chuột / vuốt trackpad do `onWheel` của khung ngoài lo (lật
+            // trang hoặc cuộn trong trang). Ở đây chỉ giữ lại đường PHÓNG TO:
+            // Ctrl/⌘ + lăn, và chụm hai ngón trên trackpad (trình duyệt gửi
+            // đúng Ctrl + lăn).
+            // Hàm chứ không phải mảng: mảng nghĩa là phải giữ ĐỦ mọi phím
+            // trong đó (Ctrl VÀ ⌘ cùng lúc), còn đây cần "một trong hai".
+            // `step` được NHÂN với độ lớn cú lăn: một nấc chuột (deltaY≈100)
+            // thành ~20%, còn chụm trackpad (delta nhỏ, liên tục) thì mượt.
+            wheel={{
+              activationKeys: (keys) => keys.includes("Control") || keys.includes("Meta"),
+              step: 0.002,
+            }}
+            trackPadPanning={{ disabled: true }}
             onTransform={(_ref, state) => {
               scaleRef.current = state.scale;
               setZoomScale(state.scale);
@@ -774,7 +840,7 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
         {box && nextPages && (
           <div
             className="absolute inset-0"
-            style={{ transform: `translate3d(${step}px, 0, 0)`, visibility: sliding ? "visible" : "hidden" }}
+            style={{ transform: `translate3d(${step}px, 0, 0)`, visibility: slide === 1 ? "visible" : "hidden" }}
           >
             <NeighbourSpread bookId={book.id} pages={nextPages} box={box} />
           </div>

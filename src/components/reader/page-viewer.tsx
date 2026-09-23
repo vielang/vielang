@@ -784,7 +784,7 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
             // nhưng CỐ Ý để nguyên pinch 2 ngón và cuộn trackpad — phóng to
             // rồi khoanh chú thích vào chữ nhỏ là chuyện thường xuyên nhất.
             panning={{ disabled: drawing }}
-            // Bấm đúp: đang ở 100% thì phóng lên (máy tính 150%, điện thoại
+            // Bấm đúp: đang ở 100% thì phóng lên (máy tính 175%, điện thoại
             // 250% — xem `DOUBLE_TAP_STEP_*`); đang phóng ở MỨC NÀO thì cũng về
             // 100%. Chế độ "toggle" của thư viện chỉ trừ đi đúng `step`, nên
             // chụm tay lên 350% rồi bấm đúp chỉ về 300% — không phải thứ người

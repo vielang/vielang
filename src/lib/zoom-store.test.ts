@@ -18,8 +18,8 @@ describe("nấc phóng to", () => {
     expect(nextZoom(3.9, 1)).toBe(4);
   });
 
-  it("bấm đúp: máy tính lên 150%, điện thoại lên 250%", () => {
-    expect(1 + DOUBLE_TAP_STEP_WIDE).toBe(1.5);
+  it("bấm đúp: máy tính lên 175%, điện thoại lên 250%", () => {
+    expect(1 + DOUBLE_TAP_STEP_WIDE).toBe(1.75);
     expect(1 + DOUBLE_TAP_STEP_NARROW).toBe(2.5);
   });
 });

@@ -11,14 +11,14 @@ export const ZOOM_STEP = 0.25;
 /**
  * Bấm đúp khi đang ở 100% thì phóng lên bao nhiêu (cộng thêm vào mức 1).
  *
- * Máy tính: +0,5 → 150%. Trang đang vừa khít chiều cao màn hình, chữ chỉ hơi
- * nhỏ; 150% là đọc rõ mà vẫn thấy gần hết bề ngang trang. Bản cũ nhảy thẳng
+ * Máy tính: +0,75 → 175%. Trang đang vừa khít chiều cao màn hình, chữ chỉ hơi
+ * nhỏ; 175% là đọc rõ mà vẫn thấy gần hết bề ngang trang. Bản cũ nhảy thẳng
  * lên 280%, phải kéo qua kéo lại mới đọc hết một dòng.
  *
  * Điện thoại: +1,5 → 250%. Trang chỉ rộng ~390px, chữ rất nhỏ — 150% vẫn
  * chưa đọc được.
  */
-export const DOUBLE_TAP_STEP_WIDE = 0.5;
+export const DOUBLE_TAP_STEP_WIDE = 0.75;
 export const DOUBLE_TAP_STEP_NARROW = 1.5;
 
 /**

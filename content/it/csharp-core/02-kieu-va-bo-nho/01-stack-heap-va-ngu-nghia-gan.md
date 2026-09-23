@@ -21,6 +21,20 @@ Nói "value type luôn ở stack" là cách nói tắt và **không chính xác*
 là field của class thì nó nằm trong object đó, tức là trên heap. Điều luôn đúng
 là: value type lưu **chính giá trị**, reference type lưu **tham chiếu**.
 
+```mermaid Hai biến cùng trỏ một object, còn int thì mỗi biến giữ một giá trị
+flowchart TD
+    subgraph stack["Stack — theo từng lời gọi method"]
+        p["Person p"]
+        q["Person q = p"]
+        x["int x = 5"]
+    end
+    subgraph heap["Heap — GC dọn"]
+        obj["Person { Name = &quot;Huy&quot; }"]
+    end
+    p -->|tham chiếu| obj
+    q -->|cùng tham chiếu| obj
+```
+
 ## Gán và truyền vào method
 
 ```csharp

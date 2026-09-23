@@ -6,8 +6,8 @@ minutes: 11
 Job dọn dữ liệu chạy lúc hai giờ sáng. Việc của nó đơn giản: duyệt danh sách
 đơn hàng, thấy đơn đã huỷ thì xoá đi.
 
-Chạy thử với hai đơn, êm. Lên production gặp dữ liệu thật, job sập ngay vòng
-lặp đầu tiên với `InvalidOperationException`.
+Chạy thử với hai đơn còn hiệu lực, êm. Lên production gặp đơn đã huỷ đầu tiên,
+job sập với `InvalidOperationException`.
 
 > **Học xong bài này bạn sẽ:** viết rẽ nhánh bằng `switch expression` như code
 > C# hiện đại; chọn đúng giữa `for` và `foreach`; và xoá phần tử trong lúc
@@ -36,7 +36,11 @@ string label = status switch
 `switch expression` (từ C# 8) trả về một giá trị nên không cần `break`. Dấu
 `_` là **discard**, đóng vai `default`.
 
-Thiếu nhánh nào, compiler cảnh báo ngay, còn chuỗi `if` thì im lặng.
+Nhưng để ý cái giá của `_`. Nó nhận mọi giá trị, kể cả giá trị bạn thêm vào
+enum sáu tháng sau.
+
+Bỏ `_` đi thì compiler buộc bạn liệt kê đủ, và thiếu một nhánh là nó cảnh báo
+**CS8509** ngay lúc build. Chuỗi `if` thì im lặng trong cả hai trường hợp.
 
 ## Guard clause kéo logic chính ra khỏi ba tầng ngoặc
 
@@ -95,7 +99,9 @@ Unhandled exception. System.InvalidOperationException:
 `foreach` giữ một con trỏ chạy trên danh sách gốc. Xoá phần tử là danh sách
 đổi. Con trỏ mất chỗ đứng, và lần lặp sau ném lỗi.
 
-Chạy thử hai phần tử thì không sập, vì xoá xong là vòng lặp cũng vừa hết.
+Bản chạy thử không sập vì hai đơn mẫu đều còn hiệu lực — nhánh `Remove` chưa
+từng chạy. Chỉ cần một đơn đã huỷ là lần lặp ngay sau đó ném lỗi, bất kể danh
+sách dài mấy phần tử.
 
 </details>
 
@@ -212,12 +218,12 @@ thì bên ngoài thấy, còn gán lại thì không. Cùng một chữ ký hàm
     "prompt": "Bạn thêm giá trị OrderStatus.Refunded vào enum. Cách viết nào giúp compiler nhắc bạn xử lý nhánh mới?",
     "options": [
       "switch dạng câu lệnh có default",
-      "switch expression liệt kê đủ các nhánh",
+      "switch expression liệt kê đủ các nhánh, KHÔNG có nhánh _",
       "Chuỗi if - else if",
-      "Cả ba đều nhắc như nhau"
+      "switch expression có nhánh _ nhận mọi giá trị còn lại"
     ],
     "answer": 2,
-    "explain": "switch expression được compiler kiểm tra tính đầy đủ và cảnh báo khi còn giá trị chưa xử lý; if và switch dạng câu lệnh thì im lặng."
+    "explain": "Compiler kiểm tra tính đầy đủ của switch expression và cảnh báo CS8509 khi còn giá trị chưa xử lý. Nhưng một nhánh _ là tự nhận hết phần còn lại, nên cảnh báo đó tắt luôn — phương án D im lặng đúng như if."
   },
   {
     "prompt": "Method có ba tầng if lồng nhau, logic chính nằm trong cùng. Cách sửa gọn nhất?",

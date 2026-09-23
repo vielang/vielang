@@ -113,9 +113,14 @@ function doMotBai(raw: string): Omit<KetQua, "file"> {
 
   // Trong bảng Markdown, `|` cắt ô kể cả khi nằm trong backtick. Phải viết \|
   // nếu không nửa sau của ô biến mất lúc render — lỗi chỉ thấy trên web.
+  //
+  // Tách theo backtick rồi chỉ soi các đoạn BÊN TRONG code (chỉ số lẻ). Một
+  // regex kiểu /`[^`]*\|[^`]*`/ trông hợp lý nhưng khớp cả khoảng trống giữa
+  // hai ô code — `| `3` | `int` |` cũng bị báo, tức 36 báo động giả.
   const bangVoPipe = than
     .split("\n")
-    .filter((d) => d.startsWith("|") && /`[^`]*\|[^`]*`/.test(d))
+    .filter((d) => d.startsWith("|"))
+    .filter((d) => d.split("`").some((doan, i) => i % 2 === 1 && /(^|[^\\])\|/.test(doan)))
     .map((d) => d.trim());
 
   // Mục mở thẳng bằng code hay bảng thì văn xuôi bị đẩy xuống vai thuyết minh

@@ -42,8 +42,9 @@ finally
 }
 ```
 
-Các khối `catch` được xét từ trên xuống. Đặt `IOException` lên trước thì
-`FileNotFoundException` không bao giờ tới lượt, vì nó là con của `IOException`.
+Các khối `catch` được xét từ trên xuống. Đặt `IOException` lên trước thì khối
+`FileNotFoundException` thành khối chết, và compiler chặn hẳn bằng lỗi
+**CS0160** — vì khối cha đã bắt trọn phần của khối con.
 
 Hai khối ở đây xử lý khác nhau. Khối đầu ghi log rồi thôi. Khối sau ghi log
 xong còn `throw;` để lỗi tiếp tục bay lên trên.

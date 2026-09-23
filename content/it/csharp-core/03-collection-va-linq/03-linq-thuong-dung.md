@@ -95,9 +95,15 @@ database.
 | Phép | Không có phần tử nào | Có từ hai trở lên |
 |---|---|---|
 | `First` | ném exception | lấy cái đầu |
-| `FirstOrDefault` | trả `null` | lấy cái đầu |
+| `FirstOrDefault` | trả `default` | lấy cái đầu |
 | `Single` | ném exception | **ném exception** |
-| `SingleOrDefault` | trả `null` | ném exception |
+| `SingleOrDefault` | trả `default` | ném exception |
+
+Để ý chữ `default`, đừng đọc thành `null`. Với `List<Order>` thì đúng là `null`,
+nhưng với `List<decimal>` nó trả `0`.
+
+Nghĩa là "không có đơn nào" và "có một đơn 0 đồng" cho ra cùng một kết quả. Chỗ
+đó phải `Any()` kiểm tra trước.
 
 Chọn theo ý định của bạn. `Single` nói "chắc chắn chỉ có một, có hai là dữ
 liệu hỏng". `First` nói "lấy cái đầu, còn lại kệ".

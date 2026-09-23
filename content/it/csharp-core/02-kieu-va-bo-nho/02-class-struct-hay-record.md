@@ -56,11 +56,12 @@ ngay, rất tiện khi ghi log.
 | `record` | giá trị | DTO, value object, message |
 | `readonly record struct` | giá trị, là value type | giá trị nhỏ, bất biến, tạo rất nhiều |
 
-Phép thử nhanh: hai object có mọi field giống nhau thì bạn coi chúng là **một**
-hay là **hai**? Là một thì `record`, là hai thì `class`.
+Phép thử nhanh: bỏ `Id` đi thì hai object còn phân biệt được với nhau không?
 
-Đơn hàng số 7 và đơn hàng số 7 là cùng một đơn. Nhưng 100.000 đồng và 100.000
-đồng thì chỉ là cùng một số tiền, không ai hỏi "số tiền nào".
+Đơn hàng thì còn. Hai đơn trùng từng ô dữ liệu vẫn là hai đơn khác nhau, và ai
+cũng sẽ hỏi "đơn nào". Nên `class`.
+
+Còn 100.000 đồng và 100.000 đồng thì không ai hỏi "số tiền nào". Nên `record`.
 
 ## class cho thứ có vòng đời
 

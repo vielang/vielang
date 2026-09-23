@@ -67,13 +67,16 @@ số gần đúng. Sai số cộng dồn, rồi ra hoá đơn.
 
 | Việc | Kiểu | Vì sao |
 |---|---|---|
-| Tiền, phần trăm, số lượng hàng | `decimal` | chính xác theo hệ thập phân |
+| Tiền, tỉ lệ, đơn giá | `decimal` | chính xác theo hệ thập phân |
 | Đo lường, toạ độ, tính khoa học | `double` | nhanh, đủ chính xác |
-| Đếm, id, chỉ số | `int` | tới hơn 2 tỉ |
+| Đếm, số lượng, id, chỉ số | `int` | tới hơn 2 tỉ |
 | Id bảng lớn, mốc thời gian | `long` | `int` sẽ tràn |
 
-Số `decimal` phải có hậu tố `m`, `float` thì `f`. Thiếu nó, compiler hiểu đó
-là `double`. Và bạn quay lại đúng cái bug vừa thấy.
+Số `decimal` phải có hậu tố `m`, `float` thì `f`. Viết `decimal x = 0.1;` là
+compiler chặn ngay, đòi bạn thêm `m` vào.
+
+Chỗ nguy hiểm là khi không có kiểu nào viết ra: `var rate = 0.1;` cho bạn một
+`double`, và bug vừa thấy quay lại y nguyên.
 
 ## var chỉ là cách viết gọn, kiểu vẫn cố định
 

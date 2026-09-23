@@ -150,16 +150,19 @@ string Describe(Payment p) => p switch
 `Card (var amount, var last4)` là **positional pattern**. Nó chạy được vì
 `record` tự sinh sẵn `Deconstruct` cho bạn.
 
-Kiểu cha là `abstract record` và các nhánh liệt kê đủ, nên compiler không còn
-cảnh báo thiếu nhánh. Thêm một loại thanh toán mới, compiler sẽ nhắc bạn ngay
-tại đây.
+C# không coi cây kế thừa này là đóng, nên `switch` vẫn báo **CS8509**: còn
+`null`, và còn kiểu con mà chưa ai viết ra.
+
+Thêm `_ => throw new NotSupportedException(p.GetType().Name)` là hết cảnh báo.
+Đổi lại, hôm có loại thanh toán mới, nhánh đó nổ ngay lần chạy đầu — đúng một
+chỗ, và nói đúng tên kiểu còn thiếu.
 
 ## Dấu hiệu trong code của bạn
 
 - Cặp `if (x is T)` rồi `(T)x` ngay dòng dưới → gộp thành `if (x is T t)`.
 - Chuỗi `if` kiểm tra null rồi mới so property → một property pattern là xong.
 - `switch` dạng câu lệnh mà mỗi nhánh chỉ gán một giá trị → đổi sang `switch expression`.
-- Chuỗi `if` phân loại theo kiểu con của một lớp cha → `switch expression` trên kiểu, và compiler sẽ nhắc khi có kiểu con mới.
+- Chuỗi `if` phân loại theo kiểu con của một lớp cha → `switch expression` trên kiểu, thêm nhánh `_ => throw` để kiểu con mới nổ đúng một chỗ thay vì rơi vào im lặng.
 
 ## Ghi nhớ
 
@@ -202,15 +205,15 @@ giây ở máy dev. Với dữ liệu thật, nó mất gần một phút.
     "explain": "Type pattern kiểm tra kiểu và gán biến trong một bước; biến c dùng được ngay trong thân if."
   },
   {
-    "prompt": "Bạn thêm một record con mới kế thừa lớp cha abstract. Cách viết nào giúp compiler nhắc chỗ còn thiếu xử lý?",
+    "prompt": "switch trên kiểu Payment có nhánh _ => throw. Nửa năm sau đồng nghiệp thêm record Momo : Payment. Chuyện gì xảy ra?",
     "options": [
-      "Chuỗi if - else if theo kiểu",
-      "switch expression trên kiểu, liệt kê đủ nhánh",
-      "Dictionary ánh xạ kiểu sang hàm xử lý",
-      "try - catch InvalidCastException"
+      "Compiler chặn ngay lúc build, vì switch không còn đầy đủ",
+      "Chạy tới một khoản Momo mới nổ, đúng một chỗ và nói rõ tên kiểu còn thiếu",
+      "Momo lặng lẽ rơi vào nhánh của Cash",
+      "Trả về null, không ai biết gì"
     ],
     "answer": 2,
-    "explain": "Compiler kiểm tra tính đầy đủ của switch expression và cảnh báo khi còn trường hợp chưa xử lý; if thì im lặng."
+    "explain": "C# không coi cây kế thừa là đóng, nên compiler không thể biết Momo cần xử lý ở đâu — nó không chặn được lúc build. Nhánh _ => throw là cách biến chỗ thiếu thành một lỗi nói rõ tên kiểu, thay vì một hành vi sai âm thầm."
   },
   {
     "prompt": "parts là mảng [\"POST\", \"/orders\", \"1\"]. Pattern nào khớp?",

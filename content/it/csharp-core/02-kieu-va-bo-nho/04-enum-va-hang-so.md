@@ -7,8 +7,8 @@ Sprint này thêm trạng thái "Đang đóng gói". Lập trình viên chèn n�
 enum cho đúng thứ tự nghiệp vụ.
 
 Deploy xong, mọi đơn hàng cũ trong database đổi nghĩa. Đơn "đã giao" hôm qua
-giờ hiện là "đã huỷ". Không ai sửa dữ liệu cả — chỉ là những con số phía sau
-enum đã trượt đi một nấc.
+giờ hiện là "đang đóng gói", còn đơn đã huỷ thì thành đã giao. Không ai sửa dữ
+liệu cả — chỉ là những con số phía sau enum đã trượt đi một nấc.
 
 > **Học xong bài này bạn sẽ:** dùng `enum` thay cho chuỗi trạng thái rải rác;
 > biết vì sao phải ghi số tường minh; phân biệt `const` với `readonly` và chọn
@@ -114,12 +114,14 @@ bool canWrite = p.HasFlag(Permission.Write);   // True
 | `Read = 1` | `001` | ✔ |
 | `Write = 2` | `010` | ✔ |
 | `Delete = 4` | `100` | ✔ |
-| `Delete = 3` | `011` | ✘ trùng `Read|Write` |
+| `Delete = 3` | `011` | ✘ trùng `Read\|Write` |
 
 Mỗi quyền phải chiếm một bit riêng. Nghĩa là giá trị phải là luỹ thừa của 2.
 
-Đặt 1, 2, 3 thì `Read|Write` bằng đúng `3`. Nó trùng luôn với quyền thứ ba, và
-`HasFlag` trả về kết quả vô nghĩa.
+Đặt 1, 2, 3 thì `Read | Write` bằng đúng `3`, mà `3` lại chính là quyền thứ ba.
+
+Cấp cho ai đó quyền đọc và ghi, xong `p.HasFlag(Permission.Delete)` trả về
+`True`. Họ xoá được dữ liệu mà chưa ai cấp quyền xoá.
 
 ## const, static readonly hay readonly
 

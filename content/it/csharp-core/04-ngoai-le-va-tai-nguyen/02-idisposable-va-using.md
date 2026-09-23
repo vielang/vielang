@@ -138,8 +138,11 @@ bên dưới và tự xoay vòng chúng theo định kỳ.
 `AddDbContext` đăng ký theo vòng đời scoped. Mỗi request một context, và
 framework tự dispose khi request kết thúc.
 
-Tự `new` một `DbContext` rồi giữ trong field `static` thì vừa rò connection,
-vừa giữ mọi thực thể đã tải trong bộ nhớ. Hai loại leak cùng một lúc.
+Tự `new` một `DbContext` rồi giữ trong field `static` thì hai request dùng
+chung một context — mà `DbContext` không an toàn khi dùng song song.
+
+Change tracker cũng phình mãi, vì mọi thực thể đã tải đều nằm lại đó. Một lỗi
+chạy sai, một lỗi ăn dần bộ nhớ.
 
 ## Chỉ tự viết Dispose khi bạn sở hữu tài nguyên
 

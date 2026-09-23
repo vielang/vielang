@@ -30,7 +30,7 @@ dấu `:` là **format string**.
 | Viết | Kết quả | Dùng khi |
 |---|---|---|
 | `$"{x:N0}"` | `1,500,000` | số có phân cách nghìn |
-| `$"{x:C}"` | `₫1,500,000` | tiền theo culture hiện tại |
+| `$"{x:C}"` | `1.500.000 ₫` trên máy `vi-VN` | tiền theo culture hiện tại — đổi máy là đổi kết quả |
 | `$"{x:P1}"` | `12.3%` | phần trăm |
 | `$"{d:dd/MM/yyyy}"` | `23/09/2026` | ngày cho người Việt đọc |
 | `$"{id:D6}"` | `000042` | đệm số 0 cho đủ 6 chữ số |
@@ -117,8 +117,8 @@ không phải tiếng người.
 ## Culture: cái bẫy chỉ lộ ra trên production
 
 ```csharp
-// máy dev tiếng Việt: "1,5"
-// server tiếng Anh:   "1.5"
+// máy dev tiếng Anh: "1.5"
+// server ở Đức:      "1,5"
 var text = value.ToString();
 
 // luôn như nhau ở mọi máy

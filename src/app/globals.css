@@ -267,3 +267,13 @@
 .prose .lesson-diagram figcaption {
   @apply mt-2 text-center text-xs text-muted-foreground;
 }
+
+/*
+ * Dấu nháy mà plugin typography tự chèn vào blockquote chỉ hợp khi trích lời
+ * ai đó. Trong bài học IT, blockquote là hộp "Học xong bạn sẽ / Cần biết
+ * trước" — có dấu nháy vào đọc thành như đang dẫn lời người khác.
+ */
+.prose blockquote p:first-of-type::before,
+.prose blockquote p:last-of-type::after {
+  content: none;
+}

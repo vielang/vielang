@@ -20,8 +20,14 @@ if (!Directory.Exists(root))
     return 2;
 }
 
+// Khối code rộng quá thì điện thoại phải cuộn ngang mới đọc hết — đo trên
+// màn 390px: quá 56 ký tự là bắt đầu phải cuộn. Đây mới là CẢNH BÁO, chưa
+// chặn build, vì các bài viết trước chuẩn này còn nợ khá nhiều dòng.
+const int maxWidth = 56;
+
 var fence = new Regex("```csharp\r?\n(.*?)```", RegexOptions.Singleline);
-int blocks = 0, bad = 0;
+int blocks = 0, bad = 0, wide = 0;
+var wideFiles = new Dictionary<string, int>();
 
 foreach (var file in Directory.GetFiles(root, "*.md", SearchOption.AllDirectories).OrderBy(f => f))
 {
@@ -38,6 +44,14 @@ foreach (var file in Directory.GetFiles(root, "*.md", SearchOption.AllDirectorie
             code,
             new CSharpParseOptions(LanguageVersion.Preview, kind: kind));
 
+        var tooWide = code.Split('\n').Count(l => l.TrimEnd().Length > maxWidth);
+        if (tooWide > 0)
+        {
+            wide += tooWide;
+            var name = Path.GetFileName(file);
+            wideFiles[name] = wideFiles.GetValueOrDefault(name) + tooWide;
+        }
+
         var errors = tree.GetDiagnostics().Where(d => d.Severity == DiagnosticSeverity.Error).ToList();
         if (errors.Count == 0) continue;
 
@@ -52,6 +66,13 @@ foreach (var file in Directory.GetFiles(root, "*.md", SearchOption.AllDirectorie
             Console.WriteLine($"    | {line}");
         }
     }
+}
+
+if (wide > 0)
+{
+    Console.WriteLine($"\nCảnh báo: {wide} dòng code dài quá {maxWidth} ký tự (điện thoại phải cuộn ngang):");
+    foreach (var (name, n) in wideFiles.OrderByDescending(p => p.Value))
+        Console.WriteLine($"  {n,3}  {name}");
 }
 
 Console.WriteLine($"\n{blocks} khối C#, {bad} khối có lỗi cú pháp.");

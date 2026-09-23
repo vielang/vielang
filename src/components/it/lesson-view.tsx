@@ -26,6 +26,10 @@ const NO_SUBSCRIBE = () => () => {};
 const LESSON_PROSE_CLASS =
   "prose prose-sm dark:prose-invert max-w-none prose-headings:font-heading prose-headings:scroll-mt-20 " +
   "prose-table:text-sm prose-pre:border prose-pre:border-border prose-pre:leading-relaxed " +
+  // Khối trích dẫn trong bài học là hộp "Học xong bạn sẽ / Cần biết trước",
+  // không phải lời ai đó nói — bỏ chữ nghiêng, thêm nền cho ra dáng cái hộp.
+  "prose-blockquote:not-italic prose-blockquote:font-normal prose-blockquote:rounded-r-lg " +
+  "prose-blockquote:bg-muted/40 prose-blockquote:py-2 prose-blockquote:pr-4 " +
   "prose-code:rounded prose-code:bg-muted prose-code:px-1 prose-code:py-0.5 prose-code:font-normal " +
   "prose-code:before:content-none prose-code:after:content-none " +
   "[&_pre_code]:bg-transparent [&_pre_code]:p-0";

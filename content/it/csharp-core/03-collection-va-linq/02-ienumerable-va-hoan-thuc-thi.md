@@ -1,20 +1,25 @@
 ---
 title: IEnumerable và hoãn thực thi
-minutes: 10
+minutes: 12
 ---
 
 Trang báo cáo của bạn chạy ngon ở máy local. Lên production, cùng một API mất 8
 giây. Mở log ra thì thấy câu truy vấn nặng nhất **chạy ba lần**, dù trong code
 bạn chỉ viết nó đúng một lần.
 
-Không ai gọi nhầm cả. Đó là cách `IEnumerable<T>` hoạt động — và khi đã hiểu, bạn
-sẽ tránh được cả một họ bug hiệu năng.
+Không ai gọi nhầm cả. Đó là cách `IEnumerable<T>` hoạt động.
+
+> **Học xong bài này bạn sẽ:** nhìn một đoạn LINQ và nói được nó chạy lúc nào,
+> chạy mấy lần; tự rà project của mình để tìm chỗ đang duyệt lại nhiều lần.
+>
+> **Cần biết trước:** `List<T>`, lambda `n => n > 0`, và biết `Where`/`Select`
+> dùng để làm gì (bài trước).
 
 ## Truy vấn LINQ là lời hứa, không phải dữ liệu
 
 ```csharp
-IEnumerable<Order> pending = orders.Where(o => o.IsPending);
-// Tới đây CHƯA có đơn hàng nào được kiểm tra
+var cho = orders.Where(o => o.IsPending);
+// Tới đây CHƯA đơn nào được kiểm tra
 ```
 
 `Where` không lọc gì cả. Nó trả về một object biết **cách** lọc, và chỉ bắt tay
@@ -26,54 +31,64 @@ lần hỏi là một lần chạy lại từ đầu.
 
 ## Thử ngay: nhìn tận mắt lúc nó chạy
 
-Tạo project mới rồi dán đoạn này vào `Program.cs`:
+```bash
+dotnet new console -o ThuLinq
+cd ThuLinq
+```
+
+Mở `Program.cs`, dán đoạn này vào rồi chạy `dotnet run`:
 
 ```csharp
 var so = new List<int> { 1, 2, 3, 4 };
 
 var chan = so.Where(n =>
 {
-    Console.WriteLine($"  đang xét {n}");
+    Console.WriteLine($"  xét {n}");
     return n % 2 == 0;
 });
 
 Console.WriteLine("Viết xong truy vấn.");
 Console.WriteLine($"Đếm: {chan.Count()}");
-Console.WriteLine($"Số chẵn đầu tiên: {chan.First()}");
+Console.WriteLine($"Đầu tiên: {chan.First()}");
 ```
 
-Kết quả:
+**Trước khi bấm chạy, đoán xem:** màn hình in ra bao nhiêu dòng "xét", và dòng
+"Viết xong truy vấn" đứng ở đâu? Đoán sai một lần nhớ lâu hơn đọc đúng mười
+lần, nên hãy đoán thật rồi mới mở kết quả bên dưới.
+
+<details>
+<summary>Đoán xong rồi — xem kết quả</summary>
 
 ```text
 Viết xong truy vấn.
-  đang xét 1
-  đang xét 2
-  đang xét 3
-  đang xét 4
+  xét 1
+  xét 2
+  xét 3
+  xét 4
 Đếm: 2
-  đang xét 1
-  đang xét 2
-Số chẵn đầu tiên: 2
+  xét 1
+  xét 2
+Đầu tiên: 2
 ```
+
+</details>
 
 Ba điều đọc được từ đây:
 
-- Dòng "Viết xong truy vấn" in ra **trước** mọi dòng "đang xét": lúc viết truy vấn, không có gì chạy.
+- "Viết xong truy vấn" in ra **trước** mọi dòng "xét": lúc viết truy vấn, không có gì chạy.
 - `Count()` duyệt **cả bốn** phần tử.
-- `First()` duyệt **lại từ đầu**, nhưng dừng ngay khi tìm thấy — đây cũng là lý do `Any()` nhanh hơn `Count() > 0`.
+- `First()` duyệt **lại từ đầu**, nhưng dừng ngay khi tìm thấy — cũng là lý do `Any()` nhanh hơn `Count() > 0`.
 
-Giờ thêm `.ToList()` vào cuối dòng `so.Where(...)` rồi chạy lại: bốn dòng "đang
-xét" in đúng một lần, `Count` và `First` không sinh thêm dòng nào nữa.
+Giờ thêm `.ToList()` vào cuối `so.Where(...)` rồi chạy lại: bốn dòng "xét" in
+đúng một lần, `Count` và `First` không sinh thêm dòng nào nữa.
 
 ```mermaid Truy vấn chỉ chạy khi có người duyệt, và chạy lại mỗi lần
 flowchart TD
-    A["orders.Where(...)"] --> B["Chưa chạy gì cả<br/>chỉ là mô tả công việc"]
+    A["orders.Where(...)"] --> B["Chưa chạy gì cả<br/>mới chỉ là mô tả"]
     B --> C["Count()"]
     B --> D["First()"]
-    B --> E["ToList()"]
-    C --> F["Duyệt nguồn lần 1"]
-    D --> G["Duyệt nguồn lần 2"]
-    E --> H["Duyệt nguồn lần 3<br/>rồi chốt thành List"]
+    C --> E["Duyệt nguồn lần 1"]
+    D --> F["Duyệt nguồn lần 2"]
 ```
 
 ## Bẫy 1: duyệt nhiều lần là chạy nhiều lần
@@ -82,28 +97,28 @@ flowchart TD
 
 ```csharp
 // SAI — truy vấn chạy 3 lần
-var donCho = db.Orders.Where(o => o.IsPending && o.Total > 1_000_000);
+var cho = db.Orders.Where(o => o.IsPending);
 
 return new Report(
-    Tong: donCho.Count(),          // lần 1
-    TienMax: donCho.Max(o => o.Total),  // lần 2
-    Top5: donCho.Take(5).ToList());     // lần 3
+    Tong: cho.Count(),             // lần 1
+    Max: cho.Max(o => o.Total),    // lần 2
+    Top5: cho.Take(5).ToList());   // lần 3
 ```
 
 ```csharp
-// ĐÚNG — chốt kết quả một lần rồi dùng lại
-var donCho = await db.Orders
-    .Where(o => o.IsPending && o.Total > 1_000_000)
+// ĐÚNG — chốt một lần rồi dùng lại
+var cho = await db.Orders
+    .Where(o => o.IsPending)
     .ToListAsync();
 
 return new Report(
-    Tong: donCho.Count,
-    TienMax: donCho.Max(o => o.Total),
-    Top5: donCho.Take(5).ToList());
+    Tong: cho.Count,
+    Max: cho.Max(o => o.Total),
+    Top5: cho.Take(5).ToList());
 ```
 
-Dữ liệu trong bộ nhớ thì ba lần duyệt chỉ tốn chút CPU. Dữ liệu ở database thì đó
-là **ba lần đi mạng, ba câu SQL**. Con số 8 giây không tới từ đâu xa.
+Dữ liệu trong bộ nhớ thì ba lần duyệt chỉ tốn chút CPU. Dữ liệu ở database thì
+đó là **ba lần đi mạng, ba câu SQL**. Con số 8 giây không tới từ đâu xa.
 
 ## Bẫy 2: nguồn đổi thì kết quả đổi theo
 
@@ -113,7 +128,8 @@ var chan = list.Where(n => n % 2 == 0);
 
 list.Add(4);
 
-Console.WriteLine(string.Join(",", chan));   // 2,4 — không phải 2
+// in ra 2,4 — không phải 2
+Console.WriteLine(string.Join(",", chan));
 ```
 
 Truy vấn giữ **tham chiếu tới nguồn**, không giữ bản sao. Rất khó lần ra khi
@@ -122,72 +138,112 @@ Truy vấn giữ **tham chiếu tới nguồn**, không giữ bản sao. Rất k
 ## Bẫy 3: exception nổ ở chỗ không ngờ
 
 ```csharp
-var noiDung = duongDanFile.Select(f => File.ReadAllText(f));   // chưa đọc file nào
+var noiDung = files.Select(f => File.ReadAllText(f));
 
-Console.WriteLine("Đã chuẩn bị xong");    // vẫn chạy bình thường
-var texts = noiDung.ToList();             // FileNotFoundException nổ Ở ĐÂY
+Console.WriteLine("Đã chuẩn bị xong");  // vẫn chạy
+var texts = noiDung.ToList();           // nổ Ở ĐÂY
 ```
 
-Khi debug mà thấy stack trace toàn tên hàm lạ của LINQ, hãy nhớ: chỗ ném lỗi
-không phải chỗ viết truy vấn.
+Stack trace khi đó trông như thế này — chỗ ném lỗi là `ToList()`, còn dòng
+`Select` viết sai thì không hề xuất hiện:
+
+```text
+Unhandled exception. System.IO.FileNotFoundException:
+  Could not find file 'C:\data\thieu.txt'.
+   at System.IO.File.ReadAllText(String path)
+   at Program.<>c.<Main>b__0_0(String f)
+   at System.Linq.Enumerable.SelectEnumerableIterator`2.MoveNext()
+   at System.Linq.Enumerable.ToList[TSource](IEnumerable`1 source)
+   at Program.Main()
+```
+
+Thấy `SelectEnumerableIterator` và `MoveNext` trong stack trace là dấu hiệu:
+lỗi xảy ra lúc **duyệt**, hãy đi ngược lên tìm chỗ viết truy vấn.
 
 ## Mặt tốt của sự lười biếng
 
 Hoãn thực thi không chỉ toàn bẫy — nó cho phép xử lý dữ liệu lớn hơn cả RAM:
 
 ```csharp
-public IEnumerable<string> DocTungDong(string path)
+public IEnumerable<string> DocDong(string path)
 {
     using var reader = new StreamReader(path);
     string? line;
     while ((line = reader.ReadLine()) is not null)
     {
         if (line.Length > 0)
-            yield return line;     // trả một dòng rồi DỪNG lại ở đây
+            yield return line;   // trả 1 dòng rồi DỪNG
     }
 }
 
-foreach (var line in DocTungDong("nhat-ky.log").Take(10))
+foreach (var line in DocDong("nhat-ky.log").Take(10))
     Console.WriteLine(line);
 ```
 
 `yield return` biến method thành một nguồn sinh dữ liệu dần. File 10 GB vẫn chạy
-được vì mỗi lúc chỉ có một dòng nằm trong bộ nhớ, và `Take(10)` nghĩa là phần còn
-lại của file **không bao giờ** bị đọc.
+được vì mỗi lúc chỉ có một dòng nằm trong bộ nhớ, và `Take(10)` nghĩa là phần
+còn lại của file **không bao giờ** bị đọc.
 
-## Quy tắc thực dụng
+## Dấu hiệu trong code của bạn
 
-- **Trong nội bộ một method**: cứ để lười. Nối nhiều phép lọc rồi chốt một lần ở cuối.
-- **Trả ra khỏi service**: `ToList()` trước khi trả. Trả `IEnumerable<T>` ra ngoài là mời người gọi duyệt lại nhiều lần, hoặc duyệt lúc connection đã đóng — lỗi `Cannot access a disposed context` sinh ra từ đây.
+Mở project đang làm và tìm bốn thứ này:
+
+- Một biến `IQueryable`/`IEnumerable` được **dùng lại từ hai lần trở lên** (`.Count()` rồi `.ToList()`, hoặc dùng trong hai nhánh `if`). Mỗi lần dùng là một lần chạy.
+- Method `public` trả về `IEnumerable<T>` mà bên trong lấy dữ liệu từ `DbContext` — người gọi duyệt lúc nào là chuyện của họ, còn connection thì đã đóng.
+- `foreach` lồng trong `foreach` trên cùng một truy vấn LINQ.
+- Lỗi `Cannot access a disposed context` trong log — gần như luôn là bài này.
 
 ## Ghi nhớ
 
 - LINQ chưa chạy cho tới khi có người duyệt (`foreach`, `ToList`, `Count`, `First`…).
 - Dùng lại kết quả nhiều lần → `ToList()` **một lần**, rồi dùng danh sách đó.
 - Truy vấn giữ tham chiếu tới nguồn, không phải bản sao.
+- Trong nội bộ một method thì cứ để lười; **trả ra khỏi service thì chốt** bằng `ToList()`.
 - `yield return` xử lý dữ liệu lớn mà không nạp hết vào bộ nhớ.
+
+## Bước tiếp theo
+
+Bài sau — **LINQ thường dùng** — đi qua bộ phép toán hay dùng nhất (`GroupBy`,
+`SelectMany`, `First` và `Single`…). Mọi phép trong đó đều mang đúng tính lười
+vừa học ở đây, nên đọc tiếp sẽ nhẹ.
 
 ```quiz
 [
   {
-    "prompt": "so là List<int> có 4 phần tử dương. Truy vấn q = so.Where(n => in ra một dòng rồi trả n > 0). Gọi liên tiếp q.Any() rồi q.Count() thì in ra mấy dòng?",
-    "options": ["4 dòng", "5 dòng", "8 dòng", "0 dòng — truy vấn chưa chạy"],
-    "answer": 2,
-    "explain": "Any() dừng ngay ở phần tử đầu (1 dòng), rồi Count() duyệt lại từ đầu cả 4 phần tử (4 dòng). Chốt bằng ToList() trước thì chỉ còn 4."
-  },
-  {
-    "prompt": "Method trả về IEnumerable<Order> lấy từ DbContext, gọi xong thì context bị dispose. Người gọi duyệt kết quả sẽ gặp gì?",
+    "prompt": "Đoạn này in ra mấy dòng log? var q = db.Orders.Where(o => o.IsPaid); if (q.Any()) { foreach (var o in q) Xuly(o); }",
     "options": [
-      "Nhận danh sách bình thường, dữ liệu đã tải sẵn",
-      "Nhận danh sách rỗng",
-      "ObjectDisposedException, vì truy vấn chạy lúc duyệt chứ không phải lúc gọi",
-      "Truy vấn tự mở lại connection mới"
+      "Một truy vấn, vì q chỉ được khai báo một lần",
+      "Hai truy vấn: một cho Any(), một cho foreach",
+      "Không truy vấn nào, vì chưa gọi ToList()",
+      "Ba truy vấn: khai báo, Any() và foreach"
     ],
-    "answer": 3,
-    "explain": "Hoãn thực thi: lúc method return chưa có truy vấn nào chạy. Sửa bằng ToListAsync() ngay trong method trước khi trả ra."
+    "answer": 2,
+    "explain": "Any() duyệt một lần, foreach duyệt lại lần nữa. Muốn một truy vấn thì ToListAsync() trước rồi kiểm tra Count trên danh sách."
   },
   {
-    "prompt": "Khi nào KHÔNG nên gọi ToList() ngay?",
+    "prompt": "Bạn thấy trong log lỗi 'Cannot access a disposed context' ở một API. Chỗ nào đáng ngờ nhất?",
+    "options": [
+      "Một method trả về IEnumerable<T> lấy dữ liệu từ DbContext",
+      "Một method trả về List<T> sau khi đã ToListAsync()",
+      "Một truy vấn có quá nhiều điều kiện Where",
+      "Một câu SQL thiếu index"
+    ],
+    "answer": 1,
+    "explain": "Trả IEnumerable<T> ra ngoài nghĩa là truy vấn chạy lúc người gọi duyệt — khi đó context đã bị dispose. Chốt bằng ToListAsync() ngay trong method."
+  },
+  {
+    "prompt": "DocDong() đọc file bằng yield return, gọi kèm .Take(3) trên một file 10 GB. Chuyện gì xảy ra?",
+    "options": [
+      "Đọc hết file rồi mới lấy 3 dòng đầu",
+      "Chỉ đọc tới khi đủ 3 dòng rồi dừng",
+      "Ném OutOfMemoryException",
+      "Take(3) không dùng được với yield return"
+    ],
+    "answer": 2,
+    "explain": "yield return sinh từng dòng theo yêu cầu, Take(3) ngừng hỏi sau dòng thứ 3 nên phần còn lại của file không bị đọc."
+  },
+  {
+    "prompt": "Trường hợp nào KHÔNG nên gọi ToList() ngay?",
     "options": [
       "Khi còn định lọc tiếp trên dữ liệu ở database",
       "Khi sắp dùng lại kết quả cho nhiều phép tính",
@@ -195,7 +251,7 @@ lại của file **không bao giờ** bị đọc.
       "Khi muốn kết quả không đổi theo nguồn"
     ],
     "answer": 1,
-    "explain": "ToList() giữa chuỗi kéo cả tập về bộ nhớ rồi mới lọc — mất hết lợi thế lọc ở database. Ba trường hợp còn lại đều là lý do nên chốt sớm."
+    "explain": "ToList() giữa chuỗi kéo cả tập về bộ nhớ rồi mới lọc — mất lợi thế lọc ở database. Ba trường hợp còn lại đều là lý do nên chốt sớm."
   }
 ]
 ```

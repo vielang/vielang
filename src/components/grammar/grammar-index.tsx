@@ -153,7 +153,9 @@ export function GrammarIndex({
           //
           // Cao 48px cho vừa đầu ngón tay. Nút xoá của WebKit bị ẩn vì đã có
           // nút xoá riêng — để cả hai thì góc phải có hai dấu X chồng nhau.
-          className="focus:ring-ring/25 h-12 w-full rounded-xl border border-border bg-background pr-11 pl-10 text-[15px] transition-colors outline-none placeholder:text-muted-foreground/70 focus:border-primary/50 focus:ring-2 [&::-webkit-search-cancel-button]:hidden"
+          // Viền sáng lúc bấm vào vẽ VÀO TRONG (`inset-ring`): vẽ ra ngoài thì
+          // ô rộng hơn mọi thẻ bên dưới vài px, nhìn như lệch khung.
+          className="focus:inset-ring-ring/25 h-12 w-full rounded-xl border border-border bg-background pr-11 pl-10 text-[15px] transition-colors outline-none placeholder:text-muted-foreground/70 focus:border-primary/50 focus:inset-ring-2 [&::-webkit-search-cancel-button]:hidden"
         />
         {query !== "" && (
           <button

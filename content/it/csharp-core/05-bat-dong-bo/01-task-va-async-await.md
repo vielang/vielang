@@ -172,8 +172,9 @@ Còn việc nặng CPU thì vẫn phải có ai đó ngồi tính. `async` khôn
 
 Bạn đã biết `async` làm gì. Giờ tới lúc biết nó hỏng ở đâu.
 
-Bài cuối của khoá, **Bẫy async thường gặp**, nói về ba thứ làm app treo hoặc
-nuốt lỗi trong im lặng: `async void`, `.Result`, và quên `CancellationToken`.
+Bài cuối của khoá, **Bẫy async thường gặp**, nói về bốn thứ làm app treo hoặc
+nuốt lỗi trong im lặng: `async void`, quên `await`, `.Result`, và
+fire-and-forget.
 
 ```quiz
 [

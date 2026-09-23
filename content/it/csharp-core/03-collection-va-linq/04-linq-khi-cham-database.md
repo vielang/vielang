@@ -3,7 +3,7 @@ title: LINQ khi chạm database
 minutes: 11
 ---
 
-API danh sách đơn hàng mất 8 giây.
+API danh sách đơn hàng mất 3 giây, cho đúng 20 dòng dữ liệu.
 
 Bạn bật log SQL lên. **Hai mươi mốt câu truy vấn** cho một lần gọi. Một câu
 lấy 20 đơn, rồi hai mươi câu nữa, mỗi câu lấy tên một khách.
@@ -79,7 +79,7 @@ SELECT ... FROM [Customers] WHERE [Id] = @__p_0
 Console in ra **21 câu**. Một câu cho đơn hàng, rồi mỗi vòng lặp thêm một câu
 nữa để lấy khách.
 
-Tên gọi của nó là **N + 1**, và đó chính là API 8 giây ở đầu bài.
+Tên gọi của nó là **N + 1**, và đó là chỗ 3 giây kia trốn.
 
 </details>
 

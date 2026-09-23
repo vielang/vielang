@@ -11,7 +11,7 @@ sao.
 
 Cùng đoạn code ấy viết `async Task` thì lỗi đã nằm gọn trong log.
 
-> **Học xong bài này bạn sẽ:** tránh ba cái bẫy async làm app treo hoặc nuốt
+> **Học xong bài này bạn sẽ:** tránh bốn cái bẫy async làm app treo hoặc nuốt
 > lỗi; chuyền `CancellationToken` cho đúng; và biết `ConfigureAwait` dùng ở
 > đâu.
 >
@@ -26,7 +26,8 @@ Cùng đoạn code ấy viết `async Task` thì lỗi đã nằm gọn trong lo
 | `.Result`, `.Wait()` | chặn luồng, có nơi treo cứng | async suốt đường |
 | `_ = DoAsync()` | không log, tắt máy là mất việc | hàng đợi hoặc `BackgroundService` |
 
-Bốn dòng này là toàn bộ bài học. Phần còn lại giải thích vì sao.
+Bốn dòng này là bốn cái bẫy. Hai mục cuối bài nói tiếp hai thứ đi kèm với
+chúng: `CancellationToken` và `ConfigureAwait`.
 
 ## async void nuốt exception và hạ cả tiến trình
 

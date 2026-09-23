@@ -172,8 +172,8 @@ không dính thêm khoảng trắng thừa.
 
 Hết chương **Nền tảng**. Bạn đã viết được code chạy đúng.
 
-Chương sau, **Kiểu và bộ nhớ**, trả lời câu hỏi còn treo từ bài Method: vì sao
-sửa object trong method thì bên ngoài thấy được.
+Chương sau, **Kiểu và bộ nhớ**, mở bằng một giỏ hàng mẫu gán cho hai khách.
+Khách B mở giỏ mình lên, và thấy đúng món của khách A.
 
 ```quiz
 [

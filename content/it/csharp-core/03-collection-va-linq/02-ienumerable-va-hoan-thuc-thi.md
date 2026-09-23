@@ -11,8 +11,8 @@ một lần. Không ai gọi nhầm. Đó là cách `IEnumerable<T>` hoạt đ�
 > **Học xong bài này bạn sẽ:** nhìn một đoạn LINQ và nói được nó chạy lúc nào,
 > chạy mấy lần; tự rà project của mình để tìm chỗ đang duyệt lại nhiều lần.
 >
-> **Cần biết trước:** `List<T>`, lambda `n => n > 0`, và biết `Where`/`Select`
-> dùng để làm gì (bài trước).
+> **Cần biết trước:** `List<T>` và lambda `n => n > 0`. Chưa cần thạo LINQ:
+> bài này chỉ dùng `Where` với `Select`, và giải thích ngay tại chỗ.
 
 ## Truy vấn LINQ là lời hứa, không phải dữ liệu
 
@@ -107,7 +107,7 @@ flowchart TD
 var pending = db.Orders.Where(o => o.IsPending);
 
 return new Report(
-    Tong: pending.Count(),             // lần 1
+    Total: pending.Count(),             // lần 1
     Max: pending.Max(o => o.Total),    // lần 2
     Top5: pending.Take(5).ToList());   // lần 3
 ```
@@ -119,7 +119,7 @@ var pending = await db.Orders
     .ToListAsync();
 
 return new Report(
-    Tong: pending.Count,
+    Total: pending.Count,
     Max: pending.Max(o => o.Total),
     Top5: pending.Take(5).ToList());
 ```
@@ -127,7 +127,8 @@ return new Report(
 Dữ liệu trong bộ nhớ thì ba lần duyệt chỉ tốn chút CPU. Dữ liệu ở database
 thì đó là **ba lần đi mạng, ba câu SQL**.
 
-Con số 8 giây không tới từ đâu xa.
+Mỗi câu SQL ấy mất chừng hai giây rưỡi trên bảng thật. Nhân ba là ra con số ở
+đầu bài.
 
 ## Bẫy 2: nguồn đổi thì kết quả đổi theo
 
@@ -147,10 +148,10 @@ Truy vấn giữ **tham chiếu tới nguồn**, không giữ bản sao. Rất k
 ## Bẫy 3: exception nổ ở chỗ không ngờ
 
 ```csharp
-var noiDung = files.Select(f => File.ReadAllText(f));
+var contents = files.Select(f => File.ReadAllText(f));
 
 Console.WriteLine("Đã chuẩn bị xong");  // vẫn chạy
-var texts = noiDung.ToList();           // nổ Ở ĐÂY
+var texts = contents.ToList();           // nổ Ở ĐÂY
 ```
 
 Stack trace khi đó trông như dưới đây. Chỗ ném lỗi là `ToList()`. Còn dòng
@@ -174,7 +175,7 @@ lỗi xảy ra lúc **duyệt**, hãy đi ngược lên tìm chỗ viết truy v
 Hoãn thực thi không chỉ toàn bẫy. Nó cho phép xử lý dữ liệu lớn hơn cả RAM:
 
 ```csharp
-public IEnumerable<string> DocDong(string path)
+public IEnumerable<string> ReadLines(string path)
 {
     using var reader = new StreamReader(path);
     string? line;
@@ -185,7 +186,7 @@ public IEnumerable<string> DocDong(string path)
     }
 }
 
-foreach (var line in DocDong("nhat-ky.log").Take(10))
+foreach (var line in ReadLines("nhat-ky.log").Take(10))
     Console.WriteLine(line);
 ```
 
@@ -213,15 +214,17 @@ Mở project đang làm và tìm bốn thứ này:
 
 ## Bước tiếp theo
 
-Bài sau — **LINQ thường dùng** — đi qua bộ phép toán hay dùng nhất (`GroupBy`,
-`SelectMany`, `First` và `Single`…). Mọi phép trong đó đều mang đúng tính lười
-vừa học ở đây, nên đọc tiếp sẽ nhẹ.
+Bài sau, **LINQ thường dùng**, mở bằng một câu hỏi của sếp: tháng này khách nào
+mua nhiều nhất.
+
+Bốn phép LINQ là trả lời được. Mà cả bốn đều lười đúng như bài này vừa chỉ, nên
+chỗ dễ sai vẫn là chỗ bạn quên `ToList`.
 
 ```quiz
 [
   {
     "prompt": "Đoạn này gửi mấy truy vấn xuống database?",
-    "code": "var q = db.Orders.Where(o => o.IsPaid);\n\nif (q.Any())\n{\n    foreach (var o in q)\n        Xuly(o);\n}",
+    "code": "var q = db.Orders.Where(o => o.IsPaid);\n\nif (q.Any())\n{\n    foreach (var o in q)\n        Process(o);\n}",
     "options": [
       "Hai truy vấn: một cho Any(), một cho foreach",
       "Một truy vấn, vì q chỉ được khai báo một lần",
@@ -243,8 +246,8 @@ vừa học ở đây, nên đọc tiếp sẽ nhẹ.
     "explain": "Trả IEnumerable<T> ra ngoài nghĩa là truy vấn chạy lúc người gọi duyệt — khi đó context đã bị dispose. Chốt bằng ToListAsync() ngay trong method."
   },
   {
-    "prompt": "DocDong() đọc file 10 GB bằng yield return. Đoạn này chạy ra sao?",
-    "code": "foreach (var d in DocDong(\"log.txt\").Take(3))\n    Console.WriteLine(d);",
+    "prompt": "ReadLines() đọc file 10 GB bằng yield return. Đoạn này chạy ra sao?",
+    "code": "foreach (var d in ReadLines(\"log.txt\").Take(3))\n    Console.WriteLine(d);",
     "options": [
       "Đọc hết file rồi mới lấy 3 dòng đầu",
       "Chỉ đọc tới khi đủ 3 dòng rồi dừng",

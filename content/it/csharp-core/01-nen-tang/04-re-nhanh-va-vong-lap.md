@@ -13,7 +13,8 @@ job sập với `InvalidOperationException`.
 > C# hiện đại; chọn đúng giữa `for` và `foreach`; và xoá phần tử trong lúc
 > duyệt mà không làm sập chương trình.
 >
-> **Cần biết trước:** biến, toán tử so sánh, `List<T>`.
+> **Cần biết trước:** biến, toán tử so sánh, và `List<T>` ở mức biết `Add`,
+> `Count`, `[i]`. Chương Collection sẽ nói kỹ về nó.
 
 ## Ba cách rẽ nhánh, chọn theo việc
 
@@ -108,18 +109,22 @@ sách dài mấy phần tử.
 Hai cách sửa, chọn theo ý định:
 
 ```csharp
-// Lọc ra danh sách mới — rõ ý, hay dùng nhất
-codes = codes.Where(c => c != "old").ToList();
-
 // Xoá tại chỗ, duyệt NGƯỢC từ cuối
 for (int i = codes.Count - 1; i >= 0; i--)
 {
     if (codes[i] == "old") codes.RemoveAt(i);
 }
+
+// Hoặc để List tự lo, một dòng
+codes.RemoveAll(c => c == "old");
 ```
 
 Duyệt ngược mới an toàn: xoá phần tử thứ `i` chỉ làm lệch những phần tử phía
 sau, mà chúng thì đã xét xong rồi.
+
+`RemoveAll` làm đúng việc ấy và gọn hơn hẳn. Chương **Collection và LINQ** sẽ
+cho bạn thêm một cách thứ ba: lọc ra một danh sách mới thay vì sửa danh sách
+cũ.
 
 ## Chọn vòng lặp theo thứ bạn cần
 

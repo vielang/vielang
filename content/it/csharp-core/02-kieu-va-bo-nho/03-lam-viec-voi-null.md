@@ -117,13 +117,13 @@ dữ liệu thiếu, mà chưa quyết định phải làm gì với nó.
 
 ```csharp
 // SAI — chỉ dập cảnh báo
-var order = await db.Orders.FindAsync(id);
+var order = orders.Find(o => o.Id == id);
 var name = order!.Customer;
 ```
 
 ```csharp
 // ĐÚNG — kiểm tra thật, compiler theo được luồng
-var order = await db.Orders.FindAsync(id);
+var order = orders.Find(o => o.Id == id);
 if (order is null)
     return NotFound();
 
@@ -194,8 +194,8 @@ Deploy xong, mọi đơn hàng cũ trong database đổi nghĩa.
     "explain": "Nullable reference types chỉ tác dụng lúc compile. Runtime chỉ an toàn khi bạn kiểm tra thật, hoặc chặn ở biên bằng ArgumentNullException."
   },
   {
-    "prompt": "Đoạn này in ra gì khi FindAsync không tìm thấy đơn hàng?",
-    "code": "var order = await db.Orders.FindAsync(id);\nConsole.WriteLine(order!.Customer);",
+    "prompt": "Đoạn này in ra gì khi Find không tìm thấy đơn hàng?",
+    "code": "var order = orders.Find(o => o.Id == id);\nConsole.WriteLine(order!.Customer);",
     "options": [
       "Chuỗi rỗng",
       "Ném NullReferenceException",
@@ -203,7 +203,7 @@ Deploy xong, mọi đơn hàng cũ trong database đổi nghĩa.
       "Lỗi compile vì thiếu kiểm tra"
     ],
     "answer": 2,
-    "explain": "FindAsync trả null khi không có. Dấu ! chỉ tắt cảnh báo của compiler, còn lúc chạy thì vẫn chạm vào null."
+    "explain": "Find trả null khi không có. Dấu ! chỉ tắt cảnh báo của compiler, còn lúc chạy thì vẫn chạm vào null."
   },
   {
     "prompt": "Method lấy danh sách đơn hàng, không có cái nào khớp. Nên trả về gì?",

@@ -184,5 +184,6 @@ namespace CourseWorld;
         public static void Archive(Order order) { }
         public static void Add(string code) { }
         public static void Process(string text) { }
+        public static void Process(Order order) { }
         public static decimal Score(Order o) => 0;
     }

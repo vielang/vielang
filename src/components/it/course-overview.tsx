@@ -6,27 +6,20 @@ import { ArrowLeft, ArrowRight, Check, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
-import {
-  courseLessons,
-  courseMinutes,
-  courseProgressId,
-  lessonHref,
-  lessonNumber,
-  type Course,
-} from "@/lib/courses";
+import { courseProgressId, lessonHref, type CourseOutline } from "@/lib/courses";
 import { getBookProgress, useProgressStore } from "@/lib/progress-store";
 
 const NO_SUBSCRIBE = () => () => {};
 
 /** Mục lục một khoá: các chương, bài đã học có dấu ✓, nút học tiếp. */
-export function CourseOverview({ course }: { course: Course }) {
+export function CourseOverview({ course }: { course: CourseOutline }) {
   const isClient = useSyncExternalStore(NO_SUBSCRIBE, () => true, () => false);
   const progressByBook = useProgressStore((s) => s.books);
   const read = new Set(
     isClient ? getBookProgress(progressByBook, courseProgressId(course.id)).readPages : []
   );
-  const lessons = courseLessons(course);
-  const next = lessons.find((l) => !read.has(lessonNumber(course, l.slug))) ?? lessons[0];
+  const lessons = course.modules.flatMap((m) => m.lessons);
+  const next = lessons.find((l) => !read.has(l.no)) ?? lessons[0];
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-8">
@@ -40,16 +33,18 @@ export function CourseOverview({ course }: { course: Course }) {
           <h1 className="text-2xl font-semibold tracking-tight">{course.title}</h1>
           <p className="mt-1 text-sm text-muted-foreground">{course.summary}</p>
           <p className="mt-2 text-xs text-muted-foreground tabular-nums">
-            {course.level} · {lessons.length} bài · {courseMinutes(course)} phút · đã học {read.size}/
-            {lessons.length}
+            {course.level} · {course.total} bài · {course.minutes} phút · đã học {read.size}/
+            {course.total}
           </p>
         </div>
-        {read.size > 0 && <Progress value={(read.size / lessons.length) * 100} className="h-1" />}
+        {read.size > 0 && <Progress value={(read.size / course.total) * 100} className="h-1" />}
         {next && (
-          <Button asChild size="lg" className="self-start">
+          <Button asChild size="lg" className="min-w-0 max-w-full self-start">
             <Link href={lessonHref(course.id, next.slug)}>
-              {read.size > 0 ? "Học tiếp" : "Bắt đầu học"}: {next.title}
-              <ArrowRight className="size-4" aria-hidden />
+              <span className="min-w-0 truncate">
+                {read.size > 0 ? "Học tiếp" : "Bắt đầu học"}: {next.title}
+              </span>
+              <ArrowRight className="size-4 shrink-0" aria-hidden />
             </Link>
           </Button>
         )}
@@ -63,7 +58,7 @@ export function CourseOverview({ course }: { course: Course }) {
           </div>
           <ul className="flex flex-col divide-y divide-border border-y border-border">
             {mod.lessons.map((lesson) => {
-              const done = read.has(lessonNumber(course, lesson.slug));
+              const done = read.has(lesson.no);
               return (
                 <li key={lesson.slug}>
                   <Link
@@ -77,7 +72,7 @@ export function CourseOverview({ course }: { course: Course }) {
                       )}
                       aria-hidden
                     >
-                      {done ? <Check className="size-3" /> : lessonNumber(course, lesson.slug)}
+                      {done ? <Check className="size-3" /> : lesson.no}
                     </span>
                     <span className="min-w-0 flex-1 truncate">{lesson.title}</span>
                     <span className="inline-flex shrink-0 items-center gap-1 text-xs text-muted-foreground tabular-nums">

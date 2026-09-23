@@ -67,9 +67,88 @@ export function getLesson(course: Course, slug: string): Lesson | undefined {
   return courseLessons(course).find((l) => l.slug === slug);
 }
 
-/** Bài trước / bài sau theo thứ tự học (null ở hai đầu khoá). */
-export function lessonNeighbours(course: Course, slug: string): { prev: Lesson | null; next: Lesson | null } {
-  const all = courseLessons(course);
+/**
+ * Bản RÚT GỌN của khoá/bài để đưa sang component phía client.
+ *
+ * `Lesson.html` là cả bài viết — trang mục lục không cần một chữ nào trong đó,
+ * mà props của client component thì bị đóng gói vào payload gửi về trình
+ * duyệt. Truyền nguyên `Course` là tải hết mọi bài chỉ để vẽ một danh sách
+ * tiêu đề.
+ */
+export interface LessonOutline {
+  slug: string;
+  title: string;
+  minutes: number;
+  /** Số thứ tự trong khoá, đếm từ 1 — cũng là "số trang" của tiến độ. */
+  no: number;
+}
+
+export interface ModuleOutline {
+  slug: string;
+  title: string;
+  summary?: string;
+  lessons: LessonOutline[];
+}
+
+export interface CourseOutline {
+  id: string;
+  title: string;
+  summary: string;
+  level: string;
+  /** Tổng số bài và tổng thời gian đọc của cả khoá. */
+  total: number;
+  minutes: number;
+  modules: ModuleOutline[];
+}
+
+export function courseOutline(course: Course): CourseOutline {
+  let no = 0;
+  return {
+    id: course.id,
+    title: course.title,
+    summary: course.summary,
+    level: course.level,
+    total: courseLessons(course).length,
+    minutes: courseMinutes(course),
+    modules: course.modules.map((m) => ({
+      slug: m.slug,
+      title: m.title,
+      ...(m.summary ? { summary: m.summary } : {}),
+      lessons: m.lessons.map((l) => ({ slug: l.slug, title: l.title, minutes: l.minutes, no: ++no })),
+    })),
+  };
+}
+
+/** Một dòng trong lộ trình ở trang `/it` — không kèm mục lục lẫn nội dung. */
+export interface CourseCard {
+  id: string;
+  title: string;
+  summary: string;
+  level: string;
+  total: number;
+  minutes: number;
+}
+
+export function courseCard(course: Course): CourseCard {
+  return {
+    id: course.id,
+    title: course.title,
+    summary: course.summary,
+    level: course.level,
+    total: courseLessons(course).length,
+    minutes: courseMinutes(course),
+  };
+}
+
+/**
+ * Bài trước / bài sau theo thứ tự học (null ở hai đầu khoá). Trả bản rút gọn
+ * vì nút điều hướng chỉ cần tiêu đề và đường dẫn, không cần cả bài viết.
+ */
+export function lessonNeighbours(
+  course: Course,
+  slug: string
+): { prev: LessonOutline | null; next: LessonOutline | null } {
+  const all = courseOutline(course).modules.flatMap((m) => m.lessons);
   const i = all.findIndex((l) => l.slug === slug);
   return { prev: i > 0 ? all[i - 1] : null, next: i >= 0 && i < all.length - 1 ? all[i + 1] : null };
 }

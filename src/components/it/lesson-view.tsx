@@ -5,15 +5,7 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight, Check, Clock, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import {
-  courseLessons,
-  courseProgressId,
-  lessonHref,
-  lessonNeighbours,
-  lessonNumber,
-  type Course,
-  type Lesson,
-} from "@/lib/courses";
+import { courseProgressId, lessonHref, type Lesson, type LessonOutline } from "@/lib/courses";
 import { getBookProgress, useProgressStore } from "@/lib/progress-store";
 
 const NO_SUBSCRIBE = () => () => {};
@@ -22,11 +14,11 @@ const NO_SUBSCRIBE = () => () => {};
  * Bài học có RẤT nhiều tên hàm, tên kiểu viết trong `code` giữa dòng. Mặc
  * định plugin typography chèn dấu backtick vào trước/sau nên đọc rất rối —
  * bỏ đi và thay bằng nền xám, còn `code` nằm trong khối `pre` thì giữ nguyên
- * (khối code đã có nền tối riêng).
+ * (khối code đã được Shiki tô màu, xem globals.css).
  */
 const LESSON_PROSE_CLASS =
   "prose prose-sm dark:prose-invert max-w-none prose-headings:font-heading prose-headings:scroll-mt-20 " +
-  "prose-table:text-sm prose-pre:border prose-pre:border-border " +
+  "prose-table:text-sm prose-pre:border prose-pre:border-border prose-pre:leading-relaxed " +
   "prose-code:rounded prose-code:bg-muted prose-code:px-1 prose-code:py-0.5 prose-code:font-normal " +
   "prose-code:before:content-none prose-code:after:content-none " +
   "[&_pre_code]:bg-transparent [&_pre_code]:p-0";
@@ -36,23 +28,37 @@ const LESSON_PROSE_CLASS =
  * lục trong bài, nút đánh dấu đã học và điều hướng bài trước/bài sau.
  *
  * Tiến độ dùng chung kho với sách (xem `courseProgressId`): số thứ tự bài
- * đóng vai "số trang", nên Góc học tập và "Đọc tiếp" thấy được luôn.
+ * đóng vai "số trang".
  */
-export function LessonView({ course, lesson }: { course: Course; lesson: Lesson }) {
+export function LessonView({
+  courseId,
+  courseTitle,
+  total,
+  no,
+  lesson,
+  prev,
+  next,
+}: {
+  courseId: string;
+  courseTitle: string;
+  /** Tổng số bài của khoá, để hiện "Bài 3/11". */
+  total: number;
+  no: number;
+  lesson: Lesson;
+  prev: LessonOutline | null;
+  next: LessonOutline | null;
+}) {
   const isClient = useSyncExternalStore(NO_SUBSCRIBE, () => true, () => false);
   const progressByBook = useProgressStore((s) => s.books);
   const hasHydrated = useProgressStore((s) => s.hasHydrated);
   const markPageRead = useProgressStore((s) => s.markPageRead);
   const setLastPage = useProgressStore((s) => s.setLastPage);
 
-  const progressId = courseProgressId(course.id);
-  const no = lessonNumber(course, lesson.slug);
-  const total = courseLessons(course).length;
-  const { prev, next } = lessonNeighbours(course, lesson.slug);
+  const progressId = courseProgressId(courseId);
   const done = isClient && getBookProgress(progressByBook, progressId).readPages.includes(no);
 
-  // Mở bài nào thì đó là chỗ đang học — ghi lại để "Đọc tiếp" quay về đúng
-  // bài. Chờ hydrate xong, không thì ghi đè lên tiến độ chưa đọc từ storage.
+  // Mở bài nào thì đó là chỗ đang học — ghi lại để "Học tiếp" quay về đúng
+  // bài. Chờ hydrate xong, không thì ghi đè lên tiến độ đọc từ storage.
   useEffect(() => {
     if (hasHydrated) setLastPage(progressId, no);
   }, [hasHydrated, progressId, no, setLastPage]);
@@ -62,11 +68,11 @@ export function LessonView({ course, lesson }: { course: Course; lesson: Lesson 
   return (
     <article className="mx-auto flex w-full max-w-2xl flex-col gap-6">
       <Link
-        href={`/it/${course.id}`}
+        href={`/it/${courseId}`}
         className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft className="size-4" aria-hidden />
-        {course.title}
+        {courseTitle}
       </Link>
 
       <header className="-mt-2 flex flex-col gap-2">
@@ -117,7 +123,7 @@ export function LessonView({ course, lesson }: { course: Course; lesson: Lesson 
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
           {prev ? (
             <Button asChild variant="outline" className="min-w-0 justify-start">
-              <Link href={lessonHref(course.id, prev.slug)}>
+              <Link href={lessonHref(courseId, prev.slug)}>
                 <ArrowLeft className="size-4 shrink-0" aria-hidden />
                 <span className="min-w-0 truncate">{prev.title}</span>
               </Link>
@@ -127,7 +133,7 @@ export function LessonView({ course, lesson }: { course: Course; lesson: Lesson 
           )}
           {next && (
             <Button asChild variant="outline" className="min-w-0 justify-end sm:col-start-2">
-              <Link href={lessonHref(course.id, next.slug)}>
+              <Link href={lessonHref(courseId, next.slug)}>
                 <span className="min-w-0 truncate">{next.title}</span>
                 <ArrowRight className="size-4 shrink-0" aria-hidden />
               </Link>

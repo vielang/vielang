@@ -4,7 +4,7 @@ import { useSyncExternalStore } from "react";
 import Link from "next/link";
 import { BookOpen, ChevronRight, Clock } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
-import { courseLessons, courseMinutes, courseProgressId, type Course } from "@/lib/courses";
+import { courseProgressId, type CourseCard } from "@/lib/courses";
 import { getBookProgress, useProgressStore } from "@/lib/progress-store";
 
 const NO_SUBSCRIBE = () => () => {};
@@ -15,14 +15,13 @@ const NO_SUBSCRIBE = () => () => {};
  * Tiến độ dùng chung kho với sách (xem `courseProgressId`) nên được đồng bộ
  * giữa các tab và sao lưu cùng dữ liệu học, khỏi dựng kho thứ hai.
  */
-export function CourseList({ courses }: { courses: Course[] }) {
+export function CourseList({ courses }: { courses: CourseCard[] }) {
   const isClient = useSyncExternalStore(NO_SUBSCRIBE, () => true, () => false);
   const progressByBook = useProgressStore((s) => s.books);
 
   return (
     <ul className="flex flex-col divide-y divide-border border-y border-border">
       {courses.map((course) => {
-        const lessons = courseLessons(course);
         const done = isClient
           ? getBookProgress(progressByBook, courseProgressId(course.id)).readPages.length
           : 0;
@@ -41,15 +40,15 @@ export function CourseList({ courses }: { courses: Course[] }) {
                 <span className="flex items-center gap-3 text-xs text-muted-foreground tabular-nums">
                   <span className="inline-flex items-center gap-1">
                     <BookOpen className="size-3.5" aria-hidden />
-                    {lessons.length} bài
+                    {course.total} bài
                   </span>
                   <span className="inline-flex items-center gap-1">
                     <Clock className="size-3.5" aria-hidden />
-                    {courseMinutes(course)} phút
+                    {course.minutes} phút
                   </span>
-                  {done > 0 && <span>đã học {done}/{lessons.length}</span>}
+                  {done > 0 && <span>đã học {done}/{course.total}</span>}
                 </span>
-                {done > 0 && <Progress value={(done / lessons.length) * 100} className="h-1" />}
+                {done > 0 && <Progress value={(done / course.total) * 100} className="h-1" />}
               </span>
               <ChevronRight
                 className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5"

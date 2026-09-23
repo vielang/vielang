@@ -1,6 +1,13 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { courseLessons, getCourse, getLesson, listCourses } from "@/lib/courses";
+import {
+  courseLessons,
+  getCourse,
+  getLesson,
+  lessonNeighbours,
+  lessonNumber,
+  listCourses,
+} from "@/lib/courses";
 import { LessonView } from "@/components/it/lesson-view";
 
 // Slug của bài là "<chương>/<bài>" nên route dùng catch-all: một mảng 2 đoạn.
@@ -39,5 +46,18 @@ export default async function LessonPage({
   const hit = await resolve(params);
   if (!hit) notFound();
 
-  return <LessonView course={hit.course} lesson={hit.lesson} />;
+  const { course, lesson } = hit;
+  const { prev, next } = lessonNeighbours(course, lesson.slug);
+
+  return (
+    <LessonView
+      courseId={course.id}
+      courseTitle={course.title}
+      total={courseLessons(course).length}
+      no={lessonNumber(course, lesson.slug)}
+      lesson={lesson}
+      prev={prev}
+      next={next}
+    />
+  );
 }

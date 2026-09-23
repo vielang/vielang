@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
+  courseCard,
   courseLessons,
   courseMinutes,
+  courseOutline,
   courseProgressId,
   getCourse,
   getLesson,
@@ -66,8 +68,8 @@ describe("điều hướng trong khoá", () => {
 
   it("đi xuyên chương theo đúng thứ tự học", () => {
     for (let i = 0; i < lessons.length - 1; i++) {
-      expect(lessonNeighbours(course, lessons[i].slug).next).toBe(lessons[i + 1]);
-      expect(lessonNeighbours(course, lessons[i + 1].slug).prev).toBe(lessons[i]);
+      expect(lessonNeighbours(course, lessons[i].slug).next?.slug).toBe(lessons[i + 1].slug);
+      expect(lessonNeighbours(course, lessons[i + 1].slug).prev?.slug).toBe(lessons[i].slug);
     }
   });
 
@@ -82,6 +84,30 @@ describe("điều hướng trong khoá", () => {
 
   it("tổng thời gian đọc là tổng các bài", () => {
     expect(courseMinutes(course)).toBe(lessons.reduce((n, l) => n + l.minutes, 0));
+  });
+});
+
+describe("bản rút gọn cho phía client", () => {
+  const course = courses[0];
+
+  it("mục lục không mang theo nội dung bài", () => {
+    const outline = courseOutline(course);
+    // Props của client component bị đóng gói gửi về trình duyệt: lọt `html`
+    // vào đây là trang mục lục tải cả khoá chỉ để vẽ danh sách tiêu đề.
+    expect(JSON.stringify(outline)).not.toContain("<p>");
+    expect(JSON.stringify(courseCard(course))).not.toContain("<p>");
+  });
+
+  it("đánh số bài liên tục xuyên các chương", () => {
+    const nos = courseOutline(course).modules.flatMap((m) => m.lessons.map((l) => l.no));
+    expect(nos).toEqual(nos.map((_, i) => i + 1));
+  });
+
+  it("giữ đúng tổng số bài và tổng thời gian", () => {
+    const outline = courseOutline(course);
+    expect(outline.total).toBe(courseLessons(course).length);
+    expect(outline.minutes).toBe(courseMinutes(course));
+    expect(courseCard(course)).toMatchObject({ id: course.id, total: outline.total });
   });
 });
 

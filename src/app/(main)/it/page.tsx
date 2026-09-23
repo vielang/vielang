@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Code2 } from "lucide-react";
-import { listCourses } from "@/lib/courses";
+import { courseCard, listCourses } from "@/lib/courses";
 import { CourseList } from "@/components/it/course-list";
 import { TrackNav } from "@/components/layout/track-nav";
 
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
  * SQL/Oracle → DSA → kiến trúc. Route tĩnh `/it` nên nó thắng `[lang]`.
  */
 export default function ItLibraryPage() {
-  const courses = listCourses();
+  const courses = listCourses().map(courseCard);
 
   return (
     <div className="flex flex-col gap-8">

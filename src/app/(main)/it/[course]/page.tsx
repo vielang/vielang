@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getCourse, listCourses } from "@/lib/courses";
+import { courseOutline, getCourse, listCourses } from "@/lib/courses";
 import { CourseOverview } from "@/components/it/course-overview";
 
 export function generateStaticParams() {
@@ -24,5 +24,5 @@ export default async function CoursePage({ params }: { params: Promise<{ course:
   const found = getCourse(course);
   if (!found) notFound();
 
-  return <CourseOverview course={found} />;
+  return <CourseOverview course={courseOutline(found)} />;
 }

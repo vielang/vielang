@@ -51,8 +51,9 @@ if (value is not string text)
     return;   // text dùng được ở phần còn lại
 ```
 
-Biến `c` chỉ tồn tại khi phép kiểm tra đúng. Không còn cảnh ép kiểu hai lần,
-cũng không còn chỗ để ép nhầm kiểu.
+Biến `c` chỉ tồn tại khi phép kiểm tra đúng.
+
+Không còn cảnh ép kiểu hai lần. Cũng không còn chỗ để ép nhầm kiểu.
 
 ## Thử ngay: property pattern tự xử lý null
 
@@ -142,8 +143,9 @@ var description = parts switch
 `..` là **slice pattern**, nghĩa là "còn lại bao nhiêu cũng được". Rất hợp khi
 phân tích dòng log hay lệnh dạng chuỗi.
 
-Thứ tự các nhánh quan trọng. Nhánh nào khớp trước thì thắng, nên đặt pattern
-cụ thể lên trên.
+Thứ tự các nhánh quan trọng. Nhánh nào khớp trước thì thắng.
+
+Nên đặt pattern cụ thể lên trên, pattern rộng xuống dưới.
 
 ## Kết hợp với record: thay cả cây if
 
@@ -196,8 +198,8 @@ chỗ, và nói đúng tên kiểu còn thiếu.
 
 Hết chương **Kiểu và bộ nhớ**. Bạn đã biết chọn kiểu và xử lý chúng gọn gàng.
 
-Chương sau, **Collection và LINQ**, mở bằng một trang đồng bộ chạy 40 mili
-giây ở máy dev. Với dữ liệu thật, nó mất gần một phút.
+Chương sau, **Collection và LINQ**, mở bằng một trang đồng bộ chạy 40 mili giây
+ở máy dev. Với 200.000 bản ghi thật, nó mất gần một phút.
 
 ```quiz
 [

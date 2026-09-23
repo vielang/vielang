@@ -5,16 +5,19 @@ minutes: 11
 
 Trang đồng bộ danh sách khách hàng chạy 40 mili giây trên máy dev.
 
-Khách hàng thật có 20.000 bản ghi. Nó chạy gần một phút. Code không sai chỗ
+Khách hàng thật có 200.000 bản ghi. Nó chạy gần một phút. Code không sai chỗ
 nào — chỉ là bên trong vòng lặp có một câu `list.Contains(x)`.
 
 > **Học xong bài này bạn sẽ:** chọn đúng collection cho từng việc; biết thao
-> tác nào tức thì và thao tác nào tốn thời gian theo số phần tử; lộ dữ liệu ra
-> ngoài mà không cho người khác sửa ruột object của bạn.
+> tác nào tức thì và thao tác nào tốn thời gian theo số phần tử; cho bên ngoài
+> đọc dữ liệu của mình mà không cho ai sửa ruột object.
 >
 > **Cần biết trước:** `List<T>`, vòng lặp `foreach`.
 
 ## Mỗi collection sinh ra cho một việc
+
+Năm việc dưới đây chiếm gần hết code hằng ngày. Đọc theo cột đầu, đừng đọc
+theo tên kiểu.
 
 | Việc cần làm | Dùng | Chi phí |
 |---|---|---|
@@ -31,6 +34,8 @@ Big-O sẽ nói kỹ ở khoá DSA.
 thành O(n²), và đó là lúc 40 mili giây biến thành một phút.
 
 ## Thử ngay: cùng một việc, hai cấu trúc
+
+Chênh lệch giữa hai dòng cuối bảng lớn tới mức nào? Đo thử.
 
 ```csharp
 using System.Diagnostics;
@@ -87,6 +92,9 @@ foreach (var code in newCodes)
 
 ## Array cố định, List&lt;T&gt; co giãn được
 
+Trang đồng bộ ở trên dùng `List`. Trước khi tin `List` mọi lúc, hãy xem nó khác
+array chỗ nào.
+
 ```csharp
 int[] scores = new int[3];         // cố định 3 phần tử
 string[] names = { "Huy", "Nam" };
@@ -102,6 +110,8 @@ Bên trong `List<T>` vẫn là một mảng, tự cấp phát lại khi đầy. 
 là tức thì. Tìm theo giá trị thì phải duyệt.
 
 ## Dictionary: tra theo khoá
+
+Cùng trang đó còn phải tra giá theo mã sản phẩm. Đúng việc của `Dictionary`.
 
 ```csharp
 var prices = new Dictionary<string, decimal>
@@ -121,6 +131,9 @@ Luôn dùng `TryGetValue` thay vì `ContainsKey` rồi mới lấy. Một lần 
 hai lần, mà code cũng ngắn hơn.
 
 ## HashSet hỏi tồn tại, Queue và Stack xếp hàng
+
+`HashSet` vừa cứu vòng lặp ở trên. Nó còn một mẹo nữa, và hai người họ hàng
+gần.
 
 ```csharp
 var processed = new HashSet<int>();
@@ -145,6 +158,8 @@ dòng, không cần kiểm tra riêng.
 
 ## Lộ ra ngoài thì dùng interface
 
+Chọn xong chỗ chứa dữ liệu thì còn câu hỏi cuối: cho ai nhìn thấy nó.
+
 ```csharp
 private readonly List<Order> _items = new();
 
@@ -157,7 +172,7 @@ public IEnumerable<Order> Pending() =>
 Trả về `List<T>` là cho người gọi quyền `Add` và `Remove` vào ruột object của
 bạn. Trả `IReadOnlyList<T>` thì họ chỉ đọc được.
 
-Bạn cũng được lợi. Đổi cấu trúc lưu trữ bên trong sau này mà không phá code
+Bạn cũng được lợi. Sau này đổi cấu trúc lưu trữ bên trong, bạn không phá code
 của ai cả.
 
 ## Dấu hiệu trong code của bạn
@@ -185,7 +200,7 @@ thấy câu truy vấn nặng nhất chạy ba lần, dù code chỉ viết nó 
 ```quiz
 [
   {
-    "prompt": "Đoạn này chạy rất chậm khi oldCodes có 20.000 phần tử. Sửa thế nào cho nhanh nhất?",
+    "prompt": "Đoạn này chậm hẳn khi oldCodes có 200.000 phần tử. Sửa thế nào cho nhanh nhất?",
     "code": "var existing = new List<string>(oldCodes);\n\nforeach (var code in newCodes)\n    if (!existing.Contains(code))\n        Add(code);",
     "options": [
       "Đổi foreach thành for",

@@ -17,6 +17,9 @@ Mà trong code chỉ có đúng một vòng `foreach`.
 
 ## IQueryable chạy ở database, IEnumerable chạy trong bộ nhớ
 
+Hai mươi mốt câu SQL cho một vòng `foreach`. Muốn hiểu vì sao, phải biết mình
+đang cầm kiểu nào.
+
 ```csharp
 // lọc TRONG BỘ NHỚ — kéo cả bảng về trước
 IEnumerable<Order> a = db.Orders
@@ -37,7 +40,10 @@ IQueryable<Order> b = db.Orders
 Nhìn code thì hai dòng gần như giống hệt, khác đúng một chữ `AsEnumerable`.
 
 Nhưng chữ ấy là ranh giới. Trước nó, câu lệnh mới là bản thiết kế chờ gửi cho
-database. Sau nó, dữ liệu đã nằm trong RAM máy chủ ứng dụng của bạn.
+database.
+
+Sau nó, mọi phép lọc là phép của C#. Nên tới lúc có người duyệt, cả bảng phải
+về bộ nhớ máy chủ ứng dụng trước đã.
 
 Với bảng vài chục dòng thì không ai thấy khác biệt. Với bảng vài triệu dòng
 thì một bên trả về trong mili giây, một bên làm sập service.
@@ -121,6 +127,8 @@ Hai mươi mốt câu vừa rút về một.
 
 ## Mọi phép trước ToListAsync gộp thành một câu SQL
 
+Sửa được N + 1 rồi, còn một câu hỏi nữa: chốt truy vấn ở chỗ nào.
+
 ```csharp
 var top = await db.Orders
     .Where(o => o.IsPaid)          // vào SQL
@@ -148,6 +156,9 @@ chốt.
 
 ## Không phải hàm nào cũng dịch được
 
+EF Core dịch được `Where` và `OrderBy`. Nhưng nó không dịch được method của
+bạn.
+
 ```csharp
 var q = db.Orders.Where(o => Score(o) > 10);
 ```
@@ -165,7 +176,10 @@ var candidates = await db.Orders
 var result = candidates.Where(o => Score(o) > 10);
 ```
 
-## Truy vấn chỉ để đọc, và đếm
+## Truy vấn chỉ để hiển thị thì bỏ phần theo dõi thay đổi
+
+Còn hai thói quen nhỏ, và cả hai đều giúp truy vấn nhẹ đi mà không phải viết
+thêm gì.
 
 ```csharp
 var rows = await db.Orders
@@ -177,8 +191,10 @@ bool exists = await db.Orders.AnyAsync(o => o.Id == id);
 int paid = await db.Orders.CountAsync(o => o.IsPaid);
 ```
 
-Mặc định EF Core ghi nhớ mọi thực thể đã tải để phát hiện thay đổi khi lưu.
-Truy vấn chỉ để hiển thị thì đâu cần phần ghi nhớ ấy.
+Mặc định EF Core **theo dõi** mọi thực thể đã tải, để phát hiện thay đổi khi
+lưu. `AsNoTracking` chính là tắt phần theo dõi đó.
+
+Truy vấn chỉ để hiển thị thì đâu cần theo dõi gì.
 
 Và đừng `ToListAsync()` rồi mới `.Count`. Đó là kéo cả tập về chỉ để đếm.
 

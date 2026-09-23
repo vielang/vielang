@@ -16,6 +16,9 @@ một lần. Không ai gọi nhầm. Đó là cách `IEnumerable<T>` hoạt đ�
 
 ## Truy vấn LINQ là lời hứa, không phải dữ liệu
 
+Ba lần chạy cho một câu truy vấn nghe như bug. Nó không phải bug, và lý do nằm
+ở dòng đầu tiên.
+
 ```csharp
 var pending = orders.Where(o => o.IsPending);
 // Tới đây CHƯA đơn nào được kiểm tra
@@ -36,6 +39,8 @@ Cơ chế này gọi là **deferred execution**, hoãn thực thi.
 Mỗi lần hỏi là một lần chạy lại từ đầu.
 
 ## Thử ngay: nhìn tận mắt lúc nó chạy
+
+Đọc bảng thì dễ tin, còn nhìn thứ tự in ra thì mới nhớ được.
 
 ```bash
 dotnet new console -o ThuLinq
@@ -80,14 +85,17 @@ Viết xong truy vấn.
 
 </details>
 
-Ba điều đọc được từ đây:
+Ba điều đọc được từ đây.
 
 - "Viết xong truy vấn" in ra **trước** mọi dòng "xét": lúc viết truy vấn, không có gì chạy.
 - `Count()` duyệt **cả bốn** phần tử.
 - `First()` duyệt **lại từ đầu**, nhưng dừng ngay khi tìm thấy — cũng là lý do `Any()` nhanh hơn `Count() > 0`.
 
-Giờ thêm `.ToList()` vào cuối `numbers.Where(...)` rồi chạy lại: bốn dòng "xét" in
-đúng một lần, `Count` và `First` không sinh thêm dòng nào nữa.
+Giờ thêm `.ToList()` vào cuối `numbers.Where(...)` rồi chạy lại. Bốn dòng "xét"
+in đúng một lần, và in **trước** dòng "Viết xong truy vấn" — vì `ToList()` chạy
+ngay tại chỗ. Sau đó `Count` với `First` không sinh thêm dòng nào nữa.
+
+Vẽ ra thì thấy ngay vì sao một truy vấn lại chạy hai lần.
 
 ```mermaid Truy vấn chỉ chạy khi có người duyệt, và chạy lại mỗi lần
 flowchart TD
@@ -97,6 +105,9 @@ flowchart TD
     C --> E["Duyệt nguồn lần 1"]
     D --> F["Duyệt nguồn lần 2"]
 ```
+
+Hai mũi tên đi xuống từ cùng một chỗ, và đó là hai lần duyệt nguồn chứ không
+phải một.
 
 ## Bẫy 1: duyệt nhiều lần là chạy nhiều lần
 
@@ -132,6 +143,8 @@ Mỗi câu SQL ấy mất chừng hai giây rưỡi trên bảng thật. Nhân b
 
 ## Bẫy 2: nguồn đổi thì kết quả đổi theo
 
+Truy vấn không giữ dữ liệu, vậy thì nó đang giữ cái gì?
+
 ```csharp
 var list = new List<int> { 1, 2, 3 };
 var evens = list.Where(n => n % 2 == 0);
@@ -142,10 +155,14 @@ list.Add(4);
 Console.WriteLine(string.Join(",", evens));
 ```
 
-Truy vấn giữ **tham chiếu tới nguồn**, không giữ bản sao. Rất khó lần ra khi
-`evens` được truyền qua vài tầng rồi mới có người sửa `list`.
+Truy vấn giữ **tham chiếu tới nguồn**, không giữ bản sao.
+
+Bẫy này khó lần ra. Bạn trả `evens` qua vài tầng, rồi ở tầng nào đó có người
+thêm phần tử vào `list`.
 
 ## Bẫy 3: exception nổ ở chỗ không ngờ
+
+Hoãn thực thi còn đổi cả chỗ mà lỗi xuất hiện trong stack trace.
 
 ```csharp
 var contents = files.Select(f => File.ReadAllText(f));
@@ -155,7 +172,7 @@ var texts = contents.ToList();           // nổ Ở ĐÂY
 ```
 
 Stack trace khi đó trông như dưới đây. Chỗ ném lỗi là `ToList()`. Còn dòng
-`Select` viết sai thì không hề xuất hiện:
+`Select` viết sai thì không hề xuất hiện.
 
 ```text
 Unhandled exception. System.IO.FileNotFoundException:
@@ -167,12 +184,12 @@ Unhandled exception. System.IO.FileNotFoundException:
    at Program.Main()
 ```
 
-Thấy `SelectEnumerableIterator` và `MoveNext` trong stack trace là dấu hiệu:
-lỗi xảy ra lúc **duyệt**, hãy đi ngược lên tìm chỗ viết truy vấn.
+Thấy `SelectEnumerableIterator` và `MoveNext` trong stack trace là một dấu
+hiệu. Lỗi xảy ra lúc **duyệt**, nên hãy đi ngược lên tìm chỗ viết truy vấn.
 
-## Mặt tốt của sự lười biếng
+## Hoãn thực thi cho phép đọc file lớn hơn cả bộ nhớ
 
-Hoãn thực thi không chỉ toàn bẫy. Nó cho phép xử lý dữ liệu lớn hơn cả RAM:
+Ba cái bẫy ở trên đều là mặt tối, còn mặt sáng thì đủ lớn để bù lại.
 
 ```csharp
 public IEnumerable<string> ReadLines(string path)
@@ -190,14 +207,14 @@ foreach (var line in ReadLines("nhat-ky.log").Take(10))
     Console.WriteLine(line);
 ```
 
-`yield return` biến method thành nguồn sinh dữ liệu dần. Mỗi lúc chỉ một dòng
-nằm trong bộ nhớ, nên file 10 GB vẫn chạy được.
+`yield return` biến method thành một nguồn sinh dữ liệu dần, mỗi lúc chỉ giữ
+một dòng trong bộ nhớ. Nhờ vậy file 10 GB vẫn chạy được.
 
 Thêm `Take(10)` nữa thì phần còn lại của file **không bao giờ** bị đọc.
 
 ## Dấu hiệu trong code của bạn
 
-Mở project đang làm và tìm bốn thứ này:
+Mở project đang làm và tìm bốn thứ này.
 
 - Một biến `IQueryable`/`IEnumerable` được **dùng lại từ hai lần trở lên** (`.Count()` rồi `.ToList()`, hoặc dùng trong hai nhánh `if`). Mỗi lần dùng là một lần chạy.
 - Method `public` trả về `IEnumerable<T>` mà bên trong lấy dữ liệu từ `DbContext` — người gọi duyệt lúc nào là chuyện của họ, còn connection thì đã đóng.

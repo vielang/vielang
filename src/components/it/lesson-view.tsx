@@ -5,7 +5,14 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight, Check, Clock, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { courseProgressId, lessonHref, type Lesson, type LessonOutline } from "@/lib/courses";
+import { QuizBody } from "@/components/quiz/quiz-body";
+import {
+  courseProgressId,
+  lessonHref,
+  lessonQuizId,
+  type Lesson,
+  type LessonOutline,
+} from "@/lib/courses";
 import { getBookProgress, useProgressStore } from "@/lib/progress-store";
 
 const NO_SUBSCRIBE = () => () => {};
@@ -107,6 +114,15 @@ export function LessonView({
       {/* Nội dung do mình viết trong content/it, dựng sang HTML lúc build —
           không phải dữ liệu người dùng nhập. */}
       <div className={LESSON_PROSE_CLASS} dangerouslySetInnerHTML={{ __html: lesson.html }} />
+
+      {lesson.quiz && (
+        <section
+          aria-label="Câu tự kiểm tra"
+          className="rounded-xl border border-border bg-muted/30 px-4 py-4"
+        >
+          <QuizBody quizId={lessonQuizId(courseId, lesson.slug)} sections={lesson.quiz} />
+        </section>
+      )}
 
       <footer className="flex flex-col gap-4 border-t border-border pt-6">
         <Button

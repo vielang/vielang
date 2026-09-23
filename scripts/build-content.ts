@@ -436,11 +436,27 @@ const lessonSlug = (file: string) => unprefix(file.replace(/\.md$/i, ""));
  * Mục lục trong bài: lấy h2/h3 của HTML vừa dựng và gắn `id` cho chúng để
  * mục lục bấm được. Làm ngay lúc build, phía app không phải đụng vào HTML.
  */
+/** Năm entity mà marked sinh ra khi escape; đủ cho tiêu đề bài học. */
+function decodeEntities(text: string): string {
+  const map: Record<string, string> = {
+    "&lt;": "<",
+    "&gt;": ">",
+    "&quot;": '"',
+    "&#39;": "'",
+    "&amp;": "&",
+  };
+  // &amp; xử lý sau cùng, không thì "&amp;lt;" bị giải mã hai lần.
+  return text.replace(/&(lt|gt|quot|#39);/g, (m) => map[m]).replace(/&amp;/g, "&");
+}
+
 function withHeadingIds(html: string): { html: string; headings: { id: string; text: string; level: 2 | 3 }[] } {
   const headings: { id: string; text: string; level: 2 | 3 }[] = [];
   const used = new Set<string>();
   const out = html.replace(/<h([23])>([\s\S]*?)<\/h\1>/g, (_all, lv: string, inner: string) => {
-    const text = inner.replace(/<[^>]+>/g, "").trim();
+    // Bỏ thẻ, rồi GIẢI MÃ entity: tiêu đề kiểu "List<T> — …" ra khỏi marked
+    // dưới dạng `List&lt;T&gt;`, mà mục lục hiển thị chuỗi này như chữ thường
+    // nên người đọc sẽ thấy nguyên cả `&lt;`.
+    const text = decodeEntities(inner.replace(/<[^>]+>/g, "")).trim();
     const base =
       text
         .toLowerCase()
@@ -456,6 +472,83 @@ function withHeadingIds(html: string): { html: string; headings: { id: string; t
     return `<h${lv} id="${id}">${inner}</h${lv}>`;
   });
   return { html: out, headings };
+}
+
+/**
+ * Câu tự kiểm tra cuối bài học IT, viết ngay trong file .md bằng một khối
+ * ```quiz chứa JSON:
+ *
+ *     ```quiz
+ *     [
+ *       { "prompt": "…", "options": ["…", "…"], "answer": 1, "explain": "…" }
+ *     ]
+ *     ```
+ *
+ * Để CHUNG file với bài thay vì một file JSON riêng: người viết bài sửa một
+ * chỗ, và câu hỏi nằm ngay cạnh đoạn nội dung mà nó hỏi.
+ *
+ * Dạng rút gọn (`options` -> choice, `answers` -> fill) rồi mới dựng thành
+ * `QuizItem` đầy đủ — `kind` và `id` suy ra được, bắt người viết gõ tay chỉ
+ * tổ sinh lỗi. Id đánh theo thứ tự (`q1`, `q2`…) và là thứ được lưu vào bài
+ * làm, nên CHÈN câu vào giữa sẽ làm lệch bài làm cũ của bài học đó — thêm
+ * câu mới thì thêm vào cuối.
+ */
+const QUIZ_FENCE = /^```quiz[ \t]*\r?\n([\s\S]*?)^```[ \t]*$/m;
+
+interface RawQuizItem {
+  prompt?: string;
+  options?: string[];
+  answers?: string[];
+  explain?: string;
+}
+
+function buildLessonQuiz(at: string, body: string): { body: string; quiz?: QuizSection[] } {
+  const m = QUIZ_FENCE.exec(body);
+  if (!m) return { body };
+
+  let raw: unknown;
+  try {
+    raw = JSON.parse(m[1]);
+  } catch (err) {
+    throw new Error(`${at}: khối "quiz" không phải JSON hợp lệ — ${(err as Error).message}`);
+  }
+  if (!Array.isArray(raw) || raw.length === 0) {
+    throw new Error(`${at}: khối "quiz" phải là một mảng câu hỏi, không rỗng`);
+  }
+
+  const items: QuizItem[] = raw.map((entry, i) => {
+    const q = entry as RawQuizItem;
+    const id = `q${i + 1}`;
+    const where = `${at} câu ${i + 1}`;
+    const base = { id, prompt: q.prompt ?? "", ...(q.explain ? { explain: q.explain } : {}) };
+
+    if (q.options) {
+      // `answer` viết theo cách người ta đánh số câu trắc nghiệm: 1 là phương
+      // án đầu. Bên trong vẫn là chỉ số từ 0 như `ChoiceItem` quy định.
+      const answer = Number((entry as { answer?: number }).answer);
+      if (!Number.isInteger(answer) || answer < 1 || answer > q.options.length) {
+        throw new Error(
+          `${where}: "answer" = ${answer} nằm ngoài "options" (1..${q.options.length})`
+        );
+      }
+      const item: QuizItem = { ...base, kind: "choice", options: q.options, answer: answer - 1 };
+      validateItem(where, item);
+      return item;
+    }
+    if (q.answers) {
+      const item: QuizItem = { ...base, kind: "fill", answers: q.answers };
+      validateItem(where, item);
+      return item;
+    }
+    throw new Error(`${where}: cần "options" (trắc nghiệm) hoặc "answers" (điền)`);
+  });
+
+  return {
+    // Cắt khối quiz khỏi phần nội dung: nó được vẽ bằng component, không phải
+    // bằng HTML của bài.
+    body: body.replace(QUIZ_FENCE, "").trimEnd(),
+    quiz: [{ title: "Tự kiểm tra", items }],
+  };
 }
 
 /** Thời gian đọc ước lượng: ~180 từ/phút, code tính gấp đôi thời gian. */
@@ -501,20 +594,98 @@ const LANG_ALIASES: Record<string, string> = {
 };
 
 type CodeHighlighter = Awaited<ReturnType<typeof import("shiki").createHighlighter>>;
+type MermaidRenderer = typeof import("beautiful-mermaid").renderMermaidSVG;
+
+/**
+ * Sơ đồ trong bài học, viết bằng cú pháp Mermaid:
+ *
+ *     ```mermaid Vòng đời của một truy vấn LINQ
+ *     flowchart TD
+ *         A[...] --> B[...]
+ *     ```
+ *
+ * Phần chữ sau "mermaid" là CHÚ THÍCH, hiện dưới sơ đồ và cũng là phần mô tả
+ * cho người dùng trình đọc màn hình.
+ *
+ * Vẽ LÚC BUILD thành SVG: trang không phải tải thư viện vẽ nào (mermaid thật
+ * nặng 300–800 KB gzip và chỉ chạy được trong trình duyệt). Dùng
+ * `beautiful-mermaid` — bản viết lại thuần TypeScript, chạy thẳng trong Node,
+ * không cần Chromium, nên `next build` trên máy chủ dựng vẫn chạy bình thường.
+ *
+ * Màu truyền vào là BIẾN CSS chứ không phải mã màu, nên sơ đồ tự đổi theo chế
+ * độ sáng/tối mà không cần vẽ lại — cùng cách đang làm cho code.
+ *
+ * Tên biến phải là `--diagram-*` riêng, KHÔNG dùng thẳng token của app: thư
+ * viện ghi các biến này lên chính thẻ svg, nên `--border: var(--border)` sẽ
+ * tự tham chiếu vòng và hỏng, còn `--surface: var(--muted)` sẽ ăn nhầm giá
+ * trị `--muted` vừa bị ghi đè ngay trên thẻ đó. Ánh xạ sang token thật nằm ở
+ * globals.css.
+ */
+const DIAGRAM_COLORS = {
+  bg: "var(--diagram-bg)",
+  fg: "var(--diagram-fg)",
+  line: "var(--diagram-line)",
+  border: "var(--diagram-line)",
+  muted: "var(--diagram-muted)",
+  surface: "var(--diagram-surface)",
+  accent: "var(--diagram-accent)",
+  transparent: true,
+} as const;
+
+const escapeHtml = (text: string) =>
+  text.replace(
+    /[&<>"']/g,
+    (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!
+  );
+
+function renderDiagram(
+  render: MermaidRenderer,
+  at: string,
+  source: string,
+  caption: string
+): string {
+  let svg: string;
+  try {
+    svg = render(source, DIAGRAM_COLORS);
+  } catch (err) {
+    throw new Error(`${at}: sơ đồ mermaid không vẽ được — ${(err as Error).message}`);
+  }
+
+  const title = caption || "Sơ đồ minh hoạ";
+  svg = svg
+    // Thư viện nhúng sẵn một @import tới Google Fonts. App đã có font riêng,
+    // còn đây sẽ là một request ra ngoài trên mỗi trang có sơ đồ — bỏ.
+    .replace(/@import url\([^)]*\);/g, "")
+    .replace(/font-family:[^;]+;/, "font-family: inherit;")
+    // Trình đọc màn hình chỉ thấy một khối đồ hoạ; cho nó cái tên.
+    .replace(/^<svg /, `<svg role="img" aria-label="${escapeHtml(title)}" `);
+
+  return (
+    `<figure class="lesson-diagram">${svg}` +
+    (caption ? `<figcaption>${escapeHtml(caption)}</figcaption>` : "") +
+    `</figure>`
+  );
+}
 
 /**
  * Renderer code của marked cho bài học IT. Ngôn ngữ lạ (hoặc khối không ghi
  * ngôn ngữ) rơi về `text`: vẫn ra đúng khung code, chỉ là không có màu —
  * tốt hơn là làm hỏng cả lần build.
  */
-function lessonMarkdown(highlighter: CodeHighlighter) {
+function lessonMarkdown(highlighter: CodeHighlighter, render: MermaidRenderer, at: string) {
   const loaded = new Set(highlighter.getLoadedLanguages());
   return new Marked(
     { gfm: true, breaks: false, async: false },
     {
       renderer: {
         code({ text, lang }) {
-          const name = (lang ?? "").trim().toLowerCase();
+          const info = (lang ?? "").trim();
+          // "mermaid Chú thích của sơ đồ" — chữ sau tên ngôn ngữ là chú thích.
+          const space = info.indexOf(" ");
+          const name = (space > 0 ? info.slice(0, space) : info).toLowerCase();
+          if (name === "mermaid") {
+            return renderDiagram(render, at, text, space > 0 ? info.slice(space + 1).trim() : "");
+          }
           const resolved = LANG_ALIASES[name] ?? name;
           return highlighter.codeToHtml(text, {
             lang: loaded.has(resolved) ? resolved : "text",
@@ -532,11 +703,11 @@ async function buildCourses(): Promise<number> {
   // import động: chỉ khoá học mới cần Shiki, các phần nội dung khác build
   // xong từ lâu trước khi nó kịp nạp grammar.
   const { createHighlighter } = await import("shiki");
+  const { renderMermaidSVG } = await import("beautiful-mermaid");
   const highlighter = await createHighlighter({
     themes: Object.values(CODE_THEMES),
     langs: CODE_LANGS,
   });
-  const lessonMarked = lessonMarkdown(highlighter);
   const courses = [];
   for (const courseDir of (await readdir(IT_ROOT)).sort()) {
     const courseRoot = path.join(IT_ROOT, courseDir);
@@ -550,7 +721,12 @@ async function buildCourses(): Promise<number> {
       const lessons = [];
       for (const file of (await readdir(moduleRoot)).sort()) {
         if (!file.endsWith(".md") || file === "_module.md") continue;
-        const { meta, body } = frontMatter(await readFile(path.join(moduleRoot, file), "utf8"));
+        const raw = frontMatter(await readFile(path.join(moduleRoot, file), "utf8"));
+        const { meta } = raw;
+        const at = `${courseDir}/${moduleDir}/${file}`;
+        const { body, quiz } = buildLessonQuiz(at, raw.body);
+        // Marked dựng riêng cho từng bài để báo lỗi sơ đồ kèm tên file.
+        const lessonMarked = lessonMarkdown(highlighter, renderMermaidSVG, at);
         const { html, headings } = withHeadingIds((lessonMarked.parse(body) as string).trim());
         lessons.push({
           slug: `${unprefix(moduleDir)}/${lessonSlug(file)}`,
@@ -558,6 +734,7 @@ async function buildCourses(): Promise<number> {
           minutes: Number(meta.minutes) || readingMinutes(body),
           html,
           headings,
+          ...(quiz ? { quiz } : {}),
         });
       }
       if (lessons.length === 0) continue;

@@ -211,3 +211,59 @@
   color: var(--shiki-dark);
   background-color: var(--shiki-dark-bg);
 }
+
+/*
+ * Câu tự kiểm tra cuối bài học IT — viết bằng thẻ details trong Markdown để
+ * đáp án ẩn đi, người học tự nghĩ trước rồi mới mở. Trình duyệt lo phần
+ * đóng/mở, ở đây chỉ cho nó ra dáng một thẻ câu hỏi thay vì đoạn văn trần.
+ */
+.prose details {
+  @apply my-4 rounded-xl border border-border bg-muted/30 px-4 py-3;
+}
+
+.prose details > summary {
+  @apply cursor-pointer font-medium;
+}
+
+.prose details > summary:hover {
+  @apply text-foreground;
+}
+
+/* Phần đáp án: sát ngay dưới câu hỏi, không cần khoảng trống của prose. */
+.prose details > *:not(summary):first-of-type {
+  margin-top: 0.75rem;
+}
+
+.prose details > *:last-child {
+  margin-bottom: 0;
+}
+
+/*
+ * Sơ đồ trong bài học IT — SVG vẽ sẵn lúc build (xem scripts/build-content).
+ * Màu đã là biến của app nên sáng/tối tự theo; ở đây chỉ lo phần khuôn khổ.
+ *
+ * SVG mang sẵn width/height thật của nó, để nguyên thì điện thoại tràn ngang.
+ * Ép co theo bề ngang và giữ tỉ lệ; sơ đồ nào vẫn quá rộng thì cuộn ngang
+ * trong khung riêng, không đẩy cả trang.
+ */
+.prose .lesson-diagram {
+  @apply my-6 overflow-x-auto;
+
+  /* Ánh xạ sang token của app. Đặt ở ĐÂY chứ không nhúng thẳng token vào SVG
+     lúc build: thư viện ghi các biến của nó lên chính thẻ svg, nên dùng trùng
+     tên (--border, --muted) là tự tham chiếu vòng. */
+  --diagram-bg: var(--background);
+  --diagram-fg: var(--foreground);
+  --diagram-line: var(--border);
+  --diagram-surface: var(--muted);
+  --diagram-muted: var(--muted-foreground);
+  --diagram-accent: var(--primary);
+}
+
+.prose .lesson-diagram svg {
+  @apply mx-auto h-auto max-w-full;
+}
+
+.prose .lesson-diagram figcaption {
+  @apply mt-2 text-center text-xs text-muted-foreground;
+}

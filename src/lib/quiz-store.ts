@@ -3,9 +3,8 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { syncAcrossTabs } from "@/lib/cross-tab-sync";
-import { noteKey } from "@/lib/note-store";
 
-/** Bài làm của người dùng cho 1 trang. */
+/** Bài làm của người dùng cho 1 bài tập (1 trang sách, hoặc 1 bài học IT). */
 export interface PageAnswers {
   /** id câu hỏi -> lựa chọn (chỉ số) hoặc chữ đã gõ. */
   answers: Record<string, string | number>;
@@ -14,18 +13,22 @@ export interface PageAnswers {
 }
 
 interface QuizState {
-  /** key = `${bookId}:${page}` (dùng chung `noteKey`). */
+  /**
+   * Khoá là một CHUỖI MỜ do nơi gọi đặt, store không hiểu và không tách nó ra:
+   *
+   * - trang sách: `${bookId}:${page}` (xem `noteKey`) — định dạng này có từ
+   *   đầu và phải giữ nguyên, người dùng đã có bài làm lưu trong máy.
+   * - bài học IT: `it:<khoá>/<bài>` (xem `lessonQuizId`).
+   *
+   * Tên field vẫn là `pages` vì đây chính là dữ liệu đã nằm trong
+   * localStorage; đổi tên là mất bài làm cũ của mọi người.
+   */
   pages: Record<string, PageAnswers>;
   hasHydrated: boolean;
   setHasHydrated: (v: boolean) => void;
-  setAnswer: (
-    bookId: string,
-    page: number,
-    questionId: string,
-    value: string | number
-  ) => void;
-  markChecked: (bookId: string, page: number, questionId: string) => void;
-  resetPage: (bookId: string, page: number) => void;
+  setAnswer: (quizId: string, questionId: string, value: string | number) => void;
+  markChecked: (quizId: string, questionId: string) => void;
+  resetQuiz: (quizId: string) => void;
 }
 
 const EMPTY: PageAnswers = { answers: {}, checked: [] };
@@ -45,14 +48,13 @@ export const useQuizStore = create<QuizState>()(
       hasHydrated: false,
       setHasHydrated: (v) => set({ hasHydrated: v }),
 
-      setAnswer: (bookId, page, questionId, value) =>
+      setAnswer: (quizId, questionId, value) =>
         set((state) => {
-          const key = noteKey(bookId, page);
-          const prev = state.pages[key] ?? EMPTY;
+          const prev = state.pages[quizId] ?? EMPTY;
           return {
             pages: {
               ...state.pages,
-              [key]: {
+              [quizId]: {
                 ...prev,
                 answers: { ...prev.answers, [questionId]: value },
                 // Sửa đáp án thì bỏ dấu "đã chấm" của chính câu đó — nếu
@@ -63,25 +65,23 @@ export const useQuizStore = create<QuizState>()(
           };
         }),
 
-      markChecked: (bookId, page, questionId) =>
+      markChecked: (quizId, questionId) =>
         set((state) => {
-          const key = noteKey(bookId, page);
-          const prev = state.pages[key] ?? EMPTY;
+          const prev = state.pages[quizId] ?? EMPTY;
           if (prev.checked.includes(questionId)) return state;
           return {
             pages: {
               ...state.pages,
-              [key]: { ...prev, checked: [...prev.checked, questionId] },
+              [quizId]: { ...prev, checked: [...prev.checked, questionId] },
             },
           };
         }),
 
-      resetPage: (bookId, page) =>
+      resetQuiz: (quizId) =>
         set((state) => {
-          const key = noteKey(bookId, page);
-          if (!(key in state.pages)) return state;
+          if (!(quizId in state.pages)) return state;
           const pages = { ...state.pages };
-          delete pages[key];
+          delete pages[quizId];
           return { pages };
         }),
     }),
@@ -99,7 +99,7 @@ export const useQuizStore = create<QuizState>()(
 // ghi — xem `cross-tab-sync`.
 syncAcrossTabs(useQuizStore);
 
-/** Bài làm của 1 trang; luôn trả về object hợp lệ để component khỏi phải kiểm. */
-export function usePageAnswers(bookId: string, page: number): PageAnswers {
-  return useQuizStore((s) => s.pages[noteKey(bookId, page)]) ?? EMPTY;
+/** Bài làm của 1 bài tập; luôn trả về object hợp lệ để component khỏi phải kiểm. */
+export function useQuizAnswers(quizId: string): PageAnswers {
+  return useQuizStore((s) => s.pages[quizId]) ?? EMPTY;
 }

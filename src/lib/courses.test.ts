@@ -47,6 +47,18 @@ describe("dữ liệu khoá học IT", () => {
     }
   });
 
+  it("chữ trong mục lục đã giải mã entity", () => {
+    for (const course of courses) {
+      for (const lesson of courseLessons(course)) {
+        for (const h of lesson.headings) {
+          // Tiêu đề "List<T> — …" ra khỏi marked dưới dạng `List&lt;T&gt;`, mà
+          // mục lục vẽ chuỗi này như chữ thường nên entity sẽ lộ nguyên hình.
+          expect(h.text).not.toMatch(/&(lt|gt|quot|amp|#39);/);
+        }
+      }
+    }
+  });
+
   it("tra được khoá và bài theo slug", () => {
     const course = courses[0];
     expect(getCourse(course.id)).toBe(course);
@@ -84,6 +96,46 @@ describe("điều hướng trong khoá", () => {
 
   it("tổng thời gian đọc là tổng các bài", () => {
     expect(courseMinutes(course)).toBe(lessons.reduce((n, l) => n + l.minutes, 0));
+  });
+});
+
+describe("sơ đồ trong bài học", () => {
+  const withDiagram = courses
+    .flatMap(courseLessons)
+    .filter((l) => l.html.includes("lesson-diagram"));
+
+  it("có bài kèm sơ đồ, và sơ đồ đã là SVG dựng sẵn", () => {
+    expect(withDiagram.length).toBeGreaterThan(0);
+    for (const lesson of withDiagram) {
+      expect(lesson.html).toContain("<svg");
+      // Còn nguyên khối ```mermaid nghĩa là bước dựng đã bỏ sót nó.
+      expect(lesson.html).not.toContain("mermaid</code>");
+    }
+  });
+
+  it("không kéo theo thứ gì từ bên ngoài, không chạy script", () => {
+    for (const lesson of withDiagram) {
+      // Thư viện nhúng sẵn @import tới Google Fonts — phải bị cắt lúc build,
+      // không thì mỗi trang có sơ đồ lại gọi ra một máy chủ khác.
+      expect(lesson.html).not.toContain("@import");
+      expect(lesson.html).not.toContain("fonts.googleapis.com");
+      expect(lesson.html).not.toContain("<script");
+    }
+  });
+
+  it("có chú thích và nhãn cho trình đọc màn hình", () => {
+    for (const lesson of withDiagram) {
+      expect(lesson.html).toMatch(/<svg role="img" aria-label="[^"]+"/);
+      expect(lesson.html).toContain("<figcaption>");
+    }
+  });
+
+  it("màu dùng biến riêng của sơ đồ, không tự tham chiếu vòng", () => {
+    for (const lesson of withDiagram) {
+      expect(lesson.html).toContain("--bg:var(--diagram-bg)");
+      // `--border:var(--border)` là vòng lặp, trình duyệt bỏ qua và sơ đồ mất viền.
+      expect(lesson.html).not.toMatch(/--(border|muted|accent):var\(--\1\)/);
+    }
   });
 });
 

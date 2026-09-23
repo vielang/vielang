@@ -9,6 +9,7 @@
  * Tracing của Next không lần được file đọc qua path dựng động lúc chạy.
  */
 import data from "../../content/it/courses.json";
+import type { QuizSection } from "@/lib/quiz";
 
 export interface LessonHeading {
   /** id của thẻ h2/h3 trong HTML — dùng cho mục lục bên trong bài. */
@@ -26,6 +27,12 @@ export interface Lesson {
   /** Nội dung đã dựng sẵn sang HTML (code đã tô màu lúc build). */
   html: string;
   headings: LessonHeading[];
+  /**
+   * Câu tự kiểm tra cuối bài, viết bằng khối ```quiz trong file .md. Dùng
+   * đúng kiểu dữ liệu của bài tập trong sách nên phần chấm, phần lưu bài làm
+   * và thống kê ở Góc học tập chạy chung một đường.
+   */
+  quiz?: QuizSection[];
 }
 
 export interface CourseModule {
@@ -172,6 +179,18 @@ export function courseMinutes(course: Course): number {
  */
 export function courseProgressId(courseId: string): string {
   return `it:${courseId}`;
+}
+
+/**
+ * Khoá lưu bài làm phần "Tự kiểm tra" của một bài học.
+ *
+ * Kho bài làm (`quiz-store`) dùng chung với bài tập trong sách, mà khoá của
+ * sách là `"<bookId>:<số trang>"`. Tiền tố `it:` cộng với dấu `/` trong slug
+ * khiến khoá của bài học không thể trùng — và các màn hình của sách lọc theo
+ * BOOKS nên chúng bỏ qua mục này.
+ */
+export function lessonQuizId(courseId: string, slug: string): string {
+  return `it:${courseId}/${slug}`;
 }
 
 /** Số thứ tự của bài trong khoá, đếm từ 1 (0 = không tìm thấy). */

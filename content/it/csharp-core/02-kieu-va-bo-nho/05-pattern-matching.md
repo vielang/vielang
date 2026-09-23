@@ -1,12 +1,13 @@
 ---
 title: Pattern matching
-minutes: 10
+minutes: 11
 ---
 
-Bạn mở một file service trong dự án và thấy hai mươi dòng thế này: kiểm tra
-kiểu, ép kiểu, gán vào biến mới, rồi mới dùng được. Cùng một việc đó, C# hiện
-đại viết trong một dòng — và đọc code người khác thì bạn sẽ gặp dạng một dòng
-nhiều hơn hẳn.
+Bạn mở một file service trong dự án và thấy hai mươi dòng lặp đi lặp lại: kiểm
+tra kiểu, ép kiểu, gán vào biến mới, rồi mới dùng được.
+
+Cùng việc đó, C# hiện đại viết trong một dòng. Và khi đọc code người khác, bạn
+sẽ gặp dạng một dòng nhiều hơn hẳn.
 
 > **Học xong bài này bạn sẽ:** đọc được `switch expression` với property
 > pattern trong code thật; thay chuỗi `if` ép kiểu bằng một biểu thức; biết
@@ -14,44 +15,60 @@ nhiều hơn hẳn.
 >
 > **Cần biết trước:** `switch expression`, `record`, `enum`.
 
-## Type pattern
+## Năm loại pattern hay gặp
+
+| Loại | Viết thế nào | Hỏi gì |
+|---|---|---|
+| Type | `x is Order o` | có phải kiểu này không |
+| Property | `{ Total: > 1000 }` | property có giá trị thế nào |
+| Relational | `> 80`, `< 0` | so sánh với một mốc |
+| Logical | `and`, `or`, `not` | ghép các pattern lại |
+| List | `["GET", var path]` | mảng có hình dạng thế nào |
+
+Cả năm dùng được ở hai chỗ. Sau `is`, và trong nhánh của `switch expression`.
+
+## Type pattern gộp kiểm tra với ép kiểu
 
 ```csharp
 // Cách cũ
-if (hinh is HinhTron)
+if (shape is Circle)
 {
-    var tron = (HinhTron)hinh;
-    Console.WriteLine(tron.BanKinh);
+    var circle = (Circle)shape;
+    Console.WriteLine(circle.Radius);
 }
 
-// Pattern matching: kiểm tra và gán một bước
-if (hinh is HinhTron tron2)
-    Console.WriteLine(tron2.BanKinh);
+// Pattern matching: một bước
+if (shape is Circle c)
+    Console.WriteLine(c.Radius);
 
-if (giaTri is not string chu)
-    return;   // chu dùng được ở phần còn lại
+if (value is not string text)
+    return;   // text dùng được ở phần còn lại
 ```
 
-## Thử ngay: property pattern
+Biến `c` chỉ tồn tại khi phép kiểm tra đúng. Không còn cảnh ép kiểu hai lần,
+cũng không còn chỗ để ép nhầm kiểu.
+
+## Thử ngay: property pattern tự xử lý null
 
 ```csharp
-record DiaChi(string ThanhPho);
-record Don(decimal Tong, DiaChi? Noi);
+record Address(string City);
+record Order(decimal Total, Address? ShipTo);
 
-decimal Phi(Don d) => d switch
+decimal Fee(Order o) => o switch
 {
-    { Tong: > 1_000_000 } => 0,
-    { Noi.ThanhPho: "Hà Nội" } => 15_000,
+    { Total: > 1_000_000 } => 0,
+    { ShipTo.City: "Hà Nội" } => 15_000,
     _ => 30_000,
 };
 
-Console.WriteLine(Phi(new Don(2_000_000, null)));
-Console.WriteLine(Phi(new Don(50_000, new("Hà Nội"))));
-Console.WriteLine(Phi(new Don(50_000, null)));
+Console.WriteLine(Fee(new Order(2_000_000, null)));
+var hanoi = new Address("Hà Nội");
+Console.WriteLine(Fee(new Order(50_000, hanoi)));
+Console.WriteLine(Fee(new Order(50_000, null)));
 ```
 
 **Đoán trước khi chạy:** ba dòng in ra gì? Chú ý dòng đầu và dòng cuối có
-`Noi` là `null`.
+`ShipTo` là `null`.
 
 <details>
 <summary>Đoán xong rồi — xem kết quả</summary>
@@ -62,16 +79,18 @@ Console.WriteLine(Phi(new Don(50_000, null)));
 30000
 ```
 
-Không dòng nào ném `NullReferenceException`. Pattern `{ Noi.ThanhPho: … }`
-không khớp khi `Noi` là null — nó **rơi xuống nhánh dưới** thay vì nổ. Đây là
-lý do pattern matching gọn hơn hẳn `if (d.Noi != null && d.Noi.ThanhPho == …)`.
+Không dòng nào ném `NullReferenceException`.
+
+Pattern `{ ShipTo.City: … }` không khớp khi `ShipTo` là null. Nó **rơi xuống
+nhánh dưới** thay vì nổ. Đó là lý do nó gọn hơn hẳn
+`if (o.ShipTo != null && o.ShipTo.City == …)`.
 
 </details>
 
-## Relational và logical pattern
+## Relational và logical pattern gộp nhiều điều kiện
 
 ```csharp
-string XepLoai(int diem) => diem switch
+string Grade(int score) => score switch
 {
     < 0 or > 100 =>
         throw new ArgumentOutOfRangeException(),
@@ -80,77 +99,87 @@ string XepLoai(int diem) => diem switch
     _ => "Trung bình",
 };
 
-bool laSo = c is >= '0' and <= '9';
+bool isDigit = c is >= '0' and <= '9';
 ```
 
 `and`, `or`, `not` ghép các pattern lại. `x is not null` đọc xuôi hơn hẳn
-`x != null`.
+`x != null`, và cũng an toàn hơn nếu kiểu đó nạp chồng toán tử `==`.
 
-## List pattern
+Để ý nhánh đầu. Nó **ném lỗi** ngay trong một biểu thức, và đó là cú pháp
+hợp lệ. Nhờ vậy bạn không phải tách ra một câu `if` riêng phía trên.
+
+## List pattern đọc dữ liệu theo hình dạng
 
 ```csharp
-var phan = dong.Split(':');
+var parts = line.Split(':');
 
-var mota = phan switch
+var description = parts switch
 {
-    ["GET", var p] => $"Đọc {p}",
-    ["POST", var p, ..] => $"Ghi {p}",
+    ["GET", var path] => $"Đọc {path}",
+    ["POST", var path, ..] => $"Ghi {path}",
     [] => "Dòng trống",
     _ => "Không hiểu",
 };
 ```
 
-`..` là **slice pattern**: "còn lại bao nhiêu cũng được". Rất hợp khi phân
-tích dòng log hay lệnh dạng chuỗi.
+`..` là **slice pattern**, nghĩa là "còn lại bao nhiêu cũng được". Rất hợp khi
+phân tích dòng log hay lệnh dạng chuỗi.
 
-## Kết hợp với record
+Thứ tự các nhánh quan trọng. Nhánh nào khớp trước thì thắng, nên đặt pattern
+cụ thể lên trên.
+
+## Kết hợp với record: thay cả cây if
 
 ```csharp
-abstract record ThanhToan;
-record TienMat(decimal So) : ThanhToan;
-record The(decimal So, string Duoi4) : ThanhToan;
-record ChuyenKhoan(decimal So, string Bank) : ThanhToan;
+abstract record Payment;
+record Cash(decimal Amount) : Payment;
+record Card(decimal Amount, string Last4) : Payment;
+record Transfer(decimal Amount, string Bank) : Payment;
 
-string MoTa(ThanhToan t) => t switch
+string Describe(Payment p) => p switch
 {
-    TienMat { So: > 10_000_000 } =>
+    Cash { Amount: > 10_000_000 } =>
         "Tiền mặt, cần xác minh",
-    TienMat m => $"Tiền mặt {m.So:N0}",
-    The (var so, var duoi) =>
-        $"Thẻ ****{duoi}, {so:N0}",
-    ChuyenKhoan c => $"Chuyển khoản qua {c.Bank}",
+    Cash cash => $"Tiền mặt {cash.Amount:N0}",
+    Card (var amount, var last4) =>
+        $"Thẻ ****{last4}, {amount:N0}",
+    Transfer t => $"Chuyển khoản qua {t.Bank}",
 };
 ```
 
-`The (var so, var duoi)` là **positional pattern**, dùng được vì `record` tự
-sinh sẵn `Deconstruct`. Kiểu cha là `abstract record` và các nhánh liệt kê đủ
-thì compiler không còn cảnh báo thiếu nhánh.
+`Card (var amount, var last4)` là **positional pattern**. Nó chạy được vì
+`record` tự sinh sẵn `Deconstruct` cho bạn.
+
+Kiểu cha là `abstract record` và các nhánh liệt kê đủ, nên compiler không còn
+cảnh báo thiếu nhánh. Thêm một loại thanh toán mới, compiler sẽ nhắc bạn ngay
+tại đây.
 
 ## Dấu hiệu trong code của bạn
 
 - Cặp `if (x is T)` rồi `(T)x` ngay dòng dưới → gộp thành `if (x is T t)`.
-- Chuỗi `if` kiểm tra null rồi mới so property (`a != null && a.B == c`) → một property pattern là xong.
+- Chuỗi `if` kiểm tra null rồi mới so property → một property pattern là xong.
 - `switch` dạng câu lệnh mà mỗi nhánh chỉ gán một giá trị → đổi sang `switch expression`.
 - Chuỗi `if` phân loại theo kiểu con của một lớp cha → `switch expression` trên kiểu, và compiler sẽ nhắc khi có kiểu con mới.
 
 ## Ghi nhớ
 
-- `is` vừa kiểm tra kiểu vừa gán biến — không còn ép kiểu hai lần.
+- `is` vừa kiểm tra kiểu vừa gán biến.
 - Pattern lồng tự xử lý null: không khớp thì rơi sang nhánh khác, không ném lỗi.
-- `switch expression` trả về giá trị, mỗi nhánh là một biểu thức, không có `break`.
+- `switch expression` trả về giá trị, mỗi nhánh là một biểu thức.
 - `and`, `or`, `not` ghép pattern; `is not null` là cách viết chuẩn hiện nay.
 
 ## Bước tiếp theo
 
-Hết chương **Kiểu và bộ nhớ**. Chương sau — **Collection và LINQ** — chọn đúng
-cấu trúc dữ liệu cho từng việc, rồi xử lý chúng bằng LINQ; `switch expression`
-và record vừa học sẽ đi cùng bạn suốt phần đó.
+Hết chương **Kiểu và bộ nhớ**. Bạn đã biết chọn kiểu và xử lý chúng gọn gàng.
+
+Chương sau, **Collection và LINQ**, mở bằng một trang đồng bộ chạy 40 mili
+giây ở máy dev. Với dữ liệu thật, nó mất gần một phút.
 
 ```quiz
 [
   {
-    "prompt": "Đoạn này in ra gì khi d.Noi là null?",
-    "code": "decimal Phi(Don d) => d switch\n{\n    { Noi.ThanhPho: \"Hà Nội\" } => 15_000,\n    _ => 30_000,\n};",
+    "prompt": "Đoạn này in ra gì khi o.ShipTo là null?",
+    "code": "decimal Fee(Order o) => o switch\n{\n    { ShipTo.City: \"Hà Nội\" } => 15_000,\n    _ => 30_000,\n};",
     "options": [
       "Ném NullReferenceException",
       "15000",
@@ -162,15 +191,15 @@ và record vừa học sẽ đi cùng bạn suốt phần đó.
   },
   {
     "prompt": "Cách viết nào thay được hai dòng kiểm tra kiểu rồi ép kiểu?",
-    "code": "if (hinh is HinhTron)\n{\n    var t = (HinhTron)hinh;\n}",
+    "code": "if (shape is Circle)\n{\n    var c = (Circle)shape;\n}",
     "options": [
-      "if (hinh as HinhTron)",
-      "if (hinh is HinhTron t)",
-      "if (hinh.GetType() == typeof(HinhTron))",
-      "switch (hinh) { case HinhTron: break; }"
+      "if (shape as Circle)",
+      "if (shape is Circle c)",
+      "if (shape.GetType() == typeof(Circle))",
+      "switch (shape) { case Circle: break; }"
     ],
     "answer": 2,
-    "explain": "Type pattern kiểm tra kiểu và gán biến trong một bước; biến t dùng được ngay trong thân if."
+    "explain": "Type pattern kiểm tra kiểu và gán biến trong một bước; biến c dùng được ngay trong thân if."
   },
   {
     "prompt": "Bạn thêm một record con mới kế thừa lớp cha abstract. Cách viết nào giúp compiler nhắc chỗ còn thiếu xử lý?",
@@ -184,7 +213,7 @@ và record vừa học sẽ đi cùng bạn suốt phần đó.
     "explain": "Compiler kiểm tra tính đầy đủ của switch expression và cảnh báo khi còn trường hợp chưa xử lý; if thì im lặng."
   },
   {
-    "prompt": "phan là mảng [\"POST\", \"/orders\", \"1\"]. Pattern nào khớp?",
+    "prompt": "parts là mảng [\"POST\", \"/orders\", \"1\"]. Pattern nào khớp?",
     "options": [
       "[\"POST\", var p]",
       "[\"POST\", var p, ..]",

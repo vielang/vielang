@@ -1,20 +1,22 @@
 ---
 title: enum và hằng số
-minutes: 9
+minutes: 11
 ---
 
-Sprint này có thêm trạng thái "Đang đóng gói", lập trình viên thêm nó vào giữa
-enum cho đúng thứ tự nghiệp vụ. Deploy xong, mọi đơn hàng cũ trong database
-đổi nghĩa: đơn "đã giao" hôm qua giờ hiện là "đã huỷ". Không ai sửa dữ liệu cả
-— chỉ là những con số phía sau enum đã trượt đi một nấc.
+Sprint này thêm trạng thái "Đang đóng gói". Lập trình viên chèn nó vào giữa
+enum cho đúng thứ tự nghiệp vụ.
+
+Deploy xong, mọi đơn hàng cũ trong database đổi nghĩa. Đơn "đã giao" hôm qua
+giờ hiện là "đã huỷ". Không ai sửa dữ liệu cả — chỉ là những con số phía sau
+enum đã trượt đi một nấc.
 
 > **Học xong bài này bạn sẽ:** dùng `enum` thay cho chuỗi trạng thái rải rác;
-> biết vì sao phải ghi số tường minh; phân biệt `const` với `readonly` và
-> chọn đúng cái.
+> biết vì sao phải ghi số tường minh; phân biệt `const` với `readonly` và chọn
+> đúng cái.
 >
 > **Cần biết trước:** kiểu dữ liệu, `switch expression`.
 
-## enum
+## enum bên dưới chỉ là số nguyên
 
 ```csharp
 public enum OrderStatus
@@ -25,13 +27,16 @@ public enum OrderStatus
     Cancelled = 3,
 }
 
-var tt = OrderStatus.Paid;
-Console.WriteLine(tt);        // Paid
-Console.WriteLine((int)tt);   // 1
+var status = OrderStatus.Paid;
+Console.WriteLine(status);        // Paid
+Console.WriteLine((int)status);   // 1
 ```
 
-Bên dưới `enum` chỉ là số nguyên. Vì vậy phải **ghi rõ số** cho từng thành viên
-khi enum được lưu xuống database hoặc gửi qua API:
+Cái tên chỉ tồn tại trong code. Xuống database hay qua API, nó là con số. Đây
+là chi tiết quyết định cả bài này.
+
+Vì vậy phải **ghi rõ số** cho từng thành viên, ngay khi enum được lưu trữ hay
+truyền đi:
 
 ```csharp
 // SAI — thêm vào giữa là mọi số phía sau trượt
@@ -53,18 +58,18 @@ public enum OrderStatus
 }
 ```
 
-Đây chính là sự cố ở đầu bài: bản ghi cũ lưu số `2`, mà `2` vừa đổi chủ.
+Bản ghi cũ lưu số `2`, mà `2` vừa đổi chủ. Đó là toàn bộ sự cố ở đầu bài.
 
 ## Thử ngay: enum không kiểm tra giá trị
 
 ```csharp
-var tt = (OrderStatus)99;
+var status = (OrderStatus)99;
 
-Console.WriteLine(tt);
-Console.WriteLine(Enum.IsDefined(tt));
+Console.WriteLine(status);
+Console.WriteLine(Enum.IsDefined(status));
 ```
 
-**Đoán trước khi chạy:** ép số 99 sang enum — chương trình ném lỗi, hay in ra
+**Đoán trước khi chạy:** ép số 99 sang enum. Chương trình ném lỗi, hay in ra
 cái gì?
 
 <details>
@@ -75,38 +80,54 @@ cái gì?
 False
 ```
 
-Ép kiểu sang enum **không hề kiểm tra**. Bạn nhận một giá trị không tồn tại
-trong danh sách, và nó lặng lẽ đi tiếp vào hệ thống. Giá trị đến từ bên ngoài
-(query string, JSON, cột số trong database cũ) thì phải kiểm bằng
-`Enum.IsDefined` trước khi tin.
+Ép kiểu sang enum **không kiểm tra gì cả**. Bạn nhận một giá trị không có
+trong danh sách, và nó lặng lẽ đi tiếp vào hệ thống.
+
+Giá trị đến từ bên ngoài — query string, JSON, cột số trong database cũ — thì
+phải kiểm bằng `Enum.IsDefined` trước khi tin.
 
 </details>
 
 ```csharp
-Enum.TryParse<OrderStatus>("Paid", out var tt2);
-var tatCa = Enum.GetValues<OrderStatus>();
+Enum.TryParse<OrderStatus>("Paid", out var parsed);
+var all = Enum.GetValues<OrderStatus>();
 ```
 
-## enum dạng cờ
+## enum dạng cờ để gộp nhiều lựa chọn
 
 ```csharp
 [Flags]
-public enum Quyen
+public enum Permission
 {
     None = 0,
-    Doc = 1,
-    Ghi = 2,
-    Xoa = 4,
+    Read = 1,
+    Write = 2,
+    Delete = 4,
 }
 
-var q = Quyen.Doc | Quyen.Ghi;
-bool ghiDuoc = q.HasFlag(Quyen.Ghi);   // True
+var p = Permission.Read | Permission.Write;
+bool canWrite = p.HasFlag(Permission.Write);   // True
 ```
 
-Giá trị phải là luỹ thừa của 2 thì phép bit mới đúng. Dùng cho quyền, cho các
-tuỳ chọn bật/tắt nhiều thứ cùng lúc.
+| Giá trị | Nhị phân | Gộp được |
+|---|---|---|
+| `Read = 1` | `001` | ✔ |
+| `Write = 2` | `010` | ✔ |
+| `Delete = 4` | `100` | ✔ |
+| `Delete = 3` | `011` | ✘ trùng `Read|Write` |
 
-## const và readonly
+Mỗi quyền phải chiếm một bit riêng. Nghĩa là giá trị phải là luỹ thừa của 2.
+
+Đặt 1, 2, 3 thì `Read|Write` bằng đúng `3`. Nó trùng luôn với quyền thứ ba, và
+`HasFlag` trả về kết quả vô nghĩa.
+
+## const, static readonly hay readonly
+
+| Khai báo | Chốt lúc nào | Dùng cho |
+|---|---|---|
+| `const` | compile | số, chuỗi, bool không bao giờ đổi |
+| `static readonly` | chạy | hằng số công khai có thể đổi |
+| `readonly` field | constructor | phụ thuộc của một object |
 
 ```csharp
 public class Config
@@ -116,53 +137,54 @@ public class Config
     public static readonly TimeSpan Timeout
         = TimeSpan.FromSeconds(30);
 
-    private readonly string _conn;
+    private readonly string _connectionString;
 
-    public Config(string conn) => _conn = conn;
+    public Config(string cs) => _connectionString = cs;
 }
 ```
 
-- `const` — cố định lúc compile, chỉ dùng được với số, chuỗi, bool.
-- `static readonly` — tính lúc chạy, dùng được với mọi kiểu.
-- `readonly` field — gán một lần trong constructor rồi khoá.
+`const` bị **nhúng thẳng** vào nơi gọi lúc compile. Sửa giá trị trong thư
+viện là chưa đủ. Bên dùng phải build lại mới thấy.
 
-`const` bị **nhúng thẳng** vào nơi gọi lúc compile. Nếu nó `public` và nằm ở
-thư viện khác, người dùng thư viện phải build lại mới thấy giá trị mới — nên
-với hằng số công khai có khả năng đổi, hãy dùng `static readonly`.
+Nên với hằng số công khai có khả năng đổi, hãy dùng `static readonly`.
 
-## Đừng dùng magic number
+## Đừng để magic number nằm rải trong code
 
 ```csharp
 // SAI — 2 là gì? 3 là gì?
-if (don.TrangThai == 2) { }
-if (soLanThu > 3) { }
+if (order.Status == 2) { }
+if (retryCount > 3) { }
 ```
 
 ```csharp
 // ĐÚNG — đọc là hiểu, sửa một chỗ
-if (don.TrangThai == OrderStatus.Shipped) { }
-if (soLanThu > Config.MaxRetry) { }
+if (order.Status == OrderStatus.Shipped) { }
+if (retryCount > Config.MaxRetry) { }
 ```
+
+Con số trần không nói gì. Cần đổi thì phải đi tìm hết mọi chỗ đã gõ nó, và
+chỉ sót một chỗ là dữ liệu lệch.
 
 ## Dấu hiệu trong code của bạn
 
 - Chuỗi trạng thái so sánh bằng `==` ("paid", "PAID") → đổi sang `enum`, compiler bắt lỗi gõ sai giúp bạn.
-- `enum` lưu xuống database mà không ghi số tường minh → quả bom hẹn giờ, chờ người thêm giá trị vào giữa.
+- `enum` lưu xuống database mà không ghi số tường minh → quả bom hẹn giờ.
 - Ép `(MyEnum)soNguyen` từ dữ liệu ngoài mà không `Enum.IsDefined` → giá trị rác đi thẳng vào nghiệp vụ.
 - Số lạ nằm rải trong điều kiện (`> 3`, `== 2`) → đặt tên cho chúng.
 
 ## Ghi nhớ
 
 - Trạng thái, loại, quyền → `enum`, đừng dùng `string` hay `int` trần.
-- Ghi số tường minh cho enum được lưu trữ hoặc truyền đi; thêm giá trị mới thì lấy số còn trống.
-- Ép kiểu sang enum không kiểm tra gì — `Enum.IsDefined` cho dữ liệu từ ngoài.
-- `const` nhúng lúc compile; hằng số công khai hay đổi thì dùng `static readonly`.
+- Ghi số tường minh; thêm giá trị mới thì lấy số còn trống.
+- Ép kiểu sang enum không kiểm tra gì — dùng `Enum.IsDefined` cho dữ liệu ngoài.
+- `const` nhúng lúc compile; hằng số công khai hay đổi thì `static readonly`.
 
 ## Bước tiếp theo
 
-Bài sau — **Pattern matching** — cách C# hiện đại hỏi "giá trị này có dạng thế
-nào", thay cho chuỗi `if` ép kiểu dài dòng. `enum` vừa học sẽ xuất hiện lại ở
-đó trong `switch expression`.
+Có `enum` rồi, câu hỏi kế là xử lý nó thế nào cho gọn.
+
+Bài sau, **Pattern matching**, thay những chuỗi `if` ép kiểu dài dòng bằng một
+biểu thức. Đây là thứ bạn sẽ gặp khắp nơi trong code C# hiện đại.
 
 ```quiz
 [
@@ -179,13 +201,13 @@ nào", thay cho chuỗi `if` ép kiểu dài dòng. `enum` vừa học sẽ xu�
   },
   {
     "prompt": "Đoạn này in ra gì?",
-    "code": "var tt = (OrderStatus)99;\nConsole.WriteLine(Enum.IsDefined(tt));",
+    "code": "var status = (OrderStatus)99;\nConsole.WriteLine(Enum.IsDefined(status));",
     "options": ["True", "False", "Ném InvalidCastException", "Lỗi compile"],
     "answer": 2,
-    "explain": "Ép kiểu sang enum không kiểm tra gì, nên tt mang giá trị 99 không có trong danh sách. IsDefined chính là cách phát hiện."
+    "explain": "Ép kiểu sang enum không kiểm tra gì, nên status mang giá trị 99 không có trong danh sách. IsDefined chính là cách phát hiện."
   },
   {
-    "prompt": "Enum [Flags] dùng cho quyền Doc, Ghi, Xoa. Giá trị phải đặt thế nào?",
+    "prompt": "Enum [Flags] dùng cho quyền Read, Write, Delete. Giá trị phải đặt thế nào?",
     "options": [
       "1, 2, 3 cho dễ nhớ",
       "1, 2, 4 — luỹ thừa của 2",
@@ -193,7 +215,7 @@ nào", thay cho chuỗi `if` ép kiểu dài dòng. `enum` vừa học sẽ xu�
       "Bao nhiêu cũng được, HasFlag tự xử lý"
     ],
     "answer": 2,
-    "explain": "Mỗi quyền phải chiếm một bit riêng thì phép | và HasFlag mới đúng. Với 1, 2, 3 thì Doc|Ghi bằng 3, trùng luôn với Xoa."
+    "explain": "Mỗi quyền phải chiếm một bit riêng thì phép | và HasFlag mới đúng. Với 1, 2, 3 thì Read|Write bằng 3, trùng luôn với Delete."
   },
   {
     "prompt": "Hằng số public MaxRetry nằm trong một thư viện dùng chung, thỉnh thoảng phải chỉnh. Khai báo thế nào?",

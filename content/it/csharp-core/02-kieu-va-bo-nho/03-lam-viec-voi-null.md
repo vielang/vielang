@@ -1,12 +1,13 @@
 ---
 title: Làm việc với null
-minutes: 10
+minutes: 11
 ---
 
-Log production báo `NullReferenceException` ở tầng service. Bạn mở đúng dòng
-đó ra: mọi biến đều được gán tử tế, không chỗ nào viết `null` cả. Giá trị null
-đi vào từ nơi khác, ba tầng gọi hàm trước đó, và stack trace không nói gì về
-nơi ấy.
+Log production chỉ có một dòng: `NullReferenceException` ở tầng service.
+
+Bạn mở đúng dòng đó ra xem. Mọi biến đều được gán tử tế, không chỗ nào viết
+`null` cả. Giá trị null đi vào từ nơi khác, ba tầng gọi hàm trước đó, và stack
+trace không nói gì về nơi ấy.
 
 > **Học xong bài này bạn sẽ:** bật và đọc được cảnh báo nullable của compiler;
 > dùng đúng `?.`, `??`, `is null`; và chặn null ngay ở biên thay vì đuổi theo
@@ -14,7 +15,7 @@ nơi ấy.
 >
 > **Cần biết trước:** reference type, method và tham số.
 
-## Bật nullable reference types
+## Nullable reference types: hàng rào ở mức compile
 
 ```xml
 <PropertyGroup>
@@ -22,15 +23,15 @@ nơi ấy.
 </PropertyGroup>
 ```
 
-Bật rồi thì `string` nghĩa là **không bao giờ null**, muốn cho phép null phải
+Bật rồi thì `string` nghĩa là **không bao giờ null**. Muốn cho phép null phải
 viết `string?`. Project .NET mới đã bật sẵn.
 
 ```csharp
-string? ten2 = null;        // hợp lệ
-string ten1 = "Huy";        // không được null
+string? middleName = null;   // hợp lệ
+string firstName = "Huy";    // không được null
 
-int dai = ten2.Length;      // cảnh báo CS8602
-int an = ten2?.Length ?? 0; // an toàn
+int length = middleName.Length;       // cảnh báo CS8602
+int safe = middleName?.Length ?? 0;   // an toàn
 ```
 
 ## Thử ngay: cảnh báo chỉ là cảnh báo
@@ -38,127 +39,152 @@ int an = ten2?.Length ?? 0; // an toàn
 ```csharp
 using System.Text.Json;
 
-class Nguoi
+class Person
 {
-    public string Ten { get; set; } = "";
+    public string Name { get; set; } = "";
 }
 
-var n = JsonSerializer.Deserialize<Nguoi>("{}");
-Console.WriteLine(n!.Ten is null);
-Console.WriteLine(n.Ten?.Length ?? -1);
+var p = JsonSerializer.Deserialize<Person>(
+    """{"Name": null}""");
+
+Console.WriteLine(p!.Name is null);
+Console.WriteLine(p.Name?.Length ?? -1);
 ```
 
-**Đoán trước khi chạy:** `Ten` khai báo là `string` không null và có giá trị
-mặc định `""`. Hai dòng in ra gì?
+**Đoán trước khi chạy:** `Name` khai báo là `string` không null, lại có giá
+trị mặc định `""`. Hai dòng in ra gì?
 
 <details>
 <summary>Đoán xong rồi — xem kết quả</summary>
 
 ```text
-False
-0
+True
+-1
 ```
 
-Lần này may: JSON rỗng nên `Ten` giữ giá trị mặc định `""`. Nhưng đổi chuỗi
-JSON thành `{"Ten": null}` mà chạy lại thì in ra `True` và `-1` — **null lọt
-vào một biến khai báo là không null**, compiler không hề cảnh báo.
+Null lọt thẳng vào một property khai báo là **không null**, và compiler không
+hề cảnh báo.
+
+Vì nullable reference types chỉ là kiểm tra **lúc compile**. Runtime không
+chặn gì cả. Dữ liệu từ JSON, database hay thư viện cũ vẫn đưa null vào được.
 
 </details>
 
-Bài học: nullable reference types là **kiểm tra lúc compile**, runtime không
-chặn gì cả. Dữ liệu từ JSON, từ database, từ thư viện cũ vẫn đưa null vào
-được. Vì vậy vẫn phải kiểm tra ở biên hệ thống.
-
-## Nullable value type
+## Nullable value type là một kiểu thật
 
 ```csharp
-int? soLuong = null;          // Nullable<int>
-if (soLuong.HasValue) { }
+int? quantity = null;          // Nullable<int>
+if (quantity.HasValue) { }
 
-int thuc = soLuong ?? 0;
-int chac = soLuong!.Value;    // ném nếu đang null
+int actual = quantity ?? 0;
+int risky = quantity!.Value;   // ném nếu đang null
 ```
 
-Với value type, `?` không chỉ là chú thích cho compiler mà đổi hẳn kiểu thành
-`Nullable<T>` — có thật trong runtime.
+| | `string?` | `int?` |
+|---|---|---|
+| Bản chất | chú thích cho compiler | kiểu thật `Nullable<int>` |
+| Còn sau khi build | không | có |
+| Runtime kiểm tra | không | có cờ `HasValue` |
 
-## Các toán tử null
+Đây là lý do `int?` tốn thêm bộ nhớ còn `string?` thì không.
+
+## Bốn toán tử làm việc với null
+
+| Toán tử | Nghĩa |
+|---|---|
+| `?.` | gặp null thì dừng, trả về null |
+| `??` | null thì lấy giá trị bên phải |
+| `??=` | gán khi đang null |
+| `is null` / `is not null` | cách kiểm tra chuẩn |
 
 ```csharp
-var tp = user?.DiaChi?.ThanhPho;   // null-conditional
-var hien = tp ?? "Chưa cập nhật";  // null-coalescing
+var city = user?.Address?.City;
+var display = city ?? "Chưa cập nhật";
 cache ??= new Dictionary<string, string>();
-var n = list?.Count ?? 0;
 ```
 
-## Dấu `!` và khi nào được dùng
+Dùng `is null` thay cho `!= null`: nó không bị ảnh hưởng nếu kiểu đó nạp chồng
+toán tử `==`.
+
+Ba toán tử đầu bảng nối chuỗi được với nhau. `user?.Address?.City` gặp null ở
+mắt xích nào cũng dừng ngay, trả về null thay vì nổ.
+
+Nhưng đừng lạm dụng. Một chuỗi `?.` dài thường có nghĩa là bạn đang chấp nhận
+dữ liệu thiếu, mà chưa quyết định phải làm gì với nó.
+
+## Dấu ! tắt cảnh báo chứ không kiểm tra gì
 
 ```csharp
-// SAI — tắt cảnh báo chứ không kiểm tra gì
-var don = await db.Orders.FindAsync(id);
-var ten = don!.KhachHang;
+// SAI — chỉ dập cảnh báo
+var order = await db.Orders.FindAsync(id);
+var name = order!.Customer;
 ```
 
 ```csharp
 // ĐÚNG — kiểm tra thật, compiler theo được luồng
-var don = await db.Orders.FindAsync(id);
-if (don is null)
+var order = await db.Orders.FindAsync(id);
+if (order is null)
     return NotFound();
 
-var ten = don.KhachHang;
+var name = order.Customer;
 ```
 
-`!` là **null-forgiving operator**: nó tắt cảnh báo, không kiểm tra gì. Mỗi lần
-viết `!` là bạn nhận trách nhiệm; sai thì lại đúng cái exception ta đang tránh.
+`!` là **null-forgiving operator**. Mỗi lần viết nó là bạn nhận trách nhiệm
+thay compiler. Sai thì lại đúng cái exception ta đang tránh.
 
-## Chặn ngay ở biên
+## Chặn ngay ở biên, đừng đuổi theo null qua nhiều tầng
 
 ```csharp
 public class Invoice
 {
-    private readonly Customer _khach;
+    private readonly Customer _customer;
 
-    public Invoice(Customer khach, decimal tien)
+    public Invoice(Customer customer, decimal amount)
     {
-        ArgumentNullException.ThrowIfNull(khach);
-        if (tien <= 0)
+        ArgumentNullException.ThrowIfNull(customer);
+        if (amount <= 0)
             throw new ArgumentOutOfRangeException(
-                nameof(tien), "Số tiền phải lớn hơn 0");
+                nameof(amount));
 
-        _khach = khach;
+        _customer = customer;
     }
 }
 ```
 
-**Fail fast**: chặn dữ liệu sai ngay lúc vào. `ArgumentNullException` ném ở
+**Fail fast**: chặn dữ liệu sai ngay lúc nó vào. `ArgumentNullException` ném ở
 constructor dễ sửa hơn nhiều so với `NullReferenceException` nổ ba tầng sau
-đó, khi chẳng còn manh mối nào về nơi null lọt vào — đúng tình huống ở đầu bài.
+đó, khi chẳng còn manh mối nào.
+
+Đó chính là khác biệt giữa bài này và cái log ở đầu bài.
 
 ## Dấu hiệu trong code của bạn
 
 - Dấu `!` rải rác để dập cảnh báo → mỗi cái là một `NullReferenceException` đang chờ.
-- Model nhận từ JSON/API có property `string` không null nhưng không kiểm tra gì sau khi deserialize.
+- Model nhận từ JSON có property `string` không null nhưng không kiểm tra gì sau khi deserialize.
 - Method `public` nhận tham số object mà không `ArgumentNullException.ThrowIfNull`.
-- Method trả về `null` cho một danh sách → mọi nơi gọi đều phải nhớ kiểm tra; trả `[]` thì không ai phải nhớ gì.
+- Method trả về `null` cho một danh sách → mọi nơi gọi đều phải nhớ kiểm tra.
 
 ## Ghi nhớ
 
 - Nullable reference types là kiểm tra **lúc compile**; runtime vẫn cho null lọt vào.
-- `is null` / `is not null` là cách kiểm tra chuẩn — không bị ảnh hưởng nếu kiểu đó nạp chồng `==`.
+- `is null` và `is not null` là cách kiểm tra chuẩn.
 - `!` tắt cảnh báo chứ không kiểm tra; ưu tiên `if (x is null) return`.
-- Đừng trả `null` cho danh sách: trả `Array.Empty<T>()` hoặc list rỗng.
+- Đừng trả `null` cho danh sách, trả `[]` để người gọi khỏi phải nhớ.
 
 ## Bước tiếp theo
 
-Bài sau — **enum và hằng số** — thay những chuỗi "paid", "PAID", "Paid" rải
-khắp code bằng thứ compiler kiểm tra được.
+Null là giá trị vắng mặt. Còn những giá trị có mặt thì sao — "paid", "PAID",
+"Paid" nằm rải khắp code?
+
+Bài sau, **enum và hằng số**, mở bằng một lần thêm trạng thái vào giữa enum.
+Deploy xong, mọi đơn hàng cũ trong database đổi nghĩa.
 
 ```quiz
 [
   {
     "prompt": "Project bật Nullable enable. Dòng nào dưới đây thật sự bảo vệ bạn lúc chạy?",
     "options": [
-      "Khai báo string Ten thay vì string? Ten",
+      "Khai báo string Name thay vì string? Name",
       "Thêm dấu ! sau biến để hết cảnh báo",
       "Kiểm tra if (x is null) trước khi dùng",
       "Bật TreatWarningsAsErrors"
@@ -168,7 +194,7 @@ khắp code bằng thứ compiler kiểm tra được.
   },
   {
     "prompt": "Đoạn này in ra gì khi FindAsync không tìm thấy đơn hàng?",
-    "code": "var don = await db.Orders.FindAsync(id);\nConsole.WriteLine(don!.KhachHang);",
+    "code": "var order = await db.Orders.FindAsync(id);\nConsole.WriteLine(order!.Customer);",
     "options": [
       "Chuỗi rỗng",
       "null",
@@ -190,7 +216,7 @@ khắp code bằng thứ compiler kiểm tra được.
     "explain": "Trả danh sách rỗng thì người gọi foreach hay Count đều chạy bình thường. Trả null là bắt mọi nơi gọi phải nhớ kiểm tra."
   },
   {
-    "prompt": "int? soLuong = null; có gì khác string? ten = null;?",
+    "prompt": "int? quantity có gì khác string? name?",
     "options": [
       "Không khác gì, chỉ là cú pháp",
       "int? đổi hẳn kiểu thành Nullable<int>, có thật lúc chạy; string? chỉ là chú thích cho compiler",
@@ -198,7 +224,7 @@ khắp code bằng thứ compiler kiểm tra được.
       "int? không dùng được với ??"
     ],
     "answer": 2,
-    "explain": "Nullable value type là một kiểu thật (Nullable<T> với cờ HasValue). Nullable reference type chỉ là thông tin cho compiler, biến mất sau khi build."
+    "explain": "Nullable value type là một kiểu thật với cờ HasValue. Nullable reference type chỉ là thông tin cho compiler, biến mất sau khi build."
   }
 ]
 ```

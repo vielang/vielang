@@ -1,32 +1,39 @@
 ---
 title: Stack, heap và ngữ nghĩa gán
-minutes: 10
+minutes: 11
 ---
 
-Bạn lấy giỏ hàng mẫu ra, gán cho khách A, thêm vài món. Khách B mở giỏ hàng
-của mình thì thấy đúng mấy món đó. Không có dòng code nào gán nhầm — chỉ là cả
-hai đang cầm chung một object.
+Bạn lấy giỏ hàng mẫu ra, gán cho khách A, thêm vài món.
 
-> **Học xong bài này bạn sẽ:** nhìn một phép gán và biết ngay hai biến đang
-> dùng chung hay tách rời; tránh được họ bug "sửa chỗ này chỗ kia đổi theo";
-> giải thích được boxing khi phỏng vấn.
+Khách B mở giỏ của mình lên thì thấy đúng mấy món đó. Không dòng code nào gán
+nhầm. Chỉ là hai người đang cầm chung một object.
+
+> **Học xong bài này bạn sẽ:** nhìn một phép gán và biết ngay hai biến dùng
+> chung hay tách rời; tránh được họ bug "sửa chỗ này chỗ kia đổi theo"; giải
+> thích được boxing khi phỏng vấn.
 >
 > **Cần biết trước:** value type và reference type ở mức đã gặp ở chương trước.
 
-## Hai vùng nhớ
+## Stack và heap: hai vùng nhớ, hai cách dọn
 
-- **Stack**: vùng nhớ theo từng lời gọi method, tự dọn khi method kết thúc. Nhanh, nhỏ.
-- **Heap**: vùng nhớ chung cho object, do **GC** (Garbage Collector) dọn khi không còn ai tham chiếu tới.
+| | Stack | Heap |
+|---|---|---|
+| Chứa gì | biến cục bộ, tham số | object do `new` tạo ra |
+| Dọn khi nào | method kết thúc là tự dọn | GC dọn khi không còn ai tham chiếu |
+| Tốc độ | rất nhanh | chậm hơn |
+| Kích thước | nhỏ, có giới hạn | lớn |
 
 ```csharp
-int x = 5;              // giá trị 5 nằm trên stack
-var don = new Order();  // object nằm trên HEAP,
-                        // biến don giữ địa chỉ của nó
+int x = 5;                // giá trị 5 nằm trên stack
+var order = new Order();  // object nằm trên HEAP,
+                          // biến order giữ địa chỉ
 ```
 
-Nói "value type luôn ở stack" là cách nói tắt và **không chính xác**: một `int`
-là field của class thì nó nằm trong object đó, tức là trên heap. Điều luôn đúng
-là: value type lưu **chính giá trị**, reference type lưu **tham chiếu**.
+Nói "value type luôn ở stack" là cách nói tắt, và **không chính xác**. Một
+`int` là field của class thì nó nằm trong object đó, tức là trên heap.
+
+Điều luôn đúng chỉ có một câu: value type lưu **chính giá trị**, reference
+type lưu **tham chiếu**.
 
 ```mermaid Hai biến cùng trỏ một object, còn int thì mỗi biến giữ một giá trị
 flowchart TD
@@ -45,18 +52,18 @@ flowchart TD
 ## Thử ngay: chép giá trị hay chép tham chiếu
 
 ```csharp
-struct Diem { public int X; }
-class Nguoi { public string Ten = "Huy"; }
+struct Point { public int X; }
+class Person { public string Name = "Huy"; }
 
-var a = new Diem { X = 1 };
+var a = new Point { X = 1 };
 var b = a;
 b.X = 99;
 
-var p = new Nguoi();
+var p = new Person();
 var q = p;
-q.Ten = "Nam";
+q.Name = "Nam";
 
-Console.WriteLine($"{a.X} và {p.Ten}");
+Console.WriteLine($"{a.X} và {p.Name}");
 ```
 
 **Đoán trước khi chạy:** dòng cuối in ra gì?
@@ -68,80 +75,92 @@ Console.WriteLine($"{a.X} và {p.Ten}");
 1 và Nam
 ```
 
-`Diem` là **struct** (value type): `b = a` chép hẳn một bản, sửa `b` không đụng
-tới `a`. `Nguoi` là **class** (reference type): `q = p` chỉ chép địa chỉ, hai
-biến cùng trỏ một object nên sửa qua `q` thì `p` thấy ngay.
+`Point` là **struct**, tức value type. `b = a` chép hẳn một bản, nên sửa `b`
+không đụng tới `a`.
+
+`Person` là **class**, tức reference type. `q = p` chỉ chép địa chỉ. Hai biến
+cùng trỏ một object, nên sửa qua `q` thì `p` thấy ngay.
 
 </details>
 
-Đây chính là bug giỏ hàng ở đầu bài. Muốn mỗi khách một giỏ riêng thì phải tạo
-object mới, không gán lại biến cũ:
+Đó chính là bug giỏ hàng ở đầu bài. Muốn mỗi khách một giỏ riêng thì phải tạo
+object mới:
 
 ```csharp
 // SAI — hai khách dùng chung một giỏ
-var gioA = gioMau;
-var gioB = gioMau;
+var cartA = sampleCart;
+var cartB = sampleCart;
 ```
 
 ```csharp
 // ĐÚNG — mỗi khách một object riêng
-var gioA = new Gio(gioMau.Items.ToList());
-var gioB = new Gio(gioMau.Items.ToList());
+var cartA = new Cart(sampleCart.Items.ToList());
+var cartB = new Cart(sampleCart.Items.ToList());
 ```
 
-Chú ý cả `Items.ToList()`: chép danh sách chứ không dùng lại chính danh sách
-của giỏ mẫu — nếu không thì vẫn chung nhau một tầng bên trong.
+Chú ý cả `Items.ToList()`. Nếu dùng lại chính danh sách của giỏ mẫu thì hai
+giỏ vẫn chung nhau một tầng bên trong.
 
-## Truyền vào method
+## Truyền vào method: sửa được, nhưng không thay được
 
 ```csharp
-void Doi(Nguoi n) => n.Ten = "Nam";   // đổi được
-void ThayThe(Nguoi n) => n = new();   // KHÔNG đổi gì
+void Rename(Person p) => p.Name = "Nam";   // đổi được
+void Replace(Person p) => p = new();       // KHÔNG đổi
 ```
 
 Tham số là một **bản chép của tham chiếu**. Sửa property thì cả hai bên cùng
-thấy; gán lại tham số chỉ đổi bản chép cục bộ. Muốn thay hẳn object của người
-gọi thì `return` object mới.
+thấy. Gán lại tham số chỉ đổi bản chép cục bộ.
 
-## Boxing
+Muốn thay hẳn object của người gọi thì `return` object mới.
+
+## Boxing: gói value type lên heap
 
 ```csharp
 int n = 42;
-object hop = n;        // boxing — chép n lên heap
-int lai = (int)hop;    // unboxing — chép ngược ra
+object boxed = n;        // boxing — chép n lên heap
+int back = (int)boxed;   // unboxing — chép ngược ra
 ```
 
-**Boxing** là gói một value type vào object để nó đi được qua chỗ cần reference
-type. Mỗi lần boxing là một lần cấp phát trên heap, nên trong vòng lặp nóng đó
-là chi phí thật. Dùng **generic** (`List<int>` chứ không phải `ArrayList`) là
-tránh được gần hết.
+**Boxing** là gói một value type vào object, để nó đi được qua chỗ cần
+reference type. Mỗi lần boxing là một lần cấp phát trên heap.
 
-## GC nói ngắn gọn
+Trong vòng lặp nóng, đó là chi phí thật. Dùng **generic** (`List<int>` thay
+cho `ArrayList`) là tránh được gần hết.
 
-GC chạy tự động, gom những object không còn ai tham chiếu. Bạn không bao giờ
-gọi `delete`. Hai điều thực tế cần nhớ:
+## GC dọn bộ nhớ, nhưng không dọn hộ bạn mọi thứ
 
-- Object còn bị tham chiếu thì **không bao giờ** bị dọn — biến `static` giữ danh sách, hay event handler quên gỡ, là nguyên nhân phổ biến của **memory leak** trong .NET.
-- Tài nguyên ngoài bộ nhớ (file, connection, socket) GC không dọn kịp thời — phải `Dispose`, xem chương về tài nguyên.
+GC chạy tự động và gom những object không còn ai tham chiếu. Bạn không bao giờ
+gọi `delete`. Nhưng có hai điều nó không làm được:
+
+| Tình huống | Vì sao GC chịu |
+|---|---|
+| `static` giữ `List` hay `Dictionary` mãi | vẫn còn tham chiếu, nên không phải rác |
+| Event handler quên gỡ | object nghe sự kiện vẫn bị giữ |
+| File, connection, socket | không phải bộ nhớ, phải `Dispose` |
+
+Hai dòng đầu bảng là nguyên nhân phổ biến nhất của **memory leak** trong .NET.
+Dòng cuối có hẳn một bài riêng ở chương Ngoại lệ và tài nguyên.
 
 ## Dấu hiệu trong code của bạn
 
 - Một `List<T>` hay object được gán cho nhiều nơi rồi nơi nào cũng sửa → tất cả đang dùng chung, sớm muộn cũng lệch dữ liệu.
-- Method nhận collection rồi `Add`/`Remove` vào chính nó → người gọi bị sửa dữ liệu mà không biết; nhận `IReadOnlyList<T>` thì compiler chặn giúp.
-- `static` giữ `List`/`Dictionary` mà chỉ thêm, không bao giờ xoá → memory leak.
-- `ArrayList`, `Hashtable`, hay `object` làm tham số trong vòng lặp lớn → boxing.
+- Method nhận collection rồi `Add` hay `Remove` vào chính nó → người gọi bị sửa dữ liệu mà không biết.
+- `static` giữ `List` hay `Dictionary` mà chỉ thêm, không bao giờ xoá → memory leak.
+- `ArrayList`, `Hashtable`, hoặc tham số `object` trong vòng lặp lớn → boxing.
 
 ## Ghi nhớ
 
-- Value type chép **giá trị**, reference type chép **tham chiếu**. Mọi thứ khác suy ra từ đó.
+- Value type chép **giá trị**, reference type chép **tham chiếu**.
 - Muốn tách rời thì tạo object mới, và nhớ chép cả collection bên trong.
 - Gán lại tham số trong method không ảnh hưởng người gọi.
-- `string` là reference type nhưng **immutable** nên dùng như value type.
+- `string` là reference type nhưng **immutable**, nên dùng như value type.
 
 ## Bước tiếp theo
 
-Bài sau — **class, struct hay record** — chọn kiểu khai báo cho từng loại dữ
-liệu, và giải thích vì sao hai object giống hệt nhau vẫn có thể `==` ra `false`.
+Biết object nằm ở đâu rồi. Câu hỏi kế: khi khai báo kiểu mới thì chọn gì?
+
+Bài sau, **class, struct hay record**, mở bằng một hàm so tiền luôn trả
+`false`. Hai bên rõ ràng cùng là 100.000 đồng.
 
 ```quiz
 [
@@ -165,7 +184,7 @@ liệu, và giải thích vì sao hai object giống hệt nhau vẫn có thể 
   },
   {
     "prompt": "Dòng này làm gì trong bộ nhớ?",
-    "code": "object hop = 42;",
+    "code": "object boxed = 42;",
     "options": [
       "Không có gì đặc biệt, 42 vẫn nằm trên stack",
       "Boxing: 42 được chép lên heap trong một object",

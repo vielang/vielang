@@ -149,6 +149,10 @@ namespace CourseWorld;
     public class ServiceCollectionLike
     {
         public ServiceCollectionLike AddScoped<TService, TImpl>() => this;
+        public ServiceCollectionLike AddScoped<TService>(Func<object, TService> factory) => this;
+        public ServiceCollectionLike AddKeyedScoped<TService, TImpl>(object key) => this;
+        public ServiceCollectionLike AddSingleton<TService, TImpl>() => this;
+        public ServiceCollectionLike AddTransient<TService, TImpl>() => this;
         public ServiceCollectionLike AddHttpClient<T>() => this;
         public ServiceCollectionLike AddDbContext<T>() => this;
     }

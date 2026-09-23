@@ -178,11 +178,16 @@ nuốt lỗi trong im lặng: `async void`, `.Result`, và quên `CancellationTo
 ```quiz
 [
   {
-    "prompt": "Ba việc độc lập, mỗi việc chờ I/O 1 giây. Đoạn này mất bao lâu?",
-    "code": "var a = await Slow(1);\nvar b = await Slow(2);\nvar c = await Slow(3);",
-    "options": ["~1 giây", "~3 giây", "~9 giây", "Tuỳ số nhân CPU"],
-    "answer": 2,
-    "explain": "await chờ xong việc này mới bắt đầu việc sau. Muốn ~1 giây thì khởi động cả ba rồi await Task.WhenAll(...)."
+    "prompt": "Một action gọi ba service độc lập, mỗi service chờ HTTP khoảng 400ms. Action này mất bao lâu?",
+    "code": "var rate = await rates.GetAsync(code);\nvar stock = await warehouse.GetAsync(id);\nvar ship = await shipping.QuoteAsync(id);",
+    "options": [
+      "~400ms",
+      "Tuỳ số nhân CPU",
+      "~1,2 giây",
+      "~400ms, vì await chạy song song"
+    ],
+    "answer": 3,
+    "explain": "Ba await liên tiếp là tuần tự: cái đầu xong thì cái sau mới bắt đầu, nên ba lần 400ms cộng lại. Ba service không phụ thuộc nhau, nên khởi động cả ba rồi await Task.WhenAll(...) là về lại ~400ms."
   },
   {
     "prompt": "API dùng async/await đúng cách. Điều nào ĐÚNG?",
@@ -199,22 +204,22 @@ nuốt lỗi trong im lặng: `async void`, `.Result`, và quên `CancellationTo
     "prompt": "Repository viết return db.Orders.FindAsync(id).Result; trong một API. Vấn đề gì?",
     "options": [
       "Không có vấn đề, chỉ là cách viết khác",
-      "Chặn luồng trong lúc chờ, mất lợi ích của async và có nguy cơ deadlock",
       "Kết quả trả về sai kiểu",
+      "Chặn luồng trong lúc chờ, mất lợi ích của async và có nguy cơ deadlock",
       "Chậm hơn vì phải tạo thêm Task"
     ],
-    "answer": 2,
+    "answer": 3,
     "explain": "gọi .Result là đứng chờ ngay trên luồng hiện tại. Chuỗi async phải liền mạch từ controller xuống repository."
   },
   {
     "prompt": "Việc nào KHÔNG nên gom bằng Task.WhenAll?",
     "options": [
-      "Gọi ba API bên ngoài khác nhau",
-      "Đọc ba file khác nhau",
       "Ba truy vấn trên cùng một DbContext",
+      "Đọc ba file khác nhau",
+      "Gọi ba API bên ngoài khác nhau",
       "Gửi ba email qua ba HttpClient"
     ],
-    "answer": 3,
+    "answer": 1,
     "explain": "DbContext không an toàn khi dùng song song. Cần chạy song song thì mỗi việc một context riêng, hoặc chạy tuần tự."
   }
 ]

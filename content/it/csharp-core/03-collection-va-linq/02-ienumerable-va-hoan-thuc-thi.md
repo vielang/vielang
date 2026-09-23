@@ -223,23 +223,23 @@ vừa học ở đây, nên đọc tiếp sẽ nhẹ.
     "prompt": "Đoạn này gửi mấy truy vấn xuống database?",
     "code": "var q = db.Orders.Where(o => o.IsPaid);\n\nif (q.Any())\n{\n    foreach (var o in q)\n        Xuly(o);\n}",
     "options": [
-      "Một truy vấn, vì q chỉ được khai báo một lần",
       "Hai truy vấn: một cho Any(), một cho foreach",
+      "Một truy vấn, vì q chỉ được khai báo một lần",
       "Không truy vấn nào, vì chưa gọi ToList()",
       "Ba truy vấn: khai báo, Any() và foreach"
     ],
-    "answer": 2,
+    "answer": 1,
     "explain": "Any() duyệt một lần, foreach duyệt lại lần nữa. Muốn một truy vấn thì ToListAsync() trước rồi kiểm tra Count trên danh sách."
   },
   {
     "prompt": "Bạn thấy trong log lỗi 'Cannot access a disposed context' ở một API. Chỗ nào đáng ngờ nhất?",
     "options": [
-      "Một method trả về IEnumerable<T> lấy dữ liệu từ DbContext",
-      "Một method trả về List<T> sau khi đã ToListAsync()",
       "Một truy vấn có quá nhiều điều kiện Where",
+      "Một method trả về List<T> sau khi đã ToListAsync()",
+      "Một method trả về IEnumerable<T> lấy dữ liệu từ DbContext",
       "Một câu SQL thiếu index"
     ],
-    "answer": 1,
+    "answer": 3,
     "explain": "Trả IEnumerable<T> ra ngoài nghĩa là truy vấn chạy lúc người gọi duyệt — khi đó context đã bị dispose. Chốt bằng ToListAsync() ngay trong method."
   },
   {
@@ -257,12 +257,12 @@ vừa học ở đây, nên đọc tiếp sẽ nhẹ.
   {
     "prompt": "Trường hợp nào KHÔNG nên gọi ToList() ngay?",
     "options": [
-      "Khi còn định lọc tiếp trên dữ liệu ở database",
+      "Khi muốn kết quả không đổi theo nguồn",
       "Khi sắp dùng lại kết quả cho nhiều phép tính",
       "Khi trả dữ liệu ra khỏi tầng service",
-      "Khi muốn kết quả không đổi theo nguồn"
+      "Khi còn định lọc tiếp trên dữ liệu ở database"
     ],
-    "answer": 1,
+    "answer": 4,
     "explain": "ToList() giữa chuỗi kéo cả tập về bộ nhớ rồi mới lọc — mất lợi thế lọc ở database. Ba trường hợp còn lại đều là lý do nên chốt sớm."
   }
 ]

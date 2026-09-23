@@ -212,12 +212,12 @@ và LINQ, xử lý lỗi và tài nguyên, bất đồng bộ.
   {
     "prompt": "Job nền viết public async void SendMail(). SMTP lỗi thì chuyện gì xảy ra?",
     "options": [
-      "Lỗi được ghi log như bình thường",
       "Exception không bay lên người gọi được, rơi vào runtime và có thể hạ cả tiến trình",
+      "Lỗi được ghi log như bình thường",
       "Task bị huỷ, các job khác vẫn chạy",
       "Compiler chặn từ lúc build"
     ],
-    "answer": 2,
+    "answer": 1,
     "explain": "async void không có Task để ai đó await, nên không có đường cho exception đi lên. Luôn dùng async Task trừ event handler."
   },
   {
@@ -225,11 +225,11 @@ và LINQ, xử lý lỗi và tài nguyên, bất đồng bộ.
     "code": "try\n{\n    Throw();   // async Task, ném lỗi sau 50ms\n    await Task.Delay(200);\n}\ncatch\n{\n    Console.WriteLine(\"bắt được\");\n}",
     "options": [
       "\"bắt được\"",
-      "Không in gì từ catch — lỗi nằm im trong Task không ai await",
       "Chương trình dừng ngay ở Throw()",
+      "Không in gì từ catch — lỗi nằm im trong Task không ai await",
       "Lỗi compile"
     ],
-    "answer": 2,
+    "answer": 3,
     "explain": "Thiếu await nên Throw() chỉ trả về một Task; exception nằm trong Task đó và biến mất lặng lẽ. Compiler có cảnh báo CS4014 cho đúng trường hợp này."
   },
   {
@@ -247,11 +247,11 @@ và LINQ, xử lý lỗi và tài nguyên, bất đồng bộ.
     "prompt": "Bạn muốn gửi email sau khi trả response cho người dùng. Cách nào đúng?",
     "options": [
       "_ = SendMailAsync(to); rồi return luôn",
-      "Đưa việc vào hàng đợi hoặc BackgroundService",
+      "Gọi async void cho khỏi phải await",
       "SendMailAsync(to).Wait(); trước khi return",
-      "Gọi async void cho khỏi phải await"
+      "Đưa việc vào hàng đợi hoặc BackgroundService"
     ],
-    "answer": 2,
+    "answer": 4,
     "explain": "Fire-and-forget không có log, không thử lại và mất việc khi tắt máy. Hàng đợi hoặc BackgroundService được thiết kế đúng cho việc này."
   }
 ]

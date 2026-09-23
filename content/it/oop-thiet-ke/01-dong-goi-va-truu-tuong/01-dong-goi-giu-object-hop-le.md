@@ -256,8 +256,13 @@ database, tính phí vận chuyển — toàn những việc cần người khá
 [
   {
     "prompt": "Thành viên khai báo không ghi access modifier thì mặc định là gì?",
-    "options": ["public", "private", "internal", "protected"],
-    "answer": 2,
+    "options": [
+      "public",
+      "protected",
+      "internal",
+      "private"
+    ],
+    "answer": 4,
     "explain": "Thành viên của class mặc định là private. Riêng class khai báo trong namespace thì mặc định là internal."
   },
   {
@@ -276,17 +281,22 @@ database, tính phí vận chuyển — toàn những việc cần người khá
     "code": "class Order\n{\n    public List<string> Lines { get; } = new();\n}\n\nvar order = new Order();\norder.Lines.Add(\"Sách\");\n\nConsole.WriteLine(order.Lines.Count);",
     "options": [
       "0",
-      "1",
       "Lỗi compile vì Lines chỉ có get",
+      "1",
       "Ném InvalidOperationException"
     ],
-    "answer": 2,
+    "answer": 3,
     "explain": "Bỏ set chỉ chặn việc thay cả danh sách, không chặn Add vào danh sách đó. Muốn khoá nội dung thì lộ ra bằng IReadOnlyList."
   },
   {
     "prompt": "Thư viện nội bộ có một class chỉ dùng trong cùng project, không muốn project khác thấy. Dùng modifier nào?",
-    "options": ["public", "internal", "protected", "private"],
-    "answer": 2,
+    "options": [
+      "internal",
+      "public",
+      "protected",
+      "private"
+    ],
+    "answer": 1,
     "explain": "internal giới hạn tầm nhìn trong cùng assembly. protected dành cho lớp con, còn private thì ngay class khác trong cùng project cũng không thấy."
   }
 ]

@@ -191,30 +191,35 @@ Chương sau, **Đa hình trong thực tế**, dùng `virtual`, `abstract` và i
   {
     "prompt": "Đoạn này in ra gì?",
     "code": "class Parent\n{\n    public Parent() => Print();\n    public virtual void Print() =>\n        Console.WriteLine(\"Parent\");\n}\n\nclass Child : Parent\n{\n    private readonly string _name = \"Child\";\n    public override void Print() =>\n        Console.WriteLine(_name ?? \"null\");\n}\n\nnew Child();",
-    "options": ["Child", "Parent", "null", "Ném NullReferenceException"],
+    "options": [
+      "Child",
+      "Parent",
+      "null",
+      "Ném NullReferenceException"
+    ],
     "answer": 3,
     "explain": "Constructor lớp cha chạy trước khi field của lớp con được gán, mà method virtual lại nhảy xuống bản override. Đừng gọi method virtual trong constructor."
   },
   {
     "prompt": "Quan hệ nào nên dùng composition thay vì kế thừa?",
     "options": [
-      "PaymentController là một ControllerBase",
       "Order có một cách tính phí vận chuyển",
+      "PaymentController là một ControllerBase",
       "OrderException là một Exception",
       "EmailBackgroundJob là một BackgroundService"
     ],
-    "answer": 2,
+    "answer": 1,
     "explain": "\"Có một\" là dấu hiệu của composition. Ba trường hợp còn lại là quan hệ \"là một\" thật sự, và đều do framework yêu cầu kế thừa."
   },
   {
     "prompt": "Lớp con override một method của lớp cha và để thân rỗng để nó không làm gì nữa. Điều đó nói lên gì?",
     "options": [
       "Thiết kế tốt, lớp con được tự do",
-      "Quan hệ \"là một\" sai — lớp con không thật sự là một lớp cha",
+      "Cần thêm sealed cho lớp con",
       "Cần đánh dấu method là abstract",
-      "Cần thêm sealed cho lớp con"
+      "Quan hệ \"là một\" sai — lớp con không thật sự là một lớp cha"
     ],
-    "answer": 2,
+    "answer": 4,
     "explain": "Nếu lớp con phải vô hiệu hoá hành vi của lớp cha thì nó không thay thế được lớp cha. Đây chính là vi phạm nguyên tắc Liskov ở chương SOLID."
   },
   {

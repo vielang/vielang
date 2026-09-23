@@ -194,33 +194,33 @@ không nên chiếm luồng, và những cái bẫy khiến cả app treo cứng
     "code": "void Run()\n{\n    using var res = new Resource();\n    throw new Exception(\"hỏng\");\n}\n\ntry { Run(); }\ncatch { Console.WriteLine(\"bắt được lỗi\"); }",
     "options": [
       "\"bắt được lỗi\" rồi mới \"đóng\"",
-      "\"đóng\" rồi mới \"bắt được lỗi\"",
       "Chỉ in \"bắt được lỗi\", Dispose không chạy",
+      "\"đóng\" rồi mới \"bắt được lỗi\"",
       "Chỉ in \"đóng\", lỗi bị nuốt"
     ],
-    "answer": 2,
+    "answer": 3,
     "explain": "using dịch thành try/finally nên Dispose chạy ngay khi rời khỏi khối, trước khi exception bay lên tầng trên."
   },
   {
     "prompt": "Service tạo new HttpClient() cho mỗi request và bọc trong using. Hệ quả?",
     "options": [
-      "Đúng chuẩn, vì HttpClient là IDisposable",
       "Cạn cổng mạng: socket đóng vẫn nằm ở TIME_WAIT vài phút",
+      "Đúng chuẩn, vì HttpClient là IDisposable",
       "Rò bộ nhớ vì GC không dọn được HttpClient",
       "Chậm vì mỗi lần phải phân giải DNS lại"
     ],
-    "answer": 2,
+    "answer": 1,
     "explain": "Đây là nghịch lý quen thuộc của HttpClient: nó nên được dùng lại. AddHttpClient / IHttpClientFactory lo phần tái sử dụng và xoay vòng kết nối."
   },
   {
     "prompt": "Trong ASP.NET Core, DbContext nên được quản lý thế nào?",
     "options": [
       "using var db = new AppDbContext() trong mỗi method",
-      "Đăng ký AddDbContext, nhận qua constructor, framework tự dispose theo request",
+      "Tạo mới rồi để GC dọn",
       "Một field static dùng chung cho cả app",
-      "Tạo mới rồi để GC dọn"
+      "Đăng ký AddDbContext, nhận qua constructor, framework tự dispose theo request"
     ],
-    "answer": 2,
+    "answer": 4,
     "explain": "AddDbContext đăng ký vòng đời scoped: mỗi request một context và tự dispose khi request kết thúc. Giữ static thì vừa rò connection vừa giữ hết thực thể đã tải."
   },
   {

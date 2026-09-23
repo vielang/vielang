@@ -196,34 +196,34 @@ một vòng `foreach`.
     "prompt": "Bạn cần lấy đơn hàng theo id — id là khoá chính nên lẽ ra chỉ có một. Dùng gì?",
     "options": [
       "First(o => o.Id == id)",
-      "Single(o => o.Id == id)",
       "Where(o => o.Id == id).ToList()",
+      "Single(o => o.Id == id)",
       "FirstOrDefault(o => o.Id == id)!"
     ],
-    "answer": 2,
+    "answer": 3,
     "explain": "Single ném lỗi nếu có từ hai bản ghi trở lên — dữ liệu trùng khoá chính là chuyện phải biết ngay, không nên bị First giấu đi."
   },
   {
     "prompt": "Cách nào nhanh hơn khi chỉ cần biết danh sách có phần tử nào không?",
     "options": [
-      "list.Count() > 0",
       "list.Any()",
+      "list.Count() > 0",
       "list.Length > 0",
       "list.ToList().Count > 0"
     ],
-    "answer": 2,
+    "answer": 1,
     "explain": "Any() dừng ngay khi gặp phần tử đầu tiên; Count() phải duyệt hết mới trả về được con số."
   },
   {
     "prompt": "Bạn muốn lấy ĐƠN HÀNG có giá trị lớn nhất, không phải con số lớn nhất. Dùng gì?",
     "options": [
       "orders.Max(o => o.Total)",
-      "orders.MaxBy(o => o.Total)",
+      "orders.Select(o => o.Total).Max()",
       "orders.OrderBy(o => o.Total).First()",
-      "orders.Select(o => o.Total).Max()"
+      "orders.MaxBy(o => o.Total)"
     ],
-    "answer": 2,
-    "explain": "Max trả về giá trị lớn nhất, MaxBy trả về chính phần tử mang giá trị đó. Phương án C cũng ra phần tử nhưng là nhỏ nhất, vì OrderBy sắp tăng dần."
+    "answer": 4,
+    "explain": "Max trả về giá trị lớn nhất, MaxBy trả về chính phần tử mang giá trị đó. OrderBy(...).First() cũng ra một phần tử, nhưng là phần tử NHỎ nhất, vì OrderBy sắp tăng dần."
   },
   {
     "prompt": "Đoạn vòng lặp này làm gì, và LINQ viết lại thế nào?",

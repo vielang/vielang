@@ -180,8 +180,13 @@ sửa object trong method thì bên ngoài thấy được.
   {
     "prompt": "Đoạn này in ra gì?",
     "code": "var s = \"abc\";\ns.ToUpper();\nConsole.WriteLine(s);",
-    "options": ["ABC", "abc", "Chuỗi rỗng", "Lỗi compile"],
-    "answer": 2,
+    "options": [
+      "ABC",
+      "Lỗi compile",
+      "Chuỗi rỗng",
+      "abc"
+    ],
+    "answer": 4,
     "explain": "string là immutable: ToUpper() trả về chuỗi mới, không sửa s. Phải gán lại s = s.ToUpper()."
   },
   {
@@ -199,22 +204,22 @@ sửa object trong method thì bên ngoài thấy được.
     "prompt": "Số tiền 1.5 gửi sang API đối tác. Trên server Đức nó thành \"1,5\". Sửa thế nào?",
     "options": [
       "Đổi ngôn ngữ hệ thống của server về tiếng Anh",
-      "Dùng value.ToString(CultureInfo.InvariantCulture)",
       "Nhân 100 rồi gửi số nguyên",
+      "Dùng value.ToString(CultureInfo.InvariantCulture)",
       "Thay dấu phẩy bằng dấu chấm sau khi ToString()"
     ],
-    "answer": 2,
+    "answer": 3,
     "explain": "Chuỗi cho máy đọc phải độc lập với culture của máy chủ. Đổi cấu hình server chỉ giấu bug tới lần deploy sau."
   },
   {
     "prompt": "So sánh mã đơn hàng người dùng nhập với mã trong database, cần bỏ qua hoa thường. Cách đúng?",
     "options": [
-      "a.ToLower() == b.ToLower()",
       "string.Equals(a, b, StringComparison.OrdinalIgnoreCase)",
+      "a.ToLower() == b.ToLower()",
       "a.Equals(b)",
       "a.CompareTo(b) == 0"
     ],
-    "answer": 2,
+    "answer": 1,
     "explain": "OrdinalIgnoreCase so theo mã ký tự, không phụ thuộc culture và không cấp phát chuỗi mới như ToLower()."
   }
 ]

@@ -168,8 +168,13 @@ Bài sau, **class, struct hay record**, mở bằng một hàm so tiền luôn t
   {
     "prompt": "Đoạn này in ra gì?",
     "code": "var a = new List<int> { 1, 2 };\nvar b = a;\nb.Add(3);\n\nConsole.WriteLine(a.Count);",
-    "options": ["2", "3", "0", "Lỗi lúc chạy"],
-    "answer": 2,
+    "options": [
+      "2",
+      "0",
+      "3",
+      "Lỗi lúc chạy"
+    ],
+    "answer": 3,
     "explain": "List là reference type: b và a cùng trỏ một danh sách. Muốn tách rời thì var b = a.ToList()."
   },
   {
@@ -188,11 +193,11 @@ Bài sau, **class, struct hay record**, mở bằng một hàm so tiền luôn t
     "code": "object boxed = 42;",
     "options": [
       "Không có gì đặc biệt, 42 vẫn nằm trên stack",
-      "Boxing: 42 được chép lên heap trong một object",
+      "Lỗi compile vì int không gán cho object được",
       "42 bị chuyển thành chuỗi \"42\"",
-      "Lỗi compile vì int không gán cho object được"
+      "Boxing: 42 được chép lên heap trong một object"
     ],
-    "answer": 2,
+    "answer": 4,
     "explain": "Boxing gói value type vào một object trên heap. Trong vòng lặp lớn, mỗi lần boxing là một lần cấp phát — dùng generic để tránh."
   },
   {

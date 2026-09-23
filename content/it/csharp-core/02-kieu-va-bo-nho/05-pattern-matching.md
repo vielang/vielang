@@ -197,34 +197,34 @@ giây ở máy dev. Với dữ liệu thật, nó mất gần một phút.
     "prompt": "Cách viết nào thay được hai dòng kiểm tra kiểu rồi ép kiểu?",
     "code": "if (shape is Circle)\n{\n    var c = (Circle)shape;\n}",
     "options": [
-      "if (shape as Circle)",
       "if (shape is Circle c)",
+      "if (shape as Circle)",
       "if (shape.GetType() == typeof(Circle))",
       "switch (shape) { case Circle: break; }"
     ],
-    "answer": 2,
+    "answer": 1,
     "explain": "Type pattern kiểm tra kiểu và gán biến trong một bước; biến c dùng được ngay trong thân if."
   },
   {
     "prompt": "switch trên kiểu Payment có nhánh _ => throw. Nửa năm sau đồng nghiệp thêm record Momo : Payment. Chuyện gì xảy ra?",
     "options": [
       "Compiler chặn ngay lúc build, vì switch không còn đầy đủ",
-      "Chạy tới một khoản Momo mới nổ, đúng một chỗ và nói rõ tên kiểu còn thiếu",
+      "Trả về null, không ai biết gì",
       "Momo lặng lẽ rơi vào nhánh của Cash",
-      "Trả về null, không ai biết gì"
+      "Chạy tới một khoản Momo mới nổ, đúng một chỗ và nói rõ tên kiểu còn thiếu"
     ],
-    "answer": 2,
+    "answer": 4,
     "explain": "C# không coi cây kế thừa là đóng, nên compiler không thể biết Momo cần xử lý ở đâu — nó không chặn được lúc build. Nhánh _ => throw là cách biến chỗ thiếu thành một lỗi nói rõ tên kiểu, thay vì một hành vi sai âm thầm."
   },
   {
     "prompt": "parts là mảng [\"POST\", \"/orders\", \"1\"]. Pattern nào khớp?",
     "options": [
       "[\"POST\", var p]",
-      "[\"POST\", var p, ..]",
+      "Cả [\"POST\", var p, ..] và [..]",
       "[..]",
-      "Cả B và C"
+      "[\"POST\", var p, ..]"
     ],
-    "answer": 4,
+    "answer": 2,
     "explain": "[\"POST\", var p] đòi đúng 2 phần tử nên không khớp. [\"POST\", var p, ..] khớp vì .. nhận phần còn lại, và [..] khớp mọi mảng — nhánh nào viết trước thì thắng."
   }
 ]

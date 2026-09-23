@@ -163,28 +163,33 @@ Bài sau, **Kiểu dữ liệu và biến**, mở bằng một hoá đơn in ra
     "prompt": "File Program.cs chỉ có Console.WriteLine(\"Hi\"); và không có class nào. Vì sao chạy được?",
     "options": [
       "C# không cần class, mọi file đều chạy được",
-      "Top-level statements: compiler tự sinh class và Main",
+      "Vì CLR bỏ qua bước tìm Main",
       "Vì đây là console application, loại project này khác",
-      "Vì CLR bỏ qua bước tìm Main"
+      "Top-level statements: compiler tự sinh class và Main"
     ],
-    "answer": 2,
+    "answer": 4,
     "explain": "Từ .NET 6, compiler tự sinh phần class và Main cho bạn. Chương trình vẫn bắt đầu từ Main như mọi khi."
   },
   {
     "prompt": "Bạn sửa code nhưng chạy lại vẫn thấy kết quả cũ. Cách xử lý hợp lý nhất?",
     "options": [
-      "Xoá thư mục bin rồi tạo project mới",
       "Chạy dotnet watch run để tự build lại khi file đổi",
+      "Xoá thư mục bin rồi tạo project mới",
       "Khởi động lại máy",
       "Đổi từ dotnet run sang dotnet build"
     ],
-    "answer": 2,
+    "answer": 1,
     "explain": "dotnet watch run theo dõi file và build lại mỗi khi bạn lưu — vòng lặp sửa rồi chạy nhanh hơn hẳn."
   },
   {
     "prompt": "Một API thật có 4 project: Api, Domain, Infrastructure, Tests. Bốn project này nằm trong cái gì?",
-    "options": ["Một assembly", "Một solution", "Một namespace", "Một package NuGet"],
-    "answer": 2,
+    "options": [
+      "Một assembly",
+      "Một namespace",
+      "Một solution",
+      "Một package NuGet"
+    ],
+    "answer": 3,
     "explain": "Solution (.sln) gom nhiều project mở cùng nhau. Mỗi project build ra một assembly riêng."
   }
 ]

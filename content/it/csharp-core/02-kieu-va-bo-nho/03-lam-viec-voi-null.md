@@ -187,10 +187,10 @@ Deploy xong, mọi đơn hàng cũ trong database đổi nghĩa.
     "options": [
       "Khai báo string Name thay vì string? Name",
       "Thêm dấu ! sau biến để hết cảnh báo",
-      "Kiểm tra if (x is null) trước khi dùng",
-      "Bật TreatWarningsAsErrors"
+      "Bật TreatWarningsAsErrors",
+      "Kiểm tra if (x is null) trước khi dùng"
     ],
-    "answer": 3,
+    "answer": 4,
     "explain": "Nullable reference types chỉ tác dụng lúc compile. Runtime chỉ an toàn khi bạn kiểm tra thật, hoặc chặn ở biên bằng ArgumentNullException."
   },
   {
@@ -198,33 +198,33 @@ Deploy xong, mọi đơn hàng cũ trong database đổi nghĩa.
     "code": "var order = await db.Orders.FindAsync(id);\nConsole.WriteLine(order!.Customer);",
     "options": [
       "Chuỗi rỗng",
-      "null",
       "Ném NullReferenceException",
+      "null",
       "Lỗi compile vì thiếu kiểm tra"
     ],
-    "answer": 3,
+    "answer": 2,
     "explain": "FindAsync trả null khi không có. Dấu ! chỉ tắt cảnh báo của compiler, còn lúc chạy thì vẫn chạm vào null."
   },
   {
     "prompt": "Method lấy danh sách đơn hàng, không có cái nào khớp. Nên trả về gì?",
     "options": [
       "null, để người gọi biết là không có",
-      "Danh sách rỗng",
       "Ném exception",
+      "Danh sách rỗng",
       "Tuỳ, hai cách như nhau"
     ],
-    "answer": 2,
+    "answer": 3,
     "explain": "Trả danh sách rỗng thì người gọi foreach hay Count đều chạy bình thường. Trả null là bắt mọi nơi gọi phải nhớ kiểm tra."
   },
   {
     "prompt": "int? quantity có gì khác string? name?",
     "options": [
-      "Không khác gì, chỉ là cú pháp",
       "int? đổi hẳn kiểu thành Nullable<int>, có thật lúc chạy; string? chỉ là chú thích cho compiler",
+      "Không khác gì, chỉ là cú pháp",
       "string? tốn thêm bộ nhớ còn int? thì không",
       "int? không dùng được với ??"
     ],
-    "answer": 2,
+    "answer": 1,
     "explain": "Nullable value type là một kiểu thật với cờ HasValue. Nullable reference type chỉ là thông tin cho compiler, biến mất sau khi build."
   }
 ]

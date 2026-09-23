@@ -234,34 +234,34 @@ hai gần như luôn an toàn hơn.
   {
     "prompt": "Interface nào đặt tên tốt nhất?",
     "options": [
-      "IOrderManager",
-      "IOrderHelper",
       "IShippingFeeCalculator",
+      "IOrderHelper",
+      "IOrderManager",
       "IOrderUtils"
     ],
-    "answer": 3,
+    "answer": 1,
     "explain": "Tên nói rõ hợp đồng hứa làm gì. Manager, Helper, Utils không hứa điều gì cụ thể, và thường là dấu hiệu interface đang ôm nhiều việc."
   },
   {
     "prompt": "Class PlaceOrder tự viết private readonly EmailNotifier _mail = new(); Hệ quả nào là nặng nhất?",
     "options": [
       "Tốn thêm bộ nhớ cho mỗi instance",
-      "Không thay được cách gửi và không test được nếu không có SMTP thật",
       "Vi phạm quy ước đặt tên",
+      "Không thay được cách gửi và không test được nếu không có SMTP thật",
       "Gây memory leak"
     ],
-    "answer": 2,
+    "answer": 3,
     "explain": "Tự new là khoá cứng vào một cách làm. Nhận INotifier qua constructor thì đổi sang SMS hay bản giả lúc test đều không phải sửa class này."
   },
   {
     "prompt": "Interface có 14 method, vài class implement phải ném NotImplementedException ở nửa số đó. Nên làm gì?",
     "options": [
       "Để nguyên, ném NotImplementedException là bình thường",
-      "Chuyển thành abstract class có sẵn thân rỗng",
       "Chia thành nhiều interface nhỏ theo việc mà từng nơi cần",
+      "Chuyển thành abstract class có sẵn thân rỗng",
       "Thêm default implementation cho mọi method"
     ],
-    "answer": 3,
+    "answer": 2,
     "explain": "NotImplementedException nghĩa là class bị ép ký một hợp đồng nó không làm. Chia nhỏ để mỗi nơi chỉ phụ thuộc đúng phần nó dùng."
   },
   {
@@ -269,10 +269,10 @@ hai gần như luôn an toàn hơn.
     "options": [
       "Lớp gọi API thanh toán bên ngoài",
       "Lớp đọc ghi database",
-      "Lớp tính thuế thuần tuý từ số liệu truyền vào, chỉ có một cách tính",
-      "Lớp lấy thời gian hiện tại"
+      "Lớp lấy thời gian hiện tại",
+      "Lớp tính thuế thuần tuý từ số liệu truyền vào, chỉ có một cách tính"
     ],
-    "answer": 3,
+    "answer": 4,
     "explain": "Không chạm ra ngoài, không có cách làm thứ hai thì interface chỉ thêm một lớp gián tiếp. Ba trường hợp còn lại đều chạm thế giới bên ngoài nên rất đáng tách hợp đồng."
   }
 ]

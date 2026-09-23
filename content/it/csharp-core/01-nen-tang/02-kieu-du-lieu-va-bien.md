@@ -159,22 +159,22 @@ Công thức đúng, dữ liệu đúng, chỉ vì hai số đem chia đều là
     "prompt": "Hệ thống tính tiền đang dùng double và thỉnh thoảng hoá đơn lệch vài đồng. Sửa thế nào?",
     "options": [
       "Làm tròn kết quả bằng Math.Round ở chỗ hiển thị",
-      "Đổi kiểu sang decimal cho mọi phép tính tiền",
+      "Nhân 100 rồi lưu bằng double",
       "Đổi sang float cho nhẹ hơn",
-      "Nhân 100 rồi lưu bằng double"
+      "Đổi kiểu sang decimal cho mọi phép tính tiền"
     ],
-    "answer": 2,
+    "answer": 4,
     "explain": "Làm tròn lúc hiển thị chỉ giấu sai số, cộng dồn qua nhiều phép vẫn lệch. decimal lưu theo hệ thập phân nên tiền ra đúng ngay từ phép tính."
   },
   {
     "prompt": "Người dùng gõ \"abc\" vào ô số lượng, code chạy int.Parse(input). Chuyện gì xảy ra?",
     "options": [
       "Trả về 0",
-      "Trả về null",
       "Ném FormatException, request lỗi 500",
+      "Trả về null",
       "Compiler chặn từ lúc build"
     ],
-    "answer": 3,
+    "answer": 2,
     "explain": "Parse ném exception khi chuỗi không phải số. Với dữ liệu từ bên ngoài, dùng int.TryParse để tự xử lý trường hợp sai."
   },
   {
@@ -192,12 +192,12 @@ Công thức đúng, dữ liệu đúng, chỉ vì hai số đem chia đều là
   {
     "prompt": "Project bật Nullable enable. Dòng string name = null; sẽ ra sao?",
     "options": [
-      "Lỗi compile, chương trình không build được",
       "Cảnh báo lúc compile, vẫn chạy được",
+      "Lỗi compile, chương trình không build được",
       "Không sao cả, string vốn cho phép null",
       "Ném NullReferenceException lúc chạy"
     ],
-    "answer": 2,
+    "answer": 1,
     "explain": "Nullable reference types chỉ sinh cảnh báo, trừ khi project bật TreatWarningsAsErrors. Runtime không chặn, nên dữ liệu từ JSON hay database vẫn có thể lọt null vào."
   }
 ]

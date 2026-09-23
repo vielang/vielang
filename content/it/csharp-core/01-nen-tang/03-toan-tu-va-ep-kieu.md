@@ -159,15 +159,25 @@ thử hai đơn thì êm, gặp dữ liệu thật thì sập ngay vòng lặp �
   {
     "prompt": "rate bằng bao nhiêu?",
     "code": "int success = 47, total = 100;\ndouble rate = success / total;",
-    "options": ["0.47", "0", "47", "Lỗi compile"],
-    "answer": 2,
+    "options": [
+      "0",
+      "0.47",
+      "47",
+      "Lỗi compile"
+    ],
+    "answer": 1,
     "explain": "Phép chia thực hiện trước khi gán, mà hai vế đều là int nên ra 0. Ép kiểu một vế: (double)success / total."
   },
   {
     "prompt": "x bằng mấy?",
     "code": "decimal price = 19.99m;\nint x = (int)price;",
-    "options": ["20", "19", "19.99", "Lỗi compile vì phải dùng Math.Round"],
-    "answer": 2,
+    "options": [
+      "20",
+      "19.99",
+      "19",
+      "Lỗi compile vì phải dùng Math.Round"
+    ],
+    "answer": 3,
     "explain": "Ép kiểu tường minh cắt cụt phần thập phân. Muốn 20 thì (int)Math.Round(price)."
   },
   {
@@ -185,11 +195,11 @@ thử hai đơn thì êm, gặp dữ liệu thật thì sập ngay vòng lặp �
     "prompt": "Vì sao if (user != null && user.IsActive) an toàn?",
     "options": [
       "Vì C# tự kiểm tra null cho mọi phép truy cập",
-      "Vì && ngắn mạch: user null thì vế phải không chạy",
+      "Không an toàn, phải dùng dấu &",
       "Vì && kiểm tra cả hai vế rồi mới quyết định",
-      "Không an toàn, phải dùng dấu &"
+      "Vì && ngắn mạch: user null thì vế phải không chạy"
     ],
-    "answer": 2,
+    "answer": 4,
     "explain": "&& chỉ chạy vế phải khi vế trái đúng. Đổi sang & là cả hai vế đều chạy và bạn nhận NullReferenceException."
   }
 ]

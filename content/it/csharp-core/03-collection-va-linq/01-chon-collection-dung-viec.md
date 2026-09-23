@@ -189,11 +189,11 @@ thấy câu truy vấn nặng nhất chạy ba lần, dù code chỉ viết nó 
     "code": "var existing = new List<string>(oldCodes);\n\nforeach (var code in newCodes)\n    if (!existing.Contains(code))\n        Add(code);",
     "options": [
       "Đổi foreach thành for",
-      "Đổi existing sang HashSet<string>",
+      "Gọi existing.ToArray() trước vòng lặp",
       "Sắp xếp existing trước khi duyệt",
-      "Gọi existing.ToArray() trước vòng lặp"
+      "Đổi existing sang HashSet<string>"
     ],
-    "answer": 2,
+    "answer": 4,
     "explain": "List.Contains duyệt tuần tự nên nằm trong vòng lặp là O(n²). HashSet.Contains tính thẳng ra chỗ cần nhìn, gần như tức thì."
   },
   {
@@ -212,22 +212,22 @@ thấy câu truy vấn nặng nhất chạy ba lần, dù code chỉ viết nó 
     "code": "decimal price = 0;\n\nif (dict.ContainsKey(code))\n    price = dict[code];",
     "options": [
       "Giữ nguyên, code này rõ ràng nhất",
-      "Dùng dict.TryGetValue(code, out var price) — chỉ tra một lần thay vì hai",
       "Dùng dict.Keys.Contains(code) trước",
+      "Dùng dict.TryGetValue(code, out var price) — chỉ tra một lần thay vì hai",
       "Bọc trong try - catch KeyNotFoundException"
     ],
-    "answer": 2,
+    "answer": 3,
     "explain": "ContainsKey rồi dict[code] là hai lần tra cùng một khoá. TryGetValue làm gọn trong một lần và cũng an toàn."
   },
   {
     "prompt": "Class có danh sách item bên trong, cần cho bên ngoài đọc nhưng không được sửa. Khai báo property thế nào?",
     "options": [
-      "public List<Item> Items { get; set; }",
       "public IReadOnlyList<Item> Items => _items;",
+      "public List<Item> Items { get; set; }",
       "public Item[] Items => _items.ToArray();",
       "public IEnumerable<Item> Items { get; set; }"
     ],
-    "answer": 2,
+    "answer": 1,
     "explain": "IReadOnlyList cho đọc và đếm nhưng không có Add hay Remove, lại không phải chép mảng mới mỗi lần gọi như phương án ToArray."
   }
 ]

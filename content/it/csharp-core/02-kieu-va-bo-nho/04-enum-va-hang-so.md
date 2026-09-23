@@ -193,19 +193,24 @@ biểu thức. Đây là thứ bạn sẽ gặp khắp nơi trong code C# hiện
   {
     "prompt": "Enum lưu xuống database dạng số. Ai đó thêm một giá trị vào GIỮA danh sách. Chuyện gì xảy ra với dữ liệu cũ?",
     "options": [
-      "Không sao, enum lưu theo tên",
       "Mọi bản ghi có số lớn hơn vị trí chèn đều đổi nghĩa",
+      "Không sao, enum lưu theo tên",
       "Database tự cập nhật lại",
       "Ứng dụng ném exception khi đọc bản ghi cũ"
     ],
-    "answer": 2,
+    "answer": 1,
     "explain": "Enum bên dưới là số tự đánh từ 0. Chèn vào giữa làm mọi giá trị phía sau trượt một nấc, còn dữ liệu cũ thì vẫn giữ số cũ."
   },
   {
     "prompt": "Đoạn này in ra gì?",
     "code": "var status = (OrderStatus)99;\nConsole.WriteLine(Enum.IsDefined(status));",
-    "options": ["True", "False", "Ném InvalidCastException", "Lỗi compile"],
-    "answer": 2,
+    "options": [
+      "True",
+      "Ném InvalidCastException",
+      "False",
+      "Lỗi compile"
+    ],
+    "answer": 3,
     "explain": "Ép kiểu sang enum không kiểm tra gì, nên status mang giá trị 99 không có trong danh sách. IsDefined chính là cách phát hiện."
   },
   {
@@ -223,11 +228,11 @@ biểu thức. Đây là thứ bạn sẽ gặp khắp nơi trong code C# hiện
     "prompt": "Hằng số public MaxRetry nằm trong một thư viện dùng chung, thỉnh thoảng phải chỉnh. Khai báo thế nào?",
     "options": [
       "public const int — nhanh nhất",
-      "public static readonly int — đổi giá trị không cần build lại bên dùng",
+      "Biến thường, gán trong constructor",
       "private const int",
-      "Biến thường, gán trong constructor"
+      "public static readonly int — đổi giá trị không cần build lại bên dùng"
     ],
-    "answer": 2,
+    "answer": 4,
     "explain": "const bị nhúng thẳng vào nơi gọi lúc compile, nên bên dùng vẫn giữ giá trị cũ cho tới khi build lại. static readonly đọc lúc chạy."
   }
 ]

@@ -210,8 +210,13 @@ file, connection, socket đúng lúc bằng `using`.
   {
     "prompt": "Đoạn này sinh ra bao nhiêu câu SQL, với 20 đơn hàng?",
     "code": "var orders = await db.Orders.Take(20).ToListAsync();\n\nforeach (var d in orders)\n    Console.WriteLine(o.Customer.Name);",
-    "options": ["1", "2", "21", "40"],
-    "answer": 3,
+    "options": [
+      "1",
+      "21",
+      "2",
+      "40"
+    ],
+    "answer": 2,
     "explain": "Một câu lấy 20 đơn, rồi mỗi lần chạm o.Customer là thêm một câu — tổng 21. Sửa bằng Include(o => o.Customer) hoặc Select sang DTO."
   },
   {
@@ -220,32 +225,32 @@ file, connection, socket đúng lúc bằng `using`.
     "options": [
       "Cả hai đều chạy ở database",
       "a chạy ở database, b trong bộ nhớ",
-      "b chạy ở database, a kéo cả bảng về rồi mới lọc",
-      "Cả hai đều kéo cả bảng về"
+      "Cả hai đều kéo cả bảng về",
+      "b chạy ở database, a kéo cả bảng về rồi mới lọc"
     ],
-    "answer": 3,
+    "answer": 4,
     "explain": "AsEnumerable() cắt đứt IQueryable: từ đó trở đi mọi phép chạy trong bộ nhớ, nên dữ liệu phải về trước."
   },
   {
     "prompt": "Bạn viết db.Orders.Where(o => Score(o) > 10) với Score là method C# của bạn. Chuyện gì xảy ra?",
     "options": [
-      "EF Core tự dịch method sang SQL",
       "Ném exception lúc chạy vì không dịch được sang SQL",
+      "EF Core tự dịch method sang SQL",
       "Chạy được nhưng chậm",
       "Lỗi compile"
     ],
-    "answer": 2,
+    "answer": 1,
     "explain": "EF Core chỉ dịch được các biểu thức nó hiểu. Muốn dùng logic C#, hãy lọc ở database trước cho tập đủ nhỏ rồi ToListAsync, sau đó mới tính."
   },
   {
     "prompt": "Truy vấn chỉ để hiển thị danh sách, không sửa gì. Thêm gì để nhẹ hơn?",
     "options": [
       "AsEnumerable()",
-      "AsNoTracking()",
       "ToList() sớm nhất có thể",
+      "AsNoTracking()",
       "Include() mọi quan hệ"
     ],
-    "answer": 2,
+    "answer": 3,
     "explain": "Mặc định EF Core theo dõi mọi thực thể đã tải để phát hiện thay đổi. Truy vấn chỉ đọc thì bỏ phần theo dõi đó đi."
   }
 ]

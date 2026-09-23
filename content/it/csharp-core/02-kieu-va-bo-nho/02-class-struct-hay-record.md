@@ -167,39 +167,49 @@ production mà không ai biết giá trị null đi vào từ đâu.
 ```quiz
 [
   {
-    "prompt": "Đoạn này in ra gì?",
-    "code": "record Money(decimal Amount);\n\nvar a = new Money(100);\nvar b = new Money(100);\n\nConsole.WriteLine(a == b);",
-    "options": ["True", "False", "Lỗi compile", "Tuỳ máy"],
-    "answer": 1,
-    "explain": "record so sánh theo giá trị: mọi field bằng nhau thì hai record bằng nhau. Nếu Money là class thì kết quả sẽ là False."
+    "prompt": "Bạn dùng CacheKey làm khoá cho Dictionary. Lưu bằng một CacheKey, rồi tra bằng một CacheKey khác nhưng cùng nội dung. Có tìm thấy không?",
+    "code": "record CacheKey(string Tenant, int Page);\n\ncache[new CacheKey(\"acme\", 2)] = rows;\nvar found = cache.TryGetValue(\n    new CacheKey(\"acme\", 2), out var ra);",
+    "options": [
+      "Không, vì đó là hai object khác nhau",
+      "Có",
+      "Ném exception vì record không làm khoá được",
+      "Tuỳ số phần tử trong Dictionary"
+    ],
+    "answer": 2,
+    "explain": "record sinh cả Equals lẫn GetHashCode theo giá trị, nên Dictionary coi hai khoá cùng nội dung là một. Đổi CacheKey thành class là tra trượt ngay, vì lúc đó nó so theo danh tính."
   },
   {
     "prompt": "Bạn cần một kiểu chở dữ liệu từ API về: chỉ đọc, so sánh theo nội dung, ghi log dễ đọc. Chọn gì?",
-    "options": ["class với property get/set", "record", "struct có set", "Dictionary<string, object>"],
-    "answer": 2,
+    "options": [
+      "class với property get/set",
+      "Dictionary<string, object>",
+      "struct có set",
+      "record"
+    ],
+    "answer": 4,
     "explain": "record sinh sẵn Equals, GetHashCode, ToString và with; property khai báo rút gọn là init-only nên dữ liệu không bị sửa lung tung."
   },
   {
     "prompt": "a có một List bên trong. Sau dòng này, b và a chia sẻ gì?",
     "code": "var b = a with { Amount = 200 };",
     "options": [
-      "Không chia sẻ gì, with chép sâu toàn bộ",
       "Chung chính List đó, vì with chỉ chép nông",
+      "Không chia sẻ gì, with chép sâu toàn bộ",
       "Chung mọi thứ, b chỉ là tên khác của a",
       "Lỗi compile vì record không dùng with với List"
     ],
-    "answer": 2,
+    "answer": 1,
     "explain": "with tạo object mới và chép từng field. Field kiểu List là tham chiếu, nên bản sao trỏ đúng danh sách cũ."
   },
   {
     "prompt": "Khi nào struct là lựa chọn đúng?",
     "options": [
       "Khi kiểu đó có nhiều property và hay bị sửa",
-      "Khi giá trị nhỏ, bất biến và được tạo ra rất nhiều",
       "Khi muốn truyền qua nhiều tầng mà không tốn bộ nhớ",
+      "Khi giá trị nhỏ, bất biến và được tạo ra rất nhiều",
       "Khi cần so sánh theo giá trị"
     ],
-    "answer": 2,
+    "answer": 3,
     "explain": "struct hợp với giá trị nhỏ và bất biến. Struct lớn còn chậm hơn class vì bị chép mỗi lần gán hay truyền đi; còn so sánh theo giá trị thì record đã làm được."
   }
 ]

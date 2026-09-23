@@ -208,33 +208,33 @@ Máy dev gửi `1.5`, server gửi `1,5`, và đối tác đọc thành mười 
     "prompt": "Reviewer đọc Save(order, true, false) và không hiểu hai bool. Cách sửa tốt nhất?",
     "options": [
       "Thêm comment giải thích ở chỗ gọi",
-      "Đổi sang named argument, hoặc thay bool bằng enum",
+      "Tách thành hai method Save khác nhau",
       "Đổi thứ tự tham số cho dễ nhớ",
-      "Tách thành hai method Save khác nhau"
+      "Đổi sang named argument, hoặc thay bool bằng enum"
     ],
-    "answer": 2,
+    "answer": 4,
     "explain": "Named argument làm chỗ gọi tự giải thích mà không đổi chữ ký; enum còn rõ hơn vì tên giá trị mang nghĩa."
   },
   {
     "prompt": "Method cần trả về cả kết quả kiểm tra lẫn thông báo lỗi. Cách nào hợp lý nhất trong C# hiện đại?",
     "options": [
-      "Hai tham số out",
       "Trả về tuple (bool Ok, string? Error)",
+      "Hai tham số out",
       "Trả về object rồi ép kiểu ở chỗ gọi",
       "Dùng biến static để truyền thông báo"
     ],
-    "answer": 2,
+    "answer": 1,
     "explain": "Tuple hoặc một record riêng đọc xuôi và dùng deconstruction được. out chỉ nên giữ cho mẫu TryParse và TryGetValue."
   },
   {
     "prompt": "Ba method cùng tên Log nhưng khác danh sách tham số. Compiler chọn bản nào lúc nào?",
     "options": [
       "Lúc chạy, theo kiểu thật của đối số",
-      "Lúc compile, theo kiểu của đối số ở chỗ gọi",
       "Luôn chọn bản có ít tham số nhất",
+      "Lúc compile, theo kiểu của đối số ở chỗ gọi",
       "Phải chỉ định rõ bằng tên đầy đủ"
     ],
-    "answer": 2,
+    "answer": 3,
     "explain": "Overload resolution xảy ra lúc compile dựa trên kiểu tĩnh của đối số — đó cũng là lý do overload nhập nhằng bị báo lỗi ngay khi build."
   }
 ]

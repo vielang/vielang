@@ -228,23 +228,23 @@ connection, socket. Và `using` chính là `finally` viết gọn lại.
     "prompt": "Đoạn này làm gì với stack trace của lỗi gốc?",
     "code": "try { Inner(); }\ncatch (Exception ex) { throw ex; }",
     "options": [
-      "Giữ nguyên, ném lại y như cũ",
       "Ghi đè stack trace từ dòng throw, mất nơi lỗi thật sự xảy ra",
+      "Giữ nguyên, ném lại y như cũ",
       "Xoá luôn cả message",
       "Bọc thành inner exception"
     ],
-    "answer": 2,
+    "answer": 1,
     "explain": "throw ex; đặt lại điểm bắt đầu của stack trace. Dùng throw; để ném tiếp mà giữ nguyên, hoặc bọc lỗi gốc làm inner exception."
   },
   {
     "prompt": "Log production chỉ có một dòng message, không stack trace. Nguyên nhân thường gặp nhất?",
     "options": [
       "Logger cấu hình sai mức log",
-      "Code ghi logger.LogError(ex.Message) thay vì logger.LogError(ex, ...)",
       "Exception không có stack trace",
+      "Code ghi logger.LogError(ex.Message) thay vì logger.LogError(ex, ...)",
       "Production tắt stack trace cho nhẹ"
     ],
-    "answer": 2,
+    "answer": 3,
     "explain": "Truyền ex làm tham số đầu thì logger ghi cả stack trace lẫn inner exception. Truyền ex.Message là tự vứt đi phần có ích nhất."
   },
   {
@@ -262,11 +262,11 @@ connection, socket. Và `using` chính là `finally` viết gọn lại.
     "prompt": "Người dùng nhập chuỗi vào ô số. Cách nào đúng?",
     "options": [
       "try { int.Parse(s) } catch { dùng 0 }",
-      "if (!int.TryParse(s, out var n)) n = 0;",
+      "Parse hay TryParse đều như nhau, chỉ khác cách viết",
       "Ném ArgumentException rồi bắt ở controller",
-      "Cả A và B như nhau"
+      "if (!int.TryParse(s, out var n)) n = 0;"
     ],
-    "answer": 2,
+    "answer": 4,
     "explain": "Người dùng gõ sai là chuyện bình thường, không phải tình huống bất thường. Exception tốn kém hơn một phép if rất nhiều."
   }
 ]

@@ -196,44 +196,44 @@ thì bên ngoài thấy, còn gán lại thì không. Cùng một chữ ký hàm
     "prompt": "Code duyệt foreach trên một List và gọi list.Remove(x) bên trong. Chuyện gì xảy ra?",
     "options": [
       "Xoá được bình thường, vòng lặp bỏ qua phần tử đã xoá",
-      "Ném InvalidOperationException ở lần lặp kế tiếp",
       "Vòng lặp chạy vô hạn",
+      "Ném InvalidOperationException ở lần lặp kế tiếp",
       "Compiler báo lỗi lúc build"
     ],
-    "answer": 2,
+    "answer": 3,
     "explain": "foreach giữ con trỏ trên danh sách gốc; danh sách đổi là con trỏ mất chỗ đứng. Lọc ra danh sách mới bằng Where, hoặc dùng for duyệt ngược."
   },
   {
     "prompt": "Bạn muốn xoá tại chỗ nhiều phần tử của một List bằng vòng for. Vì sao phải duyệt ngược từ cuối?",
     "options": [
-      "Vì RemoveAt chỉ chạy được từ cuối danh sách",
       "Vì xoá phần tử i làm mọi phần tử sau nó lùi một chỗ, duyệt xuôi sẽ bỏ sót",
+      "Vì RemoveAt chỉ chạy được từ cuối danh sách",
       "Vì duyệt ngược nhanh hơn",
       "Không bắt buộc, duyệt xuôi cũng đúng"
     ],
-    "answer": 2,
+    "answer": 1,
     "explain": "Duyệt xuôi thì sau khi xoá phần tử i, phần tử i+1 lùi vào vị trí i mà vòng lặp đã đi qua — nó bị bỏ sót."
   },
   {
     "prompt": "Bạn thêm giá trị OrderStatus.Refunded vào enum. Cách viết nào giúp compiler nhắc bạn xử lý nhánh mới?",
     "options": [
       "switch dạng câu lệnh có default",
-      "switch expression liệt kê đủ các nhánh, KHÔNG có nhánh _",
+      "switch expression có nhánh _ nhận mọi giá trị còn lại",
       "Chuỗi if - else if",
-      "switch expression có nhánh _ nhận mọi giá trị còn lại"
+      "switch expression liệt kê đủ các nhánh, KHÔNG có nhánh _"
     ],
-    "answer": 2,
-    "explain": "Compiler kiểm tra tính đầy đủ của switch expression và cảnh báo CS8509 khi còn giá trị chưa xử lý. Nhưng một nhánh _ là tự nhận hết phần còn lại, nên cảnh báo đó tắt luôn — phương án D im lặng đúng như if."
+    "answer": 4,
+    "explain": "Compiler kiểm tra tính đầy đủ của switch expression và cảnh báo CS8509 khi còn giá trị chưa xử lý. Nhưng một nhánh _ là tự nhận hết phần còn lại, nên cảnh báo đó tắt luôn. Một switch có nhánh _ im lặng đúng như if."
   },
   {
     "prompt": "Method có ba tầng if lồng nhau, logic chính nằm trong cùng. Cách sửa gọn nhất?",
     "options": [
       "Đổi sang switch expression",
-      "Gộp ba điều kiện bằng &&",
       "Dùng guard clause: kiểm tra trường hợp sai rồi return sớm",
+      "Gộp ba điều kiện bằng &&",
       "Tách thành ba method nhỏ, mỗi method một tầng"
     ],
-    "answer": 3,
+    "answer": 2,
     "explain": "Guard clause đưa các trường hợp loại trừ lên đầu và return ngay, để logic chính nằm ở mức thụt lề ngoài cùng."
   }
 ]

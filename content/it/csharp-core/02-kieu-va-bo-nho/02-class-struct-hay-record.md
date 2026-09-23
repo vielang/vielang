@@ -17,6 +17,9 @@ nội dung.
 
 ## Thử ngay: hai object giống hệt nhau có bằng nhau không
 
+Sự cố so tiền ở trên gói lại trong mười dòng. Chạy thử trước, đọc giải thích
+sau.
+
 ```csharp
 var c1 = new MoneyC();
 var c2 = new MoneyC();
@@ -51,6 +54,9 @@ ngay, rất tiện khi ghi log.
 
 ## Ba lựa chọn, ba loại dữ liệu
 
+C# cho bạn ba cách khai báo một kiểu, và chúng khác nhau ở đúng chỗ vừa thấy:
+`==` so cái gì.
+
 | Kiểu | So sánh theo | Dùng cho |
 |---|---|---|
 | `class` | danh tính (tham chiếu) | thực thể có trạng thái, có id |
@@ -66,6 +72,8 @@ Còn 100.000 đồng và 100.000 đồng thì không ai hỏi "số tiền nào"
 
 ## class cho thứ có vòng đời
 
+Bắt đầu từ dòng đầu bảng, cũng là lựa chọn mặc định.
+
 ```csharp
 public class Order
 {
@@ -78,10 +86,16 @@ public class Order
 }
 ```
 
-Reference type, có **identity**. Đúng cho đơn hàng, người dùng, service — thứ
-tồn tại theo thời gian và đổi trạng thái.
+`Order` là reference type, và nó có **danh tính** riêng. Hai đơn trùng từng ô
+dữ liệu vẫn là hai đơn.
+
+Đơn hàng, người dùng, service đều thuộc loại này. Thứ sống theo thời gian và
+đổi trạng thái.
 
 ## record cho dữ liệu chở đi
+
+Còn dữ liệu chỉ đi từ chỗ này sang chỗ khác thì không cần danh tính. Nó cần
+được so sánh và in ra cho dễ đọc.
 
 ```csharp
 public record Money(decimal Amount, string Currency);
@@ -91,17 +105,21 @@ var a = new Money(100, "VND");
 var b = a with { Amount = 200 };
 ```
 
-Compiler tự sinh `Equals`, `GetHashCode`, `ToString` và toán tử `with`. Các
-property khai báo kiểu rút gọn như trên là **init-only**: gán lúc khởi tạo rồi
-khoá.
+Compiler tự sinh `Equals`, `GetHashCode`, `ToString`, và cả phần việc bên dưới
+để `with` chạy được.
+
+Property khai báo theo dạng rút gọn như trên là **init-only**: gán lúc khởi tạo
+rồi khoá lại.
 
 Dùng `record` cho DTO của API, message giữa các service, value object trong
 domain, kết quả truy vấn.
 
-Một lưu ý: `with` chỉ chép **nông**. List bên trong vẫn dùng chung, đúng cái
-bẫy của bài trước.
+Một lưu ý về `with`. Nó chỉ chép **nông**, nên List bên trong vẫn dùng chung —
+đúng cái bẫy của bài trước.
 
 ## struct chỉ hợp khi nhỏ và bất biến
+
+Lựa chọn thứ ba hẹp hơn nhiều, và cũng là chỗ dễ dùng sai nhất.
 
 ```csharp
 public readonly record struct Point(int X, int Y);
@@ -111,11 +129,14 @@ public readonly record struct Point(int X, int Y);
 khi thoả **đồng thời** ba điều: nhỏ (khoảng 16 byte trở xuống), immutable, và
 được tạo ra rất nhiều.
 
-Ngoài các trường hợp đó, struct lớn còn chậm hơn class vì bị chép liên tục.
-Mặc định cứ `class` hoặc `record`, chỉ chuyển sang `struct` khi đo đạc cho
-thấy cần.
+Ngoài ba trường hợp đó, struct lớn còn chậm hơn class vì bị chép liên tục.
 
-## required, init và private set
+Mặc định cứ `class` hoặc `record`. Chỉ chuyển sang `struct` khi đã đo và thấy
+cần.
+
+## required và init chốt dữ liệu ngay lúc khởi tạo
+
+Chọn được kiểu rồi, còn câu hỏi ai được sửa cái gì và sửa lúc nào.
 
 ```csharp
 public class Product
@@ -140,8 +161,10 @@ var p = new Product { Name = "Bàn phím" };
 | `private set` | đọc công khai, chỉ sửa được từ bên trong |
 | `IReadOnlyList<T>` | lộ ra để đọc, không cho `Add` |
 
-Public thì dùng **property**, đừng dùng field. Property cho bạn chỗ thêm kiểm
-tra, đổi cách tính hay khoá quyền ghi mà không phá code đang gọi.
+Public thì dùng **property**, đừng dùng field.
+
+Property cho bạn chỗ thêm kiểm tra, đổi cách tính, hay khoá quyền ghi — mà
+không phá code đang gọi.
 
 ## Dấu hiệu trong code của bạn
 
@@ -159,7 +182,8 @@ tra, đổi cách tính hay khoá quyền ghi mà không phá code đang gọi.
 
 ## Bước tiếp theo
 
-Kiểu nào cũng có lúc rỗng. Mà rỗng trong C# nghĩa là `null`.
+Kiểu nào cũng có lúc không có giá trị. Trong C#, cái "không có" ấy tên là
+`null`.
 
 Bài sau, **Làm việc với null**, mở bằng một `NullReferenceException` trong log
 production mà không ai biết giá trị null đi vào từ đâu.

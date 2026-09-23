@@ -18,6 +18,9 @@ liệu cả — chỉ là những con số phía sau enum đã trượt đi mộ
 
 ## enum bên dưới chỉ là số nguyên
 
+Sự cố kia không phải lỗi của `enum`. Nó là hệ quả của một chi tiết mà ai cũng
+biết mà hay quên.
+
 ```csharp
 public enum OrderStatus
 {
@@ -62,6 +65,8 @@ Bản ghi cũ lưu số `2`, mà `2` vừa đổi chủ. Đó là toàn bộ s�
 
 ## Thử ngay: enum không kiểm tra giá trị
 
+Còn một chỗ nữa `enum` không bảo vệ bạn, và nó nằm ở biên hệ thống.
+
 ```csharp
 var status = (OrderStatus)99;
 
@@ -88,12 +93,20 @@ phải kiểm bằng `Enum.IsDefined` trước khi tin.
 
 </details>
 
+Cùng họ với `IsDefined` còn hai API hay dùng ở biên. `TryParse` đọc chuỗi từ
+query string, `GetValues` dựng danh sách cho dropdown.
+
 ```csharp
 Enum.TryParse<OrderStatus>("Paid", out var parsed);
 var all = Enum.GetValues<OrderStatus>();
 ```
 
+Cả hai giúp bạn không phải gõ lại danh sách trạng thái ở tầng giao diện.
+
 ## enum dạng cờ để gộp nhiều lựa chọn
+
+Một đơn hàng chỉ ở một trạng thái. Nhưng một người dùng thì có thể có nhiều
+quyền cùng lúc.
 
 ```csharp
 [Flags]
@@ -123,7 +136,10 @@ Mỗi quyền phải chiếm một bit riêng. Nghĩa là giá trị phải là 
 Cấp cho ai đó quyền đọc và ghi, xong `p.HasFlag(Permission.Delete)` trả về
 `True`. Họ xoá được dữ liệu mà chưa ai cấp quyền xoá.
 
-## const, static readonly hay readonly
+## const chốt lúc compile, static readonly chốt lúc chạy
+
+Hết phần `enum`. Còn những hằng số không phải là một tập giá trị thì khai báo
+thế nào.
 
 | Khai báo | Chốt lúc nào | Dùng cho |
 |---|---|---|
@@ -151,6 +167,8 @@ viện là chưa đủ. Bên dùng phải build lại mới thấy.
 Nên với hằng số công khai có khả năng đổi, hãy dùng `static readonly`.
 
 ## Đừng để magic number nằm rải trong code
+
+Cả bài này quy về một việc: đặt tên cho những giá trị đang nằm trần trong code.
 
 ```csharp
 // SAI — 2 là gì? 3 là gì?

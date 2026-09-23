@@ -16,6 +16,9 @@ nhầm. Chỉ là hai người đang cầm chung một object.
 
 ## Stack và heap: hai vùng nhớ, hai cách dọn
 
+Bug giỏ hàng bắt đầu từ một câu hỏi: object của bạn nằm ở đâu. C# có hai vùng
+nhớ, và chúng khác nhau cả ở cách dọn.
+
 | | Stack | Heap |
 |---|---|---|
 | Chứa gì | biến cục bộ, tham số | object do `new` tạo ra |
@@ -51,6 +54,8 @@ flowchart TD
 
 ## Thử ngay: chép giá trị hay chép tham chiếu
 
+Hai vùng nhớ ấy đổi hẳn nghĩa của một dấu bằng. Chạy thử để thấy.
+
 ```csharp
 var a = new Point { X = 1 };
 var b = a;
@@ -82,6 +87,10 @@ không đụng tới `a`.
 `Person` là **class**, tức reference type. `q = p` chỉ chép địa chỉ. Hai biến
 cùng trỏ một object, nên sửa qua `q` thì `p` thấy ngay.
 
+Có một ngoại lệ dễ gây nhầm: `string`. Nó là reference type, nhưng tạo ra rồi
+thì không sửa được — mọi phép "sửa" đều sinh chuỗi mới. Nên hai biến `string`
+không bao giờ lệch nhau kiểu hai biến `List`.
+
 </details>
 
 Đó chính là bug giỏ hàng ở đầu bài. Muốn mỗi khách một giỏ riêng thì phải tạo
@@ -102,19 +111,21 @@ var cartB = new Cart(sampleCart.Items.ToList());
 Chú ý cả `Items.ToList()`. Nếu dùng lại chính danh sách của giỏ mẫu thì hai
 giỏ vẫn chung nhau một tầng bên trong.
 
-## Truyền vào method: sửa được, nhưng không thay được
+Chuyện `Rename` và `Replace` ở bài Method chính là điều này: tham số là một bản
+chép của tham chiếu, nên sửa property thì cả hai bên cùng thấy, còn gán lại thì
+không.
 
-```csharp
-void Rename(Person p) => p.Name = "Nam";   // đổi được
-void Replace(Person p) => p = new();       // KHÔNG đổi
-```
+Chép nông là chỗ bẫy nằm sâu hơn. `Items.ToList()` cho bạn một danh sách mới,
+nhưng các phần tử bên trong vẫn là những object cũ.
 
-Tham số là một **bản chép của tham chiếu**. Sửa property thì cả hai bên cùng
-thấy. Gán lại tham số chỉ đổi bản chép cục bộ.
+Sửa tên một món trong giỏ A, giỏ B thấy ngay.
 
-Muốn thay hẳn object của người gọi thì `return` object mới.
+Muốn tách hẳn thì phải chép cả từng phần tử. Và đó là lúc nên hỏi lại xem có
+thật cần chép không.
 
 ## Boxing: gói value type lên heap
+
+Còn một chỗ nữa value type và reference type gặp nhau, và nó tốn tiền.
 
 ```csharp
 int n = 42;
@@ -124,6 +135,8 @@ int back = (int)boxed;   // unboxing — chép ngược ra
 
 **Boxing** là gói một value type vào object, để nó đi được qua chỗ cần
 reference type. Mỗi lần boxing là một lần cấp phát trên heap.
+
+Một lần thì không sao. Một triệu lần thì thành vấn đề.
 
 Trong vòng lặp nóng, đó là chi phí thật. Dùng **generic** (`List<int>` thay
 cho `ArrayList`) là tránh được gần hết.
@@ -144,7 +157,7 @@ Dòng cuối có hẳn một bài riêng ở chương Ngoại lệ và tài nguy
 
 ## Dấu hiệu trong code của bạn
 
-- Một `List<T>` hay object được gán cho nhiều nơi rồi nơi nào cũng sửa → tất cả đang dùng chung, sớm muộn cũng lệch dữ liệu.
+- Một `List<T>` gán cho ba bốn biến, chỗ nào cũng `Add` → tất cả đang dùng chung, sớm muộn dữ liệu cũng lệch.
 - Method nhận collection rồi `Add` hay `Remove` vào chính nó → người gọi bị sửa dữ liệu mà không biết.
 - `static` giữ `List` hay `Dictionary` mà chỉ thêm, không bao giờ xoá → memory leak.
 - `ArrayList`, `Hashtable`, hoặc tham số `object` trong vòng lặp lớn → boxing.
@@ -154,7 +167,7 @@ Dòng cuối có hẳn một bài riêng ở chương Ngoại lệ và tài nguy
 - Value type chép **giá trị**, reference type chép **tham chiếu**.
 - Muốn tách rời thì tạo object mới, và nhớ chép cả collection bên trong.
 - Gán lại tham số trong method không ảnh hưởng người gọi.
-- `string` là reference type nhưng **immutable**, nên dùng như value type.
+- `string` là reference type nhưng không sửa được, nên không có bug dùng chung.
 
 ## Bước tiếp theo
 

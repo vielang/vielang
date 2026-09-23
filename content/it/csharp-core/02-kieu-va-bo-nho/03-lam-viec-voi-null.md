@@ -6,8 +6,10 @@ minutes: 11
 Log production chỉ có một dòng: `NullReferenceException` ở tầng service.
 
 Bạn mở đúng dòng đó ra xem. Mọi biến đều được gán tử tế, không chỗ nào viết
-`null` cả. Giá trị null đi vào từ nơi khác, ba tầng gọi hàm trước đó, và stack
-trace không nói gì về nơi ấy.
+`null` cả.
+
+Null đi vào từ nơi khác, ba tầng gọi hàm trước đó. Còn stack trace thì không
+nói gì về nơi ấy.
 
 > **Học xong bài này bạn sẽ:** bật và đọc được cảnh báo nullable của compiler;
 > dùng đúng `?.`, `??`, `is null`; và chặn null ngay ở biên thay vì đuổi theo
@@ -16,6 +18,9 @@ trace không nói gì về nơi ấy.
 > **Cần biết trước:** reference type, method và tham số.
 
 ## Nullable reference types: hàng rào ở mức compile
+
+Dòng log kia không chỉ được nơi null sinh ra. Muốn tìm nơi ấy, trước hết phải
+bật hàng rào lên.
 
 ```xml
 <PropertyGroup>
@@ -35,6 +40,8 @@ int safe = middleName?.Length ?? 0;   // an toàn
 ```
 
 ## Thử ngay: cảnh báo chỉ là cảnh báo
+
+Hàng rào ấy chắc tới đâu? Thử một đường mà dữ liệu thật hay đi vào: JSON.
 
 ```csharp
 using System.Text.Json;
@@ -67,11 +74,16 @@ Null lọt thẳng vào một property khai báo là **không null**, và compil
 hề cảnh báo.
 
 Vì nullable reference types chỉ là kiểm tra **lúc compile**. Runtime không
-chặn gì cả. Dữ liệu từ JSON, database hay thư viện cũ vẫn đưa null vào được.
+chặn gì cả.
+
+Dữ liệu từ JSON, database hay thư viện cũ vẫn đưa null vào được.
 
 </details>
 
 ## Nullable value type là một kiểu thật
+
+Dấu `?` sau `string` và dấu `?` sau `int` trông giống nhau, mà bản chất khác
+hẳn.
 
 ```csharp
 int? quantity = null;          // Nullable<int>
@@ -91,6 +103,8 @@ int risky = quantity!.Value;   // ném nếu đang null
 
 ## Bốn toán tử làm việc với null
 
+Biết chỗ nào có thể null rồi, còn phải viết ra cho gọn.
+
 | Toán tử | Nghĩa |
 |---|---|
 | `?.` | gặp null thì dừng, trả về null |
@@ -104,16 +118,18 @@ var display = city ?? "Chưa cập nhật";
 cache ??= new Dictionary<string, string>();
 ```
 
-Dùng `is null` thay cho `!= null`: nó không bị ảnh hưởng nếu kiểu đó nạp chồng
+Dùng `is null` thay cho `!= null`. Nó không bị ảnh hưởng nếu kiểu đó nạp chồng
 toán tử `==`.
 
-Ba toán tử đầu bảng nối chuỗi được với nhau. `user?.Address?.City` gặp null ở
-mắt xích nào cũng dừng ngay, trả về null thay vì nổ.
+`?.` nối được thành chuỗi dài bao nhiêu cũng được. `user?.Address?.City` gặp
+null ở mắt xích nào là dừng ngay, trả về null thay vì nổ.
 
 Nhưng đừng lạm dụng. Một chuỗi `?.` dài thường có nghĩa là bạn đang chấp nhận
 dữ liệu thiếu, mà chưa quyết định phải làm gì với nó.
 
 ## Dấu ! tắt cảnh báo chứ không kiểm tra gì
+
+Có một toán tử nữa, và nó là toán tử duy nhất trong bài không bảo vệ bạn.
 
 ```csharp
 // SAI — chỉ dập cảnh báo
@@ -131,9 +147,14 @@ var name = order.Customer;
 ```
 
 `!` là **null-forgiving operator**. Mỗi lần viết nó là bạn nhận trách nhiệm
-thay compiler. Sai thì lại đúng cái exception ta đang tránh.
+thay compiler.
+
+Nhận sai thì bạn gặp lại đúng dòng log ở đầu bài.
 
 ## Chặn ngay ở biên, đừng đuổi theo null qua nhiều tầng
+
+Mọi thứ đến giờ đều là cách đối phó với null đã lọt vào. Còn cách tốt hơn là
+không cho nó vào.
 
 ```csharp
 public class Invoice
@@ -152,11 +173,15 @@ public class Invoice
 }
 ```
 
-**Fail fast**: chặn dữ liệu sai ngay lúc nó vào. `ArgumentNullException` ném ở
-constructor dễ sửa hơn nhiều so với `NullReferenceException` nổ ba tầng sau
-đó, khi chẳng còn manh mối nào.
+**Fail fast**: chặn dữ liệu sai ngay lúc nó vào.
 
-Đó chính là khác biệt giữa bài này và cái log ở đầu bài.
+`ArgumentNullException` ném ở constructor thì dễ sửa. `NullReferenceException`
+nổ ba tầng sau đó thì chẳng còn manh mối nào.
+
+Đó là chỗ dòng log đầu bài thua. Nó nổ ở chỗ *dùng*, không phải chỗ *nhận*.
+
+`ThrowIfNull` đặt ở constructor thì stack trace trỏ thẳng vào người truyền sai,
+ngay tầng đầu tiên.
 
 ## Dấu hiệu trong code của bạn
 

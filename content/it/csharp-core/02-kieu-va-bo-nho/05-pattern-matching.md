@@ -3,8 +3,9 @@ title: Pattern matching
 minutes: 11
 ---
 
-Bạn mở một file service trong dự án và thấy hai mươi dòng lặp đi lặp lại: kiểm
-tra kiểu, ép kiểu, gán vào biến mới, rồi mới dùng được.
+Bạn mở một file service trong dự án, và thấy hai mươi dòng lặp đi lặp lại.
+
+Kiểm tra kiểu. Ép kiểu. Gán vào biến mới. Rồi mới dùng được.
 
 Cùng việc đó, C# hiện đại viết trong một dòng. Và khi đọc code người khác, bạn
 sẽ gặp dạng một dòng nhiều hơn hẳn.
@@ -17,6 +18,9 @@ sẽ gặp dạng một dòng nhiều hơn hẳn.
 
 ## Năm loại pattern hay gặp
 
+Hai mươi dòng kia rút được vì C# có một bộ công cụ riêng cho việc "hỏi xem cái
+này là gì".
+
 | Loại | Viết thế nào | Hỏi gì |
 |---|---|---|
 | Type | `x is Order o` | có phải kiểu này không |
@@ -28,6 +32,8 @@ sẽ gặp dạng một dòng nhiều hơn hẳn.
 Cả năm dùng được ở hai chỗ. Sau `is`, và trong nhánh của `switch expression`.
 
 ## Type pattern gộp kiểm tra với ép kiểu
+
+Bắt đầu từ loại thay thế trực tiếp cho hai mươi dòng ở đầu bài.
 
 ```csharp
 // Cách cũ
@@ -49,6 +55,8 @@ Biến `c` chỉ tồn tại khi phép kiểm tra đúng. Không còn cảnh ép
 cũng không còn chỗ để ép nhầm kiểu.
 
 ## Thử ngay: property pattern tự xử lý null
+
+Loại thứ hai có một tính chất mà đọc thì không tin, phải chạy mới tin.
 
 ```csharp
 decimal Fee(Order o) => o switch
@@ -90,6 +98,9 @@ nhánh dưới** thay vì nổ. Đó là lý do nó gọn hơn hẳn
 
 ## Relational và logical pattern gộp nhiều điều kiện
 
+So với một mốc, rồi ghép nhiều phép so lại. Đây là chỗ `switch` thay được cả
+một thang điều kiện.
+
 ```csharp
 string Grade(int score) => score switch
 {
@@ -100,16 +111,21 @@ string Grade(int score) => score switch
     _ => "Trung bình",
 };
 
-bool isDigit = c is >= '0' and <= '9';
+char ch = line[0];
+bool isDigit = ch is >= '0' and <= '9';
 ```
 
-`and`, `or`, `not` ghép các pattern lại. `x is not null` đọc xuôi hơn hẳn
-`x != null`, và cũng an toàn hơn nếu kiểu đó nạp chồng toán tử `==`.
+`and`, `or`, `not` ghép các pattern lại.
+
+`x is not null` đọc xuôi hơn hẳn `x != null`. Nó cũng an toàn hơn, nếu kiểu đó
+nạp chồng toán tử `==`.
 
 Để ý nhánh đầu. Nó **ném lỗi** ngay trong một biểu thức, và đó là cú pháp
 hợp lệ. Nhờ vậy bạn không phải tách ra một câu `if` riêng phía trên.
 
 ## List pattern đọc dữ liệu theo hình dạng
+
+Loại cuối hỏi về hình dạng của một mảng, không phải giá trị của một phần tử.
 
 ```csharp
 var parts = line.Split(':');
@@ -131,6 +147,9 @@ cụ thể lên trên.
 
 ## Kết hợp với record: thay cả cây if
 
+Năm loại pattern gộp lại thì làm được thứ đáng làm nhất: xoá hẳn một cây `if`
+phân loại theo kiểu.
+
 ```csharp
 abstract record Payment;
 record Cash(decimal Amount) : Payment;
@@ -151,11 +170,12 @@ string Describe(Payment p) => p switch
 `Card (var amount, var last4)` là **positional pattern**. Nó chạy được vì
 `record` tự sinh sẵn `Deconstruct` cho bạn.
 
-C# không coi cây kế thừa này là đóng, nên `switch` vẫn báo **CS8509**: còn
-`null`, và còn kiểu con mà chưa ai viết ra.
+Nhưng C# không coi cây kế thừa này là đóng. `switch` vẫn báo **CS8509**: còn
+`null`, và còn kiểu con chưa ai viết ra.
 
 Thêm `_ => throw new NotSupportedException(p.GetType().Name)` là hết cảnh báo.
-Đổi lại, hôm có loại thanh toán mới, nhánh đó nổ ngay lần chạy đầu — đúng một
+
+Đổi lại, hôm có loại thanh toán mới thì nhánh đó nổ ngay lần chạy đầu. Đúng một
 chỗ, và nói đúng tên kiểu còn thiếu.
 
 ## Dấu hiệu trong code của bạn

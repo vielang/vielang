@@ -1,20 +1,36 @@
 ---
 title: Chương trình C# đầu tiên
-minutes: 9
+minutes: 10
 ---
 
-Ba dòng lệnh là bạn có một chương trình chạy thật. Nhưng giữa lúc bạn gõ
-`dotnet run` và lúc chữ hiện ra màn hình, có hai bước dịch mà người đi phỏng
-vấn backend gần như chắc chắn sẽ hỏi tới.
+Cài SDK. Gõ ba dòng lệnh. Ba mươi giây sau, màn hình hiện chữ.
 
-> **Học xong bài này bạn sẽ:** tạo và chạy được một project C#, đọc được cấu
-> trúc một chương trình đầy đủ, và giải thích được code của mình biến thành gì
+Dễ đến mức người ta bỏ qua câu hỏi đáng hỏi nhất: trong ba mươi giây ấy, máy
+đã làm gì với code của bạn?
+
+Buổi phỏng vấn backend nào cũng hỏi câu đó. Không phải để làm khó. Biết code
+biến thành gì trước khi chạy thì bạn đọc được lỗi, đọc được log, và hiểu vì
+sao một file chạy được trên cả Windows lẫn Linux.
+
+> **Học xong bài này bạn sẽ:** tạo và chạy được một project C#; đọc được cấu
+> trúc một chương trình đầy đủ; giải thích được code của mình biến thành gì
 > trước khi máy chạy nó.
 >
-> **Cần biết trước:** dùng được terminal (cd, chạy lệnh). Chưa cần biết lập
-> trình.
+> **Cần biết trước:** dùng được terminal. Chưa cần biết lập trình.
 
-## Code của bạn đi qua hai bước dịch
+## Bốn lệnh dotnet bạn sẽ gõ mỗi ngày
+
+| Lệnh | Làm gì |
+|---|---|
+| `dotnet new console -o Ten` | tạo project mới trong thư mục `Ten` |
+| `dotnet build` | dịch code, **không** chạy |
+| `dotnet run` | dịch rồi chạy luôn |
+| `dotnet watch run` | chạy lại mỗi khi bạn lưu file |
+
+`console application` là loại project đơn giản nhất. Đầu vào và đầu ra đều
+bằng chữ, không giao diện. Cả khoá dùng nó, vì nó không che mất thứ đang học.
+
+## Code đi qua hai bước dịch trước khi chạy
 
 ```mermaid Từ code tới lúc chạy: compiler dịch sang IL, CLR dịch tiếp lúc chạy
 flowchart TD
@@ -24,23 +40,22 @@ flowchart TD
     D --> E["Mã máy, chạy trên CPU"]
 ```
 
-**Compiler** dịch code sang **IL** (Intermediate Language) và cất vào file
-`.dll`. Tới lúc chạy, **CLR** (Common Language Runtime) mới dịch IL sang mã máy
-của đúng CPU đang dùng. Nhờ bước giữa này mà cùng một file `.dll` chạy được
-trên Windows, Linux hay máy Mac.
+**Compiler** dịch code sang **IL** (Intermediate Language), rồi cất vào file
+`.dll`. IL chưa phải mã máy. Nó là thứ tiếng trung gian, không CPU nào hiểu
+trực tiếp.
 
-## Thử ngay: tạo và chạy
+Tới lúc chạy, **CLR** (Common Language Runtime) mới dịch IL sang mã máy của
+đúng con CPU đang có. Đó là lý do một file `.dll` chạy được trên Windows,
+Linux và máy Mac. Bạn build một lần. Mỗi máy tự lo phần còn lại.
+
+## Thử ngay: Write và WriteLine khác nhau ở đâu
 
 ```bash
 dotnet new console -o HelloBackend
 cd HelloBackend
-dotnet run
 ```
 
-Lệnh `dotnet new console` tạo một **console application**: loại project đơn
-giản nhất, chỉ có đầu vào và đầu ra bằng chữ.
-
-Giờ mở `Program.cs`, xoá hết và dán đoạn này vào:
+Mở `Program.cs`, xoá sạch, dán đoạn này vào rồi `dotnet run`:
 
 ```csharp
 Console.Write("Xin chào ");
@@ -49,7 +64,7 @@ Console.WriteLine("!");
 Console.WriteLine("Dòng thứ hai");
 ```
 
-**Đoán trước khi chạy:** bốn lệnh trên in ra mấy dòng?
+**Đoán trước khi chạy:** bốn lệnh in ra mấy dòng?
 
 <details>
 <summary>Đoán xong rồi — xem kết quả</summary>
@@ -59,16 +74,21 @@ Xin chào backend!
 Dòng thứ hai
 ```
 
-Hai dòng. `Console.Write` in xong **không xuống dòng**, còn `WriteLine` mới
-xuống. Ba lệnh đầu cùng góp chữ vào một dòng.
+Hai dòng. `Write` in xong thì dừng tại chỗ. `WriteLine` mới xuống dòng. Ba
+lệnh đầu cùng góp chữ vào một dòng.
+
+Chi tiết nhỏ này theo bạn suốt nghề. Log dính liền nhau hay xuống dòng lung
+tung đều từ đây mà ra.
 
 </details>
 
-## Chương trình đầy đủ trông thế nào
+## Top-level statements chỉ là cách viết gọn
 
-Từ .NET 6, C# cho phép viết **top-level statements**: không cần khai báo
-`class` và hàm `Main` như đoạn trên. Compiler tự sinh chúng ra. Khi đọc code
-cũ, bạn sẽ gặp dạng đầy đủ:
+Đoạn vừa chạy không có `class`, không có `Main`. Từ .NET 6, C# cho phép viết
+thẳng như vậy. Tên gọi của nó là **top-level statements**, và compiler sẽ tự
+sinh phần còn thiếu.
+
+Code cũ thì viết đủ. Bạn sẽ gặp dạng này rất nhiều:
 
 ```csharp
 namespace HelloBackend;
@@ -82,39 +102,49 @@ public class Program
 }
 ```
 
-Hai cách chạy như nhau. Dạng đầy đủ nói rõ hơn về cấu trúc, nên phần còn lại
-của khoá dùng dạng này khi cần bàn tới `class` hay `namespace`.
+| Thành phần | Vai trò |
+|---|---|
+| `namespace` | họ của kiểu, để không trùng tên với thư viện khác |
+| `class Program` | nơi chứa code; mọi thứ trong C# đều nằm trong một kiểu |
+| `Main` | điểm bắt đầu, chương trình chạy từ đây |
+| `static` | gọi được mà chưa cần tạo object nào |
 
-- `namespace` — cái tên dài đặt trước tên kiểu để không trùng với kiểu cùng tên của thư viện khác.
-- `Main` — điểm bắt đầu; chương trình chạy từ đây.
-- `static` — gọi được mà không cần tạo object, vì lúc đó chưa có object nào cả.
+Hai cách chạy như nhau. Khoá này dùng dạng đầy đủ mỗi khi cần bàn tới `class`
+hay `namespace`.
 
-## Solution, project, assembly
+## Project, solution, assembly: ba từ gặp mỗi ngày
 
-Ba từ này xuất hiện trong mọi project .NET thật:
+| Từ | Là gì |
+|---|---|
+| **Project** (`.csproj`) | một đơn vị build |
+| **Assembly** | kết quả build: một file `.dll` hoặc `.exe` |
+| **Solution** (`.sln`) | tập hợp nhiều project mở cùng nhau |
+| **NuGet** | kho thư viện ngoài, lấy về bằng `dotnet add package` |
 
-- **Project** (`.csproj`) — một đơn vị build. Build ra một **assembly**, tức là một file `.dll` (thư viện) hoặc `.exe` (chạy trực tiếp).
-- **Solution** (`.sln`) — tập hợp nhiều project mở cùng nhau. Một API thật thường có `Api`, `Domain`, `Infrastructure`, `Tests` — bốn project trong một solution.
-- **NuGet** — nơi lấy thư viện ngoài: `dotnet add package <tên>`.
+Một API thật hiếm khi chỉ có một project. Thường là bốn: `Api`, `Domain`,
+`Infrastructure`, `Tests`. Bốn project ấy nằm chung một solution, và mỗi
+project build ra một assembly riêng.
 
 ## Lỗi hay gặp lần đầu
 
-- `dotnet run` báo không tìm thấy project → bạn đang đứng sai thư mục, `cd` vào thư mục chứa file `.csproj`.
-- Sửa code rồi mà chạy vẫn ra kết quả cũ → dùng `dotnet watch run`, nó tự build lại mỗi khi file đổi.
-- `error CS1002: ; expected` → thiếu dấu chấm phẩy cuối câu lệnh; số dòng trong thông báo chỉ đúng chỗ.
-- Gõ `dotnet` mà máy không hiểu → chưa cài .NET SDK, hoặc cài xong chưa mở lại terminal.
+- `dotnet run` báo không tìm thấy project → bạn đang đứng sai thư mục, `cd` vào chỗ có file `.csproj`.
+- Sửa code mà kết quả vẫn như cũ → dùng `dotnet watch run`, nó tự build lại khi bạn lưu.
+- `error CS1002: ; expected` → thiếu dấu chấm phẩy; số dòng trong thông báo chỉ đúng chỗ.
+- Gõ `dotnet` mà máy không hiểu → chưa cài SDK, hoặc cài xong chưa mở lại terminal.
 
 ## Ghi nhớ
 
-- `dotnet new console` tạo project, `dotnet run` build rồi chạy, `dotnet build` chỉ build.
-- Compiler → **IL** trong file `.dll`; **CLR** dịch IL sang mã máy lúc chạy.
+- `dotnet run` dịch rồi chạy; `dotnet build` chỉ dịch; `dotnet watch run` chạy lại khi file đổi.
+- Compiler ra **IL** trong file `.dll`, **CLR** dịch IL sang mã máy lúc chạy.
 - **Top-level statements** là cách viết gọn; bên dưới vẫn là `class` và `Main`.
 - Một **solution** chứa nhiều **project**, mỗi project build ra một **assembly**.
 
 ## Bước tiếp theo
 
-Bài sau — **Kiểu dữ liệu và biến** — bắt đầu từ một bug tiền bạc kinh điển, và
-giải thích vì sao chọn sai kiểu số thì phép cộng cũng ra sai.
+Chương trình đầu tiên đã chạy. Nhưng nó mới in ra chữ, chưa tính toán gì.
+
+Bài sau, **Kiểu dữ liệu và biến**, mở bằng một hoá đơn in ra
+`0.6000000000000001`. Chọn sai kiểu số thì phép cộng cũng ra sai.
 
 ```quiz
 [
@@ -130,7 +160,7 @@ giải thích vì sao chọn sai kiểu số thì phép cộng cũng ra sai.
     "explain": "Compiler dừng ở IL. CLR mới dịch IL sang mã máy lúc chạy, nên cùng một .dll chạy được trên nhiều hệ điều hành."
   },
   {
-    "prompt": "File Program.cs của bạn chỉ có Console.WriteLine(\"Hi\"); và không có class nào. Vì sao chạy được?",
+    "prompt": "File Program.cs chỉ có Console.WriteLine(\"Hi\"); và không có class nào. Vì sao chạy được?",
     "options": [
       "C# không cần class, mọi file đều chạy được",
       "Top-level statements: compiler tự sinh class và Main",
@@ -149,7 +179,7 @@ giải thích vì sao chọn sai kiểu số thì phép cộng cũng ra sai.
       "Đổi từ dotnet run sang dotnet build"
     ],
     "answer": 2,
-    "explain": "dotnet watch run theo dõi file và build lại mỗi khi bạn lưu — vòng lặp sửa/chạy nhanh hơn hẳn."
+    "explain": "dotnet watch run theo dõi file và build lại mỗi khi bạn lưu — vòng lặp sửa rồi chạy nhanh hơn hẳn."
   },
   {
     "prompt": "Một API thật có 4 project: Api, Domain, Infrastructure, Tests. Bốn project này nằm trong cái gì?",

@@ -78,6 +78,12 @@ phá vỡ mọi nơi đang gọi.
 ## Thử ngay: class toàn public set thì ai cũng phá được
 
 ```csharp
+var order = new Order { Qty = 2, UnitPrice = 100 };
+order.Status = "Shipped";
+order.Qty = -5;
+
+Console.WriteLine($"{order.Status} / {order.Total}");
+
 class Order
 {
     public int Qty { get; set; }
@@ -85,12 +91,6 @@ class Order
     public string Status { get; set; } = "New";
     public decimal Total => Qty * UnitPrice;
 }
-
-var order = new Order { Qty = 2, UnitPrice = 100 };
-order.Status = "Shipped";
-order.Qty = -5;
-
-Console.WriteLine($"{order.Status} / {order.Total}");
 ```
 
 **Đoán trước khi chạy:** có gì chặn dòng `Qty = -5` trên một đơn đã giao không?

@@ -52,9 +52,6 @@ flowchart TD
 ## Thử ngay: chép giá trị hay chép tham chiếu
 
 ```csharp
-struct Point { public int X; }
-class Person { public string Name = "Huy"; }
-
 var a = new Point { X = 1 };
 var b = a;
 b.X = 99;
@@ -64,6 +61,10 @@ var q = p;
 q.Name = "Nam";
 
 Console.WriteLine($"{a.X} và {p.Name}");
+
+struct Point { public int X; }
+
+class Person { public string Name = "Huy"; }
 ```
 
 **Đoán trước khi chạy:** dòng cuối in ra gì?

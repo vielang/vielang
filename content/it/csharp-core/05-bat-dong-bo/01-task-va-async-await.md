@@ -38,6 +38,8 @@ hơn, nó làm **số request chạy cùng lúc** nhiều hơn.
 ## Thử ngay: ba việc tuần tự mất 3 giây, song song mất 1
 
 ```csharp
+using System.Diagnostics;
+
 async Task<int> Slow(int id)
 {
     await Task.Delay(1000);

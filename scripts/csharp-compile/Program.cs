@@ -102,18 +102,39 @@ bool HuaCompilerChan(string code) =>
     code.Contains("lỗi compile") || code.Contains("compiler chặn")
     || code.Contains("không biên dịch") || code.Contains("KHÔNG biên dịch");
 
-int khoi = 0, khoiLoi = 0;
+int khoi = 0, khoiLoi = 0, khoiMinhHoa = 0;
 var thieuTen = new SortedDictionary<string, int>(StringComparer.Ordinal);
 var khoiSai = new List<string>();
+
+// Kiểu mà các khối TRƯỚC trong cùng bài đã khai báo. Bài thường dựng model
+// riêng ở khối đầu (`record Order(string Customer, decimal Total)`) rồi dùng
+// suốt các khối sau. Không mang theo thì khối sau bị soi bằng model chung
+// trong Stubs.cs và báo lỗi oan.
+var kieuTrongBai = new Dictionary<string, string>(StringComparer.Ordinal);
+
+// Đã thử mang theo cả BIẾN của khối trước, và bỏ: các bài dùng lại tên `a`,
+// `x`, `success` ở nhiều khối với nghĩa khác nhau, nên ghép vào là CS0128
+// hàng loạt. Kiểu thì khác — một bài chỉ định nghĩa `Order` đúng một lần.
 
 /// Biên dịch một khối, trả về chẩn đoán thuộc riêng khối đó.
 List<Diagnostic> BienDich(string code, out SyntaxTree tree)
 {
     tree = CSharpSyntaxTree.ParseText(code, parseOptions, path: "Program.cs");
     var t = tree;
+
+    var daKhaiBao = new HashSet<string>(
+        t.GetRoot().DescendantNodes().OfType<Microsoft.CodeAnalysis.CSharp.Syntax.BaseTypeDeclarationSyntax>()
+            .Select(n => n.Identifier.Text),
+        StringComparer.Ordinal);
+
+    var cay = new List<SyntaxTree> { t, stubTree, usingTree };
+    var boSung = kieuTrongBai.Where(p => !daKhaiBao.Contains(p.Key)).Select(p => p.Value).ToList();
+    if (boSung.Count > 0)
+        cay.Add(CSharpSyntaxTree.ParseText(string.Join("\n\n", boSung), parseOptions, path: "TrongBai.cs"));
+
     var comp = CSharpCompilation.Create(
         "Snippet",
-        new[] { t, stubTree, usingTree },
+        cay,
         refs,
         new CSharpCompilationOptions(
             OutputKind.ConsoleApplication,
@@ -123,11 +144,17 @@ List<Diagnostic> BienDich(string code, out SyntaxTree tree)
     return comp.GetDiagnostics().Where(d => d.Location.SourceTree == t).ToList();
 }
 
-void Kiem(string nhan, string code, int dongTrongFile)
+void Kiem(string nhan, string code, int dongTrongFile, bool nghiemNgat = true)
 {
     khoi++;
     var all = BienDich(code, out var tree);
     int lechDong = 0;
+
+    // Ghi lại kiểu và biến bài vừa khai báo, cho các khối sau dùng.
+    foreach (var kieu in tree.GetRoot().DescendantNodes()
+                 .OfType<Microsoft.CodeAnalysis.CSharp.Syntax.BaseTypeDeclarationSyntax>())
+        kieuTrongBai.TryAdd(kieu.Identifier.Text, kieu.ToFullString());
+
 
     // Nhiều khối là THÂN CLASS trình bày rời: `public Task<Order> GetAsync(…)`
     // đứng một mình. Ở file top-level, `public` trên một local function là
@@ -171,6 +198,15 @@ void Kiem(string nhan, string code, int dongTrongFile)
         return;
     }
 
+    // Khối minh hoạ được phép viết khai báo trước rồi mới dùng: đọc xuôi hơn,
+    // và giống cách dự án thật đặt kiểu ở file riêng. Chỉ mục "Thử ngay" mới
+    // buộc dán thẳng vào Program.cs là chạy, nên mới xét CS8803.
+    if (!nghiemNgat && loi.Count > 0 && loi.All(d => d.Id == "CS8803"))
+    {
+        khoiMinhHoa++;
+        return;
+    }
+
     if (loi.Count == 0) return;
 
     khoiLoi++;
@@ -189,9 +225,16 @@ foreach (var file in Directory.GetFiles(root, "*.md", SearchOption.AllDirectorie
     if (Path.GetFileName(file) is "FORMAT.md") continue;
     var text = File.ReadAllText(file);
     var ten = Path.GetFileName(file);
+    kieuTrongBai.Clear();   // mỗi bài một thế giới riêng
 
     foreach (Match m in fence.Matches(text))
-        Kiem(ten, m.Groups[1].Value, text[..m.Index].Count(c => c == '\n') + 1);
+    {
+        // Mục chứa khối quyết định mức nghiêm ngặt.
+        var truoc = text[..m.Index];
+        var tieuDe = Regex.Matches(truoc, "^## (.+)$", RegexOptions.Multiline).LastOrDefault()?.Groups[1].Value ?? "";
+        Kiem(ten, m.Groups[1].Value, truoc.Count(c => c == '\n') + 1,
+            nghiemNgat: tieuDe.TrimStart().StartsWith("Thử ngay"));
+    }
 
     foreach (Match mq in quizFence.Matches(text))
     {
@@ -205,7 +248,9 @@ foreach (var file in Directory.GetFiles(root, "*.md", SearchOption.AllDirectorie
             {
                 i++;
                 if (item.TryGetProperty("code", out var c))
-                    Kiem($"{ten} (câu hỏi {i})", c.GetString() ?? "", text[..mq.Index].Count(ch => ch == '\n') + 1);
+                    // Code trong câu hỏi là để ĐỌC chứ không phải để dán chạy.
+                    Kiem($"{ten} (câu hỏi {i})", c.GetString() ?? "",
+                        text[..mq.Index].Count(ch => ch == '\n') + 1, nghiemNgat: false);
             }
         }
     }
@@ -223,6 +268,9 @@ if (khoiSai.Count > 0)
     Console.WriteLine("\nKhối phản ví dụ (lỗi là đúng ý) — đối chiếu mã lỗi với lời bài:");
     foreach (var d in khoiSai) Console.WriteLine($"  {d}");
 }
+
+if (khoiMinhHoa > 0)
+    Console.WriteLine($"\n{khoiMinhHoa} khối minh hoạ khai báo trước rồi mới dùng — hợp lệ, chỉ là không dán thẳng vào Program.cs được.");
 
 Console.WriteLine($"\n{khoi} khối code, {khoiLoi} khối không biên dịch được.");
 return khoiLoi == 0 ? 0 : 1;

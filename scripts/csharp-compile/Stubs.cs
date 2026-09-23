@@ -39,6 +39,8 @@ namespace CourseWorld;
         public decimal Total { get; set; }
         public bool IsPaid { get; set; }
         public bool IsPending { get; set; }
+        public bool IsCancelled { get; set; }
+        public List<OrderLine> Lines { get; set; } = new();
         public string Code { get; set; } = "";
         public DateTime CreatedAt { get; set; }
         public OrderStatus Status { get; set; }
@@ -57,8 +59,20 @@ namespace CourseWorld;
 
     public class Person { public string Name { get; set; } = "Huy"; }
 
+    public class OrderLine
+    {
+        public string Name { get; set; } = "";
+        public decimal Price { get; set; }
+        public int Quantity { get; set; }
+    }
+
     public class Job { }
-    public class Item { }
+
+    public class Item
+    {
+        public string Name { get; set; } = "";
+        public decimal Price { get; set; }
+    }
 
     public class OrderException : Exception
     {
@@ -157,6 +171,7 @@ namespace CourseWorld;
         public static string line = "GET:/orders";
         public static int id = 1;
         public static DateTime fromDate = DateTime.Today;
+        public static DateTime cutoff = DateTime.Today.AddMonths(-6);
 
         public static List<Order> orders = new();
         public static List<Customer> customers = new();
@@ -166,6 +181,7 @@ namespace CourseWorld;
         public static List<string> files = new();
 
         public static Task Save(Order order) => Task.CompletedTask;
+        public static void Archive(Order order) { }
         public static void Add(string code) { }
         public static void Process(string text) { }
         public static decimal Score(Order o) => 0;

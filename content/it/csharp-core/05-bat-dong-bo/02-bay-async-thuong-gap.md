@@ -222,7 +222,7 @@ và LINQ, xử lý lỗi và tài nguyên, bất đồng bộ.
   },
   {
     "prompt": "Đoạn này in ra gì?",
-    "code": "try\n{\n    Throw();   // async Task, ném lỗi sau 50ms\n    await Task.Delay(200);\n}\ncatch (Exception ex)\n{\n    Console.WriteLine(\"bắt được\");\n}",
+    "code": "try\n{\n    Throw();   // async Task, ném lỗi sau 50ms\n    await Task.Delay(200);\n}\ncatch\n{\n    Console.WriteLine(\"bắt được\");\n}",
     "options": [
       "\"bắt được\"",
       "Không in gì từ catch — lỗi nằm im trong Task không ai await",

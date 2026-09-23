@@ -48,6 +48,8 @@ qua đúng những gì interface hứa.
 ## Thử ngay: constructor lớp cha chạy trước field lớp con
 
 ```csharp
+new Child();
+
 class Parent
 {
     public Parent() => PrintName();
@@ -61,8 +63,6 @@ class Child : Parent
     public override void PrintName() =>
         Console.WriteLine(_name ?? "null");
 }
-
-new Child();
 ```
 
 **Đoán trước khi chạy:** `_name` được gán ngay lúc khai báo. Dòng in ra là

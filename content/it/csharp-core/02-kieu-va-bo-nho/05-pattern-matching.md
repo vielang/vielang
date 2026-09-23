@@ -51,9 +51,6 @@ cũng không còn chỗ để ép nhầm kiểu.
 ## Thử ngay: property pattern tự xử lý null
 
 ```csharp
-record Address(string City);
-record Order(decimal Total, Address? ShipTo);
-
 decimal Fee(Order o) => o switch
 {
     { Total: > 1_000_000 } => 0,
@@ -65,6 +62,10 @@ Console.WriteLine(Fee(new Order(2_000_000, null)));
 var hanoi = new Address("Hà Nội");
 Console.WriteLine(Fee(new Order(50_000, hanoi)));
 Console.WriteLine(Fee(new Order(50_000, null)));
+
+record Address(string City);
+
+record Order(decimal Total, Address? ShipTo);
 ```
 
 **Đoán trước khi chạy:** ba dòng in ra gì? Chú ý dòng đầu và dòng cuối có

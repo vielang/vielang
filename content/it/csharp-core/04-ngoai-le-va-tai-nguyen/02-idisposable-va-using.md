@@ -39,13 +39,6 @@ giữ chúng đều cài `IDisposable`, và bạn phải gọi `Dispose` khi dù
 ## Thử ngay: using dọn trước khi lỗi bay lên
 
 ```csharp
-class Resource : IDisposable
-{
-    public Resource() => Console.WriteLine("mở");
-    public void Dispose() =>
-        Console.WriteLine("đóng");
-}
-
 void Run()
 {
     using var res = new Resource();
@@ -55,6 +48,13 @@ void Run()
 
 try { Run(); }
 catch { Console.WriteLine("bắt được lỗi"); }
+
+class Resource : IDisposable
+{
+    public Resource() => Console.WriteLine("mở");
+    public void Dispose() =>
+        Console.WriteLine("đóng");
+}
 ```
 
 **Đoán trước khi chạy:** có lỗi ném ra giữa chừng. Dòng "đóng" có được in

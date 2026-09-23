@@ -39,16 +39,17 @@ int safe = middleName?.Length ?? 0;   // an toàn
 ```csharp
 using System.Text.Json;
 
-class Person
-{
-    public string Name { get; set; } = "";
-}
 
 var p = JsonSerializer.Deserialize<Person>(
     """{"Name": null}""");
 
 Console.WriteLine(p!.Name is null);
 Console.WriteLine(p.Name?.Length ?? -1);
+
+class Person
+{
+    public string Name { get; set; } = "";
+}
 ```
 
 **Đoán trước khi chạy:** `Name` khai báo là `string` không null, lại có giá

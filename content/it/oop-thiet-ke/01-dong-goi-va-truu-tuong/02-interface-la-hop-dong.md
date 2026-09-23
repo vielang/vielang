@@ -45,6 +45,9 @@ chính là **trừu tượng**: giữ lại phần cần biết, giấu phần c
 ## Thử ngay: đổi cách làm mà không sửa nơi dùng
 
 ```csharp
+new PlaceOrder(new EmailNotifier()).Run();
+new PlaceOrder(new LogNotifier()).Run();
+
 interface INotifier
 {
     void Send(string message);
@@ -67,9 +70,6 @@ class PlaceOrder(INotifier notifier)
     public void Run() =>
         notifier.Send("Đã đặt hàng");
 }
-
-new PlaceOrder(new EmailNotifier()).Run();
-new PlaceOrder(new LogNotifier()).Run();
 ```
 
 **Đoán trước khi chạy:** `PlaceOrder` chỉ có đúng một dòng thân hàm. Hai lần

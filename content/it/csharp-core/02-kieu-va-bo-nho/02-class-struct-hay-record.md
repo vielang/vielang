@@ -18,9 +18,6 @@ nội dung.
 ## Thử ngay: hai object giống hệt nhau có bằng nhau không
 
 ```csharp
-class MoneyC { public decimal Amount = 100; }
-record MoneyR(decimal Amount);
-
 var c1 = new MoneyC();
 var c2 = new MoneyC();
 var r1 = new MoneyR(100);
@@ -28,6 +25,10 @@ var r2 = new MoneyR(100);
 
 Console.WriteLine($"{c1 == c2} và {r1 == r2}");
 Console.WriteLine(r1);
+
+class MoneyC { public decimal Amount = 100; }
+
+record MoneyR(decimal Amount);
 ```
 
 **Đoán trước khi chạy:** hai dòng in ra gì?

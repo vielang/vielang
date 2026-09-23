@@ -149,9 +149,9 @@ Bên trong vòng lặp, hai từ khoá này giúp bạn khỏi phải lồng th�
 ```csharp
 foreach (var order in orders)
 {
-    if (order.IsDeleted) continue;  // bỏ qua, chạy tiếp
-    if (order.IsFinal) break;      // thoát hẳn vòng lặp
-    Process(order);
+    if (order.IsCancelled) continue;      // bỏ qua, chạy tiếp
+    if (order.CreatedAt > cutoff) break;  // thoát hẳn vòng lặp
+    Archive(order);
 }
 ```
 

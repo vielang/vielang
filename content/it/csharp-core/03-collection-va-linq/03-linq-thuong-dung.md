@@ -33,8 +33,6 @@ code hiểu ngay bạn định làm gì.
 ## Thử ngay: câu hỏi của sếp
 
 ```csharp
-record Order(string Customer, decimal Total);
-
 var orders = new List<Order>
 {
     new("Huy", 300), new("Nam", 120),
@@ -51,6 +49,8 @@ var top = orders
     .First();
 
 Console.WriteLine($"{top.Key}: {top.Total}");
+
+record Order(string Customer, decimal Total);
 ```
 
 **Đoán trước khi chạy:** ai đứng đầu — Huy với hai đơn, hay Lan với một đơn?
@@ -132,11 +132,11 @@ decimal max = orders.Max(o => o.Total);
 var biggest = orders.MaxBy(o => o.Total);
 
 var detail = orders.Join(customers,
-    o => o.Customer,    // khoá bên trái
-    c => c.Name,        // khoá bên phải
+    o => o.Customer.Name,   // khoá bên trái
+    c => c.Name,            // khoá bên phải
     (o, c) => new { o.Total, c.Phone });
 
-var allItems = orders.SelectMany(o => o.Items);
+var allLines = orders.SelectMany(o => o.Lines);
 var page2 = orders.Skip(20).Take(20);
 ```
 
@@ -227,7 +227,7 @@ một vòng `foreach`.
   },
   {
     "prompt": "Đoạn vòng lặp này làm gì, và LINQ viết lại thế nào?",
-    "code": "var totals = new Dictionary<string, decimal>();\nforeach (var o in orders)\n{\n    totals.TryGetValue(o.Customer, out var t);\n    totals[o.Customer] = t + o.Total;\n}",
+    "code": "var totals = new Dictionary<string, decimal>();\nforeach (var o in orders)\n{\n    totals.TryGetValue(o.Customer.Name, out var t);\n    totals[o.Customer.Name] = t + o.Total;\n}",
     "options": [
       "Lọc theo khách — dùng Where",
       "Cộng tiền theo từng khách — dùng GroupBy rồi Sum",

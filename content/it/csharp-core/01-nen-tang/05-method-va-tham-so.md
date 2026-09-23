@@ -46,8 +46,6 @@ Tên method nói việc, tên biến nói vật. `CalculateTotal` thì rõ, còn
 ## Thử ngay: method sửa được gì của bạn
 
 ```csharp
-public class Person { public string Name = "Huy"; }
-
 void Rename(Person p) => p.Name = "Nam";
 void Replace(Person p) => p = new Person();
 
@@ -58,6 +56,8 @@ Console.WriteLine(a.Name);
 var b = new Person();
 Replace(b);
 Console.WriteLine(b.Name);
+
+public class Person { public string Name = "Huy"; }
 ```
 
 **Đoán trước khi chạy:** hai dòng in ra gì?
@@ -123,7 +123,7 @@ riêng, đọc xuôi hơn nhiều:
 ```csharp
 public (bool Ok, string? Error) Validate(Order order)
 {
-    if (order.Items.Count == 0)
+    if (order.Lines.Count == 0)
         return (false, "Đơn hàng trống");
 
     return (true, null);

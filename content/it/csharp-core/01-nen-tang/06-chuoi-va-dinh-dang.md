@@ -117,6 +117,8 @@ không phải tiếng người.
 ## Culture: cái bẫy chỉ lộ ra trên production
 
 ```csharp
+using System.Globalization;
+
 // máy dev tiếng Anh: "1.5"
 // server ở Đức:      "1,5"
 var text = value.ToString();

@@ -209,7 +209,7 @@ thấy câu truy vấn nặng nhất chạy ba lần, dù code chỉ viết nó 
   },
   {
     "prompt": "Cách nào tốt hơn, và vì sao?",
-    "code": "if (dict.ContainsKey(code))\n    var price = dict[code];",
+    "code": "decimal price = 0;\n\nif (dict.ContainsKey(code))\n    price = dict[code];",
     "options": [
       "Giữ nguyên, code này rõ ràng nhất",
       "Dùng dict.TryGetValue(code, out var price) — chỉ tra một lần thay vì hai",

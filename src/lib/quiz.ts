@@ -28,6 +28,14 @@ interface BaseItem {
   label?: string;
   /** Đề bài, chép nguyên văn từ trang sách. */
   prompt: string;
+  /**
+   * Đoạn code của đề, hiện thành khối riêng dưới câu hỏi.
+   *
+   * Có vì câu hỏi lập trình hay ở dạng "đọc đoạn này, chuyện gì xảy ra" — nhét
+   * code vào giữa câu văn thì vừa khó đọc vừa mất thụt lề. Sách tiếng Hàn
+   * không dùng tới.
+   */
+  code?: string;
   /** Giải thích thêm (không có trong sách) — chỉ hiện sau khi đã chấm. */
   explain?: string;
 }

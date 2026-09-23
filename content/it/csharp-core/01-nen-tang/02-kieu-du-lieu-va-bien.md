@@ -155,7 +155,8 @@ gặp nhau, và vì sao `7 / 2` trong C# lại bằng `3`.
     "explain": "Parse ném exception khi chuỗi không phải số. Với dữ liệu từ bên ngoài, dùng int.TryParse để tự xử lý trường hợp sai."
   },
   {
-    "prompt": "var ket = LayDuLieu(); — dòng này có vấn đề gì?",
+    "prompt": "Dòng này có vấn đề gì?",
+    "code": "var ket = LayDuLieu();",
     "options": [
       "Sai cú pháp, var phải đi với giá trị hằng",
       "Chậm hơn vì kiểu chỉ biết lúc chạy",

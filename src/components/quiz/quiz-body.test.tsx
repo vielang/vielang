@@ -109,6 +109,53 @@ describe("chấm bài", () => {
   });
 });
 
+describe("kiểu bài học: đánh số câu và nhãn A/B/C/D", () => {
+  const HAI_MUC: QuizSection[] = [
+    { title: "Mục 1", items: [SECTIONS[0].items[0]] },
+    {
+      title: "Mục 2",
+      items: [
+        { id: "c2", kind: "choice", prompt: "2 + 2 = ?", options: ["3", "4"], answer: 1 },
+      ],
+    },
+  ];
+
+  it("đánh số chạy xuyên các mục, không đếm lại từ đầu mỗi mục", () => {
+    render(<QuizBody quizId="t:1" sections={HAI_MUC} numbered />);
+
+    expect(screen.getByText("Câu 1")).toBeTruthy();
+    expect(screen.getByText("Câu 2")).toBeTruthy();
+  });
+
+  it("mỗi phương án có nhãn chữ cái theo thứ tự", () => {
+    render(<QuizBody quizId="t:1" sections={SECTIONS} numbered />);
+
+    const nhan = screen.getAllByRole("button", { pressed: false }).slice(0, 3);
+    expect(nhan.map((b) => b.textContent)).toEqual(["A1", "B2", "C3"]);
+  });
+
+  it("không có số thì không đánh số — bài tập trong sách giữ nguyên", () => {
+    render(<QuizBody quizId="t:2" sections={SECTIONS} />);
+
+    expect(screen.queryByText("Câu 1")).toBeNull();
+    expect(screen.getByText("연습 1")).toBeTruthy();
+  });
+
+  it("làm hết thì hiện dòng tổng kết", () => {
+    render(<QuizBody quizId="t:1" sections={HAI_MUC} numbered />);
+
+    // Nhãn chữ cái là aria-hidden nên tên khả truy cập chỉ còn nội dung phương án.
+    fireEvent.click(screen.getByRole("button", { name: "2" }));
+    fireEvent.click(screen.getAllByRole("button", { name: "Kiểm tra" })[0]);
+    // Câu 1 cũng có phương án "3"; cái thứ hai mới là của câu 2.
+    fireEvent.click(screen.getAllByRole("button", { name: "3" })[1]);
+    fireEvent.click(screen.getAllByRole("button", { name: "Kiểm tra" })[0]);
+
+    expect(screen.getByText(/Xong rồi/)).toBeTruthy();
+    expect(screen.getByText("đúng 1/2")).toBeTruthy();
+  });
+});
+
 describe("bài tập trong sách vẫn chạy như cũ", () => {
   const sections = getPageQuiz("step1", 19);
 

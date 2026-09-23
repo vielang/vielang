@@ -497,6 +497,7 @@ const QUIZ_FENCE = /^```quiz[ \t]*\r?\n([\s\S]*?)^```[ \t]*$/m;
 
 interface RawQuizItem {
   prompt?: string;
+  code?: string;
   options?: string[];
   answers?: string[];
   explain?: string;
@@ -520,7 +521,12 @@ function buildLessonQuiz(at: string, body: string): { body: string; quiz?: QuizS
     const q = entry as RawQuizItem;
     const id = `q${i + 1}`;
     const where = `${at} câu ${i + 1}`;
-    const base = { id, prompt: q.prompt ?? "", ...(q.explain ? { explain: q.explain } : {}) };
+    const base = {
+      id,
+      prompt: q.prompt ?? "",
+      ...(q.code ? { code: q.code.trimEnd() } : {}),
+      ...(q.explain ? { explain: q.explain } : {}),
+    };
 
     if (q.options) {
       // `answer` viết theo cách người ta đánh số câu trắc nghiệm: 1 là phương

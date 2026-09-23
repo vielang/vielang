@@ -124,7 +124,7 @@ export function LessonView({
           aria-label="Câu tự kiểm tra"
           className="rounded-xl border border-border bg-muted/30 px-4 py-4"
         >
-          <QuizBody quizId={lessonQuizId(courseId, lesson.slug)} sections={lesson.quiz} />
+          <QuizBody quizId={lessonQuizId(courseId, lesson.slug)} sections={lesson.quiz} numbered />
         </section>
       )}
 

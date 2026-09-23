@@ -27,7 +27,22 @@ const BLANK_ONLY = /^[_\s]+$/;
  * cách lưu, chỉ khác cái khung bọc ngoài. Nơi gọi tự đặt `quizId` (trang sách
  * hay bài học) — ở đây nó chỉ là một chuỗi.
  */
-export function QuizBody({ quizId, sections }: { quizId: string; sections: QuizSection[] }) {
+export function QuizBody({
+  quizId,
+  sections,
+  numbered = false,
+}: {
+  quizId: string;
+  sections: QuizSection[];
+  /**
+   * Đánh số "Câu 1, 2, 3…" và gắn nhãn A/B/C/D cho từng phương án.
+   *
+   * Bật ở bài học IT, TẮT ở bài tập trong sách: đề in trên sách đã có số và
+   * ký hiệu riêng (`item.label` giữ đúng "①", "1)" như bản in), thêm một hệ
+   * đếm nữa thì người học không biết nhìn theo cái nào.
+   */
+  numbered?: boolean;
+}) {
   const { answers, checked } = useQuizAnswers(quizId);
   const setAnswer = useQuizStore((s) => s.setAnswer);
   const markChecked = useQuizStore((s) => s.markChecked);
@@ -38,6 +53,16 @@ export function QuizBody({ quizId, sections }: { quizId: string; sections: QuizS
   const done = gradable.filter((i) => checked.includes(i.id));
   const correct = done.filter((i) => isCorrect(i, answers[i.id])).length;
   const touched = done.length > 0 || Object.keys(answers).length > 0;
+  const xong = gradable.length > 0 && done.length === gradable.length;
+
+  // Đánh số câu chạy XUYÊN các mục: người học đọc "Câu 3" là biết ngay câu nào,
+  // không phải đếm lại từ đầu mục. Chỉ làm ở bài học — bài tập trong sách đã
+  // có số in sẵn trên giấy (`item.label`), thêm số nữa là hai hệ đếm chồng nhau.
+  let dem = 0;
+  const so = new Map<string, number>();
+  if (numbered) {
+    for (const s of sections) for (const i of s.items) so.set(i.id, ++dem);
+  }
 
   return (
     <>
@@ -61,24 +86,43 @@ export function QuizBody({ quizId, sections }: { quizId: string; sections: QuizS
         )}
       </div>
 
-      <div className="flex flex-col gap-7">
+      {/* Thanh tiến độ chỉ có nghĩa khi đủ vài câu; panel bên sách thường chỉ
+          một hai câu nên để nguyên như cũ. */}
+      {numbered && gradable.length > 1 && (
+        <div className="mb-5 h-1 overflow-hidden rounded-full bg-muted">
+          <div
+            className={cn(
+              "h-full rounded-full transition-all duration-300",
+              xong ? "bg-emerald-500" : "bg-foreground/70"
+            )}
+            style={{ width: `${(done.length / gradable.length) * 100}%` }}
+          />
+        </div>
+      )}
+
+      <div className={cn("flex flex-col", numbered ? "gap-5" : "gap-7")}>
         {sections.map((section) => (
-          <section key={section.title} className="flex flex-col gap-4">
-            <div className="flex flex-col gap-1">
-              <h3 className="text-xs font-semibold tracking-wide text-foreground/70 uppercase">
-                {section.title}
-              </h3>
-              {section.instruction && (
-                <p className="text-xs leading-relaxed text-muted-foreground">
-                  {section.instruction}
-                </p>
-              )}
-            </div>
+          <section key={section.title} className={cn("flex flex-col", numbered ? "gap-5" : "gap-4")}>
+            {/* Ở bài học, tiêu đề mục đã là thẻ h2 "Tự kiểm tra" của chính bài
+                nên không nhắc lại; chỉ dòng hướng dẫn là còn việc để làm. */}
+            {!numbered && (
+              <div className="flex flex-col gap-1">
+                <h3 className="text-xs font-semibold tracking-wide text-foreground/70 uppercase">
+                  {section.title}
+                </h3>
+                {section.instruction && (
+                  <p className="text-xs leading-relaxed text-muted-foreground">
+                    {section.instruction}
+                  </p>
+                )}
+              </div>
+            )}
 
             {section.items.map((item) => (
               <QuizItemView
                 key={item.id}
                 item={item}
+                stt={so.get(item.id)}
                 value={answers[item.id]}
                 checked={checked.includes(item.id)}
                 onAnswer={(v) => setAnswer(quizId, item.id, v)}
@@ -92,18 +136,31 @@ export function QuizBody({ quizId, sections }: { quizId: string; sections: QuizS
           </section>
         ))}
       </div>
+
+      {numbered && xong && (
+        <p className="mt-5 rounded-lg bg-muted/60 px-3 py-2 text-sm">
+          Xong rồi: <strong className="tabular-nums">đúng {correct}/{gradable.length}</strong>
+          {correct < gradable.length && " — đọc lại phần giải thích của câu sai rồi thử lại nhé."}
+        </p>
+      )}
     </>
   );
 }
 
+/** A, B, C… cho phương án thứ 0, 1, 2… */
+const chuCai = (i: number) => String.fromCharCode(65 + i);
+
 function QuizItemView({
   item,
+  stt,
   value,
   checked,
   onAnswer,
   onCheck,
 }: {
   item: QuizItem;
+  /** Số thứ tự câu; có thì vẽ kiểu bài học (thẻ riêng, nhãn A/B/C/D). */
+  stt?: number;
   value: string | number | undefined;
   checked: boolean;
   onAnswer: (value: string | number) => void;
@@ -139,9 +196,43 @@ function QuizItemView({
   const showPrompt = !BLANK_ONLY.test(item.prompt);
 
   return (
-    <div className="flex flex-col gap-2">
+    <div
+      className={cn(
+        "flex flex-col gap-2",
+        // Kiểu bài học: mỗi câu là một thẻ riêng, đọc trên trang dài thì biết
+        // câu bắt đầu và kết thúc ở đâu.
+        stt !== undefined &&
+          "gap-3 rounded-xl border border-border bg-background px-4 py-3.5"
+      )}
+    >
+      {stt !== undefined && (
+        <div className="flex items-baseline justify-between gap-2">
+          <span className="text-xs font-semibold tracking-wide text-muted-foreground uppercase tabular-nums">
+            Câu {stt}
+          </span>
+          {isGradable(item) && checked && (
+            <span
+              className={cn(
+                "inline-flex items-center gap-1 text-xs font-medium",
+                correct ? "text-emerald-600 dark:text-emerald-400" : "text-destructive"
+              )}
+            >
+              {correct ? (
+                <>
+                  <Check className="size-3.5" aria-hidden /> Đúng
+                </>
+              ) : (
+                <>
+                  <X className="size-3.5" aria-hidden /> Chưa đúng
+                </>
+              )}
+            </span>
+          )}
+        </div>
+      )}
+
       {(item.label || showPrompt) && (
-        <p className="text-sm leading-relaxed">
+        <p className={cn("leading-relaxed", stt !== undefined ? "text-sm font-medium" : "text-sm")}>
           {item.label && (
             <span className="text-muted-foreground">{item.label} </span>
           )}
@@ -149,8 +240,14 @@ function QuizItemView({
         </p>
       )}
 
+      {item.code && (
+        <pre className="overflow-x-auto rounded-lg border border-border bg-muted/60 px-3 py-2 text-xs leading-relaxed">
+          <code>{item.code}</code>
+        </pre>
+      )}
+
       {item.kind === "choice" && (
-        <div className="flex flex-col gap-1">
+        <div className={cn("flex flex-col", stt !== undefined ? "gap-1.5" : "gap-1")}>
           {item.options.map((option, i) => {
             const selected = value === i;
             // Chỉ tô màu sau khi chấm, và chỉ tô phương án ĐÃ CHỌN cùng
@@ -164,7 +261,10 @@ function QuizItemView({
                 onClick={() => onAnswer(i)}
                 aria-pressed={selected}
                 className={cn(
-                  "rounded-md border px-3 py-1.5 text-left text-sm transition-colors",
+                  "rounded-md border text-left text-sm transition-colors",
+                  stt !== undefined
+                    ? "flex items-start gap-2.5 px-2.5 py-2"
+                    : "px-3 py-1.5",
                   asCorrect
                     ? "border-emerald-500/70 bg-emerald-500/10"
                     : asWrong
@@ -174,7 +274,24 @@ function QuizItemView({
                         : "border-transparent bg-muted/50 hover:bg-muted"
                 )}
               >
-                {option}
+                {stt !== undefined && (
+                  <span
+                    className={cn(
+                      "mt-px flex size-5 shrink-0 items-center justify-center rounded text-[0.7rem] font-semibold",
+                      asCorrect
+                        ? "bg-emerald-500 text-white"
+                        : asWrong
+                          ? "bg-destructive text-white"
+                          : selected
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-background text-muted-foreground inset-ring inset-ring-border"
+                    )}
+                    aria-hidden
+                  >
+                    {chuCai(i)}
+                  </span>
+                )}
+                <span className="min-w-0">{option}</span>
               </button>
             );
           })}
@@ -257,7 +374,9 @@ function QuizItemView({
             {hintOpen ? "Ẩn gợi ý" : "Gợi ý"}
           </Button>
         )}
-        {isGradable(item) && checked && (
+        {/* Kiểu bài học đã có nhãn đúng/sai ở đầu thẻ; chỉ câu điền mới cần
+            nhắc lại ở đây vì còn phải hiện đáp án đúng. */}
+        {isGradable(item) && checked && (stt === undefined || item.kind === "fill") && (
           <span
             className={cn(
               "flex items-center gap-1 text-xs font-medium",

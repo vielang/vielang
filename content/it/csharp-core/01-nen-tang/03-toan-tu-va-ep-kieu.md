@@ -130,13 +130,15 @@ luồng chạy, kèm `switch expression` mà code C# hiện đại dùng khắp 
 ```quiz
 [
   {
-    "prompt": "double tiLe = daXong / tongSo; với daXong = 47, tongSo = 100, cả hai là int. tiLe bằng bao nhiêu?",
+    "prompt": "tiLe bằng bao nhiêu?",
+    "code": "int daXong = 47, tongSo = 100;\ndouble tiLe = daXong / tongSo;",
     "options": ["0.47", "0", "47", "Lỗi compile"],
     "answer": 2,
     "explain": "Phép chia thực hiện trước khi gán, mà hai vế đều là int nên ra 0. Ép kiểu một vế: (double)daXong / tongSo."
   },
   {
-    "prompt": "decimal gia = 19.99m; int x = (int)gia; — x bằng mấy?",
+    "prompt": "x bằng mấy?",
+    "code": "decimal gia = 19.99m;\nint x = (int)gia;",
     "options": ["20", "19", "19.99", "Lỗi compile vì phải dùng Math.Round"],
     "answer": 2,
     "explain": "Ép kiểu tường minh cắt cụt phần thập phân. Muốn 20 thì (int)Math.Round(gia)."

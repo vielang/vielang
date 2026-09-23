@@ -210,7 +210,8 @@ vừa học ở đây, nên đọc tiếp sẽ nhẹ.
 ```quiz
 [
   {
-    "prompt": "Đoạn này in ra mấy dòng log? var q = db.Orders.Where(o => o.IsPaid); if (q.Any()) { foreach (var o in q) Xuly(o); }",
+    "prompt": "Đoạn này gửi mấy truy vấn xuống database?",
+    "code": "var q = db.Orders.Where(o => o.IsPaid);\n\nif (q.Any())\n{\n    foreach (var o in q)\n        Xuly(o);\n}",
     "options": [
       "Một truy vấn, vì q chỉ được khai báo một lần",
       "Hai truy vấn: một cho Any(), một cho foreach",
@@ -232,7 +233,8 @@ vừa học ở đây, nên đọc tiếp sẽ nhẹ.
     "explain": "Trả IEnumerable<T> ra ngoài nghĩa là truy vấn chạy lúc người gọi duyệt — khi đó context đã bị dispose. Chốt bằng ToListAsync() ngay trong method."
   },
   {
-    "prompt": "DocDong() đọc file bằng yield return, gọi kèm .Take(3) trên một file 10 GB. Chuyện gì xảy ra?",
+    "prompt": "DocDong() đọc file 10 GB bằng yield return. Đoạn này chạy ra sao?",
+    "code": "foreach (var d in DocDong(\"log.txt\").Take(3))\n    Console.WriteLine(d);",
     "options": [
       "Đọc hết file rồi mới lấy 3 dòng đầu",
       "Chỉ đọc tới khi đủ 3 dòng rồi dừng",

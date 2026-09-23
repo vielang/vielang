@@ -3,10 +3,16 @@ title: IDisposable và using
 minutes: 10
 ---
 
-Service chạy êm vài giờ rồi bắt đầu trả lỗi
-`SocketException: Only one usage of each socket address is normally permitted`.
-Khởi động lại là hết, vài giờ sau lại thế. Nguyên nhân nằm ở một dòng trông
-vô hại: `new HttpClient()` trong mỗi request.
+Service chạy êm vài giờ rồi bắt đầu trả lỗi.
+
+```text
+SocketException: Only one usage of each socket
+address is normally permitted
+```
+
+Khởi động lại là hết. Vài giờ sau lại thế.
+
+Nguyên nhân nằm ở một dòng trông vô hại: `new HttpClient()` trong mỗi request.
 
 > **Học xong bài này bạn sẽ:** biết thứ gì GC dọn được và thứ gì không; dùng
 > `using` đúng chỗ; và tránh hai cái bẫy tài nguyên hay gặp nhất trong app
@@ -15,34 +21,43 @@ vô hại: `new HttpClient()` trong mỗi request.
 > **Cần biết trước:** `try/finally` (bài trước), GC ở mức "dọn object không ai
 > tham chiếu".
 
-## GC không dọn mọi thứ
+## GC dọn bộ nhớ, không dọn tài nguyên hệ điều hành
 
-GC quản **bộ nhớ**. Còn file handle, connection tới database, socket, cổng
-mạng — đó là tài nguyên của hệ điều hành, GC không biết chúng đắt tới mức nào
-và không dọn kịp thời. Những kiểu nắm giữ chúng đều cài `IDisposable`, và bạn
-phải gọi `Dispose` khi dùng xong.
+| Thứ bạn tạo ra | GC dọn giúp | Ai chịu trách nhiệm |
+|---|---|---|
+| `List`, `string`, object thường | có | GC, khi không còn ai tham chiếu |
+| File handle (`FileStream`) | không | bạn, qua `Dispose` |
+| Connection tới database | không | bạn, hoặc framework |
+| Socket mạng (`HttpClient`) | không | dùng lại, đừng tạo mới |
 
-## Thử ngay: using gọi Dispose lúc nào
+GC quản bộ nhớ, và nó làm việc đó rất tốt. Nhưng file handle, connection,
+socket thì thuộc về hệ điều hành.
+
+GC không biết chúng đắt tới mức nào, nên cũng không vội dọn. Những kiểu nắm
+giữ chúng đều cài `IDisposable`, và bạn phải gọi `Dispose` khi dùng xong.
+
+## Thử ngay: using dọn trước khi lỗi bay lên
 
 ```csharp
-class TaiNguyen : IDisposable
+class Resource : IDisposable
 {
-    public TaiNguyen() => Console.WriteLine("mở");
-    public void Dispose() => Console.WriteLine("đóng");
+    public Resource() => Console.WriteLine("mở");
+    public void Dispose() =>
+        Console.WriteLine("đóng");
 }
 
-void Chay()
+void Run()
 {
-    using var tn = new TaiNguyen();
+    using var res = new Resource();
     Console.WriteLine("đang dùng");
     throw new Exception("hỏng giữa chừng");
 }
 
-try { Chay(); }
+try { Run(); }
 catch { Console.WriteLine("bắt được lỗi"); }
 ```
 
-**Đoán trước khi chạy:** có lỗi ném ra giữa chừng — dòng "đóng" có được in
+**Đoán trước khi chạy:** có lỗi ném ra giữa chừng. Dòng "đóng" có được in
 không, và in trước hay sau "bắt được lỗi"?
 
 <details>
@@ -55,91 +70,95 @@ mở
 bắt được lỗi
 ```
 
-`using` dọn **trước** khi lỗi bay lên tầng trên. Bên dưới, compiler dịch nó
-thành `try/finally`, nên dù `return` sớm hay ném exception thì `Dispose` vẫn
-chạy.
+`using` dọn **trước** khi lỗi bay lên tầng trên.
+
+Bên dưới, compiler dịch nó thành `try/finally`. Nên dù bạn `return` sớm hay
+ném exception thì `Dispose` vẫn chạy.
 
 </details>
 
-## Hai cách viết
+## Ba cách viết using, khác nhau ở thời điểm dọn
+
+| Viết | Dọn lúc nào | Dùng khi |
+|---|---|---|
+| `using var x = …` | cuối khối chứa nó | mặc định |
+| `using (var x = …) { }` | cuối cặp ngoặc | cần đóng sớm hơn |
+| `await using var x = …` | cuối khối, gọi `DisposeAsync` | tài nguyên bất đồng bộ |
 
 ```csharp
-// using declaration — dọn ở cuối khối chứa nó
 using var reader = new StreamReader(path);
 var text = reader.ReadToEnd();
 
-// using statement — dọn ở cuối khối ngoặc
-using (var conn = new SqlConnection(chuoi))
+using (var conn = new SqlConnection(cs))
 {
     conn.Open();
 }
+
+await using var db = new SqlConnection(cs);
+await db.OpenAsync();
 ```
 
 Dạng `using var` gọn hơn và đủ dùng cho hầu hết trường hợp. Dạng có ngoặc hợp
-khi bạn muốn tài nguyên đóng **sớm hơn** cuối method.
+khi bạn muốn tài nguyên đóng sớm hơn cuối method.
 
-Với tài nguyên bất đồng bộ (stream mạng, `DbConnection`), dùng `await using` —
-nó gọi `DisposeAsync` thay vì `Dispose`:
-
-```csharp
-await using var conn2 = new SqlConnection(chuoi);
-await conn2.OpenAsync();
-```
-
-## Bẫy 1: HttpClient tạo mới mỗi lần
+## HttpClient phải dùng lại, không tạo mới mỗi request
 
 ```csharp
-// SAI — mỗi request một socket, đóng rồi vẫn bị giữ
+// SAI — mỗi request một socket mới
 using var http = new HttpClient();
 var res = await http.GetAsync(url);
 ```
 
-Nghe rất ngược: `HttpClient` cài `IDisposable`, nhưng tạo mới liên tục lại
-chính là vấn đề. Socket sau khi đóng còn nằm ở trạng thái `TIME_WAIT` vài
-phút, nên app bận sẽ cạn cổng — đúng lỗi ở đầu bài.
+Nghe rất ngược. `HttpClient` cài `IDisposable` hẳn hoi, vậy mà `using` nó lại
+chính là vấn đề.
+
+Socket sau khi đóng còn nằm ở trạng thái `TIME_WAIT` thêm vài phút. App bận
+thì cạn cổng, và đó là lỗi ở đầu bài.
 
 ```csharp
 // ĐÚNG — để DI quản, dùng lại kết nối
-public class GiaService(HttpClient http)
+public class PriceService(HttpClient http)
 {
-    public Task<string> Lay(string url) =>
+    public Task<string> Get(string url) =>
         http.GetStringAsync(url);
 }
 
 // Program.cs
-builder.Services.AddHttpClient<GiaService>();
+builder.Services.AddHttpClient<PriceService>();
 ```
 
-`IHttpClientFactory` (qua `AddHttpClient`) tái sử dụng kết nối bên dưới và tự
-xoay vòng chúng theo định kỳ.
+`IHttpClientFactory`, mà `AddHttpClient` dựng lên cho bạn, tái sử dụng kết nối
+bên dưới và tự xoay vòng chúng theo định kỳ.
 
-## Bẫy 2: DbContext sống quá lâu
+## DbContext để framework quản theo từng request
 
-`DbContext` cũng là `IDisposable`, nhưng trong ASP.NET Core bạn **không tự
-`using`** nó: `AddDbContext` đăng ký theo vòng đời scoped, mỗi request một
-context, và framework tự dispose khi request kết thúc.
+`DbContext` cũng là `IDisposable`. Nhưng trong ASP.NET Core bạn **không tự
+`using`** nó.
 
-Tự tạo `DbContext` bằng `new` rồi giữ trong một field `static` thì vừa rò
-connection vừa giữ mọi thực thể đã tải trong bộ nhớ — hai loại leak cùng lúc.
+`AddDbContext` đăng ký theo vòng đời scoped. Mỗi request một context, và
+framework tự dispose khi request kết thúc.
 
-## Khi nào viết Dispose của riêng mình
+Tự `new` một `DbContext` rồi giữ trong field `static` thì vừa rò connection,
+vừa giữ mọi thực thể đã tải trong bộ nhớ. Hai loại leak cùng một lúc.
 
-Chỉ khi class của bạn **nắm giữ** một tài nguyên cần dọn:
+## Chỉ tự viết Dispose khi bạn sở hữu tài nguyên
 
 ```csharp
-public class BoDemFile : IDisposable
+public class FileBuffer : IDisposable
 {
     private readonly StreamWriter _writer;
 
-    public BoDemFile(string path) =>
+    public FileBuffer(string path) =>
         _writer = new StreamWriter(path);
 
     public void Dispose() => _writer.Dispose();
 }
 ```
 
-Class chỉ dùng các service khác (do DI cấp) thì **không** cần cài
-`IDisposable` — dọn thứ mình không sở hữu là gây lỗi cho người khác.
+Class này tự tạo ra `StreamWriter`, nên nó phải tự dọn.
+
+Còn class chỉ nhận service từ DI rồi dùng thì **không** cần cài `IDisposable`.
+Dọn thứ mình không sở hữu là gây lỗi cho người khác đang dùng chung.
 
 ## Dấu hiệu trong code của bạn
 
@@ -159,15 +178,17 @@ Class chỉ dùng các service khác (do DI cấp) thì **không** cần cài
 
 ## Bước tiếp theo
 
-Hết chương **Ngoại lệ và tài nguyên**. Chương cuối của khoá — **Bất đồng bộ** —
-nói về `async`/`await`: vì sao một API chờ database lại không nên chiếm luồng,
-và những cái bẫy khiến app treo cứng.
+Hết chương **Ngoại lệ và tài nguyên**. Code của bạn giờ không nuốt lỗi, cũng
+không rò tài nguyên nữa.
+
+Chương cuối của khoá là **Bất đồng bộ**. Vì sao một API ngồi chờ database lại
+không nên chiếm luồng, và những cái bẫy khiến cả app treo cứng.
 
 ```quiz
 [
   {
     "prompt": "Đoạn này in ra thứ tự nào?",
-    "code": "void Chay()\n{\n    using var tn = new TaiNguyen();\n    throw new Exception(\"hỏng\");\n}\n\ntry { Chay(); }\ncatch { Console.WriteLine(\"bắt được lỗi\"); }",
+    "code": "void Run()\n{\n    using var res = new Resource();\n    throw new Exception(\"hỏng\");\n}\n\ntry { Run(); }\ncatch { Console.WriteLine(\"bắt được lỗi\"); }",
     "options": [
       "\"bắt được lỗi\" rồi mới \"đóng\"",
       "\"đóng\" rồi mới \"bắt được lỗi\"",

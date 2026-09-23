@@ -3,11 +3,10 @@ title: IEnumerable và hoãn thực thi
 minutes: 12
 ---
 
-Trang báo cáo của bạn chạy ngon ở máy local. Lên production, cùng một API mất 8
-giây. Mở log ra thì thấy câu truy vấn nặng nhất **chạy ba lần**, dù trong code
-bạn chỉ viết nó đúng một lần.
+Trang báo cáo chạy ngon ở máy local. Lên production, cùng API ấy mất 8 giây.
 
-Không ai gọi nhầm cả. Đó là cách `IEnumerable<T>` hoạt động.
+Bạn mở log. Câu truy vấn nặng nhất **chạy ba lần**, trong khi code chỉ viết nó
+một lần. Không ai gọi nhầm. Đó là cách `IEnumerable<T>` hoạt động.
 
 > **Học xong bài này bạn sẽ:** nhìn một đoạn LINQ và nói được nó chạy lúc nào,
 > chạy mấy lần; tự rà project của mình để tìm chỗ đang duyệt lại nhiều lần.
@@ -18,16 +17,23 @@ Không ai gọi nhầm cả. Đó là cách `IEnumerable<T>` hoạt động.
 ## Truy vấn LINQ là lời hứa, không phải dữ liệu
 
 ```csharp
-var cho = orders.Where(o => o.IsPending);
+var pending = orders.Where(o => o.IsPending);
 // Tới đây CHƯA đơn nào được kiểm tra
 ```
 
-`Where` không lọc gì cả. Nó trả về một object biết **cách** lọc, và chỉ bắt tay
-vào làm khi có người hỏi tới từng phần tử. Cơ chế này gọi là **deferred
-execution** — hoãn thực thi.
+`Where` không lọc gì cả. Nó chỉ trả về một object biết **cách** lọc. Object ấy
+nằm im cho tới khi có người hỏi tới từng phần tử.
 
-Ai là "người hỏi tới"? `foreach`, `ToList()`, `Count()`, `First()`, `Sum()`… Mỗi
-lần hỏi là một lần chạy lại từ đầu.
+Cơ chế này gọi là **deferred execution**, hoãn thực thi.
+
+| Phép | Chạy truy vấn chưa |
+|---|---|
+| `Where`, `Select`, `OrderBy` | chưa, chỉ mô tả việc cần làm |
+| `foreach`, `ToList`, `ToArray` | có, duyệt hết |
+| `Count`, `Sum`, `Max` | có, duyệt hết |
+| `Any`, `First` | có, nhưng dừng sớm khi tìm thấy |
+
+Mỗi lần hỏi là một lần chạy lại từ đầu.
 
 ## Thử ngay: nhìn tận mắt lúc nó chạy
 
@@ -39,22 +45,23 @@ cd ThuLinq
 Mở `Program.cs`, dán đoạn này vào rồi chạy `dotnet run`:
 
 ```csharp
-var so = new List<int> { 1, 2, 3, 4 };
+var numbers = new List<int> { 1, 2, 3, 4 };
 
-var chan = so.Where(n =>
+var evens = numbers.Where(n =>
 {
     Console.WriteLine($"  xét {n}");
     return n % 2 == 0;
 });
 
 Console.WriteLine("Viết xong truy vấn.");
-Console.WriteLine($"Đếm: {chan.Count()}");
-Console.WriteLine($"Đầu tiên: {chan.First()}");
+Console.WriteLine($"Đếm: {evens.Count()}");
+Console.WriteLine($"Đầu tiên: {evens.First()}");
 ```
 
-**Trước khi bấm chạy, đoán xem:** màn hình in ra bao nhiêu dòng "xét", và dòng
-"Viết xong truy vấn" đứng ở đâu? Đoán sai một lần nhớ lâu hơn đọc đúng mười
-lần, nên hãy đoán thật rồi mới mở kết quả bên dưới.
+**Đoán trước khi chạy:** màn hình in ra bao nhiêu dòng "xét"? Và dòng "Viết
+xong truy vấn" đứng ở đâu?
+
+Đoán sai một lần nhớ lâu hơn đọc đúng mười lần. Hãy đoán thật rồi mới mở.
 
 <details>
 <summary>Đoán xong rồi — xem kết quả</summary>
@@ -79,7 +86,7 @@ Ba điều đọc được từ đây:
 - `Count()` duyệt **cả bốn** phần tử.
 - `First()` duyệt **lại từ đầu**, nhưng dừng ngay khi tìm thấy — cũng là lý do `Any()` nhanh hơn `Count() > 0`.
 
-Giờ thêm `.ToList()` vào cuối `so.Where(...)` rồi chạy lại: bốn dòng "xét" in
+Giờ thêm `.ToList()` vào cuối `numbers.Where(...)` rồi chạy lại: bốn dòng "xét" in
 đúng một lần, `Count` và `First` không sinh thêm dòng nào nữa.
 
 ```mermaid Truy vấn chỉ chạy khi có người duyệt, và chạy lại mỗi lần
@@ -97,43 +104,45 @@ flowchart TD
 
 ```csharp
 // SAI — truy vấn chạy 3 lần
-var cho = db.Orders.Where(o => o.IsPending);
+var pending = db.Orders.Where(o => o.IsPending);
 
 return new Report(
-    Tong: cho.Count(),             // lần 1
-    Max: cho.Max(o => o.Total),    // lần 2
-    Top5: cho.Take(5).ToList());   // lần 3
+    Tong: pending.Count(),             // lần 1
+    Max: pending.Max(o => o.Total),    // lần 2
+    Top5: pending.Take(5).ToList());   // lần 3
 ```
 
 ```csharp
 // ĐÚNG — chốt một lần rồi dùng lại
-var cho = await db.Orders
+var pending = await db.Orders
     .Where(o => o.IsPending)
     .ToListAsync();
 
 return new Report(
-    Tong: cho.Count,
-    Max: cho.Max(o => o.Total),
-    Top5: cho.Take(5).ToList());
+    Tong: pending.Count,
+    Max: pending.Max(o => o.Total),
+    Top5: pending.Take(5).ToList());
 ```
 
-Dữ liệu trong bộ nhớ thì ba lần duyệt chỉ tốn chút CPU. Dữ liệu ở database thì
-đó là **ba lần đi mạng, ba câu SQL**. Con số 8 giây không tới từ đâu xa.
+Dữ liệu trong bộ nhớ thì ba lần duyệt chỉ tốn chút CPU. Dữ liệu ở database
+thì đó là **ba lần đi mạng, ba câu SQL**.
+
+Con số 8 giây không tới từ đâu xa.
 
 ## Bẫy 2: nguồn đổi thì kết quả đổi theo
 
 ```csharp
 var list = new List<int> { 1, 2, 3 };
-var chan = list.Where(n => n % 2 == 0);
+var evens = list.Where(n => n % 2 == 0);
 
 list.Add(4);
 
 // in ra 2,4 — không phải 2
-Console.WriteLine(string.Join(",", chan));
+Console.WriteLine(string.Join(",", evens));
 ```
 
 Truy vấn giữ **tham chiếu tới nguồn**, không giữ bản sao. Rất khó lần ra khi
-`chan` được truyền qua vài tầng rồi mới có người sửa `list`.
+`evens` được truyền qua vài tầng rồi mới có người sửa `list`.
 
 ## Bẫy 3: exception nổ ở chỗ không ngờ
 
@@ -144,7 +153,7 @@ Console.WriteLine("Đã chuẩn bị xong");  // vẫn chạy
 var texts = noiDung.ToList();           // nổ Ở ĐÂY
 ```
 
-Stack trace khi đó trông như thế này — chỗ ném lỗi là `ToList()`, còn dòng
+Stack trace khi đó trông như dưới đây. Chỗ ném lỗi là `ToList()`. Còn dòng
 `Select` viết sai thì không hề xuất hiện:
 
 ```text
@@ -162,7 +171,7 @@ lỗi xảy ra lúc **duyệt**, hãy đi ngược lên tìm chỗ viết truy v
 
 ## Mặt tốt của sự lười biếng
 
-Hoãn thực thi không chỉ toàn bẫy — nó cho phép xử lý dữ liệu lớn hơn cả RAM:
+Hoãn thực thi không chỉ toàn bẫy. Nó cho phép xử lý dữ liệu lớn hơn cả RAM:
 
 ```csharp
 public IEnumerable<string> DocDong(string path)
@@ -180,9 +189,10 @@ foreach (var line in DocDong("nhat-ky.log").Take(10))
     Console.WriteLine(line);
 ```
 
-`yield return` biến method thành một nguồn sinh dữ liệu dần. File 10 GB vẫn chạy
-được vì mỗi lúc chỉ có một dòng nằm trong bộ nhớ, và `Take(10)` nghĩa là phần
-còn lại của file **không bao giờ** bị đọc.
+`yield return` biến method thành nguồn sinh dữ liệu dần. Mỗi lúc chỉ một dòng
+nằm trong bộ nhớ, nên file 10 GB vẫn chạy được.
+
+Thêm `Take(10)` nữa thì phần còn lại của file **không bao giờ** bị đọc.
 
 ## Dấu hiệu trong code của bạn
 

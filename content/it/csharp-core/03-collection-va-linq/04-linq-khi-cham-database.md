@@ -3,16 +3,19 @@ title: LINQ khi chạm database
 minutes: 11
 ---
 
-API danh sách đơn hàng mất 8 giây. Bật log SQL lên thì thấy **21 câu truy
-vấn** cho một lần gọi: một câu lấy 20 đơn, rồi hai mươi câu nữa, mỗi câu lấy
-tên một khách hàng. Trong code chỉ có đúng một vòng `foreach`.
+API danh sách đơn hàng mất 8 giây.
+
+Bạn bật log SQL lên. **Hai mươi mốt câu truy vấn** cho một lần gọi. Một câu
+lấy 20 đơn, rồi hai mươi câu nữa, mỗi câu lấy tên một khách.
+
+Mà trong code chỉ có đúng một vòng `foreach`.
 
 > **Học xong bài này bạn sẽ:** biết câu LINQ của mình chạy ở database hay
 > trong bộ nhớ; nhận ra và sửa bẫy N + 1; đọc được SQL mà EF Core sinh ra.
 >
 > **Cần biết trước:** LINQ cơ bản và hoãn thực thi (hai bài trước).
 
-## IEnumerable hay IQueryable
+## IQueryable chạy ở database, IEnumerable chạy trong bộ nhớ
 
 ```csharp
 // lọc TRONG BỘ NHỚ — kéo cả bảng về trước
@@ -25,15 +28,23 @@ IQueryable<Order> b = db.Orders
     .Where(o => o.Total > 100_000);
 ```
 
-- `IEnumerable<T>`: các phép chạy trong bộ nhớ, nên dữ liệu phải về máy chủ ứng dụng trước.
-- `IQueryable<T>`: điều kiện được **dịch sang SQL** và gửi cho database, chỉ kết quả mới đi về.
+| | `IEnumerable<T>` | `IQueryable<T>` |
+|---|---|---|
+| Phép `Where` chạy ở đâu | trong bộ nhớ | ở database |
+| Dữ liệu đi về | **cả bảng** | chỉ kết quả |
+| Dịch sang SQL | không | có |
+
+Nhìn code thì hai dòng gần như giống hệt, khác đúng một chữ `AsEnumerable`.
+
+Nhưng chữ ấy là ranh giới. Trước nó, câu lệnh mới là bản thiết kế chờ gửi cho
+database. Sau nó, dữ liệu đã nằm trong RAM máy chủ ứng dụng của bạn.
 
 Với bảng vài chục dòng thì không ai thấy khác biệt. Với bảng vài triệu dòng
 thì một bên trả về trong mili giây, một bên làm sập service.
 
 ## Thử ngay: nhìn SQL thật
 
-Bật log SQL trong `DbContext` — một dòng, và nên bật suốt lúc phát triển:
+Bật log SQL trong `DbContext`. Một dòng thôi, và nên bật suốt lúc phát triển.
 
 ```csharp
 protected override void OnConfiguring(
@@ -44,13 +55,13 @@ protected override void OnConfiguring(
 }
 ```
 
-Rồi chạy đoạn này:
+Rồi chạy đoạn này.
 
 ```csharp
-var dons = await db.Orders.Take(20).ToListAsync();
+var orders = await db.Orders.Take(20).ToListAsync();
 
-foreach (var d in dons)
-    Console.WriteLine(d.Customer.Name);
+foreach (var o in orders)
+    Console.WriteLine(o.Customer.Name);
 ```
 
 **Đoán trước khi chạy:** console in ra bao nhiêu câu `SELECT`?
@@ -65,8 +76,10 @@ SELECT ... FROM [Customers] WHERE [Id] = @__p_0
 ... (thêm 18 câu nữa)
 ```
 
-**21 câu**: một câu lấy đơn hàng, rồi mỗi vòng lặp một câu lấy khách hàng. Tên
-gọi của nó là **N + 1**, và đó chính là API 8 giây ở đầu bài.
+Console in ra **21 câu**. Một câu cho đơn hàng, rồi mỗi vòng lặp thêm một câu
+nữa để lấy khách.
+
+Tên gọi của nó là **N + 1**, và đó chính là API 8 giây ở đầu bài.
 
 </details>
 
@@ -82,11 +95,11 @@ sequenceDiagram
     end
 ```
 
-Hai cách sửa:
+Có hai cách sửa.
 
 ```csharp
 // Lấy sẵn dữ liệu liên quan trong cùng một câu
-var dons = await db.Orders
+var orders = await db.Orders
     .Include(o => o.Customer)
     .Take(20)
     .ToListAsync();
@@ -101,7 +114,12 @@ var rows = await db.Orders
     .ToListAsync();
 ```
 
-## Thứ tự các phép
+`Include` bảo EF Core lấy sẵn khách hàng ngay trong cùng một câu SQL. `Select`
+đi xa hơn một bước và chỉ lấy đúng ba cột bạn cần.
+
+Hai mươi mốt câu vừa rút về một.
+
+## Mọi phép trước ToListAsync gộp thành một câu SQL
 
 ```csharp
 var top = await db.Orders
@@ -112,32 +130,39 @@ var top = await db.Orders
     .ToListAsync();                // gửi truy vấn
 ```
 
-Mọi phép trước `ToListAsync` gộp lại thành **một** câu SQL. Sau `ToList` thì dữ
-liệu đã nằm trong bộ nhớ, mọi phép tiếp theo là LINQ thường.
+Mọi phép trước `ToListAsync` gộp lại thành **một** câu SQL. Sau `ToList` thì
+dữ liệu đã nằm trong bộ nhớ. Mọi phép tiếp theo là LINQ thường.
 
 ```csharp
 // SAI — tải cả bảng rồi mới lọc
-var sai = (await db.Orders.ToListAsync())
+var wrong = (await db.Orders.ToListAsync())
     .Where(o => o.IsPaid)
     .Take(20);
 ```
 
+Đoạn này vẫn ra đúng 20 đơn, chỉ có điều nó tải cả triệu dòng về rồi mới vứt
+đi 999.980 dòng.
+
+Quy tắc gọn lại một câu: lọc, sắp xếp và phân trang phải đứng **trước** dấu
+chốt.
+
 ## Không phải hàm nào cũng dịch được
 
 ```csharp
-var q = db.Orders.Where(o => TinhDiem(o) > 10);
+var q = db.Orders.Where(o => Score(o) > 10);
 ```
 
-EF Core không biết dịch `TinhDiem` sang SQL nên **ném exception lúc chạy**.
-Muốn dùng logic C# thì chốt dữ liệu về bộ nhớ trước — và chỉ làm vậy sau khi
-đã lọc cho tập đủ nhỏ:
+EF Core không biết dịch `Score` sang SQL, nên nó **ném exception lúc chạy**.
+
+Muốn dùng logic C# thì chốt dữ liệu về bộ nhớ trước. Và chỉ làm vậy sau khi đã
+lọc cho tập đủ nhỏ.
 
 ```csharp
-var canXet = await db.Orders
-    .Where(o => o.IsPaid && o.CreatedAt >= tuNgay)
+var candidates = await db.Orders
+    .Where(o => o.IsPaid && o.CreatedAt >= fromDate)
     .ToListAsync();
 
-var ketQua = canXet.Where(o => TinhDiem(o) > 10);
+var result = candidates.Where(o => Score(o) > 10);
 ```
 
 ## Truy vấn chỉ để đọc, và đếm
@@ -148,18 +173,18 @@ var rows = await db.Orders
     .Where(o => o.IsPaid)
     .ToListAsync();
 
-bool co = await db.Orders.AnyAsync(o => o.Id == id);
-int n = await db.Orders.CountAsync(o => o.IsPaid);
+bool exists = await db.Orders.AnyAsync(o => o.Id == id);
+int paid = await db.Orders.CountAsync(o => o.IsPaid);
 ```
 
 Mặc định EF Core ghi nhớ mọi thực thể đã tải để phát hiện thay đổi khi lưu.
-Với truy vấn chỉ để hiển thị, `AsNoTracking` bỏ phần ghi nhớ đó — nhanh hơn và
-tốn ít bộ nhớ hơn. Và đừng `ToListAsync()` rồi mới `.Count` — đó là kéo cả tập
-về chỉ để đếm.
+Truy vấn chỉ để hiển thị thì đâu cần phần ghi nhớ ấy.
+
+Và đừng `ToListAsync()` rồi mới `.Count`. Đó là kéo cả tập về chỉ để đếm.
 
 ## Dấu hiệu trong code của bạn
 
-- Vòng lặp chạm tới navigation property (`d.Customer.Name`) mà truy vấn không có `Include` hay `Select` → N + 1.
+- Vòng lặp chạm tới navigation property (`o.Customer.Name`) mà truy vấn không có `Include` hay `Select` → N + 1.
 - `.ToList()` hoặc `.AsEnumerable()` đứng **trước** một `Where` → cả bảng đang về bộ nhớ rồi mới lọc.
 - Truy vấn chỉ để hiển thị mà thiếu `AsNoTracking()`.
 - Gọi một method C# của bạn bên trong `Where` trên `IQueryable` → sẽ ném lỗi lúc chạy.
@@ -174,18 +199,20 @@ về chỉ để đếm.
 
 ## Bước tiếp theo
 
-Hết chương **Collection và LINQ**. Chương kế của khoá sẽ là **Ngoại lệ và tài
-nguyên**: xử lý lỗi cho đúng, và đóng file, connection, socket đúng lúc bằng
-`using`.
+Hết chương **Collection và LINQ**. Bạn đã biết chọn chỗ chứa dữ liệu, xử lý
+chúng bằng LINQ, và nhìn ra câu SQL thật phía sau.
+
+Chương kế của khoá là **Ngoại lệ và tài nguyên**. Xử lý lỗi cho đúng, và đóng
+file, connection, socket đúng lúc bằng `using`.
 
 ```quiz
 [
   {
     "prompt": "Đoạn này sinh ra bao nhiêu câu SQL, với 20 đơn hàng?",
-    "code": "var dons = await db.Orders.Take(20).ToListAsync();\n\nforeach (var d in dons)\n    Console.WriteLine(d.Customer.Name);",
+    "code": "var orders = await db.Orders.Take(20).ToListAsync();\n\nforeach (var d in orders)\n    Console.WriteLine(o.Customer.Name);",
     "options": ["1", "2", "21", "40"],
     "answer": 3,
-    "explain": "Một câu lấy 20 đơn, rồi mỗi lần chạm d.Customer là thêm một câu — tổng 21. Sửa bằng Include(o => o.Customer) hoặc Select sang DTO."
+    "explain": "Một câu lấy 20 đơn, rồi mỗi lần chạm o.Customer là thêm một câu — tổng 21. Sửa bằng Include(o => o.Customer) hoặc Select sang DTO."
   },
   {
     "prompt": "Câu nào chạy ở database, câu nào kéo cả bảng về bộ nhớ?",
@@ -200,7 +227,7 @@ nguyên**: xử lý lỗi cho đúng, và đóng file, connection, socket đúng
     "explain": "AsEnumerable() cắt đứt IQueryable: từ đó trở đi mọi phép chạy trong bộ nhớ, nên dữ liệu phải về trước."
   },
   {
-    "prompt": "Bạn viết db.Orders.Where(o => TinhDiem(o) > 10) với TinhDiem là method C# của bạn. Chuyện gì xảy ra?",
+    "prompt": "Bạn viết db.Orders.Where(o => Score(o) > 10) với Score là method C# của bạn. Chuyện gì xảy ra?",
     "options": [
       "EF Core tự dịch method sang SQL",
       "Ném exception lúc chạy vì không dịch được sang SQL",

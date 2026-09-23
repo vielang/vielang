@@ -3,9 +3,12 @@ title: Task và async await
 minutes: 11
 ---
 
-API của bạn chịu được 200 request mỗi giây rồi đứng. CPU chỉ 15%, database
-cũng nhàn. Máy chẳng bận gì cả — nó chỉ đang có vài trăm luồng **đứng chờ**
-database trả lời, và không còn luồng nào rảnh để nhận request mới.
+API của bạn chịu được 200 request mỗi giây rồi đứng.
+
+CPU chỉ 15%. Database cũng nhàn. Máy chẳng bận gì cả.
+
+Nó chỉ đang có vài trăm luồng **đứng chờ** database trả lời, và không còn luồng
+nào rảnh để nhận request mới.
 
 > **Học xong bài này bạn sẽ:** hiểu `async`/`await` giải phóng luồng thế nào;
 > viết method bất đồng bộ đúng từ controller xuống repository; chạy song song
@@ -13,43 +16,45 @@ database trả lời, và không còn luồng nào rảnh để nhận request m
 >
 > **Cần biết trước:** method và giá trị trả về; LINQ với EF Core ở mức đã gặp.
 
-## await không phải là chờ
+## await trả luồng lại, chứ không đứng chờ
 
 ```csharp
-public async Task<Order?> LayDon(int id)
+public async Task<Order?> GetOrder(int id)
 {
-    var don = await db.Orders.FindAsync(id);
-    return don;
+    var order = await db.Orders.FindAsync(id);
+    return order;
 }
 ```
 
-Khi chạy tới `await`, method **trả luồng lại** cho hệ thống và đăng ký "xong
-thì gọi tôi". Luồng đó quay về phục vụ request khác. Lúc database trả lời, một
-luồng rảnh nào đó chạy tiếp phần sau `await`.
+Chạy tới `await`, method trả luồng lại cho hệ thống và đăng ký một lời nhắn:
+xong thì gọi tôi.
 
-Đây là lý do `async` giúp máy chủ chịu tải cao hơn: nó không làm một request
-nhanh hơn, nó làm **số request chạy cùng lúc** nhiều hơn.
+Luồng đó quay về phục vụ request khác. Lúc database trả lời, một luồng rảnh
+nào đó sẽ chạy tiếp phần sau `await`.
 
-## Thử ngay: bao lâu cho ba việc
+Đây là lý do `async` giúp máy chịu tải cao hơn. Nó không làm một request nhanh
+hơn, nó làm **số request chạy cùng lúc** nhiều hơn.
+
+## Thử ngay: ba việc tuần tự mất 3 giây, song song mất 1
 
 ```csharp
-async Task<int> Cham(int id)
+async Task<int> Slow(int id)
 {
     await Task.Delay(1000);
     return id;
 }
 
-var dh = Stopwatch.StartNew();
+var sw = Stopwatch.StartNew();
 
-var a = await Cham(1);
-var b = await Cham(2);
-var c = await Cham(3);
-Console.WriteLine($"Lần lượt: {dh.Elapsed}");
+var a = await Slow(1);
+var b = await Slow(2);
+var c = await Slow(3);
+Console.WriteLine($"Lần lượt: {sw.Elapsed}");
 
-dh.Restart();
-var ketQua = await Task.WhenAll(
-    Cham(1), Cham(2), Cham(3));
-Console.WriteLine($"Song song: {dh.Elapsed}");
+sw.Restart();
+var results = await Task.WhenAll(
+    Slow(1), Slow(2), Slow(3));
+Console.WriteLine($"Song song: {sw.Elapsed}");
 ```
 
 **Đoán trước khi chạy:** mỗi việc mất 1 giây. Hai con số in ra là bao nhiêu?
@@ -62,21 +67,23 @@ Lần lượt: 00:00:03.0131
 Song song: 00:00:01.0062
 ```
 
-Ba `await` liên tiếp chạy **tuần tự**: `await` đầu phải xong mới tới cái sau.
-`Task.WhenAll` khởi động cả ba rồi mới chờ, nên tổng thời gian bằng việc lâu
-nhất.
+Ba `await` liên tiếp chạy tuần tự. Cái đầu phải xong thì cái sau mới bắt đầu.
+
+`Task.WhenAll` khởi động cả ba trước rồi mới chờ, nên tổng thời gian chỉ bằng
+việc lâu nhất.
 
 </details>
 
-Chỉ dùng `WhenAll` khi các việc **độc lập** với nhau. Ba câu truy vấn trên
-cùng một `DbContext` thì **không** được: `DbContext` không an toàn khi dùng
-song song.
+Chỉ gom bằng `WhenAll` khi các việc thật sự **độc lập**.
 
-## Viết async cho đúng
+Ba câu truy vấn trên cùng một `DbContext` thì không được. `DbContext` không an
+toàn khi dùng song song.
+
+## async phải đi suốt chuỗi gọi, đứt một chỗ là hỏng
 
 ```csharp
 // SAI — chặn luồng, mất sạch lợi ích của async
-public Order Lay(int id)
+public Order Get(int id)
 {
     return db.Orders.FindAsync(id).Result;
 }
@@ -84,50 +91,64 @@ public Order Lay(int id)
 
 ```csharp
 // ĐÚNG — async suốt đường từ controller xuống
-public async Task<Order?> Lay(int id)
+public async Task<Order?> Get(int id)
 {
     return await db.Orders.FindAsync(id);
 }
 ```
 
-`async` phải đi **suốt chuỗi gọi**: controller `async`, service `async`,
-repository `async`. Chỉ một chỗ gọi `.Result` hay `.Wait()` là cả chuỗi mất
-tác dụng, và tệ hơn — xem bài sau về deadlock.
+Controller `async`, service `async`, repository `async`. Cả chuỗi phải liền
+mạch.
 
-## Task, Task&lt;T&gt; và ValueTask
+Chỉ một chỗ gọi `.Result` hay `.Wait()` là luồng bị chặn trở lại. Tệ hơn nữa
+là deadlock, và bài sau sẽ cho bạn thấy nó xảy ra thế nào.
 
-- `Task` — việc không trả giá trị (như `void` nhưng bất đồng bộ).
-- `Task<T>` — việc trả về `T`.
-- `ValueTask<T>` — dành cho đường chạy thường xong ngay (đọc cache); chỉ dùng khi đã đo và thấy cần.
+## Task, Task&lt;T&gt; hay ValueTask tuỳ việc trả về gì
+
+| Kiểu trả về | Dùng cho | Ghi chú |
+|---|---|---|
+| `Task` | việc không trả giá trị | như `void` nhưng bất đồng bộ |
+| `Task<T>` | việc trả về một `T` | dạng hay gặp nhất |
+| `ValueTask<T>` | đường chạy thường xong ngay | chỉ dùng khi đã đo và thấy cần |
 
 ```csharp
-public async Task GhiLog(string s) { }
-public async Task<int> Dem() => 1;
+public async Task WriteLog(string message) { }
+public async Task<int> Count() => 1;
 ```
 
-Method `async` mà không có `await` nào bên trong thì compiler cảnh báo — đó là
-dấu hiệu bạn đánh dấu `async` thừa, hoặc quên `await`.
+Method đánh dấu `async` mà bên trong không có `await` nào thì compiler cảnh
+báo ngay. Đó là dấu hiệu bạn gắn `async` thừa, hoặc quên mất một `await`.
 
-## Đặt tên và quy ước
+## Hậu tố Async và CancellationToken là quy ước chung
 
 ```csharp
-public Task<List<Order>> LayDonAsync(
+public Task<List<Order>> GetOrdersAsync(
     CancellationToken ct = default)
 {
     return db.Orders.ToListAsync(ct);
 }
 ```
 
-- Hậu tố `Async` cho method trả `Task` — quy ước chung của .NET.
-- Nhận `CancellationToken` và chuyền nó xuống dưới; bài sau nói kỹ.
-- Method chỉ trả thẳng một `Task` thì **không cần** `async`/`await` — trả luôn `Task` cho gọn.
+Hậu tố `Async` là quy ước của cả .NET. Nhìn tên là người gọi biết phải `await`.
 
-## Async không phải đa luồng
+`CancellationToken` thì nhận vào rồi chuyền thẳng xuống dưới. Bài sau nói kỹ
+vì sao nó quan trọng.
 
-`async` không tự tạo luồng mới. Với việc **chờ I/O** (database, HTTP, file),
-không có luồng nào bị chiếm trong lúc chờ cả. Còn việc **nặng CPU** (tính
-toán, nén ảnh) thì `async` không giúp gì — thứ bạn cần là
-`Task.Run` để đẩy sang luồng khác, hoặc xử lý nền bằng hàng đợi.
+Để ý method này không có `async` lẫn `await`. Nó chỉ trả thẳng một `Task` sẵn
+có, nên thêm vào cũng chẳng để làm gì.
+
+## async giúp việc chờ I/O, không giúp việc nặng CPU
+
+| Loại việc | async có giúp không | Nên dùng gì |
+|---|---|---|
+| Chờ database, HTTP, file | **có** | `async`/`await` |
+| Nén ảnh, tính toán nặng | không | `Task.Run` hoặc hàng đợi nền |
+
+`async` không tự tạo ra luồng mới. Với việc chờ I/O, không có luồng nào bị
+chiếm trong suốt thời gian chờ cả.
+
+Còn việc nặng CPU thì vẫn phải có ai đó ngồi tính. `async` không làm phép màu
+ở đây được.
 
 ## Dấu hiệu trong code của bạn
 
@@ -147,14 +168,16 @@ toán, nén ảnh) thì `async` không giúp gì — thứ bạn cần là
 
 ## Bước tiếp theo
 
-Bài cuối của khoá — **Bẫy async thường gặp** — ba thứ làm app treo hoặc nuốt
-lỗi trong im lặng: `async void`, `.Result`, và quên `CancellationToken`.
+Bạn đã biết `async` làm gì. Giờ tới lúc biết nó hỏng ở đâu.
+
+Bài cuối của khoá, **Bẫy async thường gặp**, nói về ba thứ làm app treo hoặc
+nuốt lỗi trong im lặng: `async void`, `.Result`, và quên `CancellationToken`.
 
 ```quiz
 [
   {
     "prompt": "Ba việc độc lập, mỗi việc chờ I/O 1 giây. Đoạn này mất bao lâu?",
-    "code": "var a = await Cham(1);\nvar b = await Cham(2);\nvar c = await Cham(3);",
+    "code": "var a = await Slow(1);\nvar b = await Slow(2);\nvar c = await Slow(3);",
     "options": ["~1 giây", "~3 giây", "~9 giây", "Tuỳ số nhân CPU"],
     "answer": 2,
     "explain": "await chờ xong việc này mới bắt đầu việc sau. Muốn ~1 giây thì khởi động cả ba rồi await Task.WhenAll(...)."

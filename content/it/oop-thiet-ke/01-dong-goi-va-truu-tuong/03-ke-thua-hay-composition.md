@@ -3,9 +3,12 @@ title: Kế thừa hay composition
 minutes: 11
 ---
 
-`BaseService` dài 800 dòng, mười hai class kế thừa nó. Bạn sửa một method
-trong lớp cha cho đúng yêu cầu của module thanh toán, rồi ba module khác hỏng
-— những module bạn chưa từng mở ra xem.
+`BaseService` dài 800 dòng, mười hai class kế thừa nó.
+
+Bạn sửa một method trong lớp cha cho đúng yêu cầu của module thanh toán. Rồi
+ba module khác hỏng.
+
+Ba module bạn chưa từng mở ra xem.
 
 > **Học xong bài này bạn sẽ:** phân biệt "là một" với "có một"; biết cái bẫy
 > gọi method `virtual` trong constructor; và chọn composition ở những chỗ
@@ -13,133 +16,151 @@ trong lớp cha cho đúng yêu cầu của module thanh toán, rồi ba module 
 >
 > **Cần biết trước:** `class`, interface (bài trước).
 
-## Hai cách dùng lại code
+## Đọc to lên: "là một" thì kế thừa, "có một" thì composition
 
 ```csharp
-// Kế thừa — "NhanVienToanThoiGian LÀ MỘT NhanVien"
-class NhanVien { public string Ten = ""; }
-class NhanVienToanThoiGian : NhanVien { }
+// Kế thừa — FullTimeEmployee LÀ MỘT Employee
+class Employee { public string Name = ""; }
+class FullTimeEmployee : Employee { }
 
-// Composition — "DonHang CÓ MỘT cách tính phí"
-class DonHang(ITinhPhi tinhPhi)
+// Composition — Order CÓ MỘT cách tính phí
+class Order(IFeeCalculator calculator)
 {
-    public decimal Phi() => tinhPhi.Tinh(this);
+    public decimal Fee() => calculator.Calculate(this);
 }
 ```
 
-Phép thử nhanh: đọc to lên. "Nhân viên toàn thời gian **là một** nhân viên" —
-xuôi tai. "Đơn hàng **là một** cách tính phí" — vô lý, nên chỗ đó phải là
-composition.
+Phép thử nhanh là đọc to lên. "Nhân viên toàn thời gian **là một** nhân viên"
+nghe xuôi tai.
 
-Kế thừa tạo ràng buộc mạnh nhất giữa hai class: lớp con thấy cả `protected`,
-phụ thuộc vào thứ tự gọi trong lớp cha, và **không đổi được lúc chạy**.
-Composition thì chỉ ràng buộc qua một hợp đồng nhỏ.
+"Đơn hàng **là một** cách tính phí" thì vô lý. Vậy chỗ đó phải là composition.
 
-## Thử ngay: cái bẫy constructor
+| | Kế thừa | Composition |
+|---|---|---|
+| Lớp con thấy `protected` | có | không |
+| Đổi được lúc chạy | không | có |
+| Phụ thuộc vào | cả nội bộ lớp cha | một hợp đồng nhỏ |
+| Thay bằng bản giả khi test | khó | dễ |
+
+Kế thừa tạo ràng buộc mạnh nhất giữa hai class. Composition thì chỉ ràng buộc
+qua đúng những gì interface hứa.
+
+## Thử ngay: constructor lớp cha chạy trước field lớp con
 
 ```csharp
-class Cha
+class Parent
 {
-    public Cha() => InDanhTinh();
-    public virtual void InDanhTinh() =>
-        Console.WriteLine("Cha");
+    public Parent() => PrintName();
+    public virtual void PrintName() =>
+        Console.WriteLine("Parent");
 }
 
-class Con : Cha
+class Child : Parent
 {
-    private readonly string _ten = "Con";
-    public override void InDanhTinh() =>
-        Console.WriteLine($"Con: {_ten ?? "null"}");
+    private readonly string _name = "Child";
+    public override void PrintName() =>
+        Console.WriteLine(_name ?? "null");
 }
 
-new Con();
+new Child();
 ```
 
-**Đoán trước khi chạy:** `_ten` được gán ngay khi khai báo. Dòng in ra là
-`Con: Con` hay gì khác?
+**Đoán trước khi chạy:** `_name` được gán ngay lúc khai báo. Dòng in ra là
+`Child` hay gì khác?
 
 <details>
 <summary>Đoán xong rồi — xem kết quả</summary>
 
 ```text
-Con: null
+null
 ```
 
-Constructor của **lớp cha chạy trước**, mà lúc đó field của lớp con chưa được
-gán. Method `virtual` gọi từ constructor nhảy xuống bản override của lớp con,
+Constructor của lớp cha chạy trước, và lúc ấy field của lớp con chưa được gán.
+
+Method `virtual` gọi từ constructor lại nhảy xuống bản override của lớp con,
 nơi mọi thứ còn rỗng.
 
-Đây là **fragile base class**: lớp cha đúng, lớp con đúng, ghép lại thì sai —
-và không compiler nào cảnh báo.
+Người ta gọi đây là **fragile base class**. Lớp cha đúng, lớp con đúng, ghép
+lại thì sai, và không compiler nào cảnh báo bạn.
 
 </details>
 
-Quy tắc rút ra: **không gọi method `virtual` trong constructor**. Rộng hơn:
-mỗi lần lớp cha gọi một method có thể bị override, nó đang phụ thuộc vào code
-mà nó không kiểm soát.
+Quy tắc rút ra ngắn thôi: đừng gọi method `virtual` trong constructor.
 
-## Khi nào kế thừa là đúng
+Rộng hơn nữa, mỗi lần lớp cha gọi một method có thể bị override, nó đang phụ
+thuộc vào code mà nó không kiểm soát.
 
-- Framework yêu cầu: `ControllerBase`, `DbContext`, `Exception`, `BackgroundService`.
-- Quan hệ "là một" thật sự và ổn định, lớp con **chỉ thêm** chứ không bóp méo hành vi lớp cha.
-- Bạn kiểm soát cả cha lẫn con, và cả hai nằm cùng một module.
+## Kế thừa đúng chỗ chỉ còn vài trường hợp
 
-Với những thứ khác, hãy bắt đầu bằng composition. Đổi từ composition sang kế
-thừa dễ hơn nhiều so với chiều ngược lại.
+| Tình huống | Chọn |
+|---|---|
+| Framework yêu cầu (`ControllerBase`, `DbContext`) | kế thừa |
+| "Là một" thật sự, lớp con chỉ thêm hành vi | kế thừa |
+| Dùng lại tiện ích chung (log, mail, thuế) | composition |
+| Cần đổi hành vi lúc chạy hoặc lúc test | composition |
 
-## Viết lại một lớp cha phình to
+Với mọi thứ khác, hãy bắt đầu bằng composition.
+
+Lý do rất thực dụng. Chuyển từ composition sang kế thừa thì dễ, còn chiều
+ngược lại thường phải mở lại cả mười hai class.
+
+## Một lớp cha phình to nên tách thành phụ thuộc
 
 ```csharp
-// SAI — mỗi module cần thêm gì lại nhét vào lớp cha
+// SAI — module nào cần gì lại nhét vào lớp cha
 abstract class BaseService
 {
-    protected void GhiLog(string s) { }
-    protected void GuiMail(string s) { }
-    protected void KiemTraQuyen(string s) { }
-    protected decimal TinhThue(decimal x) => x * 0.1m;
+    protected void WriteLog(string s) { }
+    protected void SendMail(string s) { }
+    protected void CheckPermission(string s) { }
+    protected decimal Tax(decimal x) => x * 0.1m;
 }
 
-class ThanhToanService : BaseService { }
+class PaymentService : BaseService { }
 ```
 
 ```csharp
 // ĐÚNG — nhận đúng thứ mình cần
-class ThanhToanService(
-    ILogger<ThanhToanService> logger,
-    ITinhThue thue)
+class PaymentService(
+    ILogger<PaymentService> logger,
+    ITaxCalculator tax)
 {
-    public decimal Tinh(decimal goc)
+    public decimal Total(decimal amount)
     {
-        logger.LogInformation("Tính thuế {Goc}", goc);
-        return goc + thue.Tinh(goc);
+        logger.LogInformation("Thuế {A}", amount);
+        return amount + tax.Calculate(amount);
     }
 }
 ```
 
-Bản composition dài dòng hơn vài dòng, nhưng: nhìn constructor là biết class
-cần gì; sửa `ITinhThue` không ảnh hưởng module khác; và lúc test thì truyền
-vào bản giả, không phải dựng cả `BaseService`.
+Bản composition dài hơn vài dòng. Bù lại bạn được ba thứ.
 
-## sealed, protected và những gì lộ ra
+Nhìn constructor là biết class cần gì. Sửa `ITaxCalculator` không làm module
+khác hỏng. Và lúc test thì truyền vào một bản giả, khỏi phải dựng cả
+`BaseService`.
+
+## sealed là mặc định hợp lý, protected là API công khai
 
 ```csharp
-public sealed class TinhPhiTieuChuan : ITinhPhi { }
+public sealed class StandardFeeCalculator
+    : IFeeCalculator { }
 ```
 
-`sealed` nói "class này không thiết kế để kế thừa". Đây là mặc định hợp lý:
-cho phép kế thừa là một lời hứa rằng mọi method `virtual` sẽ giữ nguyên cách
-gọi ở các phiên bản sau.
+`sealed` nói rằng class này không thiết kế để kế thừa.
 
-`protected` là một loại API công khai — với lớp con. Mỗi thành viên
-`protected` bạn thêm vào là một thứ nữa phải giữ nguyên về sau.
+Đó là mặc định hợp lý. Cho phép kế thừa là một lời hứa: mọi method `virtual`
+sẽ giữ nguyên cách gọi ở các phiên bản sau.
 
-## Composition trong .NET hằng ngày
+`protected` cũng là API công khai, chỉ là công khai với lớp con. Mỗi thành
+viên `protected` bạn thêm vào là một thứ nữa phải giữ nguyên về sau.
 
-Bạn đã dùng composition rất nhiều mà có thể chưa gọi tên nó:
+## Composition đã ở khắp .NET mà bạn đang dùng
+
+Bạn dùng composition rất nhiều rồi, có thể chỉ chưa gọi tên nó.
 
 - `ILogger`, `IHttpClientFactory`, `IOptions<T>` nhận qua constructor.
-- Middleware trong ASP.NET Core: xếp chồng các mắt xích, không phải kế thừa nhau.
-- `Stream` bọc `Stream`: `GZipStream(fileStream)` — thêm hành vi bằng cách bọc, đúng mẫu **Decorator** sẽ gặp ở chương pattern.
+- Middleware trong ASP.NET Core xếp chồng thành chuỗi, không kế thừa nhau.
+- `Stream` bọc `Stream`: `GZipStream(fileStream)` thêm hành vi bằng cách bọc, đúng mẫu **Decorator** sẽ gặp ở chương pattern.
 
 ## Dấu hiệu trong code của bạn
 
@@ -159,25 +180,27 @@ Bạn đã dùng composition rất nhiều mà có thể chưa gọi tên nó:
 
 ## Bước tiếp theo
 
-Hết chương **Đóng gói và trừu tượng**. Chương sau — **Đa hình trong thực tế** —
-dùng `virtual`, `abstract` và interface để thay những chuỗi `if` phân loại
-theo kiểu, và chọn giữa interface với abstract class.
+Hết chương **Đóng gói và trừu tượng**. Bạn đã có đủ công cụ để giấu chi tiết và
+dùng lại code cho an toàn.
+
+Chương sau, **Đa hình trong thực tế**, dùng `virtual`, `abstract` và interface
+để thay những chuỗi `if` phân loại theo kiểu.
 
 ```quiz
 [
   {
     "prompt": "Đoạn này in ra gì?",
-    "code": "class Cha\n{\n    public Cha() => In();\n    public virtual void In() =>\n        Console.WriteLine(\"Cha\");\n}\n\nclass Con : Cha\n{\n    private readonly string _ten = \"Con\";\n    public override void In() =>\n        Console.WriteLine(_ten ?? \"null\");\n}\n\nnew Con();",
-    "options": ["Con", "Cha", "null", "Ném NullReferenceException"],
+    "code": "class Parent\n{\n    public Parent() => Print();\n    public virtual void Print() =>\n        Console.WriteLine(\"Parent\");\n}\n\nclass Child : Parent\n{\n    private readonly string _name = \"Child\";\n    public override void Print() =>\n        Console.WriteLine(_name ?? \"null\");\n}\n\nnew Child();",
+    "options": ["Child", "Parent", "null", "Ném NullReferenceException"],
     "answer": 3,
     "explain": "Constructor lớp cha chạy trước khi field của lớp con được gán, mà method virtual lại nhảy xuống bản override. Đừng gọi method virtual trong constructor."
   },
   {
     "prompt": "Quan hệ nào nên dùng composition thay vì kế thừa?",
     "options": [
-      "ThanhToanController là một ControllerBase",
-      "DonHang có một cách tính phí vận chuyển",
-      "DonHangException là một Exception",
+      "PaymentController là một ControllerBase",
+      "Order có một cách tính phí vận chuyển",
+      "OrderException là một Exception",
       "EmailBackgroundJob là một BackgroundService"
     ],
     "answer": 2,

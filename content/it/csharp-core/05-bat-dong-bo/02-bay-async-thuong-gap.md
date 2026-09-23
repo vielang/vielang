@@ -3,10 +3,13 @@ title: Bẫy async thường gặp
 minutes: 11
 ---
 
-Một job nền gửi email chạy `async void`. Hôm SMTP lỗi, job ném exception —
-và không có gì trong log cả. Tệ hơn: tiến trình chết hẳn, container khởi động
-lại, không ai hiểu vì sao. Cùng đoạn code đó viết `async Task` thì lỗi đã nằm
-gọn trong log.
+Một job nền gửi email chạy `async void`. Hôm SMTP lỗi, job ném exception, và
+trong log không có gì cả.
+
+Tệ hơn nữa: tiến trình chết hẳn, container khởi động lại, không ai hiểu vì
+sao.
+
+Cùng đoạn code ấy viết `async Task` thì lỗi đã nằm gọn trong log.
 
 > **Học xong bài này bạn sẽ:** tránh ba cái bẫy async làm app treo hoặc nuốt
 > lỗi; chuyền `CancellationToken` cho đúng; và biết `ConfigureAwait` dùng ở
@@ -14,11 +17,22 @@ gọn trong log.
 >
 > **Cần biết trước:** `async`/`await` và `Task` (bài trước).
 
-## Bẫy 1: async void
+## Bốn cái bẫy, và thứ thay thế chúng
+
+| Bẫy | Hậu quả | Thay bằng |
+|---|---|---|
+| `async void` | exception hạ cả tiến trình | `async Task` |
+| Quên `await` | lỗi biến mất lặng lẽ | nghe cảnh báo CS4014 |
+| `.Result`, `.Wait()` | chặn luồng, có nơi treo cứng | async suốt đường |
+| `_ = DoAsync()` | không log, tắt máy là mất việc | hàng đợi hoặc `BackgroundService` |
+
+Bốn dòng này là toàn bộ bài học. Phần còn lại giải thích vì sao.
+
+## async void nuốt exception và hạ cả tiến trình
 
 ```csharp
 // SAI — không ai await được, lỗi không bắt được
-public async void GuiMail(string to)
+public async void SendMail(string to)
 {
     await smtp.SendAsync(to);
 }
@@ -26,21 +40,22 @@ public async void GuiMail(string to)
 
 ```csharp
 // ĐÚNG — trả Task để người gọi await và bắt lỗi
-public async Task GuiMailAsync(string to)
+public async Task SendMailAsync(string to)
 {
     await smtp.SendAsync(to);
 }
 ```
 
-`async void` không trả về gì để `await`, nên exception bên trong **không bay
-lên người gọi** — nó rơi thẳng vào runtime và hạ luôn tiến trình. Ngoại lệ duy
-nhất được phép dùng `async void` là event handler của UI, vì chữ ký hàm bắt
-buộc thế.
+`async void` không trả về gì để `await`. Exception bên trong vì thế không có
+đường bay lên người gọi.
 
-## Thử ngay: quên await
+Nó rơi thẳng vào runtime và hạ luôn tiến trình. Ngoại lệ duy nhất được phép là
+event handler của UI, vì chữ ký hàm bắt buộc phải thế.
+
+## Thử ngay: quên await là lỗi biến mất lặng lẽ
 
 ```csharp
-async Task Nem()
+async Task Throw()
 {
     await Task.Delay(50);
     throw new Exception("hỏng");
@@ -48,7 +63,7 @@ async Task Nem()
 
 try
 {
-    Nem();                 // KHÔNG await
+    Throw();               // KHÔNG await
     Console.WriteLine("qua được try");
     await Task.Delay(200);
 }
@@ -70,89 +85,103 @@ qua được try
 hết
 ```
 
-**Không bắt được gì cả.** `Nem()` không có `await` nên nó chỉ trả về một
-`Task` rồi đi tiếp; exception nằm im trong `Task` đó, và vì không ai hỏi tới
-nên nó biến mất lặng lẽ.
+Không bắt được gì cả.
 
-Thêm `await` vào trước `Nem()` rồi chạy lại: dòng `bắt được: hỏng` xuất hiện.
+`Throw()` thiếu `await` nên nó chỉ trả về một `Task` rồi đi tiếp. Exception
+nằm im trong `Task` đó, và vì không ai hỏi tới nên nó biến mất.
+
+Thêm `await` vào trước `Throw()` rồi chạy lại. Dòng `bắt được: hỏng` xuất hiện
+ngay.
 
 </details>
 
-Compiler có cảnh báo CS4014 cho trường hợp này. Đừng tắt nó.
+Compiler có cảnh báo CS4014 cho đúng trường hợp này. Đừng tắt nó.
 
-## Bẫy 2: .Result và .Wait()
+## .Result chặn luồng, và có nơi còn treo cứng
 
 ```csharp
-// SAI — chặn luồng, và treo cứng trong vài môi trường
-var don = LayDonAsync(id).Result;
+// SAI — chặn luồng, và treo cứng ở vài môi trường
+var order = GetOrderAsync(id).Result;
 ```
 
-Ngoài chuyện chặn luồng đã nói ở bài trước, `.Result` còn gây **deadlock**
-trong các môi trường có SynchronizationContext (WinForms, WPF, ASP.NET cũ):
-luồng chính đứng chờ task, mà task lại cần chính luồng đó để chạy tiếp. Cả hai
+Chặn luồng thì bài trước đã nói. Nhưng `.Result` còn gây **deadlock** ở những
+môi trường có SynchronizationContext, như WinForms, WPF hay ASP.NET cũ.
+
+Luồng chính đứng chờ task. Task lại cần chính luồng đó để chạy tiếp. Hai bên
 chờ nhau vĩnh viễn.
 
-ASP.NET Core hiện đại không còn SynchronizationContext nên ít treo hơn, nhưng
-chặn luồng vẫn là chặn luồng. Quy tắc: **async suốt đường**, không `.Result`.
+ASP.NET Core hiện đại bỏ SynchronizationContext nên ít treo hơn. Nhưng chặn
+luồng vẫn là chặn luồng.
 
-## Bẫy 3: quên CancellationToken
+## CancellationToken phải chuyền xuống tận truy vấn
 
 ```csharp
-// SAI — người dùng đóng tab, truy vấn vẫn chạy tiếp
+// SAI — người dùng đóng tab, truy vấn vẫn chạy
 [HttpGet]
-public async Task<IActionResult> Tim(string q)
+public async Task<IActionResult> Search(string q)
 {
-    var kq = await db.Orders
-        .Where(o => o.Ma.Contains(q))
+    var rows = await db.Orders
+        .Where(o => o.Code.Contains(q))
         .ToListAsync();
 
-    return Ok(kq);
+    return Ok(rows);
 }
 ```
 
 ```csharp
-// ĐÚNG — huỷ được, chuyền token xuống tận database
+// ĐÚNG — token đi xuống tận database
 [HttpGet]
-public async Task<IActionResult> Tim(
+public async Task<IActionResult> Search(
     string q, CancellationToken ct)
 {
-    var kq = await db.Orders
-        .Where(o => o.Ma.Contains(q))
+    var rows = await db.Orders
+        .Where(o => o.Code.Contains(q))
         .ToListAsync(ct);
 
-    return Ok(kq);
+    return Ok(rows);
 }
 ```
 
-ASP.NET Core tự cấp `CancellationToken` cho action và huỷ nó khi client ngắt
-kết nối. Chuyền nó xuống mọi lời gọi bất đồng bộ thì truy vấn nặng sẽ dừng
-thay vì chạy tiếp cho một người đã bỏ đi.
+ASP.NET Core tự cấp token cho action và huỷ nó khi client ngắt kết nối. Bạn
+chỉ cần khai vào tham số.
 
-Trong job nền, `ct` đến từ host và được huỷ khi ứng dụng tắt — nhờ vậy
-container dừng gọn thay vì bị giết cứng.
+Chuyền nó xuống mọi lời gọi bất đồng bộ thì truy vấn nặng sẽ dừng, thay vì
+chạy tiếp cho một người đã bỏ đi.
 
-## ConfigureAwait(false)
+Trong job nền, `ct` đến từ host và bị huỷ lúc ứng dụng tắt. Nhờ vậy container
+dừng gọn gàng thay vì bị giết cứng.
+
+## ConfigureAwait(false) dành cho thư viện, không cho app
+
+| Bạn đang viết | Cần `ConfigureAwait(false)` |
+|---|---|
+| Thư viện dùng chung, NuGet package | **có** |
+| App ASP.NET Core | không |
+| App WinForms, WPF | chỉ ở tầng không chạm UI |
 
 ```csharp
 await smtp.SendAsync(to).ConfigureAwait(false);
 ```
 
-Nói với runtime: "chạy tiếp ở luồng nào cũng được". Cần trong **thư viện dùng
-chung**, vì bạn không biết người dùng thư viện chạy trong môi trường nào. Code
-ứng dụng ASP.NET Core thì **không cần** — ở đó không có
-SynchronizationContext để quay về.
+Câu này nói với runtime rằng chạy tiếp ở luồng nào cũng được. Thư viện cần nó
+vì bạn không biết người dùng thư viện chạy trong môi trường nào.
 
-## Chạy nền cho đúng
+Còn app ASP.NET Core thì không có SynchronizationContext để quay về, nên thêm
+vào chỉ tổ rối mắt.
+
+## Chạy nền cần hàng đợi, không phải fire-and-forget
 
 ```csharp
-// SAI — fire-and-forget, lỗi biến mất
-_ = GuiMailAsync(to);
+// SAI — lỗi biến mất, tắt máy là mất việc
+_ = SendMailAsync(to);
 ```
 
-Muốn làm việc gì đó sau khi trả response, hãy dùng thứ được thiết kế cho việc
-ấy: `IHostedService`/`BackgroundService`, hàng đợi (Channel, RabbitMQ), hoặc
-một job runner. Chúng có chỗ ghi log, có cơ chế thử lại, và tắt máy cũng
-không mất việc.
+Muốn làm gì đó sau khi đã trả response, hãy dùng thứ được thiết kế cho việc
+ấy.
+
+`BackgroundService`, một hàng đợi như Channel hay RabbitMQ, hoặc một job
+runner. Chúng có chỗ ghi log, có cơ chế thử lại, và tắt máy cũng không mất
+việc.
 
 ## Dấu hiệu trong code của bạn
 
@@ -172,15 +201,16 @@ không mất việc.
 
 ## Bước tiếp theo
 
-Bạn vừa học hết khoá **C# Core**: cú pháp, kiểu dữ liệu và bộ nhớ, collection
-và LINQ, xử lý lỗi và tài nguyên, bất đồng bộ. Đây là nền để đi tiếp sang
-**OOP và design principles**, rồi **ASP.NET Core** và **SQL/Oracle** — những
-thứ tạo nên công việc hằng ngày của một backend developer.
+Bạn vừa học hết khoá **C# Core**. Cú pháp, kiểu dữ liệu và bộ nhớ, collection
+và LINQ, xử lý lỗi và tài nguyên, bất đồng bộ.
+
+Đây là nền để đi tiếp sang **OOP và thiết kế**, rồi **ASP.NET Core** và
+**SQL**. Những thứ làm nên công việc hằng ngày của một backend developer.
 
 ```quiz
 [
   {
-    "prompt": "Job nền viết public async void GuiMail(). SMTP lỗi thì chuyện gì xảy ra?",
+    "prompt": "Job nền viết public async void SendMail(). SMTP lỗi thì chuyện gì xảy ra?",
     "options": [
       "Lỗi được ghi log như bình thường",
       "Exception không bay lên người gọi được, rơi vào runtime và có thể hạ cả tiến trình",
@@ -192,15 +222,15 @@ thứ tạo nên công việc hằng ngày của một backend developer.
   },
   {
     "prompt": "Đoạn này in ra gì?",
-    "code": "try\n{\n    Nem();   // async Task, ném lỗi sau 50ms\n    await Task.Delay(200);\n}\ncatch (Exception ex)\n{\n    Console.WriteLine(\"bắt được\");\n}",
+    "code": "try\n{\n    Throw();   // async Task, ném lỗi sau 50ms\n    await Task.Delay(200);\n}\ncatch (Exception ex)\n{\n    Console.WriteLine(\"bắt được\");\n}",
     "options": [
       "\"bắt được\"",
       "Không in gì từ catch — lỗi nằm im trong Task không ai await",
-      "Chương trình dừng ngay ở Nem()",
+      "Chương trình dừng ngay ở Throw()",
       "Lỗi compile"
     ],
     "answer": 2,
-    "explain": "Thiếu await nên Nem() chỉ trả về một Task; exception nằm trong Task đó và biến mất lặng lẽ. Compiler có cảnh báo CS4014 cho đúng trường hợp này."
+    "explain": "Thiếu await nên Throw() chỉ trả về một Task; exception nằm trong Task đó và biến mất lặng lẽ. Compiler có cảnh báo CS4014 cho đúng trường hợp này."
   },
   {
     "prompt": "Người dùng đóng tab khi truy vấn tìm kiếm đang chạy. Làm sao để truy vấn dừng theo?",
@@ -216,9 +246,9 @@ thứ tạo nên công việc hằng ngày của một backend developer.
   {
     "prompt": "Bạn muốn gửi email sau khi trả response cho người dùng. Cách nào đúng?",
     "options": [
-      "_ = GuiMailAsync(to); rồi return luôn",
+      "_ = SendMailAsync(to); rồi return luôn",
       "Đưa việc vào hàng đợi hoặc BackgroundService",
-      "GuiMailAsync(to).Wait(); trước khi return",
+      "SendMailAsync(to).Wait(); trước khi return",
       "Gọi async void cho khỏi phải await"
     ],
     "answer": 2,

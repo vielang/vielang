@@ -3,9 +3,11 @@ title: LINQ thường dùng
 minutes: 11
 ---
 
-Sếp hỏi: "Tháng này khách nào mua nhiều nhất?". Bạn có `List<Order>` trong tay.
-Viết bằng vòng lặp mất mười lăm dòng và một `Dictionary` tạm. Viết bằng LINQ
-mất bốn dòng — và quan trọng hơn, người đọc code hiểu ngay bạn định làm gì.
+Sếp hỏi: "Tháng này khách nào mua nhiều nhất?"
+
+Bạn có `List<Order>` trong tay. Viết bằng vòng lặp mất mười lăm dòng và một
+`Dictionary` tạm. Viết bằng LINQ mất bốn dòng. Và quan trọng hơn, người đọc
+code hiểu ngay bạn định làm gì.
 
 > **Học xong bài này bạn sẽ:** dùng thạo bộ phép LINQ hay gặp nhất; chọn đúng
 > giữa `First` và `Single`, `Any` và `Count`; nhóm dữ liệu rồi tính tổng theo
@@ -13,30 +15,45 @@ mất bốn dòng — và quan trọng hơn, người đọc code hiểu ngay b�
 >
 > **Cần biết trước:** `List<T>`, lambda, và hoãn thực thi (bài trước).
 
+## Bộ phép LINQ theo nhóm việc
+
+| Việc | Phép | Ghi chú |
+|---|---|---|
+| Lọc | `Where` | giữ lại phần tử thoả điều kiện |
+| Đổi hình dạng | `Select` | gọi là **projection** |
+| Sắp xếp | `OrderBy`, `ThenBy` | thêm `Descending` để đảo |
+| Lấy một | `First`, `Single`, `FirstOrDefault` | khác nhau ở chỗ không có thì sao |
+| Hỏi có không | `Any`, `All` | dừng sớm, không duyệt hết |
+| Tính | `Count`, `Sum`, `Max`, `MaxBy` | `Max` trả giá trị, `MaxBy` trả phần tử |
+| Nhóm | `GroupBy` | bản LINQ của `GROUP BY` |
+| Làm phẳng | `SelectMany` | danh sách lồng danh sách |
+| Phân trang | `Skip`, `Take` | |
+| Chốt kết quả | `ToList`, `ToDictionary`, `ToLookup` | |
+
 ## Thử ngay: câu hỏi của sếp
 
 ```csharp
-record Don(string Khach, decimal Tien);
+record Order(string Customer, decimal Total);
 
-var dons = new List<Don>
+var orders = new List<Order>
 {
     new("Huy", 300), new("Nam", 120),
     new("Huy", 250), new("Lan", 900),
 };
 
-var top = dons
-    .GroupBy(d => d.Khach)
+var top = orders
+    .GroupBy(o => o.Customer)
     .Select(g => new {
         g.Key,
-        Tong = g.Sum(d => d.Tien),
+        Total = g.Sum(o => o.Total),
     })
-    .OrderByDescending(x => x.Tong)
+    .OrderByDescending(x => x.Total)
     .First();
 
-Console.WriteLine($"{top.Key}: {top.Tong}");
+Console.WriteLine($"{top.Key}: {top.Total}");
 ```
 
-**Đoán trước khi chạy:** ai đứng đầu — Huy (hai đơn) hay Lan (một đơn)?
+**Đoán trước khi chạy:** ai đứng đầu — Huy với hai đơn, hay Lan với một đơn?
 
 <details>
 <summary>Đoán xong rồi — xem kết quả</summary>
@@ -45,138 +62,137 @@ Console.WriteLine($"{top.Key}: {top.Tong}");
 Lan: 900
 ```
 
-Huy mua **nhiều lần hơn** (hai đơn, cộng lại 550), nhưng câu truy vấn này xếp
-theo **tổng tiền**, mà Lan một đơn đã 900. Đổi `Tong = g.Sum(...)` thành
-`SoDon = g.Count()` là đáp án đổi sang Huy ngay.
+Huy mua **nhiều lần hơn**: hai đơn, cộng lại 550. Nhưng câu truy vấn này xếp
+theo **tổng tiền**, mà Lan một đơn đã 900.
 
-Bài học nhỏ: "khách nào mua nhiều nhất" là câu hỏi mơ hồ — nhiều tiền hay
-nhiều lần? Câu LINQ buộc bạn phải trả lời rõ điều đó, còn vòng lặp thì giấu
-câu hỏi ấy đi giữa mười lăm dòng.
+Đổi `Total = g.Sum(...)` thành `Count = g.Count()` là đáp án đổi sang Huy.
+
+Bài học nhỏ: "mua nhiều nhất" là câu hỏi mơ hồ. Nhiều tiền hay nhiều lần? LINQ
+buộc bạn trả lời rõ, còn vòng lặp thì giấu câu hỏi ấy giữa mười lăm dòng.
 
 </details>
 
-`GroupBy` trả về các nhóm, mỗi nhóm có `Key` và bản thân nó là một tập phần tử
-— đúng bản LINQ của `GROUP BY` trong SQL.
+`GroupBy` trả về các nhóm. Mỗi nhóm có `Key`, và bản thân nó cũng là một tập
+phần tử để bạn `Sum` hay `Count` tiếp.
 
-## Lọc, chiếu, sắp xếp
+## Lọc, chiếu và sắp xếp nối được thành chuỗi
 
 ```csharp
-var ketQua = dons
-    .Where(d => d.Tien > 100)
-    .OrderByDescending(d => d.Tien)
-    .ThenBy(d => d.Khach)
-    .Select(d => new { d.Khach, d.Tien })
+var result = orders
+    .Where(o => o.Total > 100)
+    .OrderByDescending(o => o.Total)
+    .ThenBy(o => o.Customer)
+    .Select(o => new { o.Customer, o.Total })
     .ToList();
 ```
 
-`Select` gọi là **projection**: biến mỗi phần tử thành hình dạng khác. Lấy đúng
-thứ cần thay vì bê cả object là thói quen tốt, nhất là khi dữ liệu đến từ
+`Select` gọi là **projection**: biến mỗi phần tử thành hình dạng khác. Lấy
+đúng thứ cần thay vì bê cả object là thói quen tốt, nhất là khi dữ liệu đến từ
 database.
 
-## Lấy một phần tử
+## First, Single và bạn bè
+
+| Phép | Không có phần tử nào | Có từ hai trở lên |
+|---|---|---|
+| `First` | ném exception | lấy cái đầu |
+| `FirstOrDefault` | trả `null` | lấy cái đầu |
+| `Single` | ném exception | **ném exception** |
+| `SingleOrDefault` | trả `null` | ném exception |
+
+Chọn theo ý định của bạn. `Single` nói "chắc chắn chỉ có một, có hai là dữ
+liệu hỏng". `First` nói "lấy cái đầu, còn lại kệ".
+
+Dùng `First` để tra theo khoá chính là **giấu mất** lỗi trùng dữ liệu.
+
+## Any dừng sớm, còn Count phải đếm hết
 
 ```csharp
-var a = dons.First(d => d.Khach == "Huy");
-var b = dons.FirstOrDefault(d => d.Khach == "X");
-var c = dons.Single(d => d.Khach == "Lan");
-var e = dons.SingleOrDefault(d => d.Khach == "X");
+bool hasBig = orders.Any(o => o.Total > 500);
+bool allPaid = orders.All(o => o.Total > 0);
+int bigCount = orders.Count(o => o.Total > 100);
+
+if (orders.Any()) { }        // dừng ở phần tử đầu
+if (orders.Count() > 0) { }  // duyệt hết mới biết
 ```
 
-Chọn theo ý định: `Single` nói "chắc chắn chỉ có một, có hai là dữ liệu hỏng,
-hãy báo lỗi". `First` nói "lấy cái đầu, còn lại kệ". Dùng `First` cho khoá
-chính là **giấu mất** lỗi trùng dữ liệu.
+Hai dòng cuối cho cùng kết quả. Nhưng `Any()` dừng ngay khi thấy phần tử đầu
+tiên, còn `Count()` phải đếm hết.
 
-`FirstOrDefault` trả `null` khi không có — nhớ kiểm tra trước khi dùng.
-
-## Kiểm tra và đếm
+## Tính tổng, ghép, làm phẳng
 
 ```csharp
-bool coHuy = dons.Any(d => d.Tien > 500);
-bool taTraHet = dons.All(d => d.Tien > 0);
-int soDon = dons.Count(d => d.Tien > 100);
+decimal revenue = orders.Sum(o => o.Total);
+decimal max = orders.Max(o => o.Total);
+var biggest = orders.MaxBy(o => o.Total);
 
-if (dons.Any()) { }        // dừng ở phần tử đầu
-if (dons.Count() > 0) { }  // phải duyệt hết mới biết
+var detail = orders.Join(customers,
+    o => o.Customer,    // khoá bên trái
+    c => c.Name,        // khoá bên phải
+    (o, c) => new { o.Total, c.Phone });
+
+var allItems = orders.SelectMany(o => o.Items);
+var page2 = orders.Skip(20).Take(20);
 ```
 
-## Tính tổng
+`Max` trả về **giá trị** lớn nhất, `MaxBy` trả về **phần tử** mang giá trị đó.
+Hai cái này hay bị nhầm.
 
-```csharp
-decimal doanhThu = dons.Sum(d => d.Tien);
-decimal trungBinh = dons.Average(d => d.Tien);
-decimal lonNhat = dons.Max(d => d.Tien);
-var donLonNhat = dons.MaxBy(d => d.Tien);
-```
-
-`Max` trả về **giá trị** lớn nhất, `MaxBy` trả về **phần tử** có giá trị đó —
-hay nhầm. Trên danh sách rỗng, `Sum` ra 0 nhưng `Average` và `Max` thì ném
-exception.
-
-## Ghép, làm phẳng, phân trang
-
-```csharp
-var chiTiet = dons.Join(khachs,
-    d => d.Khach,      // khoá bên trái
-    k => k.Ten,        // khoá bên phải
-    (d, k) => new { d.Tien, k.DienThoai });
-
-var moiMon = dons.SelectMany(d => d.Items);
-var maKhach = dons.Select(d => d.Khach).Distinct();
-var theoTen = dons.DistinctBy(d => d.Khach);
-var trang2 = dons.Skip(20).Take(20);
-```
-
-`SelectMany` làm phẳng danh sách lồng danh sách — không có nó thì phải hai
-vòng lặp lồng nhau.
+Trên danh sách rỗng, `Sum` ra 0 nhưng `Average` và `Max` thì ném exception.
 
 ## Hai cách viết, và cách chốt kết quả
 
 ```csharp
 // Method syntax — phổ biến hơn
-var a2 = dons.Where(d => d.Tien > 100)
-             .Select(d => d.Tien);
+var a = orders.Where(o => o.Total > 100)
+              .Select(o => o.Total);
 
 // Query syntax — giống SQL
-var b2 = from d in dons
-         where d.Tien > 100
-         select d.Tien;
+var b = from o in orders
+        where o.Total > 100
+        select o.Total;
 
-var list = dons.ToList();
 // trùng khoá là ném lỗi
-var map = dons.ToDictionary(d => d.Khach);
+var map = orders.ToDictionary(o => o.Customer);
 // cho phép trùng, mỗi khoá một nhóm
-var look = dons.ToLookup(d => d.Khach);
+var lookup = orders.ToLookup(o => o.Customer);
 ```
+
+Hai cách cho ra cùng một thứ. Code .NET ngày nay dùng **method syntax** là
+chính.
 
 ## Dấu hiệu trong code của bạn
 
-- `Count() > 0` → đổi sang `Any()`, nó dừng ngay ở phần tử đầu.
+- `Count() > 0` → đổi sang `Any()`.
 - `First()` dùng để lấy bản ghi theo id → nên là `Single()`, để trùng dữ liệu lộ ra thay vì bị giấu.
 - `FirstOrDefault()` rồi dùng luôn kết quả → thiếu kiểm tra null.
-- `Dictionary` tạm dựng bằng vòng lặp để cộng dồn theo nhóm → `GroupBy` làm đúng việc đó, ngắn hơn và đọc ra ý định.
+- `Dictionary` tạm dựng bằng vòng lặp để cộng dồn theo nhóm → `GroupBy` làm đúng việc đó.
 - `ToList()` đứng giữa chuỗi phép → chốt sớm, xem bài sau khi dữ liệu ở database.
 
 ## Ghi nhớ
 
-- `Any()` thay cho `Count() > 0`; `Single` thay cho `First` khi dữ liệu lẽ ra chỉ có một.
+- `Any()` thay cho `Count() > 0`.
+- `Single` khi dữ liệu lẽ ra chỉ có một; `First` khi lấy cái đầu là đủ.
 - `Max` trả giá trị, `MaxBy` trả phần tử.
-- `GroupBy` + `Select` thay cho `Dictionary` tạm.
+- `GroupBy` cộng `Select` thay cho `Dictionary` tạm.
 - Nối nhiều phép rồi `ToList()` **một lần** ở cuối.
 
 ## Bước tiếp theo
 
-Bài sau — **LINQ khi chạm database** — cũng những phép này, nhưng chạy trên EF
-Core thì một câu viết ẩu có thể kéo cả bảng về máy chủ ứng dụng.
+Những phép này chạy trên `List` thì vô hại.
+
+Bài sau, **LINQ khi chạm database**, cho thấy cũng câu ấy chạy trên EF Core có
+thể kéo cả bảng về máy chủ ứng dụng. Mở bằng một API sinh ra 21 câu SQL cho
+một vòng `foreach`.
 
 ```quiz
 [
   {
     "prompt": "Bạn cần lấy đơn hàng theo id — id là khoá chính nên lẽ ra chỉ có một. Dùng gì?",
     "options": [
-      "First(d => d.Id == id)",
-      "Single(d => d.Id == id)",
-      "Where(d => d.Id == id).ToList()",
-      "FirstOrDefault(d => d.Id == id)!"
+      "First(o => o.Id == id)",
+      "Single(o => o.Id == id)",
+      "Where(o => o.Id == id).ToList()",
+      "FirstOrDefault(o => o.Id == id)!"
     ],
     "answer": 2,
     "explain": "Single ném lỗi nếu có từ hai bản ghi trở lên — dữ liệu trùng khoá chính là chuyện phải biết ngay, không nên bị First giấu đi."
@@ -195,17 +211,17 @@ Core thì một câu viết ẩu có thể kéo cả bảng về máy chủ ứn
   {
     "prompt": "Bạn muốn lấy ĐƠN HÀNG có giá trị lớn nhất, không phải con số lớn nhất. Dùng gì?",
     "options": [
-      "dons.Max(d => d.Tien)",
-      "dons.MaxBy(d => d.Tien)",
-      "dons.OrderBy(d => d.Tien).First()",
-      "dons.Select(d => d.Tien).Max()"
+      "orders.Max(o => o.Total)",
+      "orders.MaxBy(o => o.Total)",
+      "orders.OrderBy(o => o.Total).First()",
+      "orders.Select(o => o.Total).Max()"
     ],
     "answer": 2,
     "explain": "Max trả về giá trị lớn nhất, MaxBy trả về chính phần tử mang giá trị đó. Phương án C cũng ra phần tử nhưng là nhỏ nhất, vì OrderBy sắp tăng dần."
   },
   {
     "prompt": "Đoạn vòng lặp này làm gì, và LINQ viết lại thế nào?",
-    "code": "var tong = new Dictionary<string, decimal>();\nforeach (var d in dons)\n{\n    tong.TryGetValue(d.Khach, out var t);\n    tong[d.Khach] = t + d.Tien;\n}",
+    "code": "var totals = new Dictionary<string, decimal>();\nforeach (var o in orders)\n{\n    totals.TryGetValue(o.Customer, out var t);\n    totals[o.Customer] = t + o.Total;\n}",
     "options": [
       "Lọc theo khách — dùng Where",
       "Cộng tiền theo từng khách — dùng GroupBy rồi Sum",
@@ -213,7 +229,7 @@ Core thì một câu viết ẩu có thể kéo cả bảng về máy chủ ứn
       "Ghép hai danh sách — dùng Join"
     ],
     "answer": 2,
-    "explain": "Đây đúng là mẫu gom nhóm rồi cộng dồn: dons.GroupBy(d => d.Khach).Select(g => new { g.Key, Tong = g.Sum(d => d.Tien) })."
+    "explain": "Đây đúng là mẫu gom nhóm rồi cộng dồn: orders.GroupBy(o => o.Customer).Select(g => new { g.Key, Total = g.Sum(o => o.Total) })."
   }
 ]
 ```

@@ -3,10 +3,12 @@ title: Interface là hợp đồng
 minutes: 11
 ---
 
-Dự án có một interface tên `IOrderManager` với mười bốn method. Thêm tính năng
-nào cũng phải sửa nó, và ba class implement đều phải sửa theo — kể cả hai class
-chẳng liên quan gì tới tính năng mới. Đó không phải hợp đồng, đó là một cái
-thùng.
+Dự án có một interface tên `IOrderManager` với mười bốn method.
+
+Thêm tính năng nào cũng phải sửa nó. Ba class implement đều phải sửa theo, kể
+cả hai class chẳng liên quan gì tới tính năng mới.
+
+Đó không phải hợp đồng. Đó là một cái thùng.
 
 > **Học xong bài này bạn sẽ:** viết interface theo **việc cần làm** chứ không
 > theo lớp kỹ thuật; đặt tên interface để người đọc biết ngay nó hứa gì; và
@@ -14,64 +16,63 @@ thùng.
 >
 > **Cần biết trước:** `class`, method, đóng gói (bài trước).
 
-## Interface trả lời "làm gì", class trả lời "làm thế nào"
+## Interface nói làm gì, class nói làm thế nào
 
 ```csharp
-public interface IGuiThongBao
+public interface INotifier
 {
-    Task GuiAsync(string den, string noiDung);
+    Task SendAsync(string to, string message);
 }
 
-public class GuiMail : IGuiThongBao
+public class EmailNotifier : INotifier
 {
-    public Task GuiAsync(string den, string noiDung) =>
-        smtp.SendAsync(den, noiDung);
+    public Task SendAsync(string to, string message) =>
+        smtp.SendAsync(to, message);
 }
 
-public class GuiSms : IGuiThongBao
+public class SmsNotifier : INotifier
 {
-    public Task GuiAsync(string den, string noiDung) =>
-        sms.SendAsync(den, noiDung);
+    public Task SendAsync(string to, string message) =>
+        sms.SendAsync(to, message);
 }
 ```
 
-Class nào dùng `IGuiThongBao` chỉ biết "có thể gửi thông báo", không biết bên
-dưới là SMTP, SMS hay ghi ra file lúc chạy test. Đó là **trừu tượng**: giữ lại
-phần cần biết, giấu phần còn lại.
+Class nào dùng `INotifier` chỉ biết một điều: gửi được thông báo.
+
+Nó không biết bên dưới là SMTP, SMS, hay chỉ ghi ra file lúc chạy test. Đó
+chính là **trừu tượng**: giữ lại phần cần biết, giấu phần còn lại.
 
 ## Thử ngay: đổi cách làm mà không sửa nơi dùng
 
 ```csharp
-interface IGuiThongBao
+interface INotifier
 {
-    void Gui(string noiDung);
+    void Send(string message);
 }
 
-class GuiMail : IGuiThongBao
+class EmailNotifier : INotifier
 {
-    public void Gui(string n) =>
-        Console.WriteLine($"mail: {n}");
+    public void Send(string m) =>
+        Console.WriteLine($"mail: {m}");
 }
 
-class GuiLog : IGuiThongBao
+class LogNotifier : INotifier
 {
-    public void Gui(string n) =>
-        Console.WriteLine($"log: {n}");
+    public void Send(string m) =>
+        Console.WriteLine($"log: {m}");
 }
 
-class DatHang
+class PlaceOrder(INotifier notifier)
 {
-    private readonly IGuiThongBao _tb;
-    public DatHang(IGuiThongBao tb) => _tb = tb;
-
-    public void Dat() => _tb.Gui("Đã đặt hàng");
+    public void Run() =>
+        notifier.Send("Đã đặt hàng");
 }
 
-new DatHang(new GuiMail()).Dat();
-new DatHang(new GuiLog()).Dat();
+new PlaceOrder(new EmailNotifier()).Run();
+new PlaceOrder(new LogNotifier()).Run();
 ```
 
-**Đoán trước khi chạy:** class `DatHang` có một dòng `Dat()` duy nhất. Hai lần
+**Đoán trước khi chạy:** `PlaceOrder` chỉ có đúng một dòng thân hàm. Hai lần
 gọi in ra giống nhau hay khác nhau?
 
 <details>
@@ -82,120 +83,127 @@ mail: Đã đặt hàng
 log: Đã đặt hàng
 ```
 
-Cùng một dòng code trong `DatHang` cho ra hai hành vi. `DatHang` **không hề
-biết** ai đang gửi — và đó chính là điều làm nó thay được cách gửi (thêm SMS,
-thêm push) mà không phải mở lại file này.
+Một dòng code, hai hành vi.
 
-Lúc viết test, bạn truyền vào một bản ghi nhớ nội dung trong bộ nhớ, không cần
-SMTP thật. Chi tiết ở chương "Thiết kế để test được".
+`PlaceOrder` không hề biết ai đang gửi. Nhờ vậy bạn thêm SMS hay push về sau
+mà không phải mở lại file này.
+
+Lúc viết test, bạn truyền vào một bản chỉ ghi nhớ nội dung trong bộ nhớ. Không
+cần SMTP thật, không cần mạng.
 
 </details>
 
-## Đặt tên theo khả năng, không theo kỹ thuật
+## Đặt tên theo khả năng, không theo lớp kỹ thuật
+
+| Tên | Nó hứa gì | Nên là |
+|---|---|---|
+| `IOrderManager` | không rõ | tách theo từng việc |
+| `IOrderHelper` | không rõ | tách theo từng việc |
+| `IShippingFeeCalculator` | tính phí vận chuyển | ✔ |
+| `IOrderReader` | đọc đơn hàng | ✔ |
 
 ```csharp
-// SAI — tên không hứa điều gì cụ thể
-public interface IOrderManager { }
-public interface IOrderHelper { }
-public interface IOrderService { }
-```
-
-```csharp
-// ĐÚNG — đọc tên là biết nó làm được gì
-public interface ITinhPhiVanChuyen
+public interface IShippingFeeCalculator
 {
-    decimal Tinh(DonHang don);
+    decimal Calculate(Order order);
 }
 
-public interface ILuuDonHang
+public interface IOrderWriter
 {
-    Task<int> LuuAsync(DonHang d, CancellationToken ct);
+    Task<int> SaveAsync(
+        Order order, CancellationToken ct);
 }
 ```
 
-`Manager`, `Helper`, `Utils`, `Processor` là những cái tên không nói gì. Khi
-một interface khó đặt tên cho cụ thể, thường là vì nó đang ôm quá nhiều việc.
+`Manager`, `Helper`, `Utils`, `Processor` là những cái tên không nói gì cả.
 
-Quy ước .NET: tên interface bắt đầu bằng `I`. Với interface mô tả **khả năng**,
-tên tính từ cũng rất hợp: `IDisposable`, `IComparable`, `IEnumerable`.
+Và đây là dấu hiệu hữu ích: khi một interface khó đặt tên cho cụ thể, thường
+là vì nó đang ôm quá nhiều việc.
 
-## Interface nhỏ, chia theo người dùng
+Quy ước .NET thì tên bắt đầu bằng `I`. Với interface mô tả khả năng, tên tính
+từ cũng rất hợp: `IDisposable`, `IComparable`, `IEnumerable`.
+
+## Nhiều interface nhỏ tốt hơn một interface to
 
 ```csharp
 // SAI — mọi nơi phải implement đủ 14 method
 public interface IOrderManager
 {
-    Task<DonHang> LayAsync(int id);
-    Task LuuAsync(DonHang d);
-    Task HuyAsync(int id);
-    decimal TinhPhi(DonHang d);
-    Task GuiMailAsync(DonHang d);
-    Task XuatPdfAsync(DonHang d);
+    Task<Order> GetAsync(int id);
+    Task SaveAsync(Order order);
+    Task CancelAsync(int id);
+    decimal CalculateFee(Order order);
+    Task SendMailAsync(Order order);
+    Task ExportPdfAsync(Order order);
     // … thêm 8 method nữa
 }
 ```
 
 ```csharp
 // ĐÚNG — mỗi hợp đồng cho một việc
-public interface IDocDonHang
+public interface IOrderReader
 {
-    Task<DonHang?> LayAsync(int id);
+    Task<Order?> GetAsync(int id);
 }
 
-public interface ILuuDonHang
+public interface IOrderWriter
 {
-    Task LuuAsync(DonHang d);
-}
-
-public interface ITinhPhiVanChuyen
-{
-    decimal Tinh(DonHang d);
+    Task SaveAsync(Order order);
 }
 ```
 
-Chia nhỏ thì nơi chỉ cần đọc sẽ phụ thuộc đúng `IDocDonHang`, và khi bạn sửa
-phần lưu thì nó không bị kéo theo. Một class vẫn có thể implement nhiều
-interface cùng lúc — chia nhỏ không có nghĩa là phải có nhiều class.
+Chia nhỏ thì nơi chỉ cần đọc sẽ phụ thuộc đúng `IOrderReader`. Bạn sửa phần
+lưu, nó không bị kéo theo.
 
-## Phụ thuộc vào interface, nhận qua constructor
+Một class vẫn implement được nhiều interface cùng lúc. Chia nhỏ hợp đồng không
+có nghĩa là phải sinh thêm class.
+
+## Phụ thuộc nhận qua constructor, đừng new bên trong
 
 ```csharp
-// SAI — tự tạo bên trong, không đổi và không test được
-public class DatHang
+// SAI — tự tạo bên trong, không đổi và không test
+public class PlaceOrder
 {
-    private readonly GuiMail _mail = new();
+    private readonly EmailNotifier _mail = new();
 }
 ```
 
 ```csharp
 // ĐÚNG — nói rõ mình cần gì, ai cấp là việc bên ngoài
-public class DatHang(IGuiThongBao thongBao)
+public class PlaceOrder(INotifier notifier)
 {
-    public Task DatAsync() =>
-        thongBao.GuiAsync("admin", "Có đơn mới");
+    public Task RunAsync() =>
+        notifier.SendAsync("admin", "Có đơn mới");
 }
 
 // Program.cs
 builder.Services
-    .AddScoped<IGuiThongBao, GuiMail>();
+    .AddScoped<INotifier, EmailNotifier>();
 ```
 
-Constructor là **bản kê khai phụ thuộc**: nhìn vào là biết class này cần
-những gì để chạy. Đây chính là dependency injection, và chương SOLID sẽ nói
-kỹ vì sao nó lật ngược chiều phụ thuộc.
+Constructor là **bản kê khai phụ thuộc**. Nhìn vào là biết class này cần những
+gì để chạy được.
 
-## Khi nào thì chưa cần interface
+Đây chính là dependency injection. Chương SOLID sẽ nói kỹ vì sao nó lật ngược
+chiều phụ thuộc.
 
-Interface có giá của nó: thêm một file, thêm một lớp gián tiếp khi đọc code.
-Chưa cần vội nếu:
+## Chưa chạm ra ngoài thì chưa cần interface
 
-- Chỉ có **một** cách làm và chưa thấy cách thứ hai nào trong tầm nhìn.
-- Kiểu đó là dữ liệu thuần (DTO, record) — không có hành vi để trừu tượng.
-- Bạn tạo interface chỉ vì "để test", trong khi class đó không hề chạm ra ngoài (không gọi mạng, không đọc file, không đụng thời gian).
+| Kiểu của bạn | Tách interface? |
+|---|---|
+| Gọi API bên ngoài, database, file | **nên** |
+| Đọc đồng hồ, sinh số ngẫu nhiên | **nên**, để test được |
+| Tính toán thuần từ tham số truyền vào | chưa cần |
+| DTO, `record` chỉ chứa dữ liệu | không |
 
-Dấu hiệu rõ nhất để **cần** interface: chỗ đó chạm ra thế giới bên ngoài
-(database, HTTP, file, đồng hồ, hàng đợi), hoặc bạn thật sự có từ hai cách
-làm trở lên.
+Interface có giá của nó. Thêm một file, và thêm một lớp gián tiếp khi ai đó
+lần theo code.
+
+Dấu hiệu rõ nhất để cần nó: chỗ đó chạm ra thế giới bên ngoài, hoặc bạn thật
+sự đã có từ hai cách làm trở lên.
+
+Tạo interface chỉ để "cho dễ test" một class không hề chạm ra ngoài là tự thêm
+việc cho mình.
 
 ## Dấu hiệu trong code của bạn
 
@@ -215,8 +223,11 @@ làm trở lên.
 
 ## Bước tiếp theo
 
-Bài sau — **Kế thừa hay composition** — hai cách dùng lại code, và vì sao cách
-thứ hai gần như luôn là lựa chọn an toàn hơn.
+Interface cho bạn cách thay đổi hành vi từ bên ngoài. Còn dùng lại code thì
+sao?
+
+Bài sau, **Kế thừa hay composition**, so hai cách dùng lại. Và vì sao cách thứ
+hai gần như luôn an toàn hơn.
 
 ```quiz
 [
@@ -225,14 +236,14 @@ thứ hai gần như luôn là lựa chọn an toàn hơn.
     "options": [
       "IOrderManager",
       "IOrderHelper",
-      "ITinhPhiVanChuyen",
+      "IShippingFeeCalculator",
       "IOrderUtils"
     ],
     "answer": 3,
     "explain": "Tên nói rõ hợp đồng hứa làm gì. Manager, Helper, Utils không hứa điều gì cụ thể, và thường là dấu hiệu interface đang ôm nhiều việc."
   },
   {
-    "prompt": "Class DatHang tự viết private readonly GuiMail _mail = new(); Hệ quả nào là nặng nhất?",
+    "prompt": "Class PlaceOrder tự viết private readonly EmailNotifier _mail = new(); Hệ quả nào là nặng nhất?",
     "options": [
       "Tốn thêm bộ nhớ cho mỗi instance",
       "Không thay được cách gửi và không test được nếu không có SMTP thật",
@@ -240,7 +251,7 @@ thứ hai gần như luôn là lựa chọn an toàn hơn.
       "Gây memory leak"
     ],
     "answer": 2,
-    "explain": "Tự new là khoá cứng vào một cách làm. Nhận IGuiThongBao qua constructor thì đổi sang SMS hay bản giả lúc test đều không phải sửa class này."
+    "explain": "Tự new là khoá cứng vào một cách làm. Nhận INotifier qua constructor thì đổi sang SMS hay bản giả lúc test đều không phải sửa class này."
   },
   {
     "prompt": "Interface có 14 method, vài class implement phải ném NotImplementedException ở nửa số đó. Nên làm gì?",

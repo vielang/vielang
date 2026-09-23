@@ -16,7 +16,9 @@ Cùng đoạn code ấy trả `async Task`, rồi để `BackgroundService` awai
 > lỗi; chuyền `CancellationToken` cho đúng; và biết `ConfigureAwait` dùng ở
 > đâu.
 >
-> **Cần biết trước:** `async`/`await` và `Task` (bài trước).
+> **Cần biết trước:** `async`/`await` và `Task` (bài trước). Vài ví dụ dùng
+> controller và `BackgroundService` của ASP.NET Core, nhưng cái bẫy thì giống
+> nhau ở mọi loại app.
 
 ## Bốn cái bẫy, và thứ thay thế chúng
 

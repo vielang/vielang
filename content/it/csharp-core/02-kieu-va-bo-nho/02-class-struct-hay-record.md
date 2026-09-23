@@ -159,7 +159,7 @@ var p = new Product { Name = "Bàn phím" };
 | `required` | thiếu là **lỗi compile**, không phải lỗi lúc chạy |
 | `init` | gán lúc khởi tạo rồi khoá lại |
 | `private set` | đọc công khai, chỉ sửa được từ bên trong |
-| `IReadOnlyList<T>` | lộ ra để đọc, không cho `Add` |
+| `IReadOnlyList<T>` | lộ ra để đọc, không cho `Add` — chương Collection nói kỹ |
 
 Public thì dùng **property**, đừng dùng field.
 

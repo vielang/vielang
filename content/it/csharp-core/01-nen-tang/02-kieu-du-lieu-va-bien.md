@@ -117,33 +117,28 @@ string code = "AB-01";  // reference type — giữ tham chiếu
 Khác biệt này đẻ ra cả một họ bug kiểu "sửa chỗ này sao chỗ kia đổi theo". Nó
 có hẳn một bài riêng ở chương sau.
 
-## Nullable reference types bắt lỗi null từ lúc build
+## Dấu ? cho biết biến nào được phép rỗng
 
-Project .NET mới bật sẵn `<Nullable>enable</Nullable>`. Khi đó `string` nghĩa
-là không bao giờ null. Muốn cho phép null thì viết `string?`.
+Còn một chữ nữa bạn sẽ thấy khắp code .NET mới, và nó cũng là một phần của kiểu.
 
 ```csharp
 string? middleName = null;   // hợp lệ
 string firstName = "Huy";    // không được null
 
-int len = middleName.Length;       // cảnh báo CS8602
-int safe = middleName?.Length ?? 0;
+int len = middleName.Length;   // cảnh báo CS8602
 ```
 
-| Toán tử | Nghĩa |
-|---|---|
-| `?.` | gặp null thì dừng, trả về null |
-| `??` | null thì lấy giá trị bên phải |
-| `??=` | gán khi đang null |
+Project .NET mới bật sẵn `<Nullable>enable</Nullable>`. Khi đó `string` nghĩa là
+không bao giờ null, còn `string?` mới được phép rỗng.
 
-Ba toán tử này thay cho những câu `if (x != null)` dài dòng. Nhưng nhớ: đây
-chỉ là cảnh báo lúc compile. Runtime vẫn cho null lọt vào, nên dữ liệu từ JSON
-hay database vẫn phải kiểm tra.
+Nhưng đây chỉ là cảnh báo **lúc compile**. Runtime vẫn cho null lọt vào.
+
+Cả một bài riêng ở chương sau nói về chuyện đó, cùng bộ toán tử để làm việc với
+null.
 
 ## Dấu hiệu trong code của bạn
 
 - `double` hay `float` đứng cạnh `price`, `amount`, `total` → đổi sang `decimal`.
-- `int.Parse` nhận dữ liệu từ request hay file → đổi sang `int.TryParse`, không thì một ký tự lạ là sập request.
 - `var` mà nhìn vế phải không đoán ra kiểu → viết kiểu ra cho người đọc sau.
 - Cảnh báo `CS8602` bị tắt hoặc dập bằng `!` → đó là `NullReferenceException` của tuần sau.
 
@@ -152,7 +147,6 @@ hay database vẫn phải kiểm tra.
 - `decimal` cho tiền, `double` cho đo lường. Số `decimal` phải có hậu tố `m`.
 - `var` là cách viết gọn, không phải kiểu động.
 - Value type chép **giá trị**, reference type chép **tham chiếu**.
-- `int.Parse` ném exception, `int.TryParse` trả `false` — dữ liệu người dùng thì luôn `TryParse`.
 - Nullable reference types chỉ cảnh báo lúc compile, runtime không chặn.
 
 ## Bước tiếp theo
@@ -176,15 +170,15 @@ Công thức đúng, dữ liệu đúng, chỉ vì hai số đem chia đều là
     "explain": "Làm tròn lúc hiển thị chỉ giấu sai số, cộng dồn qua nhiều phép vẫn lệch. decimal lưu theo hệ thập phân nên tiền ra đúng ngay từ phép tính."
   },
   {
-    "prompt": "Người dùng gõ \"abc\" vào ô số lượng, code chạy int.Parse(input). Chuyện gì xảy ra?",
+    "prompt": "Bạn khai báo lãi suất bằng var rate = 0.1; rồi nhân với số tiền. Vấn đề gì?",
     "options": [
-      "Trả về 0",
-      "Ném FormatException, request lỗi 500",
-      "Trả về null",
-      "Compiler chặn từ lúc build"
+      "Không có vấn đề, 0.1 là số thập phân",
+      "Lỗi compile vì thiếu hậu tố m",
+      "rate là double, nên tiền lại quay về sai số nhị phân",
+      "rate thành int và mất phần lẻ"
     ],
-    "answer": 2,
-    "explain": "Parse ném exception khi chuỗi không phải số. Với dữ liệu từ bên ngoài, dùng int.TryParse để tự xử lý trường hợp sai."
+    "answer": 3,
+    "explain": "Không viết kiểu ra thì vế phải quyết định: 0.1 là một double. Muốn decimal thì phải có hậu tố m, hoặc viết hẳn decimal rate = 0.1m."
   },
   {
     "prompt": "Dòng này có vấn đề gì?",

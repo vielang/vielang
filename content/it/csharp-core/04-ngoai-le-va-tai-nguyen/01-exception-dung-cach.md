@@ -3,21 +3,39 @@ title: Exception đúng cách
 minutes: 11
 ---
 
-Production lỗi lúc hai giờ sáng. Bạn mở log lên, và thấy đúng một dòng.
+Hai khối `catch` dưới đây khác nhau đúng một chữ.
 
-```text
-Object reference not set to an instance of an object
+```csharp
+try { db.SaveChanges(); }
+catch (SqlException ex)
+{
+    logger.LogError(ex, "Lỗi đơn {Id}", id);
+    throw;
+}
 ```
 
-Không stack trace. Không id đơn hàng. Không biết file nào, dòng nào.
+```csharp
+try { db.SaveChanges(); }
+catch (SqlException ex)
+{
+    logger.LogError(ex, "Lỗi đơn {Id}", id);
+    throw ex;
+}
+```
 
-Ai đó đã `catch` rồi ghi `ex.Message`, và vứt mất phần có ích nhất.
+Một khối cho bạn biết lỗi xảy ra ở dòng nào, trong file nào.
+
+Khối kia chỉ vào chính nó.
+
+Hai giờ sáng, khác biệt ấy quyết định bạn ngủ tiếp hay thức tới sáng.
 
 > **Học xong bài này bạn sẽ:** biết khi nào nên `catch` và khi nào để lỗi bay
 > lên; giữ nguyên stack trace khi ném lại; viết exception riêng cho lỗi nghiệp
 > vụ; và không bao giờ nuốt lỗi nữa.
 >
-> **Cần biết trước:** method, `throw` ở mức đã thấy trong các bài trước.
+> **Cần biết trước:** method, `throw` ở mức đã thấy trong các bài trước. Bài lấy
+> ví dụ từ một API ASP.NET Core — những chữ như middleware sẽ do khoá ASP.NET
+> Core dạy, ở đây chỉ cần hiểu đó là chỗ lỗi đi ra ngoài.
 
 ## Bắt kiểu cụ thể trước, kiểu chung sau
 
@@ -115,8 +133,10 @@ catch (SqlException ex)
 }
 ```
 
-Bọc lại thì lỗi gốc vẫn nằm nguyên trong `InnerException`. Bạn được cả hai:
-ngữ cảnh nghiệp vụ ở lớp ngoài, chi tiết kỹ thuật ở lớp trong.
+Bọc lại thì lỗi gốc vẫn nằm nguyên trong `InnerException`.
+
+Bạn được cả hai. Ngữ cảnh nghiệp vụ ở lớp ngoài, chi tiết kỹ thuật ở lớp
+trong.
 
 ## Log phải nhận cả object exception, không chỉ message
 
@@ -150,8 +170,8 @@ catch (Exception ex)
 Truyền `ex` làm tham số đầu tiên thì logger ghi cả stack trace lẫn inner
 exception cho bạn.
 
-`LogError(ex.Message)` chỉ để lại một dòng chữ. Đúng tình huống hai giờ sáng ở
-đầu bài.
+`LogError(ex.Message)` chỉ để lại một dòng chữ. Hai giờ sáng, đó là tất cả
+những gì bạn có.
 
 ## Chỉ catch khi bạn làm được gì đó với lỗi
 
@@ -165,8 +185,9 @@ Câu hỏi đứng trước mọi câu hỏi khác: có nên bắt lỗi này kh
 | Biên hệ thống | biến lỗi thành phản hồi HTTP |
 | Mọi trường hợp còn lại | **không bắt**, để lỗi bay lên |
 
-Trong ASP.NET Core, biên ấy là một middleware duy nhất. Không phải `try/catch`
-rải đều trong từng controller.
+Trong ASP.NET Core, biên ấy là một middleware duy nhất.
+
+Không phải `try/catch` rải đều trong từng controller.
 
 Một chỗ duy nhất biết cách biến lỗi thành mã HTTP thì dễ sửa và dễ test. Rải
 ra khắp nơi thì mỗi chỗ xử lý một kiểu, và thế nào cũng có chỗ nuốt mất lỗi.
@@ -211,8 +232,9 @@ if (!int.TryParse(input, out var number))
     number = 0;
 ```
 
-Ném rồi bắt một exception tốn kém hơn phép `if` rất nhiều lần. Nhưng cái giá
-thật nằm ở chỗ khác.
+Ném rồi bắt một exception tốn kém hơn phép `if` rất nhiều lần.
+
+Nhưng cái giá thật nằm ở chỗ khác.
 
 Người đọc thấy `try` là hiểu rằng chỗ này có thể hỏng bất thường. Dùng nó cho
 việc người dùng gõ sai một ô số là nói dối người đọc.
@@ -238,8 +260,8 @@ việc người dùng gõ sai một ô số là nói dối người đọc.
 `finally` vừa gặp ở đây là chỗ dọn dẹp thủ công. Nhưng viết tay thì có ngày
 quên.
 
-Bài sau, **IDisposable và using**, dọn những thứ GC không dọn giúp: file,
-connection, socket. Và `using` chính là `finally` viết gọn lại.
+Bài sau, **IDisposable và using**, mở bằng một nghịch lý: `HttpClient` cài
+`IDisposable` hẳn hoi, mà `using` nó lại chính là bug.
 
 ```quiz
 [

@@ -3,17 +3,30 @@ title: LINQ khi chạm database
 minutes: 11
 ---
 
-API danh sách đơn hàng mất 3 giây, cho đúng 20 dòng dữ liệu.
+Đoạn này nằm trong một controller. Bốn dòng, và đọc qua thì không có gì đáng
+ngờ.
 
-Bạn bật log SQL lên. **Hai mươi mốt câu truy vấn** cho một lần gọi. Một câu
-lấy 20 đơn, rồi hai mươi câu nữa, mỗi câu lấy tên một khách.
+```csharp
+var orders = await db.Orders
+    .Take(20)
+    .ToListAsync();
 
-Mà trong code chỉ có đúng một vòng `foreach`.
+foreach (var o in orders)
+    rows.Add(new OrderRow(
+        o.Id, o.Customer.Name, o.Total));
+```
+
+Không `Include`. Không `Select`. Chỉ một vòng lặp lấy ra hai mươi dòng.
+
+Nó gửi xuống database **hai mươi mốt câu SQL**, và API mất 3 giây cho đúng hai
+mươi dòng ấy.
 
 > **Học xong bài này bạn sẽ:** biết câu LINQ của mình chạy ở database hay
 > trong bộ nhớ; nhận ra và sửa bẫy N + 1; đọc được SQL mà EF Core sinh ra.
 >
-> **Cần biết trước:** LINQ cơ bản và hoãn thực thi (hai bài trước).
+> **Cần biết trước:** LINQ cơ bản và hoãn thực thi (hai bài trước). Phần Thử
+> ngay cần một project EF Core đã nối được database; chưa có thì đọc câu SQL in
+> ra là đủ.
 
 ## IQueryable chạy ở database, IEnumerable chạy trong bộ nhớ
 
@@ -85,7 +98,7 @@ SELECT ... FROM [Customers] WHERE [Id] = @__p_0
 Console in ra **21 câu**. Một câu cho đơn hàng, rồi mỗi vòng lặp thêm một câu
 nữa để lấy khách.
 
-Tên gọi của nó là **N + 1**, và đó là chỗ 3 giây kia trốn.
+Tên gọi của nó là **N + 1**, và đó là chỗ ba giây kia trốn.
 
 </details>
 
@@ -218,8 +231,9 @@ Và đừng `ToListAsync()` rồi mới `.Count`. Đó là kéo cả tập về 
 Hết chương **Collection và LINQ**. Bạn đã biết chọn chỗ chứa dữ liệu, xử lý
 chúng bằng LINQ, và nhìn ra câu SQL thật phía sau.
 
-Chương kế của khoá là **Ngoại lệ và tài nguyên**. Xử lý lỗi cho đúng, và đóng
-file, connection, socket đúng lúc bằng `using`.
+Chương kế của khoá là **Ngoại lệ và tài nguyên**. Nó mở bằng hai khối `catch`
+khác nhau đúng một chữ — và chữ ấy quyết định lúc hai giờ sáng bạn có tìm được
+bug hay không.
 
 ```quiz
 [

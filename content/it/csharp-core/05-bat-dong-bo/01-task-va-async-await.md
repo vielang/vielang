@@ -3,12 +3,12 @@ title: Task và async await
 minutes: 11
 ---
 
-API của bạn chịu được 200 request mỗi giây rồi đứng.
+Khi API của bạn ngồi chờ database trả lời, luồng đang làm gì?
 
-CPU chỉ 15%. Database cũng nhàn. Máy chẳng bận gì cả.
+Câu hỏi nghe hiền lành. Nó cũng là câu hay được hỏi lúc phỏng vấn, và trả lời
+sai thì bạn có một API chịu được 200 request mỗi giây rồi đứng.
 
-Nó chỉ đang có vài trăm luồng **đứng chờ** database trả lời, và không còn luồng
-nào rảnh để nhận request mới.
+CPU mới 15%. Database thì nhàn. Máy chẳng bận gì cả.
 
 > **Học xong bài này bạn sẽ:** hiểu `async`/`await` giải phóng luồng thế nào;
 > viết method bất đồng bộ đúng từ controller xuống repository; chạy song song

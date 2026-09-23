@@ -212,8 +212,10 @@ chính.
 Những phép này chạy trên `List` thì vô hại.
 
 Bài sau, **LINQ khi chạm database**, cho thấy cũng câu ấy chạy trên EF Core có
-thể kéo cả bảng về máy chủ ứng dụng. Mở bằng một API sinh ra 21 câu SQL cho
-một vòng `foreach`.
+thể kéo cả bảng về máy chủ ứng dụng.
+
+Nó mở bằng bốn dòng code trông rất sạch sẽ, mà bên dưới là hai mươi mốt câu
+SQL.
 
 ```quiz
 [

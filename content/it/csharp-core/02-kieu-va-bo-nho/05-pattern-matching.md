@@ -23,7 +23,7 @@ này là gì".
 
 | Loại | Viết thế nào | Hỏi gì |
 |---|---|---|
-| Type | `x is Order o` | có phải kiểu này không |
+| Type | `x is Card c` | có phải kiểu này không |
 | Property | `{ Total: > 1000 }` | property có giá trị thế nào |
 | Relational | `> 80`, `< 0` | so sánh với một mốc |
 | Logical | `and`, `or`, `not` | ghép các pattern lại |
@@ -35,23 +35,32 @@ Cả năm dùng được ở hai chỗ. Sau `is`, và trong nhánh của `switch
 
 Bắt đầu từ loại thay thế trực tiếp cho hai mươi dòng ở đầu bài.
 
+Cả bài dùng một bối cảnh: các kiểu thanh toán của một đơn hàng.
+
+```csharp
+abstract record Payment;
+record Cash(decimal Amount) : Payment;
+record Card(decimal Amount, string Last4) : Payment;
+record Transfer(decimal Amount, string Bank) : Payment;
+```
+
 ```csharp
 // Cách cũ
-if (shape is Circle)
+if (payment is Card)
 {
-    var circle = (Circle)shape;
-    Console.WriteLine(circle.Radius);
+    var card = (Card)payment;
+    Console.WriteLine(card.Last4);
 }
 
 // Pattern matching: một bước
-if (shape is Circle c)
-    Console.WriteLine(c.Radius);
+if (payment is Card card2)
+    Console.WriteLine(card2.Last4);
 
 if (value is not string text)
     return;   // text dùng được ở phần còn lại
 ```
 
-Biến `c` chỉ tồn tại khi phép kiểm tra đúng.
+Biến `card2` chỉ tồn tại khi phép kiểm tra đúng.
 
 Không còn cảnh ép kiểu hai lần. Cũng không còn chỗ để ép nhầm kiểu.
 
@@ -103,13 +112,13 @@ So với một mốc, rồi ghép nhiều phép so lại. Đây là chỗ `switc
 một thang điều kiện.
 
 ```csharp
-string Grade(int score) => score switch
+string Tier(decimal total) => total switch
 {
-    < 0 or > 100 =>
+    < 0 =>
         throw new ArgumentOutOfRangeException(),
-    >= 80 => "Giỏi",
-    >= 50 => "Khá",
-    _ => "Trung bình",
+    >= 10_000_000 => "Kim cương",
+    >= 1_000_000 => "Vàng",
+    _ => "Thường",
 };
 
 char ch = line[0];
@@ -153,11 +162,6 @@ Năm loại pattern gộp lại thì làm được thứ đáng làm nhất: xo�
 phân loại theo kiểu.
 
 ```csharp
-abstract record Payment;
-record Cash(decimal Amount) : Payment;
-record Card(decimal Amount, string Last4) : Payment;
-record Transfer(decimal Amount, string Bank) : Payment;
-
 string Describe(Payment p) => p switch
 {
     Cash { Amount: > 10_000_000 } =>
@@ -217,12 +221,12 @@ Chương sau, **Collection và LINQ**, mở bằng một trang đồng bộ ch�
   },
   {
     "prompt": "Cách viết nào thay được hai dòng kiểm tra kiểu rồi ép kiểu?",
-    "code": "if (shape is Circle)\n{\n    var c = (Circle)shape;\n}",
+    "code": "if (payment is Card)\n{\n    var c = (Card)payment;\n}",
     "options": [
-      "if (shape is Circle c)",
-      "if (shape as Circle)",
-      "if (shape.GetType() == typeof(Circle))",
-      "switch (shape) { case Circle: break; }"
+      "if (payment is Card c)",
+      "if (payment as Card)",
+      "if (payment.GetType() == typeof(Card))",
+      "switch (payment) { case Card: break; }"
     ],
     "answer": 1,
     "explain": "Type pattern kiểm tra kiểu và gán biến trong một bước; biến c dùng được ngay trong thân if."

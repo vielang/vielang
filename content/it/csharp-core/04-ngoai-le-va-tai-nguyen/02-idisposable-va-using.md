@@ -3,23 +3,24 @@ title: IDisposable và using
 minutes: 10
 ---
 
-Service chạy êm vài giờ rồi bắt đầu trả lỗi.
+`HttpClient` cài `IDisposable` hẳn hoi. Và `using` nó lại chính là bug.
+
+Nghe vô lý, nhưng đó là lý do một service chạy êm vài giờ rồi bắt đầu trả lỗi:
 
 ```text
 SocketException: Only one usage of each socket
 address is normally permitted
 ```
 
-Khởi động lại là hết. Vài giờ sau lại thế.
-
-Nguyên nhân nằm ở một dòng trông vô hại: `new HttpClient()` trong mỗi request.
+Khởi động lại là hết, rồi vài giờ sau lại đúng như thế.
 
 > **Học xong bài này bạn sẽ:** biết thứ gì GC dọn được và thứ gì không; dùng
 > `using` đúng chỗ; và tránh hai cái bẫy tài nguyên hay gặp nhất trong app
 > .NET là `HttpClient` và `DbContext`.
 >
 > **Cần biết trước:** `try/finally` (bài trước), GC ở mức "dọn object không ai
-> tham chiếu".
+> tham chiếu". Bài có nhắc `AddHttpClient` và `AddDbContext` của ASP.NET Core;
+> chưa quen thì cứ đọc chúng như "nơi khai báo phụ thuộc".
 
 ## GC dọn bộ nhớ, không dọn tài nguyên hệ điều hành
 
@@ -37,8 +38,9 @@ GC quản bộ nhớ, và nó làm việc đó rất tốt. Nhưng file handle, 
 socket thì thuộc về hệ điều hành.
 
 GC chỉ đếm bộ nhớ managed. Một `FileStream` nặng vài chục byte trong đó, không
-bao giờ đủ để kích hoạt một lần thu gom — trong khi handle của hệ điều hành thì
-vẫn bị giữ nguyên.
+bao giờ đủ để kích hoạt một lần thu gom.
+
+Còn handle của hệ điều hành thì vẫn bị giữ nguyên, và file vẫn đang mở.
 
 Những kiểu nắm giữ chúng đều cài `IDisposable`. Bạn phải gọi `Dispose` khi dùng
 xong.
@@ -89,7 +91,8 @@ ném exception thì `Dispose` vẫn chạy.
 
 ## Ba cách viết using, khác nhau ở thời điểm dọn
 
-Biết `Dispose` chạy lúc nào rồi, giờ chọn cách viết.
+Biết `Dispose` chạy lúc nào rồi, giờ tới chuyện chọn cách viết cho từng tình
+huống.
 
 | Viết | Dọn lúc nào | Dùng khi |
 |---|---|---|
@@ -124,11 +127,10 @@ using var http = new HttpClient();
 var res = await http.GetAsync(url);
 ```
 
-Nghe rất ngược. `HttpClient` cài `IDisposable` hẳn hoi, vậy mà `using` nó lại
-chính là vấn đề.
+Đây là nghịch lý ở đầu bài, và lý do nằm ở tầng dưới `HttpClient`.
 
-Socket sau khi đóng còn nằm ở trạng thái `TIME_WAIT` thêm vài phút. App bận
-thì cạn cổng, và đó là lỗi ở đầu bài.
+Socket sau khi đóng còn nằm ở trạng thái `TIME_WAIT` thêm vài phút. App bận thì
+cạn cổng, rồi `SocketException` xuất hiện.
 
 ```csharp
 // ĐÚNG — để DI quản, dùng lại kết nối
@@ -142,9 +144,11 @@ public class PriceService(HttpClient http)
 builder.Services.AddHttpClient<PriceService>();
 ```
 
-`AddHttpClient` dựng lên `IHttpClientFactory` cho bạn. Nó giữ chung pool kết nối
-để dùng lại, và cứ vài phút thay handler một lần — để app không bám mãi vào một
-địa chỉ DNS cũ.
+`AddHttpClient` dựng lên `IHttpClientFactory` cho bạn. Nó giữ chung pool kết
+nối để dùng lại.
+
+Cứ vài phút nó thay handler một lần, để app không bám mãi vào một địa chỉ DNS
+cũ.
 
 ## DbContext để framework quản theo từng request
 
@@ -155,7 +159,7 @@ builder.Services.AddHttpClient<PriceService>();
 framework tự dispose khi request kết thúc.
 
 Tự `new` một `DbContext` rồi giữ trong field `static` thì hai request dùng
-chung một context — mà `DbContext` không an toàn khi dùng song song.
+chung một context. Mà `DbContext` không an toàn khi dùng song song.
 
 Change tracker cũng phình mãi, vì mọi thực thể đã tải đều nằm lại đó. Một lỗi
 chạy sai, một lỗi ăn dần bộ nhớ.
@@ -177,7 +181,7 @@ public class FileBuffer : IDisposable
 }
 ```
 
-Class này tự tạo ra `StreamWriter`, nên nó phải tự dọn.
+Class này tự tay tạo ra `StreamWriter`, nên nó cũng là chỗ phải tự dọn.
 
 Còn class chỉ nhận service từ DI rồi dùng thì **không** cần cài `IDisposable`.
 Dọn thứ mình không sở hữu là gây lỗi cho người khác đang dùng chung.
@@ -203,8 +207,8 @@ Dọn thứ mình không sở hữu là gây lỗi cho người khác đang dùn
 Hết chương **Ngoại lệ và tài nguyên**. Code của bạn giờ không nuốt lỗi, cũng
 không rò tài nguyên nữa.
 
-Chương cuối của khoá là **Bất đồng bộ**. Vì sao một API ngồi chờ database lại
-không nên chiếm luồng, và những cái bẫy khiến cả app treo cứng.
+Chương cuối của khoá là **Bất đồng bộ**. Nó mở bằng một câu hỏi phỏng vấn: lúc
+API ngồi chờ database, luồng đang làm gì?
 
 ```quiz
 [

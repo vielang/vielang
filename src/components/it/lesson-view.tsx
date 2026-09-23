@@ -103,9 +103,14 @@ export function LessonView({
             <List className="size-3.5" aria-hidden />
             Nội dung bài
           </p>
+          {/* Đánh số ở ĐÂY chứ không gõ số vào tiêu đề trong file .md: chèn
+              thêm một mục là phải đánh số lại cả bài, kiểu gì cũng sót. */}
           <ol className="mt-2 flex flex-col gap-1 text-sm">
-            {toc.map((h) => (
-              <li key={h.id}>
+            {toc.map((h, i) => (
+              <li key={h.id} className="flex gap-2">
+                <span className="w-6 shrink-0 text-right text-muted-foreground tabular-nums">
+                  {i + 1}.
+                </span>
                 <a href={`#${h.id}`} className="text-muted-foreground hover:text-foreground">
                   {h.text}
                 </a>

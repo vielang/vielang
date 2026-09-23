@@ -66,3 +66,5 @@ next-env.d.ts
 # Công cụ kiểm tra cú pháp C# của bài học IT (chạy bằng .NET SDK)
 scripts/csharp-check/bin/
 scripts/csharp-check/obj/
+scripts/csharp-compile/bin/
+scripts/csharp-compile/obj/

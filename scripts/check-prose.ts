@@ -6,6 +6,8 @@
  * biết chính xác bài nào còn nợ gì: câu dài lê thê, thiếu bảng tra cứu, tiêu
  * đề chỉ là cái nhãn, hay định danh còn viết tiếng Việt.
  *
+ * Công cụ này KHÔNG biết code có chạy được không — đó là việc của check-code.
+ *
  * Chạy: npm run check-prose          (toàn bộ)
  *       npm run check-prose -- linq  (lọc theo tên file)
  */
@@ -28,12 +30,31 @@ const NGUONG = {
 /** Tiêu đề cố định của phần khung, không tính là "nhãn". */
 const TIEU_DE_KHUNG = ["Dấu hiệu trong code của bạn", "Ghi nhớ", "Bước tiếp theo", "Lỗi hay gặp lần đầu"];
 
+/** Âm tiết tiếng Việt hay bị dùng làm tên biến. */
+const AM_TIET_VIET = new Set([
+  "don", "hang", "khach", "tien", "gia", "ten", "tong", "luong", "so", "nguoi",
+  "ngay", "thang", "luu", "xoa", "them", "sua", "tim", "lay", "dat", "gui",
+  "nhan", "kiem", "tinh", "dem", "doi", "mo", "dong", "chay", "xuly", "cho",
+  "moi", "cu", "dau", "cuoi", "truoc", "sau", "trong", "ngoai", "noi", "dung",
+  "doc", "ghi", "bat", "tat", "phi", "thue", "diem",
+]);
+
 /**
- * Định danh tiếng Việt còn sót. Không đoán bằng từ điển: chỉ cần bắt các âm
- * tiết tiếng Việt hay dùng làm tên biến — đủ để lọc ra bài cần xem lại.
+ * Định danh tiếng Việt còn sót. Tách camelCase/PascalCase ra từng âm tiết rồi
+ * mới so — nếu chỉ so cả từ thì `DocDong`, `noiDung`, `Tong` đều lọt, vì `\b`
+ * không có ranh giới nào ở giữa một định danh ghép.
  */
-const AM_TIET_VIET =
-  /\b(?:don|hang|khach|tien|gia|ten|tong|soLuong|so|nguoi|ngay|thang|luu|xoa|them|sua|tim|lay|dat|gui|nhan|kiem|tinh|dem|doi|mo|dong|chay|xuly|xuLy|cho|moi|cu|dau|cuoi|truoc|sau|trong|ngoai)\b/g;
+function timDinhDanhViet(code: string): string[] {
+  const ra = new Set<string>();
+  for (const m of code.matchAll(/\b[A-Za-z_][A-Za-z0-9_]*\b/g)) {
+    const ten = m[0];
+    if (ten.length < 2) continue;
+    const phan = ten.split(/(?=[A-Z])|_/).filter(Boolean).map((p) => p.toLowerCase());
+    // Một âm tiết Việt đứng riêng thành một phần của tên: `DocDong` → doc, dong.
+    if (phan.some((p) => AM_TIET_VIET.has(p))) ra.add(ten);
+  }
+  return [...ra];
+}
 
 interface KetQua {
   file: string;
@@ -45,6 +66,14 @@ interface KetQua {
   bang: number;
   nhan: string[];
   vietNam: string[];
+  /** Vị trí đáp án đúng, 1–4. Dồn hết vào một vị trí là quiz đoán được. */
+  dapAn: number[];
+  /** Ô bảng có `|` chưa escape — dấu đó cắt ô, nội dung sau nó mất khi render. */
+  bangVoPipe: string[];
+  /** Mục h2 mở thẳng bằng code hoặc bảng, không câu bản lề. */
+  mucTran: string[];
+  /** Câu hỏi có code chép lại nguyên văn từ thân bài. */
+  quizChep: number;
 }
 
 async function lietKe(dir: string): Promise<string[]> {
@@ -82,7 +111,44 @@ function doMotBai(raw: string): Omit<KetQua, "file"> {
     .map((m) => m[1].replace(/\/\/[^\n]*/g, "").replace(/"[^"]*"/g, '""'))
     .join("\n");
 
+  // Trong bảng Markdown, `|` cắt ô kể cả khi nằm trong backtick. Phải viết \|
+  // nếu không nửa sau của ô biến mất lúc render — lỗi chỉ thấy trên web.
+  const bangVoPipe = than
+    .split("\n")
+    .filter((d) => d.startsWith("|") && /`[^`]*\|[^`]*`/.test(d))
+    .map((d) => d.trim());
+
+  // Mục mở thẳng bằng code hay bảng thì văn xuôi bị đẩy xuống vai thuyết minh
+  // lại thứ người đọc vừa thấy. FORMAT.md đòi một câu bản lề trước đã.
+  const mucTran: string[] = [];
+  for (const khuc of than.split(/^## /m).slice(1)) {
+    const [tieuDe, ...conLai] = khuc.split("\n");
+    const dongDau = conLai.find((d) => d.trim());
+    if (dongDau && (dongDau.startsWith("```") || dongDau.startsWith("|"))) mucTran.push(tieuDe.trim());
+  }
+
+  // Quiz: vị trí đáp án, và câu hỏi chép lại code của thân bài.
+  const dapAn: number[] = [];
+  let quizChep = 0;
+  const khoiQuiz = raw.match(/```quiz\n([\s\S]*?)```/);
+  if (khoiQuiz) {
+    try {
+      const cauHoi = JSON.parse(khoiQuiz[1]) as { answer: number; code?: string }[];
+      for (const c of cauHoi) {
+        dapAn.push(c.answer);
+        const dongDau = c.code?.split("\\n")[0]?.trim();
+        if (dongDau && dongDau.length > 15 && than.includes(dongDau)) quizChep++;
+      }
+    } catch {
+      // Quiz sai JSON đã có check-code báo, ở đây bỏ qua.
+    }
+  }
+
   return {
+    dapAn,
+    bangVoPipe,
+    mucTran,
+    quizChep,
     tu: than.replace(/```[\s\S]*?```/g, "").split(/\s+/).filter(Boolean).length,
     cau: doDai.length,
     dai: doDai.filter((n) => n > 22).length,
@@ -90,8 +156,16 @@ function doMotBai(raw: string): Omit<KetQua, "file"> {
     tb: doDai.length ? +(doDai.reduce((a, b) => a + b, 0) / doDai.length).toFixed(1) : 0,
     bang: (than.match(/^\|/gm) ?? []).length,
     nhan,
-    vietNam: [...new Set(code.match(AM_TIET_VIET) ?? [])],
+    vietNam: timDinhDanhViet(code),
   };
+}
+
+/** Đáp án dồn về một vị trí thì người học đoán được mà không cần đọc đề. */
+function quizDoanDuoc(dapAn: number[]): boolean {
+  if (dapAn.length < 3) return false;
+  const dem = new Map<number, number>();
+  for (const a of dapAn) dem.set(a, (dem.get(a) ?? 0) + 1);
+  return Math.max(...dem.values()) > dapAn.length - 2;
 }
 
 function dat(k: KetQua): boolean {
@@ -103,7 +177,11 @@ function dat(k: KetQua): boolean {
     k.tb <= NGUONG.tbMax &&
     k.bang > 0 &&
     k.nhan.length === 0 &&
-    k.vietNam.length === 0
+    k.vietNam.length === 0 &&
+    k.bangVoPipe.length === 0 &&
+    k.mucTran.length === 0 &&
+    k.quizChep === 0 &&
+    !quizDoanDuoc(k.dapAn)
   );
 }
 
@@ -139,6 +217,10 @@ async function main() {
     if (k.bang === 0) loi.push("chưa có bảng tra cứu");
     if (k.nhan.length) loi.push(`tiêu đề còn là nhãn: ${k.nhan.join(" / ")}`);
     if (k.vietNam.length) loi.push(`định danh tiếng Việt: ${k.vietNam.slice(0, 6).join(", ")}`);
+    if (k.bangVoPipe.length) loi.push(`${k.bangVoPipe.length} ô bảng có | chưa escape (mất chữ khi render)`);
+    if (k.mucTran.length) loi.push(`${k.mucTran.length} mục mở trần: ${k.mucTran.slice(0, 2).join(" / ")}`);
+    if (k.quizChep) loi.push(`${k.quizChep} câu hỏi chép code thân bài`);
+    if (quizDoanDuoc(k.dapAn)) loi.push(`đáp án dồn một vị trí: ${k.dapAn.join("")}`);
     if (loi.length) console.log("    " + loi.join(" · "));
   }
 

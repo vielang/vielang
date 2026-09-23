@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <RootNamespace>csharp_compile</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Stubs.cs là NGUỒN NẠP VÀO lúc kiểm, không phải code của công cụ. -->
+    <Compile Remove="Stubs.cs" />
+    <None Include="Stubs.cs" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.9.0" />
+  </ItemGroup>
+
+</Project>

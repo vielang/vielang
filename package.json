@@ -14,6 +14,7 @@
     "prepare-audio": "tsx scripts/prepare-audio.ts",
     "build-content": "tsx scripts/build-content.ts",
     "check-csharp": "dotnet run --project scripts/csharp-check",
+    "check-code": "dotnet run --project scripts/csharp-compile",
     "check-prose": "tsx scripts/check-prose.ts",
     "copy-excalidraw-fonts": "tsx scripts/copy-excalidraw-fonts.ts",
     "crawl-orgs": "tsx scripts/crawl-kiip-orgs.ts",

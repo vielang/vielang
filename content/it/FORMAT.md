@@ -12,7 +12,7 @@ File này không nằm trong thư mục khoá nào nên bước build bỏ qua n
 |---|---|---|
 | Tình huống mở đầu (2–3 câu) | Cho người học lý do đọc tiếp, trước khi có định nghĩa | ✔ |
 | Khối "Học xong bạn sẽ / Cần biết trước" | Nói rõ đích và điều kiện vào bài | ✔ |
-| **Cốt lõi** | Định nghĩa một câu, BẢNG từ khoá đi kèm, BẢNG so sánh những cái dễ nhầm — chỗ tra cứu chính xác, đặt trước phần kể chuyện | ✔ |
+| **Phần tra cứu** | Định nghĩa một câu, BẢNG từ khoá đi kèm, BẢNG so sánh những cái dễ nhầm — đặt trước phần kể chuyện | ✔ |
 | "Thử ngay" | Đoạn chạy được thật, kèm lệnh cụ thể | ✔ với bài có code |
 | Câu hỏi dự đoán, kết quả giấu trong thẻ details | Đoán sai một lần nhớ lâu hơn đọc đúng mười lần — mà kết quả bày sẵn ngay dưới thì mắt đọc lướt qua là mất luôn cơ hội đoán | ✔ trong "Thử ngay" |
 | Sơ đồ | Chỉ khi hình hơn hẳn chữ | tuỳ |
@@ -22,7 +22,12 @@ File này không nằm trong thư mục khoá nào nên bước build bỏ qua n
 | "Bước tiếp theo" | Nối sang bài sau để mạch học không đứt | ✔ |
 | "Tự kiểm tra" (khối ```quiz) | Nhớ lại chủ động, và chấm được | ✔ |
 
-## Mục "Cốt lõi" gồm ba phần
+## Phần tra cứu gồm ba thứ
+
+Đây **không** phải một mục tên là "Cốt lõi". Tiêu đề vẫn phải là câu khẳng định
+như mọi tiêu đề khác (xem mục dưới) — quy tắc cũ đòi một cái nhãn "Cốt lõi" nên
+nó tự đụng với quy tắc tiêu đề, và đã bỏ. Thứ bắt buộc là **nội dung**: mục đầu
+tiên sau hộp mục tiêu phải tra cứu được.
 
 1. **Định nghĩa một câu**, chính xác, không ẩn dụ. Đọc xong phải trả lời được "nó là gì".
 2. **Bảng từ khoá**: mọi từ khoá C# mà bài dùng tới, kèm nghĩa ngắn. Không dùng từ khoá nào mà chưa có trong bảng — bài "đóng gói" từng dùng `public`/`private` 25 lần mà không định nghĩa chúng lần nào, còn `internal` thì cả 22 bài không hề nhắc tới.
@@ -121,9 +126,23 @@ Một hình ảnh đời thường đắt hơn ba câu giải thích, nhưng m�
 - `explain` viết cho người chọn sai: nói vì sao sai và sửa thế nào.
 - Mục nào chiếm hẳn một phần trong bài thì phải có câu hỏi chạm tới.
 
+## Bốn thứ chỉ máy bắt được
+
+Bốn lỗi này viết tay không ai thấy, nên `check-prose` và `check-code` kiểm hộ.
+
+1. **Mọi khối code phải biên dịch được.** Dán vào `Program.cs` là chạy, nghĩa là khai báo `class`/`record` đặt **sau** các câu lệnh top-level, không phải trước. `npm run check-code` biên dịch thật từng khối, kể cả code trong câu hỏi trắc nghiệm. Khối phản ví dụ thì ghi `// SAI` để công cụ biết lỗi là đúng ý — và nếu comment hứa "lỗi compile" thì khối buộc phải lỗi thật.
+2. **Dấu `|` trong bảng phải escape thành `\|`, kể cả khi nằm trong backtick.** Markdown vẫn cắt ô, nên `` `Read|Write` `` làm mất nửa sau của ô — lỗi chỉ lộ ra trên web, đọc file không thấy.
+3. **Không mục nào mở thẳng bằng code hay bảng.** Một câu bản lề trước đã, nối vào mục trên hoặc vào sự cố mở bài. Thiếu nó thì văn xuôi tụt xuống vai thuyết minh lại thứ người đọc vừa thấy.
+4. **Đáp án trắc nghiệm phải rải đều 1–4.** Dồn về một vị trí là người học đoán được mà không cần đọc đề. Và câu hỏi không được chép lại code của thân bài.
+
+Bài học rút ra từ lần kiểm trước: `check-prose` chỉ đo nhịp câu, nên nó báo
+"22/22 đạt chuẩn" trong khi 30 khối code không biên dịch được, 80% đáp án nằm ở
+vị trí 2, và một ô bảng mất chữ khi render. **Con số của công cụ chỉ nói được
+về thứ nó đo.**
+
 ## Độ dài
 
-- **Ngân sách chữ: 900–1200 từ văn xuôi một bài.** Đếm bằng cách bỏ code và bảng ra. Vượt ngân sách nghĩa là có đoạn đang nói lại điều vừa nói.
+- **Ngân sách chữ: 700–1200 từ văn xuôi một bài, nhắm 900–1100.** Đếm bằng cách bỏ code và bảng ra. `check-prose` chặn ở 700 và 1200; khoảng 900–1100 là chỗ một bài đủ chỗ cho câu bản lề giữa các mục mà chưa nói lại điều vừa nói. Ngưỡng trong `scripts/check-prose.ts` phải khớp đúng hai con số 700 và 1200 này — trước đây FORMAT ghi 900 mà công cụ chặn ở 700, nên "đạt chuẩn" không có nghĩa gì.
 - 9–11 phút đọc, khoảng 8–10 màn hình trên điện thoại.
 - Mỗi câu phải mang thông tin mới. Xoá thử một câu: người đọc vẫn nắm được thì câu đó thừa.
 - Dài hơn thì tách bài, đừng cắt phần "Thử ngay" hay phần tự kiểm tra — đó là hai chỗ tạo ra việc học thật.

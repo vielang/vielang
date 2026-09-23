@@ -1,6 +1,6 @@
 ---
 title: OOP và thiết kế
-summary: Đóng gói, trừu tượng, đa hình và SOLID — viết code mà sáu tháng sau người khác còn sửa được.
+summary: Đóng gói, kế thừa, đa hình, trừu tượng, interface, composition và SOLID — viết code dễ đọc, dễ sửa.
 level: Trung cấp
 order: 2
 ---

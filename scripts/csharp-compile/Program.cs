@@ -193,7 +193,9 @@ void Kiem(string nhan, string code, int dongTrongFile, bool nghiemNgat = true)
     // mã lỗi để tác giả đối chiếu với lời mình viết.
     if (LaKhoiSai(code) || HuaCompilerChan(code))
     {
-        if (HuaCompilerChan(code) && loi.Count == 0)
+        // Khối đã hứa có lỗi thì mọi lỗi thật đều tính, kể cả loại thường bị
+        // coi là "oan" với mảnh rời (CS0161 thiếu return là chính điều bài dạy).
+        if (HuaCompilerChan(code) && !all.Any(d => d.Severity == DiagnosticSeverity.Error))
             khoiSai.Add($"{nhan} (dòng {dongTrongFile}): comment hứa compiler chặn, nhưng khối biên dịch sạch");
         return;
     }

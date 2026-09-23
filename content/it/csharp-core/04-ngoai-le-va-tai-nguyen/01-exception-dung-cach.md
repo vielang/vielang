@@ -11,7 +11,7 @@ Object reference not set to an instance of an object
 
 Không stack trace. Không id đơn hàng. Không biết file nào, dòng nào.
 
-Ai đó đã `catch` rồi ghi `ex.Message`, và ném đi mất phần duy nhất có ích.
+Ai đó đã `catch` rồi ghi `ex.Message`, và vứt mất phần có ích nhất.
 
 > **Học xong bài này bạn sẽ:** biết khi nào nên `catch` và khi nào để lỗi bay
 > lên; giữ nguyên stack trace khi ném lại; viết exception riêng cho lỗi nghiệp
@@ -20,6 +20,9 @@ Ai đó đã `catch` rồi ghi `ex.Message`, và ném đi mất phần duy nhấ
 > **Cần biết trước:** method, `throw` ở mức đã thấy trong các bài trước.
 
 ## Bắt kiểu cụ thể trước, kiểu chung sau
+
+Một khối `try` có thể có nhiều khối `catch`, và thứ tự viết ra không phải
+chuyện thẩm mỹ.
 
 ```csharp
 try
@@ -42,14 +45,19 @@ finally
 }
 ```
 
+`finally` chạy dù khối `try` kết thúc bằng gì: trả về, ném lỗi, hay chạy hết.
+Nên chỗ dọn dẹp đặt ở đó là chắc nhất.
+
 Các khối `catch` được xét từ trên xuống. Đặt `IOException` lên trước thì khối
 `FileNotFoundException` thành khối chết, và compiler chặn hẳn bằng lỗi
 **CS0160** — vì khối cha đã bắt trọn phần của khối con.
 
-Hai khối ở đây xử lý khác nhau. Khối đầu ghi log rồi thôi. Khối sau ghi log
-xong còn `throw;` để lỗi tiếp tục bay lên trên.
+Chọn ghi log rồi thôi, hay ghi log rồi `throw;`, tuỳ vào việc tầng trên còn cần
+biết hay không.
 
 ## Thử ngay: throw ex xoá mất nơi lỗi xảy ra
+
+Cả bài này quy về một chữ. Dán đoạn dưới vào `Program.cs` rồi chạy để thấy.
 
 ```csharp
 void Inner() =>
@@ -89,6 +97,9 @@ lại ngay đầu danh sách.
 
 ## Ba cách ném lại, chỉ hai cách giữ được nơi lỗi
 
+Bắt được lỗi rồi mà chưa xử lý xong thì phải ném tiếp. Có ba cách viết, và
+chúng không tương đương.
+
 | Viết | Stack trace gốc | Dùng khi |
 |---|---|---|
 | `throw;` | giữ nguyên | ghi log xong, để lỗi bay tiếp |
@@ -108,6 +119,8 @@ Bọc lại thì lỗi gốc vẫn nằm nguyên trong `InnerException`. Bạn �
 ngữ cảnh nghiệp vụ ở lớp ngoài, chi tiết kỹ thuật ở lớp trong.
 
 ## Log phải nhận cả object exception, không chỉ message
+
+Giữ được stack trace rồi cũng vô nghĩa, nếu lúc ghi log bạn vứt nó đi.
 
 ```csharp
 // SAI — lỗi biến mất, không ai biết gì
@@ -142,6 +155,8 @@ exception cho bạn.
 
 ## Chỉ catch khi bạn làm được gì đó với lỗi
 
+Câu hỏi đứng trước mọi câu hỏi khác: có nên bắt lỗi này không.
+
 | Tình huống | Nên làm |
 |---|---|
 | Gọi mạng hỏng, deadlock database | bắt rồi thử lại |
@@ -157,6 +172,8 @@ Một chỗ duy nhất biết cách biến lỗi thành mã HTTP thì dễ sửa
 ra khắp nơi thì mỗi chỗ xử lý một kiểu, và thế nào cũng có chỗ nuốt mất lỗi.
 
 ## Exception riêng tách lỗi nghiệp vụ khỏi lỗi kỹ thuật
+
+Để tầng trên quyết định được, nó phải phân biệt được loại lỗi.
 
 ```csharp
 public class OrderException : Exception
@@ -178,7 +195,9 @@ dậy lúc hai giờ sáng.
 
 Đừng gom tất cả vào một `AppException` chung chung.
 
-## Exception dành cho bất thường, không dành cho luồng chạy
+## Exception dành cho bất thường, không dành cho đường chạy thường ngày
+
+Còn một cách dùng sai nữa, và nó không nằm ở chỗ bắt lỗi mà ở chỗ ném lỗi.
 
 ```csharp
 // SAI — chậm và giấu mất ý định
@@ -212,7 +231,7 @@ việc người dùng gõ sai một ô số là nói dối người đọc.
 - Log thì truyền cả object `ex`, đừng chỉ truyền `ex.Message`.
 - Chỉ `catch` khi làm được gì đó; còn lại để lỗi bay lên biên hệ thống.
 - Exception dành cho tình huống bất thường, không dành cho luồng chạy bình thường.
-- `finally` luôn chạy — đó là chỗ để dọn dẹp.
+- `finally` chạy dù `try` kết thúc bằng gì — trả về, ném lỗi, hay chạy hết.
 
 ## Bước tiếp theo
 

@@ -9,7 +9,8 @@ trong log không có gì cả.
 Tệ hơn nữa: tiến trình chết hẳn, container khởi động lại, không ai hiểu vì
 sao.
 
-Cùng đoạn code ấy viết `async Task` thì lỗi đã nằm gọn trong log.
+Cùng đoạn code ấy trả `async Task`, rồi để `BackgroundService` await nó, thì lỗi
+đã nằm gọn trong log.
 
 > **Học xong bài này bạn sẽ:** tránh bốn cái bẫy async làm app treo hoặc nuốt
 > lỗi; chuyền `CancellationToken` cho đúng; và biết `ConfigureAwait` dùng ở
@@ -19,10 +20,13 @@ Cùng đoạn code ấy viết `async Task` thì lỗi đã nằm gọn trong lo
 
 ## Bốn cái bẫy, và thứ thay thế chúng
 
+Job gửi mail kia mắc cái bẫy thứ nhất. Ba cái còn lại cũng đều làm lỗi biến
+mất, mỗi cái theo một đường.
+
 | Bẫy | Hậu quả | Thay bằng |
 |---|---|---|
 | `async void` | exception hạ cả tiến trình | `async Task` |
-| Quên `await` | lỗi biến mất lặng lẽ | nghe cảnh báo CS4014 |
+| Quên `await` | lỗi biến mất lặng lẽ | `await DoAsync()` |
 | `.Result`, `.Wait()` | chặn luồng, có nơi treo cứng | async suốt đường |
 | `_ = DoAsync()` | không log, tắt máy là mất việc | hàng đợi hoặc `BackgroundService` |
 
@@ -30,6 +34,8 @@ Bốn dòng này là bốn cái bẫy. Hai mục cuối bài nói tiếp hai th�
 chúng: `CancellationToken` và `ConfigureAwait`.
 
 ## async void nuốt exception và hạ cả tiến trình
+
+Bắt đầu từ dòng đầu bảng, vì nó là cái bẫy làm chết tiến trình.
 
 ```csharp
 // SAI — không ai await được, lỗi không bắt được
@@ -53,7 +59,9 @@ public async Task SendMailAsync(string to)
 Nó rơi thẳng vào runtime và hạ luôn tiến trình. Ngoại lệ duy nhất được phép là
 event handler của UI, vì chữ ký hàm bắt buộc phải thế.
 
-## Thử ngay: quên await là lỗi biến mất lặng lẽ
+## Thử ngay: gọi một method async mà không await
+
+Cái bẫy thứ hai không cần `async void`. Chỉ cần bạn quên một chữ.
 
 ```csharp
 async Task Throw()
@@ -100,6 +108,8 @@ Compiler có cảnh báo CS4014 cho đúng trường hợp này. Đừng tắt n
 
 ## .Result chặn luồng, và có nơi còn treo cứng
 
+Hai bẫy trên làm mất lỗi. Cái thứ ba thì làm mất luôn cả app.
+
 ```csharp
 // SAI — chặn luồng, và treo cứng ở vài môi trường
 var order = GetOrderAsync(id).Result;
@@ -115,6 +125,8 @@ ASP.NET Core hiện đại bỏ SynchronizationContext nên ít treo hơn. Nhưn
 luồng vẫn là chặn luồng.
 
 ## CancellationToken phải chuyền xuống tận truy vấn
+
+Hết bốn cái bẫy. Còn hai thứ đi kèm với chúng, và đây là thứ nhất.
 
 ```csharp
 // SAI — người dùng đóng tab, truy vấn vẫn chạy
@@ -149,28 +161,37 @@ chỉ cần khai vào tham số.
 Chuyền nó xuống mọi lời gọi bất đồng bộ thì truy vấn nặng sẽ dừng, thay vì
 chạy tiếp cho một người đã bỏ đi.
 
-Trong job nền, `ct` đến từ host và bị huỷ lúc ứng dụng tắt. Nhờ vậy container
-dừng gọn gàng thay vì bị giết cứng.
+Job nền cũng có token như vậy, chỉ khác nguồn: nó đến từ host, và bị huỷ lúc
+ứng dụng nhận lệnh tắt.
+
+Nhận rồi chuyền xuống thì job kịp dừng trong thời gian ân hạn, thay vì bị cắt
+giữa việc.
 
 ## ConfigureAwait(false) dành cho thư viện, không cho app
+
+Thứ thứ hai bạn sẽ gặp trong code thư viện, và hay bị dán vào chỗ không cần.
 
 | Bạn đang viết | Cần `ConfigureAwait(false)` |
 |---|---|
 | Thư viện dùng chung, NuGet package | **có** |
 | App ASP.NET Core | không |
-| App WinForms, WPF | chỉ ở tầng không chạm UI |
+| App WinForms, WPF | có, ở tầng không chạm UI |
 
 ```csharp
-await smtp.SendAsync(to).ConfigureAwait(false);
+// trong một NuGet package dùng chung
+await transport.SendAsync(msg)
+    .ConfigureAwait(false);
 ```
 
 Câu này nói với runtime rằng chạy tiếp ở luồng nào cũng được. Thư viện cần nó
 vì bạn không biết người dùng thư viện chạy trong môi trường nào.
 
 Còn app ASP.NET Core thì không có SynchronizationContext để quay về, nên thêm
-vào chỉ tổ rối mắt.
+vào không đổi được gì, chỉ dài dòng thêm.
 
 ## Chạy nền cần hàng đợi, không phải fire-and-forget
+
+Quay lại dòng cuối bảng bẫy, vì nó là chỗ người ta hay nghĩ mình đang làm đúng.
 
 ```csharp
 // SAI — lỗi biến mất, tắt máy là mất việc
@@ -194,10 +215,10 @@ việc.
 
 ## Ghi nhớ
 
-- `async void` chỉ dành cho event handler; còn lại luôn `async Task`.
-- Quên `await` là exception biến mất lặng lẽ — tôn trọng cảnh báo CS4014.
-- Không `.Result`, không `.Wait()`; async suốt đường.
-- Chuyền `CancellationToken` từ controller xuống tận truy vấn.
+- Không có `Task` thì không có đường cho exception đi lên — đó là toàn bộ lý do của `async Task`.
+- Lỗi nằm trong một `Task` không ai `await` thì im lặng biến mất, kể cả khi đã `async Task`.
+- `.Result` chặn luồng ở mọi nơi, và treo cứng ở nơi có SynchronizationContext.
+- Token chỉ có tác dụng ở lời gọi cuối cùng; chuyền thiếu một tầng là mất.
 - `ConfigureAwait(false)` cho thư viện, không cần cho app ASP.NET Core.
 
 ## Bước tiếp theo

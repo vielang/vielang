@@ -23,20 +23,30 @@ Nguyên nhân nằm ở một dòng trông vô hại: `new HttpClient()` trong m
 
 ## GC dọn bộ nhớ, không dọn tài nguyên hệ điều hành
 
+GC lo bộ nhớ cho bạn suốt ngày, nên dễ tưởng nó lo hết. Bảng dưới đây là phần
+nó không lo.
+
 | Thứ bạn tạo ra | GC dọn giúp | Ai chịu trách nhiệm |
 |---|---|---|
 | `List`, `string`, object thường | có | GC, khi không còn ai tham chiếu |
 | File handle (`FileStream`) | không | bạn, qua `Dispose` |
 | Connection tới database | không | bạn, hoặc framework |
-| Socket mạng (`HttpClient`) | không | dùng lại, đừng tạo mới |
+| Kết nối mạng (`HttpClient` giữ bên dưới) | không | bạn, bằng cách dùng lại một instance |
 
 GC quản bộ nhớ, và nó làm việc đó rất tốt. Nhưng file handle, connection,
 socket thì thuộc về hệ điều hành.
 
-GC không biết chúng đắt tới mức nào, nên cũng không vội dọn. Những kiểu nắm
-giữ chúng đều cài `IDisposable`, và bạn phải gọi `Dispose` khi dùng xong.
+GC chỉ đếm bộ nhớ managed. Một `FileStream` nặng vài chục byte trong đó, không
+bao giờ đủ để kích hoạt một lần thu gom — trong khi handle của hệ điều hành thì
+vẫn bị giữ nguyên.
+
+Những kiểu nắm giữ chúng đều cài `IDisposable`. Bạn phải gọi `Dispose` khi dùng
+xong.
 
 ## Thử ngay: using dọn trước khi lỗi bay lên
+
+`using` gọi `Dispose` giúp bạn. Câu hỏi là nó gọi vào lúc nào, khi có lỗi ném
+ra giữa chừng.
 
 ```csharp
 void Run()
@@ -79,6 +89,8 @@ ném exception thì `Dispose` vẫn chạy.
 
 ## Ba cách viết using, khác nhau ở thời điểm dọn
 
+Biết `Dispose` chạy lúc nào rồi, giờ chọn cách viết.
+
 | Viết | Dọn lúc nào | Dùng khi |
 |---|---|---|
 | `using var x = …` | cuối khối chứa nó | mặc định |
@@ -102,6 +114,9 @@ Dạng `using var` gọn hơn và đủ dùng cho hầu hết trường hợp. D
 khi bạn muốn tài nguyên đóng sớm hơn cuối method.
 
 ## HttpClient phải dùng lại, không tạo mới mỗi request
+
+Tới đây thì `using` nghe như luôn đúng. Có một ngoại lệ lớn, và nó là lỗi ở đầu
+bài.
 
 ```csharp
 // SAI — mỗi request một socket mới
@@ -127,8 +142,9 @@ public class PriceService(HttpClient http)
 builder.Services.AddHttpClient<PriceService>();
 ```
 
-`IHttpClientFactory`, mà `AddHttpClient` dựng lên cho bạn, tái sử dụng kết nối
-bên dưới và tự xoay vòng chúng theo định kỳ.
+`AddHttpClient` dựng lên `IHttpClientFactory` cho bạn. Nó giữ chung pool kết nối
+để dùng lại, và cứ vài phút thay handler một lần — để app không bám mãi vào một
+địa chỉ DNS cũ.
 
 ## DbContext để framework quản theo từng request
 
@@ -145,6 +161,9 @@ Change tracker cũng phình mãi, vì mọi thực thể đã tải đều nằm
 chạy sai, một lỗi ăn dần bộ nhớ.
 
 ## Chỉ tự viết Dispose khi bạn sở hữu tài nguyên
+
+Hai cái bẫy trên đều là dùng `IDisposable` của người khác. Còn tự cài nó thì
+khi nào?
 
 ```csharp
 public class FileBuffer : IDisposable
@@ -169,7 +188,7 @@ Dọn thứ mình không sở hữu là gây lỗi cho người khác đang dùn
 - `new StreamReader`, `new SqlConnection`, `new FileStream` mà không có `using` → rò tài nguyên.
 - `DbContext` được `new` bằng tay, hoặc giữ trong field `static`.
 - Class cài `IDisposable` nhưng bên trong chỉ gọi `Dispose` của service do DI cấp → đang dọn đồ của người khác.
-- Lỗi `Too many open files`, `SocketException`, hay connection pool cạn trong log → gần như luôn là bài này.
+- Lỗi `Too many open files`, `SocketException`, hay connection pool cạn trong log → gần như luôn là một chỗ quên `Dispose`, hoặc một `new HttpClient()` nằm trong request.
 
 ## Ghi nhớ
 

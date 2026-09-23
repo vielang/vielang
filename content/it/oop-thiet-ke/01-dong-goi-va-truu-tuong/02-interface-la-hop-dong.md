@@ -18,6 +18,9 @@ cả hai class chẳng liên quan gì tới tính năng mới.
 
 ## Interface nói làm gì, class nói làm thế nào
 
+Mười bốn method trong một interface là dấu hiệu của chuyện khác: người viết
+chưa hỏi interface dùng để làm gì.
+
 ```csharp
 public interface INotifier
 {
@@ -43,6 +46,9 @@ Nó không biết bên dưới là SMTP, SMS, hay chỉ ghi ra file lúc chạy 
 chính là **trừu tượng**: giữ lại phần cần biết, giấu phần còn lại.
 
 ## Thử ngay: đổi cách làm mà không sửa nơi dùng
+
+Nói "giấu phần còn lại" thì trừu tượng. Chạy thử thì thấy ngay nó cho bạn cái
+gì.
 
 ```csharp
 new PlaceOrder(new EmailNotifier()).Run();
@@ -95,6 +101,8 @@ cần SMTP thật, không cần mạng.
 
 ## Đặt tên theo khả năng, không theo lớp kỹ thuật
 
+Interface là một lời hứa, nên cái tên phải nói được nó hứa gì.
+
 | Tên | Nó hứa gì | Nên là |
 |---|---|---|
 | `IOrderManager` | không rõ | tách theo từng việc |
@@ -124,6 +132,8 @@ Quy ước .NET thì tên bắt đầu bằng `I`. Với interface mô tả kh�
 từ cũng rất hợp: `IDisposable`, `IComparable`, `IEnumerable`.
 
 ## Nhiều interface nhỏ tốt hơn một interface to
+
+Giờ tới `IOrderManager` mười bốn method ở đầu bài.
 
 ```csharp
 // SAI — mọi nơi phải implement đủ 14 method
@@ -160,6 +170,8 @@ có nghĩa là phải sinh thêm class.
 
 ## Phụ thuộc nhận qua constructor, đừng new bên trong
 
+Chia nhỏ hợp đồng rồi, còn câu hỏi ai đưa chúng vào cho class của bạn.
+
 ```csharp
 // SAI — tự tạo bên trong, không đổi và không test
 public class PlaceOrder
@@ -188,6 +200,8 @@ gì để chạy được.
 chiều phụ thuộc.
 
 ## Chưa chạm ra ngoài thì chưa cần interface
+
+Đến đây thì dễ thành tách interface cho mọi thứ. Nó cũng có giá của nó.
 
 | Kiểu của bạn | Tách interface? |
 |---|---|

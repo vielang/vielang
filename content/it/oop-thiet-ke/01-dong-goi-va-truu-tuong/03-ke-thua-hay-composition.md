@@ -18,6 +18,9 @@ Ba module bạn chưa từng mở ra xem.
 
 ## Đọc to lên: "là một" thì kế thừa, "có một" thì composition
 
+Ba module hỏng vì một lớp cha. Nhưng kế thừa không sai — sai là dùng nó cho
+việc của composition.
+
 ```csharp
 // Kế thừa — FullTimeEmployee LÀ MỘT Employee
 class Employee { public string Name = ""; }
@@ -46,6 +49,9 @@ Kế thừa tạo ràng buộc mạnh nhất giữa hai class. Composition thì 
 qua đúng những gì interface hứa.
 
 ## Thử ngay: constructor lớp cha chạy trước field lớp con
+
+Ràng buộc mạnh nghĩa là gì, cụ thể? Đây là một chỗ mà cả hai class đều đúng mà
+ghép lại thì sai.
 
 ```csharp
 new Child();
@@ -92,6 +98,9 @@ thuộc vào code mà nó không kiểm soát.
 
 ## Kế thừa đúng chỗ chỉ còn vài trường hợp
 
+Sau cái bẫy đó thì câu hỏi không phải "kế thừa có xấu không", mà là còn chỗ nào
+nó đúng.
+
 | Tình huống | Chọn |
 |---|---|
 | Framework yêu cầu (`ControllerBase`, `DbContext`) | kế thừa |
@@ -105,6 +114,8 @@ Lý do rất thực dụng. Chuyển từ composition sang kế thừa thì dễ
 ngược lại thường phải mở lại cả mười hai class.
 
 ## Một lớp cha phình to nên tách thành phụ thuộc
+
+Giờ tới `BaseService` 800 dòng ở đầu bài.
 
 ```csharp
 // SAI — module nào cần gì lại nhét vào lớp cha
@@ -140,6 +151,9 @@ khác hỏng. Và lúc test thì truyền vào một bản giả, khỏi phải 
 `BaseService`.
 
 ## sealed là mặc định hợp lý, protected là API công khai
+
+Còn khi bạn viết class mà người khác có thể muốn kế thừa, hãy quyết định trước
+thay vì để ngỏ.
 
 ```csharp
 public sealed class StandardFeeCalculator

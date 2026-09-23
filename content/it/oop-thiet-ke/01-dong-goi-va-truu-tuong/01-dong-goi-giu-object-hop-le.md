@@ -31,6 +31,8 @@ và **ai gán được, lúc nào**.
 
 ## Access modifier quyết định ai nhìn thấy được gì
 
+Câu hỏi thứ nhất trả lời bằng bốn từ khoá. Bảng này là toàn bộ danh sách.
+
 | Từ khoá | Nhìn thấy được từ |
 |---|---|
 | `public` | mọi nơi, kể cả project khác |
@@ -77,6 +79,8 @@ phá vỡ mọi nơi đang gọi.
 
 ## Thử ngay: class toàn public set thì ai cũng phá được
 
+Biết bốn từ khoá rồi. Giờ xem một class không dùng chúng thì hỏng tới đâu.
+
 ```csharp
 var order = new Order { Qty = 2, UnitPrice = 100 };
 order.Status = "Shipped";
@@ -110,6 +114,8 @@ Một người quên là bạn có đơn hàng số lượng âm.
 </details>
 
 ## Sửa lại: constructor kiểm tra, private set, method nghiệp vụ
+
+Cùng class ấy, viết lại theo đúng hai câu hỏi ở trên.
 
 ```csharp
 class Order

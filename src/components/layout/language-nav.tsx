@@ -6,39 +6,30 @@ import { LANGUAGES, languageHref } from "@/lib/languages";
 import { cn } from "@/lib/utils";
 
 /**
- * Chuyển đổi giữa các thư viện theo ngôn ngữ (KIIP tiếng Hàn, tiếng Anh sắp
- * bổ sung, ...) — đứng cạnh logo trong header như 1 nav chữ thường, không
- * phải nhóm nút. Nguồn ngôn ngữ lấy từ lib/languages.ts, thêm ngôn ngữ mới
- * ở đó là nav này tự có thêm mục, khỏi sửa gì ở đây.
+ * Chọn thư viện theo ngôn ngữ (KIIP tiếng Hàn, tiếng Anh, …) — nút chọn đặt
+ * ở đầu trang thư viện, vì nó chỉ áp dụng cho thư viện. Nguồn ngôn ngữ lấy
+ * từ lib/languages.ts: thêm ngôn ngữ mới ở đó là có thêm mục, khỏi sửa ở đây.
  */
 export function LanguageNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex items-center gap-3 text-sm">
-      {LANGUAGES.map((language, i) => {
+    <nav aria-label="Ngôn ngữ" className="flex gap-0.5 self-start rounded-lg bg-muted p-0.5 text-sm">
+      {LANGUAGES.map((language) => {
         const href = languageHref(language.slug);
         const isActive = href === "/" ? pathname === "/" : pathname.startsWith(href);
         return (
-          <span key={language.code} className="flex items-center gap-3">
-            {i > 0 && (
-              <span className="text-border" aria-hidden>
-                /
-              </span>
+          <Link
+            key={language.code}
+            href={href}
+            aria-current={isActive ? "page" : undefined}
+            className={cn(
+              "rounded-md px-3 py-1.5 transition-colors",
+              isActive ? "bg-background font-medium shadow-sm" : "text-muted-foreground hover:text-foreground"
             )}
-            <Link
-              href={href}
-              aria-current={isActive ? "page" : undefined}
-              className={cn(
-                "transition-colors",
-                isActive
-                  ? "font-medium text-foreground"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              {language.label}
-            </Link>
-          </span>
+          >
+            {language.label}
+          </Link>
         );
       })}
     </nav>

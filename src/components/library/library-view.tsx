@@ -6,6 +6,7 @@ import { groupBooksByLevel } from "@/lib/library";
 import type { LanguageConfig } from "@/lib/languages";
 import type { GrammarEntry } from "@/lib/page-grammar";
 import { GrammarIndex } from "@/components/grammar/grammar-index";
+import { LanguageNav } from "@/components/layout/language-nav";
 
 /**
  * Khung trang thư viện dùng chung cho trang gốc (tiếng Hàn) và mọi trang
@@ -35,6 +36,11 @@ export function LibraryView({
 
   return (
     <div className="flex flex-col gap-8">
+      {/* Chọn ngôn ngữ của THƯ VIỆN nằm ngay trong thư viện (trước đây ở
+          header): nó chỉ áp dụng cho trang này, mà đứng trên header thì
+          trông như điều hướng chính. */}
+      <LanguageNav />
+
       {/* Ô tra cứu THAY CHỖ tiêu đề: tiêu đề "Thư viện" chỉ nhắc lại thứ
           người dùng vừa bấm để tới đây, còn ô này làm được việc. Dòng gợi ý
           bên trong nó giữ lại phần thông tin mà tiêu đề từng mang. */}

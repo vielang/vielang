@@ -262,7 +262,7 @@ function GroupPractice({ exam, section, initialNo }: { exam: Exam; section: Exam
                 className="inline-flex items-center gap-1 text-xs font-medium underline-offset-2 hover:underline"
               >
                 <RotateCcw className="size-3" aria-hidden />
-                {items.length === 1 ? "Làm lại" : "Làm lại khối"}
+                Làm lại
               </button>
             </div>
           </Verdict>

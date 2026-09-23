@@ -63,6 +63,29 @@ const SPREAD_GAP = 4;
  */
 const TURN_MS = 260;
 
+/** Nhanh nhất / chậm nhất cho cú trượt nốt sau khi thả tay, ms. */
+const TURN_MIN_MS = 130;
+const TURN_MAX_MS = 280;
+
+/**
+ * Tốc độ tối thiểu dùng để tính (px mỗi ms). Kéo chậm rồi thả khi trang gần
+ * sang hẳn mà vẫn lấy đúng tốc độ tay thì quãng cuối ngắn tí lại bò mất
+ * gần 300ms — nhìn như bị treo.
+ */
+const TURN_MIN_SPEED = 0.8;
+
+/**
+ * Trượt nốt quãng còn lại với TỐC ĐỘ NGÓN TAY vừa rời ra, thay vì luôn 260ms.
+ *
+ * Vẩy nhanh mà vẫn chờ đủ 260ms thì thấy ì; kéo chậm gần hết màn rồi thả mà
+ * cũng 260ms thì trang giật lên một đoạn ngắn. Lấy quãng còn lại chia tốc độ
+ * là nối tiếp đúng đà tay đang có.
+ */
+function turnDuration(remaining: number, speed: number): number {
+  const v = Math.max(Math.abs(speed), TURN_MIN_SPEED);
+  return Math.min(TURN_MAX_MS, Math.max(TURN_MIN_MS, remaining / v));
+}
+
 /**
  * Chạm một cái thì chờ chừng này mới bật/tắt thanh công cụ, để phân biệt với
  * bấm đúp (phóng to).
@@ -337,12 +360,11 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
    * lại dựng lại cả TransformWrapper và mấy lớp phủ, và cái kéo sẽ giật.
    */
   const trackRef = useRef<HTMLDivElement>(null);
-  const place = useCallback((x: number, animate: boolean) => {
+  const place = useCallback((x: number, animate: boolean | number) => {
     const el = trackRef.current;
     if (!el) return;
-    el.style.transition = animate
-      ? `transform ${TURN_MS}ms cubic-bezier(0.22, 0.61, 0.36, 1)`
-      : "none";
+    const ms = animate === true ? TURN_MS : animate === false ? 0 : animate;
+    el.style.transition = ms ? `transform ${ms}ms cubic-bezier(0.22, 0.61, 0.36, 1)` : "none";
     el.style.transform = `translate3d(${x}px, 0, 0)`;
   }, []);
 
@@ -359,7 +381,7 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
   );
 
   const commit = useCallback(
-    (direction: 1 | -1) => {
+    (direction: 1 | -1, gesture?: { moved: number; speed: number }) => {
       if (committed.current) return false;
       if ((direction === 1 ? nextPages : prevPages) === null) return false;
       const width = widthRef.current;
@@ -372,11 +394,24 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
         go();
         return true;
       }
-      place(direction === 1 ? -width : width, true);
-      // Đổi route SAU khi trượt xong. Lúc đó trang đích đã nằm đúng giữa màn
-      // hình rồi, nên lượt dựng lại chỉ là thay nội dung y hệt chỗ cũ —
-      // không thấy nhảy.
-      timer.current = setTimeout(go, TURN_MS);
+      const remaining = Math.max(0, width - Math.abs(gesture?.moved ?? 0));
+      const ms = gesture ? turnDuration(remaining, gesture.speed) : TURN_MS;
+      place(direction === 1 ? -width : width, ms);
+      // Đổi route ngay khi trang vừa trượt xong — bắt `transitionend` chứ
+      // không hẹn giờ song song, để không còn quãng chờ thừa ở cuối (lúc đó
+      // trang đích đã nằm đúng giữa màn hình, dựng lại chỉ là thay nội dung
+      // y hệt chỗ cũ). Hẹn giờ giữ làm phương án dự phòng nếu trình duyệt
+      // nuốt mất sự kiện (vd tab bị ẩn, hay hiệu ứng bị bỏ qua).
+      const el = trackRef.current;
+      let done = false;
+      const finish = () => {
+        if (done) return;
+        done = true;
+        el?.removeEventListener("transitionend", finish);
+        go();
+      };
+      el?.addEventListener("transitionend", finish, { once: true });
+      timer.current = setTimeout(finish, ms);
       return true;
     },
     [nextPages, prevPages, onSwipeNext, onSwipePrev, place]
@@ -571,7 +606,7 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
         // hất ngược lại là người ta đổi ý, phải trả trang về chỗ cũ.
         const flicked =
           Math.abs(g.speed) > FLICK_SPEED && Math.sign(g.speed) === Math.sign(moved);
-        if ((farEnough || flicked) && commit(direction)) return;
+        if ((farEnough || flicked) && commit(direction, { moved, speed: g.speed })) return;
         place(0, true);
         return;
       }

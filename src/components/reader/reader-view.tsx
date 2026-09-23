@@ -204,6 +204,15 @@ export function ReaderView({
     [book.id, book.totalPages, page, router, effectiveDouble]
   );
 
+  // Nạp sẵn route hai bên: `router.push` của trang chưa nạp phải chờ tải
+  // payload, đúng vào lúc hiệu ứng lật vừa xong nên thấy khựng. Ảnh đã có
+  // `AdjacentPreload` lo.
+  useEffect(() => {
+    for (const p of [...prevPages ?? [], ...nextPages ?? []]) {
+      router.prefetch(`/read/${book.id}/${p}`);
+    }
+  }, [book.id, prevPages, nextPages, router]);
+
   // Lùi/tiến đúng 1 spread ở chế độ 2 trang (bước 1 hoặc 2 trang tuỳ spread
   // hiện tại dài bao nhiêu), hoặc đúng 1 trang ở chế độ 1 trang.
   const stepNext = useCallback(() => {

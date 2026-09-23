@@ -44,6 +44,22 @@ foreach (var file in Directory.GetFiles(root, "*.md", SearchOption.AllDirectorie
             code,
             new CSharpParseOptions(LanguageVersion.Preview, kind: kind));
 
+        // Script mode hiểu `using` ở đầu khối là using-directive, nên mảnh bắt
+        // đầu bằng `using var x = …` hay có `await` sẽ báo lỗi oan. Thử lại
+        // bằng cách bọc vào một method async rồi mới kết luận.
+        if (tree.GetDiagnostics().Any(d => d.Severity == DiagnosticSeverity.Error))
+        {
+            var boc =
+                "class __W { async System.Threading.Tasks.Task __M() {\n"
+                + code
+                + "\n} }";
+            var treeBoc = CSharpSyntaxTree.ParseText(
+                boc,
+                new CSharpParseOptions(LanguageVersion.Preview));
+            if (!treeBoc.GetDiagnostics().Any(d => d.Severity == DiagnosticSeverity.Error))
+                tree = treeBoc;
+        }
+
         var tooWide = code.Split('\n').Count(l => l.TrimEnd().Length > maxWidth);
         if (tooWide > 0)
         {

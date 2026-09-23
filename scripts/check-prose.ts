@@ -1,0 +1,150 @@
+#!/usr/bin/env tsx
+/**
+ * Đo văn phong từng bài học IT theo các ngưỡng trong content/it/FORMAT.md.
+ *
+ * Có công cụ này vì "văn chưa hay" là nhận xét không sửa được. Đo ra số thì
+ * biết chính xác bài nào còn nợ gì: câu dài lê thê, thiếu bảng tra cứu, tiêu
+ * đề chỉ là cái nhãn, hay định danh còn viết tiếng Việt.
+ *
+ * Chạy: npm run check-prose          (toàn bộ)
+ *       npm run check-prose -- linq  (lọc theo tên file)
+ */
+import { readdir, readFile, stat } from "node:fs/promises";
+import path from "node:path";
+
+const ROOT = path.resolve(process.cwd(), "content", "it");
+
+/** Ngưỡng lấy từ FORMAT.md — sửa ở đó thì sửa cả ở đây. */
+const NGUONG = {
+  cauDaiToiDa: 3, // câu trên 22 từ
+  tiLeCauNganMin: 30, // % câu dưới 10 từ
+  tiLeCauNganMax: 55,
+  tbMin: 11,
+  tbMax: 14,
+  tuMin: 700,
+  tuMax: 1200,
+};
+
+/** Tiêu đề cố định của phần khung, không tính là "nhãn". */
+const TIEU_DE_KHUNG = ["Dấu hiệu trong code của bạn", "Ghi nhớ", "Bước tiếp theo", "Lỗi hay gặp lần đầu"];
+
+/**
+ * Định danh tiếng Việt còn sót. Không đoán bằng từ điển: chỉ cần bắt các âm
+ * tiết tiếng Việt hay dùng làm tên biến — đủ để lọc ra bài cần xem lại.
+ */
+const AM_TIET_VIET =
+  /\b(?:don|hang|khach|tien|gia|ten|tong|soLuong|so|nguoi|ngay|thang|luu|xoa|them|sua|tim|lay|dat|gui|nhan|kiem|tinh|dem|doi|mo|dong|chay|xuly|xuLy|cho|moi|cu|dau|cuoi|truoc|sau|trong|ngoai)\b/g;
+
+interface KetQua {
+  file: string;
+  tu: number;
+  cau: number;
+  dai: number;
+  nganPhanTram: number;
+  tb: number;
+  bang: number;
+  nhan: string[];
+  vietNam: string[];
+}
+
+async function lietKe(dir: string): Promise<string[]> {
+  const out: string[] = [];
+  for (const ten of await readdir(dir)) {
+    const p = path.join(dir, ten);
+    if ((await stat(p)).isDirectory()) out.push(...(await lietKe(p)));
+    else if (ten.endsWith(".md") && ten !== "FORMAT.md" && ten !== "_module.md" && ten !== "course.md")
+      out.push(p);
+  }
+  return out;
+}
+
+function doMotBai(raw: string): Omit<KetQua, "file"> {
+  const than = raw.replace(/^---[\s\S]*?---/, "").replace(/```quiz[\s\S]*?```/, "");
+  const vanXuoi = than
+    .replace(/```[\s\S]*?```/g, "")
+    .replace(/^\|.*$/gm, "")
+    .replace(/^[->#].*$/gm, "");
+
+  const cau = vanXuoi
+    .split(/(?<=[.!?])\s+/)
+    .map((c) => c.replace(/\s+/g, " ").trim())
+    .filter((c) => c.split(" ").length > 2);
+  const doDai = cau.map((c) => c.split(" ").length);
+  const ngan = doDai.filter((n) => n < 10).length;
+
+  const nhan = [...than.matchAll(/^## (.+)$/gm)]
+    .map((m) => m[1])
+    .filter((t) => !TIEU_DE_KHUNG.includes(t))
+    // Tiêu đề là "nhãn" khi quá ngắn và không chứa động từ/mệnh đề.
+    .filter((t) => t.split(" ").length <= 4 && !t.includes(":"));
+
+  const code = [...than.matchAll(/```csharp[^\n]*\n([\s\S]*?)```/g)]
+    .map((m) => m[1].replace(/\/\/[^\n]*/g, "").replace(/"[^"]*"/g, '""'))
+    .join("\n");
+
+  return {
+    tu: than.replace(/```[\s\S]*?```/g, "").split(/\s+/).filter(Boolean).length,
+    cau: doDai.length,
+    dai: doDai.filter((n) => n > 22).length,
+    nganPhanTram: doDai.length ? Math.round((100 * ngan) / doDai.length) : 0,
+    tb: doDai.length ? +(doDai.reduce((a, b) => a + b, 0) / doDai.length).toFixed(1) : 0,
+    bang: (than.match(/^\|/gm) ?? []).length,
+    nhan,
+    vietNam: [...new Set(code.match(AM_TIET_VIET) ?? [])],
+  };
+}
+
+function dat(k: KetQua): boolean {
+  return (
+    k.dai <= NGUONG.cauDaiToiDa &&
+    k.nganPhanTram >= NGUONG.tiLeCauNganMin &&
+    k.nganPhanTram <= NGUONG.tiLeCauNganMax &&
+    k.tb >= NGUONG.tbMin &&
+    k.tb <= NGUONG.tbMax &&
+    k.bang > 0 &&
+    k.nhan.length === 0 &&
+    k.vietNam.length === 0
+  );
+}
+
+async function main() {
+  const loc = process.argv[2];
+  const files = (await lietKe(ROOT)).filter((f) => !loc || f.includes(loc));
+  const ketQua: KetQua[] = [];
+
+  for (const f of files) {
+    ketQua.push({ file: path.relative(ROOT, f), ...doMotBai(await readFile(f, "utf8")) });
+  }
+
+  console.log(
+    "bài".padEnd(46) + "từ".padStart(6) + "dài".padStart(5) + "ngắn".padStart(6) + "TB".padStart(6) + "bảng".padStart(6)
+  );
+  for (const k of ketQua) {
+    const dau = dat(k) ? "✓" : "·";
+    console.log(
+      `${dau} ${k.file.slice(-44).padEnd(44)}` +
+        String(k.tu).padStart(6) +
+        String(k.dai).padStart(5) +
+        `${k.nganPhanTram}%`.padStart(6) +
+        String(k.tb).padStart(6) +
+        String(k.bang).padStart(6)
+    );
+    const loi: string[] = [];
+    if (k.dai > NGUONG.cauDaiToiDa) loi.push(`${k.dai} câu dài quá 22 từ`);
+    if (k.nganPhanTram < NGUONG.tiLeCauNganMin) loi.push("thiếu câu ngắn");
+    if (k.nganPhanTram > NGUONG.tiLeCauNganMax) loi.push("cụt quá, gộp bớt");
+    if (k.tb < NGUONG.tbMin || k.tb > NGUONG.tbMax) loi.push(`TB ${k.tb} từ ngoài khoảng ${NGUONG.tbMin}–${NGUONG.tbMax}`);
+    if (k.tu < NGUONG.tuMin) loi.push(`mới ${k.tu} từ, còn mỏng`);
+    if (k.tu > NGUONG.tuMax) loi.push(`${k.tu} từ, vượt ngân sách`);
+    if (k.bang === 0) loi.push("chưa có bảng tra cứu");
+    if (k.nhan.length) loi.push(`tiêu đề còn là nhãn: ${k.nhan.join(" / ")}`);
+    if (k.vietNam.length) loi.push(`định danh tiếng Việt: ${k.vietNam.slice(0, 6).join(", ")}`);
+    if (loi.length) console.log("    " + loi.join(" · "));
+  }
+
+  const xong = ketQua.filter(dat).length;
+  console.log(`\n${xong}/${ketQua.length} bài đạt chuẩn.`);
+
+}
+
+main();

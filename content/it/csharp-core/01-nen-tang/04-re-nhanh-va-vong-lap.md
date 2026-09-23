@@ -1,60 +1,30 @@
 ---
 title: Rẽ nhánh và vòng lặp
-minutes: 10
+minutes: 11
 ---
 
-Một job dọn dữ liệu chạy đêm: duyệt danh sách đơn hàng, thấy đơn đã huỷ thì
-xoá khỏi danh sách. Chạy thử với hai đơn thì êm. Lên production gặp danh sách
-thật, job sập ngay vòng lặp đầu tiên với `InvalidOperationException`.
+Job dọn dữ liệu chạy lúc hai giờ sáng. Việc của nó đơn giản: duyệt danh sách
+đơn hàng, thấy đơn đã huỷ thì xoá đi.
+
+Chạy thử với hai đơn, êm. Lên production gặp dữ liệu thật, job sập ngay vòng
+lặp đầu tiên với `InvalidOperationException`.
 
 > **Học xong bài này bạn sẽ:** viết rẽ nhánh bằng `switch expression` như code
-> C# hiện đại, chọn đúng giữa `for` và `foreach`, và không còn sập khi cần xoá
-> phần tử trong lúc duyệt.
+> C# hiện đại; chọn đúng giữa `for` và `foreach`; và xoá phần tử trong lúc
+> duyệt mà không làm sập chương trình.
 >
-> **Cần biết trước:** biến, toán tử so sánh, `List<T>` ở mức dùng được.
+> **Cần biết trước:** biến, toán tử so sánh, `List<T>`.
 
-## if và guard clause
+## Ba cách rẽ nhánh, chọn theo việc
 
-```csharp
-if (score >= 80)
-    level = "Giỏi";
-else if (score >= 50)
-    level = "Khá";
-else
-    level = "Trung bình";
-```
-
-Luôn viết `{ }` cho thân `if` kể cả khi chỉ có một dòng — thêm dòng thứ hai mà
-quên ngoặc là lỗi rất khó nhìn ra lúc review.
-
-Lồng quá hai tầng `if` thì đổi sang **guard clause**: kiểm tra trường hợp sai
-rồi `return` sớm, phần còn lại của method khỏi thụt vào sâu.
+| Cách viết | Hợp khi |
+|---|---|
+| `if` / `else if` | điều kiện phức tạp, mỗi nhánh làm nhiều việc |
+| `switch expression` | chọn **một giá trị** theo một biến |
+| Guard clause (`if … return`) | loại bỏ trường hợp sai rồi làm việc chính |
 
 ```csharp
-// SAI — logic chính nằm sâu trong ba tầng ngoặc
-if (order != null)
-{
-    if (order.IsPaid)
-    {
-        if (order.Items.Count > 0)
-            Giao(order);
-    }
-}
-```
-
-```csharp
-// ĐÚNG — chặn sớm, logic chính nằm ở mức ngoài cùng
-if (order is null) return;
-if (!order.IsPaid) return;
-if (order.Items.Count == 0) return;
-
-Giao(order);
-```
-
-## switch expression
-
-```csharp
-string nhan = status switch
+string label = status switch
 {
     OrderStatus.New       => "Mới tạo",
     OrderStatus.Paid      => "Đã thanh toán",
@@ -63,25 +33,55 @@ string nhan = status switch
 };
 ```
 
-Dạng **expression** (từ C# 8) trả về một giá trị, không cần `break`. Dấu `_` là
-**discard**, đóng vai `default`. Thiếu nhánh nào đó thì compiler cảnh báo —
-an toàn hơn hẳn `switch` dạng câu lệnh cũ, thứ bạn vẫn sẽ gặp trong code có sẵn.
+`switch expression` (từ C# 8) trả về một giá trị nên không cần `break`. Dấu
+`_` là **discard**, đóng vai `default`.
+
+Thiếu nhánh nào, compiler cảnh báo ngay, còn chuỗi `if` thì im lặng.
+
+## Guard clause kéo logic chính ra khỏi ba tầng ngoặc
+
+```csharp
+// SAI — việc chính nằm sâu nhất
+if (order != null)
+{
+    if (order.IsPaid)
+    {
+        if (order.Items.Count > 0)
+            Ship(order);
+    }
+}
+```
+
+```csharp
+// ĐÚNG — chặn sớm, việc chính ở mức ngoài cùng
+if (order is null) return;
+if (!order.IsPaid) return;
+if (order.Items.Count == 0) return;
+
+Ship(order);
+```
+
+Hai đoạn chạy như nhau. Nhưng đoạn dưới đọc được từ trên xuống. Thêm một điều
+kiện nữa cũng không làm code thụt sâu thêm.
+
+Còn `{ }`: luôn viết, kể cả khi thân `if` chỉ một dòng. Thêm dòng thứ hai mà
+quên ngoặc là lỗi rất khó nhìn ra lúc review.
 
 ## Thử ngay: vì sao job dọn dữ liệu sập
 
 ```csharp
-var ds = new List<string> { "a", "huy", "b", "huy" };
+var codes = new List<string> { "a", "old", "b", "old" };
 
-foreach (var x in ds)
+foreach (var code in codes)
 {
-    if (x == "huy")
-        ds.Remove(x);
+    if (code == "old")
+        codes.Remove(code);
 }
 
-Console.WriteLine(string.Join(",", ds));
+Console.WriteLine(string.Join(",", codes));
 ```
 
-**Đoán trước khi chạy:** in ra `a,b`, hay in ra thứ khác, hay không in được gì?
+**Đoán trước khi chạy:** in ra `a,b`, in ra thứ khác, hay không in được gì?
 
 <details>
 <summary>Đoán xong rồi — xem kết quả</summary>
@@ -93,7 +93,9 @@ Unhandled exception. System.InvalidOperationException:
 ```
 
 `foreach` giữ một con trỏ chạy trên danh sách gốc. Xoá phần tử là danh sách
-đổi, con trỏ mất chỗ đứng, nên lần lặp kế tiếp ném lỗi.
+đổi. Con trỏ mất chỗ đứng, và lần lặp sau ném lỗi.
+
+Chạy thử hai phần tử thì không sập, vì xoá xong là vòng lặp cũng vừa hết.
 
 </details>
 
@@ -101,67 +103,86 @@ Hai cách sửa, chọn theo ý định:
 
 ```csharp
 // Lọc ra danh sách mới — rõ ý, hay dùng nhất
-ds = ds.Where(x => x != "huy").ToList();
+codes = codes.Where(c => c != "old").ToList();
 
 // Xoá tại chỗ, duyệt NGƯỢC từ cuối
-for (int i = ds.Count - 1; i >= 0; i--)
+for (int i = codes.Count - 1; i >= 0; i--)
 {
-    if (ds[i] == "huy") ds.RemoveAt(i);
+    if (codes[i] == "old") codes.RemoveAt(i);
 }
 ```
 
-Duyệt ngược mới an toàn: xoá phần tử thứ `i` không làm lệch những phần tử chưa
-xét, vì chúng nằm phía trước.
+Duyệt ngược mới an toàn: xoá phần tử thứ `i` chỉ làm lệch những phần tử phía
+sau, mà chúng thì đã xét xong rồi.
 
-## for, foreach, while
+## Chọn vòng lặp theo thứ bạn cần
+
+| Vòng lặp | Dùng khi |
+|---|---|
+| `foreach` | chỉ cần từng phần tử — mặc định nên dùng |
+| `for` | cần chỉ số, hoặc cần duyệt ngược |
+| `while` | chưa biết trước số lần lặp |
+| `do … while` | phải chạy ít nhất một lần |
 
 ```csharp
-for (int i = 0; i < items.Count; i++)  // cần chỉ số
-    Console.WriteLine($"{i}: {items[i]}");
-
-foreach (var item in items)        // chỉ cần phần tử
+foreach (var item in items)
     Console.WriteLine(item);
 
-while (hang.Count > 0)             // chưa biết mấy lần
-    Xuly(hang.Dequeue());
+for (int i = 0; i < items.Count; i++)
+    Console.WriteLine($"{i}: {items[i]}");
 
-do { lan++; } while (lan < 3);     // chạy ít nhất 1 lần
+while (queue.Count > 0)
+    Handle(queue.Dequeue());
 ```
 
-Mặc định dùng `foreach`: nó nói đúng ý định "làm gì đó với từng phần tử" và
-không có chỗ để gõ nhầm chỉ số.
+`foreach` nói đúng ý định: làm gì đó với từng phần tử. Nó cũng không có chỗ
+nào để gõ nhầm chỉ số.
+
+Bên trong vòng lặp, hai từ khoá này giúp bạn khỏi phải lồng thêm `if`:
 
 ```csharp
-foreach (var o in orders)
+foreach (var order in orders)
 {
-    if (o.IsDeleted) continue;   // bỏ qua, chạy tiếp
-    if (o.IsFinal) break;        // thoát hẳn vòng lặp
-    Xuly(o);
+    if (order.IsDeleted) continue;  // bỏ qua, chạy tiếp
+    if (order.IsFinal) break;      // thoát hẳn vòng lặp
+    Process(order);
 }
-
-var cuoi = items[^1];      // phần tử cuối
-var ba = items[..3];       // ba phần tử đầu
 ```
+
+`continue` nhảy sang phần tử kế tiếp. `break` bỏ luôn cả vòng lặp. Dùng chúng
+như guard clause: loại trường hợp không cần xử lý ra trước. Phần còn lại nằm
+phẳng ở dưới.
+
+Hai cách viết gọn nữa hay gặp trong code C# hiện đại:
+
+```csharp
+var last = items[^1];     // phần tử cuối
+var first3 = items[..3];  // ba phần tử đầu
+```
+
+`^1` là "đếm ngược từ cuối", còn `..` là một khoảng. Không cần
+`items.Count - 1` nữa, nên cũng hết chỗ sai chỉ số.
 
 ## Dấu hiệu trong code của bạn
 
 - `Add`, `Remove`, `Clear` nằm trong thân một `foreach` duyệt chính collection đó → sẽ ném `InvalidOperationException`.
 - `if` lồng từ ba tầng trở lên → đổi sang guard clause, hoặc tách method.
-- `switch` dạng câu lệnh dài, mỗi nhánh chỉ gán một giá trị → viết lại thành `switch expression`.
+- `switch` dạng câu lệnh dài mà mỗi nhánh chỉ gán một giá trị → viết lại thành `switch expression`.
 - `while (true)` mà không thấy `break` hay `CancellationToken` → service sẽ treo, không phải "có thể treo".
 
 ## Ghi nhớ
 
-- Không thêm/xoá phần tử của collection đang `foreach`; lọc ra danh sách mới, hoặc `for` duyệt ngược.
+- Không thêm hay xoá phần tử của collection đang `foreach`.
+- Muốn xoá: lọc ra danh sách mới, hoặc `for` duyệt ngược từ cuối.
 - `switch expression` trả giá trị, không cần `break`, và được compiler nhắc khi thiếu nhánh.
 - Guard clause giữ logic chính ở mức ngoài cùng.
-- `foreach` chạy trên mọi thứ cài `IEnumerable<T>` — mảng, `List<T>`, kết quả LINQ, dữ liệu đọc dần từ database.
 
 ## Bước tiếp theo
 
-Bài sau — **Method và tham số** — gói những đoạn logic vừa viết thành method
-đặt tên đàng hoàng, và giải thích vì sao sửa object trong method thì bên ngoài
-thấy đổi, còn gán lại thì không.
+Những đoạn logic vừa viết rồi sẽ dài ra. Tới lúc gói chúng lại và đặt tên.
+
+Bài sau, **Method và tham số**, mở bằng một câu đố. Sửa object trong method
+thì bên ngoài thấy, còn gán lại thì không. Cùng một chữ ký hàm.
 
 ```quiz
 [
@@ -207,7 +228,7 @@ thấy đổi, còn gán lại thì không.
       "Tách thành ba method nhỏ, mỗi method một tầng"
     ],
     "answer": 3,
-    "explain": "Guard clause đưa các trường hợp loại trừ lên đầu và return ngay, để logic chính nằm ở mức thụt lề ngoài cùng, dễ đọc nhất."
+    "explain": "Guard clause đưa các trường hợp loại trừ lên đầu và return ngay, để logic chính nằm ở mức thụt lề ngoài cùng."
   }
 ]
 ```

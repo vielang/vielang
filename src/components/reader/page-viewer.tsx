@@ -55,6 +55,9 @@ export interface PageViewerHandle {
 /** Khoảng hở giữa 2 trang ở chế độ xem 2 trang, mô phỏng gáy sách. */
 const SPREAD_GAP = 4;
 
+/** Khoảng hở giữa trang đang đọc và trang kế bên trong dải lật. */
+const TURN_GAP = 24;
+
 /**
  * Thời gian trang trượt hẳn sang bên, tính bằng ms.
  *
@@ -334,6 +337,9 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
    * thì không được phép làm dựng lại cây component.
    */
   const widthRef = useRef(0);
+  /** Quãng trượt của một lượt lật (px) — đo cùng chỗ với `box` bên dưới. */
+  const [step, setStep] = useState(0);
+  const stepRef = useRef(0);
 
   useLayoutEffect(() => {
     const el = boxRef.current;
@@ -345,6 +351,14 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
       const maxWidthPerPage = (target.offsetWidth - gapTotal) / count;
       const width = Math.min(maxWidthPerPage, target.offsetHeight * aspectRatio);
       setBox({ width, height: width / aspectRatio });
+      // Trang kế nằm ngay SÁT cạnh trang đang đọc, không phải cách nhau cả
+      // bề ngang màn hình: màn rộng thì trang chỉ chiếm phần giữa, cách nhau
+      // cả màn hình nghĩa là kéo một đoạn dài vẫn chỉ thấy nền đen rồi trang
+      // mới nhảy ra ở cuối. Không bao giờ vượt quá bề ngang màn (điện thoại
+      // trang đã chiếm gần hết bề ngang).
+      const turn = Math.min(target.offsetWidth, width * count + gapTotal + TURN_GAP);
+      stepRef.current = turn;
+      setStep(turn);
     }
 
     measure(el);
@@ -384,7 +398,7 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
     (direction: 1 | -1, gesture?: { moved: number; speed: number }) => {
       if (committed.current) return false;
       if ((direction === 1 ? nextPages : prevPages) === null) return false;
-      const width = widthRef.current;
+      const width = stepRef.current;
       if (width <= 0) return false;
 
       committed.current = true;
@@ -600,8 +614,9 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
       if (g.axis === "x") {
         const moved = e.clientX - g.originX;
         const direction: 1 | -1 = moved < 0 ? 1 : -1;
-        const width = widthRef.current || 1;
-        const farEnough = Math.abs(moved) > width * COMMIT_RATIO;
+        // Ngưỡng lật tính theo bề ngang MÀN HÌNH (kéo được bao nhiêu phần
+        // màn hình), còn quãng trượt nốt thì theo bước lật — xem `commit`.
+        const farEnough = Math.abs(moved) > (widthRef.current || 1) * COMMIT_RATIO;
         // Vẩy chỉ tính khi còn đang đi đúng hướng đã kéo — kéo sang trái rồi
         // hất ngược lại là người ta đổi ý, phải trả trang về chỗ cũ.
         const flicked =
@@ -656,7 +671,7 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
         style={{ transform: "translate3d(0px, 0, 0)" }}
       >
         {box && prevPages && (
-          <div className="absolute inset-0 -translate-x-full">
+          <div className="absolute inset-0" style={{ transform: `translate3d(${-step}px, 0, 0)` }}>
             <NeighbourSpread bookId={book.id} pages={prevPages} box={box} />
           </div>
         )}
@@ -720,7 +735,7 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
         </div>
 
         {box && nextPages && (
-          <div className="absolute inset-0 translate-x-full">
+          <div className="absolute inset-0" style={{ transform: `translate3d(${step}px, 0, 0)` }}>
             <NeighbourSpread bookId={book.id} pages={nextPages} box={box} />
           </div>
         )}

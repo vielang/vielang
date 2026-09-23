@@ -465,8 +465,78 @@ function readingMinutes(body: string): number {
   return Math.max(1, Math.round(words / 180));
 }
 
+/**
+ * Tô màu code bằng Shiki — dùng chính grammar TextMate và theme của VS Code
+ * nên C# ra đúng màu như lúc gõ trong IDE, hơn hẳn regex của highlight.js.
+ *
+ * Chạy LÚC BUILD: HTML sinh ra đã có màu dán thẳng vào từng token, trình
+ * duyệt không phải tải thêm thư viện tô màu nào (Shiki chỉ nằm trong
+ * devDependencies). Đổi lại phải build lại khi sửa bài — vốn đã phải thế.
+ *
+ * `defaultColor: false` cho Shiki ghi màu của CẢ HAI theme vào biến CSS
+ * (`--shiki-light`, `--shiki-dark`), để CSS chọn theo class `.dark` — xem
+ * globals.css. Nếu chỉ nhúng một theme thì chế độ tối phải tô màu lại bằng
+ * JS, hoặc code sáng trưng giữa nền tối.
+ */
+const CODE_THEMES = { light: "github-light", dark: "github-dark" } as const;
+
+/**
+ * Ngôn ngữ nạp sẵn cho Shiki. Chỉ nạp những thứ khoá học thật sự dùng: mỗi
+ * grammar là một file khá nặng, nạp cả bundle thì build chậm vô ích.
+ */
+const CODE_LANGS = ["csharp", "bash", "sql", "json", "xml", "csv", "diff"];
+
+/** Tên ngôn ngữ hay viết tắt trong file .md -> tên Shiki hiểu. */
+const LANG_ALIASES: Record<string, string> = {
+  cs: "csharp",
+  "c#": "csharp",
+  dotnet: "bash",
+  sh: "bash",
+  shell: "bash",
+  console: "bash",
+  plsql: "sql",
+  oracle: "sql",
+  csproj: "xml",
+  text: "text",
+};
+
+type CodeHighlighter = Awaited<ReturnType<typeof import("shiki").createHighlighter>>;
+
+/**
+ * Renderer code của marked cho bài học IT. Ngôn ngữ lạ (hoặc khối không ghi
+ * ngôn ngữ) rơi về `text`: vẫn ra đúng khung code, chỉ là không có màu —
+ * tốt hơn là làm hỏng cả lần build.
+ */
+function lessonMarkdown(highlighter: CodeHighlighter) {
+  const loaded = new Set(highlighter.getLoadedLanguages());
+  return new Marked(
+    { gfm: true, breaks: false, async: false },
+    {
+      renderer: {
+        code({ text, lang }) {
+          const name = (lang ?? "").trim().toLowerCase();
+          const resolved = LANG_ALIASES[name] ?? name;
+          return highlighter.codeToHtml(text, {
+            lang: loaded.has(resolved) ? resolved : "text",
+            themes: CODE_THEMES,
+            defaultColor: false,
+          });
+        },
+      },
+    }
+  );
+}
+
 async function buildCourses(): Promise<number> {
   if (!(await exists(IT_ROOT))) return 0;
+  // import động: chỉ khoá học mới cần Shiki, các phần nội dung khác build
+  // xong từ lâu trước khi nó kịp nạp grammar.
+  const { createHighlighter } = await import("shiki");
+  const highlighter = await createHighlighter({
+    themes: Object.values(CODE_THEMES),
+    langs: CODE_LANGS,
+  });
+  const lessonMarked = lessonMarkdown(highlighter);
   const courses = [];
   for (const courseDir of (await readdir(IT_ROOT)).sort()) {
     const courseRoot = path.join(IT_ROOT, courseDir);
@@ -481,7 +551,7 @@ async function buildCourses(): Promise<number> {
       for (const file of (await readdir(moduleRoot)).sort()) {
         if (!file.endsWith(".md") || file === "_module.md") continue;
         const { meta, body } = frontMatter(await readFile(path.join(moduleRoot, file), "utf8"));
-        const { html, headings } = withHeadingIds((marked.parse(body) as string).trim());
+        const { html, headings } = withHeadingIds((lessonMarked.parse(body) as string).trim());
         lessons.push({
           slug: `${unprefix(moduleDir)}/${lessonSlug(file)}`,
           title: meta.title ?? lessonSlug(file),

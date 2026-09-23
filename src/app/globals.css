@@ -190,3 +190,24 @@
 [data-radix-popper-content-wrapper]:has(> [data-slot="tooltip-content"]) {
   pointer-events: none;
 }
+
+/*
+ * Khối code trong bài học IT, tô màu sẵn bằng Shiki lúc build (xem
+ * scripts/build-content.ts). Shiki ghi màu của cả theme sáng lẫn theme tối
+ * vào biến CSS ở từng token, đây là chỗ chọn bộ nào theo chế độ đang bật —
+ * nhờ vậy đổi sáng/tối không cần tô màu lại bằng JS.
+ *
+ * Để NGOÀI mọi @layer là cố ý: nền và màu chữ mặc định của plugin typography
+ * nằm trong layer, mà CSS không layer thì thắng mọi layer.
+ */
+.prose .shiki,
+.prose .shiki span {
+  color: var(--shiki-light);
+  background-color: var(--shiki-light-bg);
+}
+
+.dark .prose .shiki,
+.dark .prose .shiki span {
+  color: var(--shiki-dark);
+  background-color: var(--shiki-dark-bg);
+}

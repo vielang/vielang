@@ -20,7 +20,9 @@ export function SiteHeader() {
   const current = activeTab(pathname);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    // Lề trên theo vùng an toàn: thêm app vào màn hình chính trên iOS thì
+    // app chạy toàn màn hình, không chừa thì chữ nằm dưới thanh trạng thái.
+    <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 pt-[env(safe-area-inset-top)] backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="mx-auto flex h-14 max-w-5xl items-center justify-between gap-4 px-4">
         <div className="flex min-w-0 items-center gap-4">
           {/* Điện thoại chỉ còn tên app: đang ở đâu thì thanh tab dưới đáy

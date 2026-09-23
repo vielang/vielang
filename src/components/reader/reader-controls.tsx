@@ -109,7 +109,7 @@ export function ReaderControls({
       {/* Top bar */}
       <div
         className={cn(
-          "fixed inset-x-0 top-0 z-20 flex items-center justify-between gap-2 bg-gradient-to-b from-black/70 to-transparent p-3 text-white transition-transform duration-200",
+          "fixed inset-x-0 top-0 z-20 flex items-center justify-between gap-2 bg-gradient-to-b from-black/70 to-transparent p-3 pt-[max(0.75rem,env(safe-area-inset-top))] text-white transition-transform duration-200",
           visible ? "translate-y-0" : "pointer-events-none -translate-y-full"
         )}
       >
@@ -255,7 +255,7 @@ export function ReaderControls({
       {/* Bottom bar */}
       <div
         className={cn(
-          "fixed inset-x-0 bottom-0 z-20 flex items-center justify-center gap-1 bg-gradient-to-t from-black/70 to-transparent p-3 text-white transition-transform duration-200",
+          "fixed inset-x-0 bottom-0 z-20 flex items-center justify-center gap-1 bg-gradient-to-t from-black/70 to-transparent p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] text-white transition-transform duration-200",
           visible ? "translate-y-0" : "pointer-events-none translate-y-full"
         )}
       >

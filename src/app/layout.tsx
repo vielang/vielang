@@ -36,6 +36,11 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  // iOS: thiếu cái này thì `env(safe-area-inset-*)` luôn bằng 0, nên các
+  // thanh dính đáy (thanh tab, thanh thao tác, phiếu trả lời) nằm lọt dưới
+  // vạch Home / thanh công cụ Safari và bị che mất một phần. Android không
+  // có vùng đó nên không lộ ra.
+  viewportFit: "cover",
   // Không khoá pinch-zoom toàn cục (a11y) — trang đọc sách tự quản lý zoom
   // riêng cho ảnh qua touch-action, không cần chặn zoom trình duyệt ở đây.
   themeColor: [

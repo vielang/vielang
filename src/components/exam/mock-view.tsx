@@ -174,7 +174,7 @@ function MockRunning({ exam, attempt }: { exam: Exam; attempt: MockAttempt }) {
   return (
     // Máy tính dùng cả bề ngang (đề + phiếu trả lời, hoặc đề viết + ô viết).
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-5 pb-6 lg:max-w-none lg:pb-12">
-      <div className="sticky top-14 z-30 -mx-4 flex flex-col gap-2 border-b border-border bg-background/95 px-4 pt-2 pb-2.5 backdrop-blur">
+      <div className="sticky top-[calc(3.5rem+env(safe-area-inset-top))] z-30 -mx-4 flex flex-col gap-2 border-b border-border bg-background/95 px-4 pt-2 pb-2.5 backdrop-blur">
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
             <p className="truncate text-sm font-medium">{examTitle(exam)}</p>

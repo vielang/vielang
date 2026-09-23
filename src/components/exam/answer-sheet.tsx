@@ -223,14 +223,20 @@ export function MobileAnswerSheet({
   return (
     <>
       {/* Chừa chỗ để câu cuối cuộn lên được trên phiếu. */}
-      <div aria-hidden className="lg:hidden" style={{ height: heightOf(snap, vh) + 16 }} />
+      <div
+        aria-hidden
+        className="lg:hidden"
+        style={{ height: `calc(${heightOf(snap, vh) + 16}px + env(safe-area-inset-bottom))` }}
+      />
       <section
         aria-label="Phiếu trả lời"
         className={cn(
           "fixed inset-x-0 bottom-0 z-30 flex flex-col rounded-t-2xl border-t border-border bg-background shadow-[0_-8px_24px_-12px_rgb(0_0_0/0.25)] lg:hidden",
           drag === null && "transition-[height] duration-200 ease-out"
         )}
-        style={{ height }}
+        // Cao thêm đúng vùng an toàn dưới đáy (vạch Home trên iOS) — xem
+        // `viewportFit` ở app/layout.
+        style={{ height: `calc(${height}px + env(safe-area-inset-bottom))`, paddingBottom: "env(safe-area-inset-bottom)" }}
       >
         <div
           role="button"

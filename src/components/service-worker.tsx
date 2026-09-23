@@ -89,7 +89,7 @@ export function ServiceWorker() {
   return (
     <div
       role="status"
-      className="fixed inset-x-0 bottom-0 z-[70] flex justify-center p-3"
+      className="fixed inset-x-0 bottom-0 z-[70] flex justify-center p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
     >
       <div className="flex items-center gap-2 rounded-full bg-popover py-1.5 pr-1.5 pl-4 text-sm text-popover-foreground ring-1 ring-foreground/10 shadow-lg">
         <span>Đã có bản cập nhật</span>

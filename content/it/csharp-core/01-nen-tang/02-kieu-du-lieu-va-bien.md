@@ -65,6 +65,9 @@ số gần đúng. Sai số cộng dồn, rồi ra hoá đơn.
 
 ## Chọn kiểu số theo việc, không theo thói quen
 
+Hoá đơn lệch một xu không phải lỗi của bạn. Nó là lỗi chọn kiểu, và bảng dưới
+đây gỡ được hầu hết những lần chọn sai như thế.
+
 | Việc | Kiểu | Vì sao |
 |---|---|---|
 | Tiền, tỉ lệ, đơn giá | `decimal` | chính xác theo hệ thập phân |
@@ -79,6 +82,9 @@ Chỗ nguy hiểm là khi không có kiểu nào viết ra: `var rate = 0.1;` ch
 `double`, và bug vừa thấy quay lại y nguyên.
 
 ## var chỉ là cách viết gọn, kiểu vẫn cố định
+
+Vừa nói tới `var rate = 0.1;`, nên phải nói rõ luôn `var` là gì. Nhiều người
+tưởng nó giống JavaScript.
 
 ```csharp
 var total = 10;             // compiler suy ra int
@@ -95,9 +101,12 @@ cho họ đỡ mất công.
 
 ## Value type chép giá trị, reference type chép tham chiếu
 
+Mọi kiểu trong C# chia làm hai nhóm, và cái nhóm quyết định chuyện gì xảy ra
+khi bạn gán biến này sang biến khác.
+
 ```csharp
-int a2 = 5;         // value type — giá trị ở trong biến
-string s = "abc";   // reference type — giữ tham chiếu
+int quantity = 5;       // value type — giá trị ở trong biến
+string code = "AB-01";  // reference type — giữ tham chiếu
 ```
 
 | Nhóm | Gồm | Gán là chép gì |

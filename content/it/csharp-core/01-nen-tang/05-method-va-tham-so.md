@@ -16,7 +16,10 @@ gì cả. Cùng một chữ ký hàm, hai kết quả khác hẳn nhau.
 > **Cần biết trước:** biến, kiểu dữ liệu, `class` ở mức biết object có
 > property.
 
-## Khai báo, và ba quy ước đặt tên
+## Tên method là động từ, tên biến là vật
+
+Một method có ba phần người đọc nhìn vào: kiểu trả về, cái tên, và danh sách
+tham số. Cái tên là phần họ đọc trước.
 
 ```csharp
 public decimal CalculateTotal(decimal price, int qty)
@@ -44,6 +47,8 @@ Tên method nói việc, tên biến nói vật. `CalculateTotal` thì rõ, còn
 `ProcessData` thì chẳng nói gì — "xử lý" là xử lý cái gì?
 
 ## Thử ngay: method sửa được gì của bạn
+
+Giờ tới câu đố ở đầu bài. Hai method, mỗi cái đúng một dòng.
 
 ```csharp
 void Rename(Person p) => p.Name = "Nam";
@@ -82,6 +87,9 @@ Muốn thay hẳn object của người gọi thì `return` object mới. Cách 
 
 ## Named argument làm chỗ gọi tự giải thích
 
+Chữ ký hàm rõ rồi, nhưng chỗ gọi thì chưa chắc. Đây là nơi người đọc code hay
+phải dừng lại đoán.
+
 ```csharp
 public string Format(
     decimal amount,
@@ -101,6 +109,9 @@ Tham số tuỳ chọn thì đặt ở cuối, và chỉ dùng cho giá trị m�
 lý với đa số trường hợp.
 
 ## ref, out, in: ba cách truyền tham chiếu
+
+Mặc định C# chép giá trị tham số. Ba từ khoá dưới đây phá lệ ấy, mỗi cái theo
+một kiểu.
 
 | Từ khoá | Ai gán giá trị | Gặp ở đâu |
 |---|---|---|
@@ -132,7 +143,10 @@ public (bool Ok, string? Error) Validate(Order order)
 var (ok, error) = Validate(order);   // deconstruction
 ```
 
-## Overload, params và local function
+## Overload cùng việc, params gọn tay, local function không lọt ra ngoài
+
+Còn ba thứ nữa hay gặp trong code thật, và cả ba đều nhằm cùng một đích: bớt
+việc cho người gọi.
 
 ```csharp
 public void Log(string message) { }
@@ -161,8 +175,9 @@ bản phù hợp lúc compile.
 Chỉ overload khi các bản làm *cùng một việc*. Khác việc thì đặt tên khác, đừng
 bắt người đọc tự đoán.
 
-`params` cho phép gọi `Sum(1, 2, 3)` mà không cần gõ `new[]`. Tiện, nhưng chỉ
-đặt nó ở tham số cuối cùng, và mỗi method chỉ một cái.
+`params` cho phép gọi `Sum(1, 2, 3)` mà không cần gõ `new[]`. Nó phải là tham
+số cuối cùng, và mỗi method chỉ được một cái — compiler chặn ngay nếu bạn viết
+khác.
 
 **Local function** là hàm phụ nằm hẳn bên trong method. Nó không lọt ra ngoài
 class, nên người đọc biết ngay phạm vi dùng của nó chỉ có bấy nhiêu. Trước đây
@@ -185,7 +200,8 @@ không chắc còn ai gọi.
 
 ## Bước tiếp theo
 
-Method đã gọn gàng. Nhưng thứ chúng xử lý nhiều nhất là chuỗi.
+Các method đã gọn. Việc chúng làm nhiều nhất thì vẫn là ghép chữ: ghi log,
+dựng thông báo, gửi số sang hệ thống khác.
 
 Bài sau, **Chuỗi và định dạng**, mở bằng một API gửi số tiền sang đối tác.
 Máy dev gửi `1.5`, server gửi `1,5`, và đối tác đọc thành mười lăm.

@@ -17,6 +17,8 @@ cũng đúng, chia số này cho số kia. Sai ở chỗ không ai ngờ — c�
 
 ## Thử ngay: phép chia làm hỏng báo cáo
 
+Báo cáo kia gói lại được trong bốn dòng. Chạy thử trước, đọc giải thích sau.
+
 ```csharp
 int success = 47, total = 100;
 
@@ -48,6 +50,8 @@ Cả tuần không ai phát hiện, vì `0%` trông vẫn như một con số h�
 
 ## Kết quả mang kiểu của vế rộng hơn
 
+Một phép chia có thể ra bốn kết quả khác nhau, tuỳ kiểu của hai vế.
+
 | Biểu thức | Kết quả | Kiểu |
 |---|---|---|
 | `7 / 2` | `3` | `int` |
@@ -58,7 +62,10 @@ Cả tuần không ai phát hiện, vì `0%` trông vẫn như một con số h�
 Quy tắc chỉ có một câu: chỉ cần **một vế** là số thực, kết quả thành số thực.
 Còn hai `int` gặp nhau thì phần lẻ bị vứt. Không làm tròn, không cảnh báo.
 
-## Ép kiểu ngầm định và tường minh
+## Compiler tự ép khi không mất gì, còn lại là việc của bạn
+
+Đi từ kiểu hẹp sang kiểu rộng thì compiler làm giúp. Ngược lại thì nó bắt bạn
+nói rõ, vì chiều đó có mất dữ liệu.
 
 ```csharp
 int small = 100;
@@ -81,6 +88,8 @@ conversion**. Ngược lại thì bạn phải tự ép, và tự chịu trách 
 
 ## C# không báo tràn số, trừ khi bạn yêu cầu
 
+Cắt phần lẻ thì còn thấy được. Tràn số thì im lặng hoàn toàn.
+
 ```csharp
 int max = int.MaxValue;
 int over = max + 1;   // -2147483648, âm thầm quay vòng
@@ -98,6 +107,9 @@ Với id tự tăng, tiền cộng dồn hay số lượng tồn kho, hãy chọ
 từ đầu: `long` hoặc `decimal`.
 
 ## Parse ném lỗi, TryParse thì không
+
+Đổi số sang số là chuyện của compiler. Đổi chuỗi sang số thì phải tự lo, vì
+chuỗi có thể là bất cứ thứ gì.
 
 ```csharp
 int ok = int.Parse("42");
@@ -118,19 +130,20 @@ Query string, form, CSV đều là dữ liệu ngoài. Ở đó luôn dùng `Try
 
 ## && và || chỉ chạy vế phải khi cần
 
+Còn một toán tử nữa hay bị gõ thiếu một ký tự, và hậu quả thì không nhỏ.
+
 ```csharp
 if (user != null && user.IsActive) { }
-bool both = Check(a) & Check(b);   // chạy CẢ HAI vế
 
-int port = configPort ?? 8080;     // null thì lấy 8080
-name ??= "Khách";                   // gán khi đang null
+// Bớt một ký tự: cả hai vế cùng chạy
+if (user != null & user.IsActive) { }
 ```
 
 `&&` và `||` là **short-circuit**: vế trái sai thì vế phải không chạy. Nhờ vậy
 mẫu `x != null && x.Prop` mới an toàn.
 
-Đổi sang `&` là cả hai vế cùng chạy, và bạn nhận ngay `NullReferenceException`.
-Hiếm khi bạn muốn thế.
+Dòng thứ hai thì `user.IsActive` vẫn chạy dù `user` đang null, nên bạn nhận
+`NullReferenceException` ngay tại chỗ `if`. Hiếm khi ai muốn thế.
 
 ## Dấu hiệu trong code của bạn
 

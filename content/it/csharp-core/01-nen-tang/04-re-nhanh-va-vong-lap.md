@@ -18,6 +18,9 @@ job sập với `InvalidOperationException`.
 
 ## Ba cách rẽ nhánh, chọn theo việc
 
+Job kia sập ở một vòng lặp. Nhưng trước khi tới vòng lặp, cần nói về thứ quyết
+định đi nhánh nào.
+
 | Cách viết | Hợp khi |
 |---|---|
 | `if` / `else if` | điều kiện phức tạp, mỗi nhánh làm nhiều việc |
@@ -45,13 +48,16 @@ Bỏ `_` đi thì compiler buộc bạn liệt kê đủ, và thiếu một nhá
 
 ## Guard clause kéo logic chính ra khỏi ba tầng ngoặc
 
+Chọn được cách rẽ nhánh rồi, còn một câu hỏi nữa: xếp các điều kiện theo thứ tự
+nào cho dễ đọc.
+
 ```csharp
 // SAI — việc chính nằm sâu nhất
 if (order != null)
 {
     if (order.IsPaid)
     {
-        if (order.Items.Count > 0)
+        if (order.Lines.Count > 0)
             Ship(order);
     }
 }
@@ -61,7 +67,7 @@ if (order != null)
 // ĐÚNG — chặn sớm, việc chính ở mức ngoài cùng
 if (order is null) return;
 if (!order.IsPaid) return;
-if (order.Items.Count == 0) return;
+if (order.Lines.Count == 0) return;
 
 Ship(order);
 ```
@@ -73,6 +79,8 @@ Còn `{ }`: luôn viết, kể cả khi thân `if` chỉ một dòng. Thêm dòn
 quên ngoặc là lỗi rất khó nhìn ra lúc review.
 
 ## Thử ngay: vì sao job dọn dữ liệu sập
+
+Giờ tới cái job hai giờ sáng ở đầu bài. Nó chỉ có bốn dòng.
 
 ```csharp
 var codes = new List<string> { "a", "old", "b", "old" };
@@ -127,6 +135,9 @@ cho bạn thêm một cách thứ ba: lọc ra một danh sách mới thay vì s
 cũ.
 
 ## Chọn vòng lặp theo thứ bạn cần
+
+C# có bốn kiểu vòng lặp, và chọn sai thì không sập — chỉ khiến người đọc phải
+dừng lại nghĩ.
 
 | Vòng lặp | Dùng khi |
 |---|---|
@@ -184,8 +195,8 @@ var first3 = items[..3];  // ba phần tử đầu
 ## Ghi nhớ
 
 - Không thêm hay xoá phần tử của collection đang `foreach`.
-- Muốn xoá: lọc ra danh sách mới, hoặc `for` duyệt ngược từ cuối.
-- `switch expression` trả giá trị, không cần `break`, và được compiler nhắc khi thiếu nhánh.
+- Muốn xoá: `RemoveAll`, hoặc `for` duyệt ngược từ cuối.
+- `switch expression` trả giá trị, không cần `break`; bỏ nhánh `_` thì compiler nhắc khi thiếu nhánh.
 - Guard clause giữ logic chính ở mức ngoài cùng.
 
 ## Bước tiếp theo
@@ -206,7 +217,7 @@ thì bên ngoài thấy, còn gán lại thì không. Cùng một chữ ký hàm
       "Compiler báo lỗi lúc build"
     ],
     "answer": 3,
-    "explain": "foreach giữ con trỏ trên danh sách gốc; danh sách đổi là con trỏ mất chỗ đứng. Lọc ra danh sách mới bằng Where, hoặc dùng for duyệt ngược."
+    "explain": "foreach giữ con trỏ trên danh sách gốc; danh sách đổi là con trỏ mất chỗ đứng. Dùng RemoveAll, hoặc for duyệt ngược từ cuối."
   },
   {
     "prompt": "Bạn muốn xoá tại chỗ nhiều phần tử của một List bằng vòng for. Vì sao phải duyệt ngược từ cuối?",

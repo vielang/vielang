@@ -14,7 +14,10 @@ ngôn ngữ hệ thống khác nhau.
 >
 > **Cần biết trước:** biến, kiểu `string`, vòng lặp.
 
-## String interpolation và bảng định dạng
+## Dấu $ chèn biểu thức, phần sau dấu : định dạng nó
+
+Ghép chuỗi là việc bạn làm nhiều nhất với `string`. C# hiện đại có đúng một
+cách nên dùng.
 
 ```csharp
 var name = "Huy";
@@ -36,6 +39,9 @@ dấu `:` là **format string**.
 | `$"{id:D6}"` | `000042` | đệm số 0 cho đủ 6 chữ số |
 
 ## Thử ngay: chuỗi không đổi được
+
+Trước khi tới chuyện culture, cần biết một tính chất của `string` đứng sau khá
+nhiều thứ trong bài này.
 
 ```csharp
 var s = "abc";
@@ -86,7 +92,14 @@ var report2 = sb.ToString();
 Quy tắc thực dụng: dưới chục lần nối thì `+` hay interpolation đều ổn. Nối
 trong vòng lặp không biết trước số lần thì `StringBuilder`.
 
-## Kiểm tra rỗng và so sánh
+Còn một chỗ tuyệt đối không được nối chuỗi: câu SQL.
+
+Nối mã người dùng nhập vào câu lệnh là cho họ viết tiếp câu SQL của bạn. Tên
+của nó là **SQL injection**. Truyền tham số, đừng nối.
+
+## Với dữ liệu người nhập, luôn kiểm tra cả khoảng trắng
+
+Chuỗi đến từ người dùng thì rỗng và "toàn dấu cách" là hai chuyện khác nhau.
 
 ```csharp
 string.IsNullOrEmpty(s);        // null hoặc ""
@@ -116,6 +129,8 @@ không phải tiếng người.
 
 ## Culture: cái bẫy chỉ lộ ra trên production
 
+Giờ tới cái API ở đầu bài. Cùng một số, hai máy in ra hai chuỗi khác nhau.
+
 ```csharp
 using System.Globalization;
 
@@ -138,7 +153,10 @@ Chuỗi có hai loại người đọc. Bạn phải biết mình đang viết c
 Nhầm hai loại này sinh ra đúng cái bug ở đầu bài. Nó chỉ xuất hiện sau khi
 deploy, trên máy có ngôn ngữ khác máy bạn.
 
-## Raw string literal giữ nguyên mọi ký tự bên trong
+## Raw string literal: viết JSON, SQL mà không escape dấu nháy
+
+Còn một cách viết chuỗi nữa, sinh ra đúng cho lúc bạn phải nhúng JSON hay SQL
+vào code.
 
 ```csharp
 var json = """

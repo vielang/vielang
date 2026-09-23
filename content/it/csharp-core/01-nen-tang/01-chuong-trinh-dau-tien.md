@@ -20,6 +20,9 @@ sao một file chạy được trên cả Windows lẫn Linux.
 
 ## Bốn lệnh dotnet bạn sẽ gõ mỗi ngày
 
+Trước khi trả lời câu hỏi kia, cần đã có cái gì để mà quan sát. Bốn lệnh dưới
+đây theo bạn tới hết nghề.
+
 | Lệnh | Làm gì |
 |---|---|
 | `dotnet new console -o Ten` | tạo project mới trong thư mục `Ten` |
@@ -31,6 +34,9 @@ sao một file chạy được trên cả Windows lẫn Linux.
 bằng chữ, không giao diện. Cả khoá dùng nó, vì nó không che mất thứ đang học.
 
 ## Code đi qua hai bước dịch trước khi chạy
+
+Ba lệnh đầu chỉ khác nhau ở chỗ có chạy hay không. Thứ đáng hỏi nằm trong chữ
+"dịch", và nó xảy ra hai lần chứ không phải một.
 
 ```mermaid Từ code tới lúc chạy: compiler dịch sang IL, CLR dịch tiếp lúc chạy
 flowchart TD
@@ -49,6 +55,9 @@ Tới lúc chạy, **CLR** (Common Language Runtime) mới dịch IL sang mã m�
 Linux và máy Mac. Bạn build một lần. Mỗi máy tự lo phần còn lại.
 
 ## Thử ngay: Write và WriteLine khác nhau ở đâu
+
+Đủ lý thuyết rồi. Dựng một project thật, và thử một chi tiết nhỏ mà hầu như ai
+cũng vấp lần đầu.
 
 ```bash
 dotnet new console -o HelloBackend
@@ -112,7 +121,10 @@ public class Program
 Hai cách chạy như nhau. Khoá này dùng dạng đầy đủ mỗi khi cần bàn tới `class`
 hay `namespace`.
 
-## Project, solution, assembly: ba từ gặp mỗi ngày
+## Một solution chứa nhiều project, mỗi project ra một assembly
+
+Bốn từ dưới đây đi kèm nhau trong mọi cuộc nói chuyện về build, và hay bị dùng
+lẫn.
 
 | Từ | Là gì |
 |---|---|

@@ -26,12 +26,36 @@ if (!Directory.Exists(root))
 const int maxWidth = 56;
 
 var fence = new Regex("```csharp\r?\n(.*?)```", RegexOptions.Singleline);
+
+// Câu hỏi cũng mang code (trường "code" trong khối ```quiz), mà code ở đó
+// cũng hiện trong một khối pre y như trong bài — nên cũng phải vừa bề ngang.
+var quizFence = new Regex("```quiz\r?\n(.*?)```", RegexOptions.Singleline);
+
 int blocks = 0, bad = 0, wide = 0;
 var wideFiles = new Dictionary<string, int>();
+
+void DemRong(string name, string code)
+{
+    var n = code.Split('\n').Count(l => l.TrimEnd().Length > maxWidth);
+    if (n == 0) return;
+    wide += n;
+    wideFiles[name] = wideFiles.GetValueOrDefault(name) + n;
+}
 
 foreach (var file in Directory.GetFiles(root, "*.md", SearchOption.AllDirectories).OrderBy(f => f))
 {
     var text = File.ReadAllText(file);
+
+    foreach (Match mq in quizFence.Matches(text))
+    {
+        using var doc = System.Text.Json.JsonDocument.Parse(mq.Groups[1].Value);
+        foreach (var item in doc.RootElement.EnumerateArray())
+        {
+            if (item.TryGetProperty("code", out var c))
+                DemRong(Path.GetFileName(file) + " (câu hỏi)", c.GetString() ?? "");
+        }
+    }
+
     foreach (Match m in fence.Matches(text))
     {
         blocks++;
@@ -60,13 +84,7 @@ foreach (var file in Directory.GetFiles(root, "*.md", SearchOption.AllDirectorie
                 tree = treeBoc;
         }
 
-        var tooWide = code.Split('\n').Count(l => l.TrimEnd().Length > maxWidth);
-        if (tooWide > 0)
-        {
-            wide += tooWide;
-            var name = Path.GetFileName(file);
-            wideFiles[name] = wideFiles.GetValueOrDefault(name) + tooWide;
-        }
+        DemRong(Path.GetFileName(file), code);
 
         var errors = tree.GetDiagnostics().Where(d => d.Severity == DiagnosticSeverity.Error).ToList();
         if (errors.Count == 0) continue;

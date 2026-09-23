@@ -340,6 +340,33 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
   /** Quãng trượt của một lượt lật (px) — đo cùng chỗ với `box` bên dưới. */
   const [step, setStep] = useState(0);
   const stepRef = useRef(0);
+  /**
+   * Đang kéo/đang trượt lật — chỉ lúc đó mới hiện trang kế bên. Trang kế nằm
+   * ngay sát cạnh trang đang đọc, nên để hiện sẵn là màn rộng thấy lú một
+   * mẩu trang trước và trang sau ở hai mép.
+   */
+  const [sliding, setSliding] = useState(false);
+  const slideOff = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const startSlide = useCallback(() => {
+    if (slideOff.current) {
+      clearTimeout(slideOff.current);
+      slideOff.current = null;
+    }
+    setSliding(true);
+  }, []);
+  /** Hết kéo mà không lật: giấu lại sau khi trang trôi về chỗ cũ. */
+  const endSlide = useCallback((after: number) => {
+    slideOff.current = setTimeout(() => {
+      slideOff.current = null;
+      setSliding(false);
+    }, after);
+  }, []);
+  useEffect(
+    () => () => {
+      if (slideOff.current) clearTimeout(slideOff.current);
+    },
+    []
+  );
 
   useLayoutEffect(() => {
     const el = boxRef.current;
@@ -402,6 +429,7 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
       if (width <= 0) return false;
 
       committed.current = true;
+      startSlide();
       const go = () => (direction === 1 ? onSwipeNext() : onSwipePrev());
 
       if (prefersReducedMotion()) {
@@ -428,7 +456,7 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
       timer.current = setTimeout(finish, ms);
       return true;
     },
-    [nextPages, prevPages, onSwipeNext, onSwipePrev, place]
+    [nextPages, prevPages, onSwipeNext, onSwipePrev, place, startSlide]
   );
 
   useImperativeHandle(
@@ -566,6 +594,7 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
           }
           g.axis = "x";
           g.originX = e.clientX;
+          startSlide();
           e.currentTarget.setPointerCapture?.(e.pointerId);
         } else if (Math.abs(dy) > 10) {
           g.axis = "off";
@@ -589,6 +618,7 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
         g.axis = "x";
         g.panning = false;
         g.originX = g.edgeX;
+        startSlide();
         e.currentTarget.setPointerCapture?.(e.pointerId);
       }
       if (g.axis !== "x") return;
@@ -597,7 +627,7 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
       const blocked = (moved < 0 && !nextPages) || (moved > 0 && !prevPages);
       place(blocked ? moved * EDGE_RESISTANCE : moved, false);
     },
-    [nextPages, prevPages, place, atPanEdge]
+    [nextPages, prevPages, place, atPanEdge, startSlide]
   );
 
   const onPointerUp = useCallback(
@@ -623,6 +653,7 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
           Math.abs(g.speed) > FLICK_SPEED && Math.sign(g.speed) === Math.sign(moved);
         if ((farEnough || flicked) && commit(direction, { moved, speed: g.speed })) return;
         place(0, true);
+        endSlide(TURN_MS);
         return;
       }
       if (g.axis === "off") return;
@@ -641,7 +672,7 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
         }, TAP_DELAY_MS);
       }
     },
-    [commit, onTap, place]
+    [commit, onTap, place, endSlide]
   );
 
   const onPointerCancel = useCallback(
@@ -650,9 +681,12 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
       pointers.current.delete(e.pointerId);
       if (!g || g.id !== e.pointerId) return;
       drag.current = null;
-      if (g.axis === "x" && !committed.current) place(0, true);
+      if (g.axis === "x" && !committed.current) {
+        place(0, true);
+        endSlide(TURN_MS);
+      }
     },
-    [place]
+    [place, endSlide]
   );
 
   return (
@@ -671,7 +705,10 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
         style={{ transform: "translate3d(0px, 0, 0)" }}
       >
         {box && prevPages && (
-          <div className="absolute inset-0" style={{ transform: `translate3d(${-step}px, 0, 0)` }}>
+          <div
+            className="absolute inset-0"
+            style={{ transform: `translate3d(${-step}px, 0, 0)`, visibility: sliding ? "visible" : "hidden" }}
+          >
             <NeighbourSpread bookId={book.id} pages={prevPages} box={box} />
           </div>
         )}
@@ -735,7 +772,10 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
         </div>
 
         {box && nextPages && (
-          <div className="absolute inset-0" style={{ transform: `translate3d(${step}px, 0, 0)` }}>
+          <div
+            className="absolute inset-0"
+            style={{ transform: `translate3d(${step}px, 0, 0)`, visibility: sliding ? "visible" : "hidden" }}
+          >
             <NeighbourSpread bookId={book.id} pages={nextPages} box={box} />
           </div>
         )}

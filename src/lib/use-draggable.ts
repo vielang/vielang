@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, type RefObject } from "react";
+import { useCallback, useEffect, useRef, type RefObject } from "react";
 
 export interface DragPos {
   x: number;
@@ -22,6 +22,37 @@ export function clampToViewport(pos: DragPos, width: number, height: number): Dr
     x: Math.min(Math.max(pos.x, DRAG_MARGIN), Math.max(maxX, DRAG_MARGIN)),
     y: Math.min(Math.max(pos.y, DRAG_MARGIN), Math.max(maxY, DRAG_MARGIN)),
   };
+}
+
+/**
+ * Giữ widget nổi nằm trong màn hình khi cửa sổ đổi kích thước (hoặc xoay
+ * máy). Vị trí widget lưu theo toạ độ tuyệt đối và trước đây chỉ kẹp lúc
+ * kéo: đặt nút audio sát mép phải ở màn rộng rồi thu hẹp cửa sổ là nó nằm
+ * ngoài màn hình, không bấm tới được nữa.
+ */
+export function useKeepInViewport({
+  pos,
+  setPos,
+  width,
+  height,
+  clamp = clampToViewport,
+}: {
+  pos: DragPos | null;
+  setPos: (p: DragPos) => void;
+  width: number;
+  height: number;
+  clamp?: (pos: DragPos, width: number, height: number) => DragPos;
+}) {
+  useEffect(() => {
+    if (!pos) return;
+    const fix = () => {
+      const next = clamp(pos, width, height);
+      if (next.x !== pos.x || next.y !== pos.y) setPos(next);
+    };
+    fix();
+    window.addEventListener("resize", fix);
+    return () => window.removeEventListener("resize", fix);
+  }, [pos, setPos, width, height, clamp]);
 }
 
 /**

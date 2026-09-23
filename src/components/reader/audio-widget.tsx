@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useAudioWidgetStore } from "@/lib/audio-widget-store";
 import { useRetryingMedia } from "@/lib/use-retrying-media";
+import { useKeepInViewport } from "@/lib/use-draggable";
 import { AUDIO_WIDGET_SIZE, audioAnchor } from "@/lib/widget-dock";
 
 // Đường kính nút tròn lúc thu nhỏ. Các widget nổi khác neo theo số này nên
@@ -211,6 +212,17 @@ export function AudioWidget({
   const width = collapsed ? SIZE : PANEL_WIDTH;
   const height = collapsed ? SIZE : panelHeight;
   const setPos = collapsed ? setCollapsedPosition : setPanelPosition;
+
+  // Thu hẹp cửa sổ (hoặc xoay máy) thì kéo widget về lại trong màn hình —
+  // vị trí lưu theo toạ độ tuyệt đối, để nguyên là nút nằm ngoài mép phải
+  // và không bấm tới được nữa.
+  useKeepInViewport({
+    pos: collapsed ? collapsedPosition : panelPosition,
+    setPos,
+    width,
+    height,
+    clamp,
+  });
 
   function expand() {
     setPanelPosition(panelPositionFrom(pos, panelHeight));

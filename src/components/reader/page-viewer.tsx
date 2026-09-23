@@ -410,6 +410,20 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
    * Quyết hướng MỘT LẦN rồi giữ nguyên: đổi ngả giữa chừng thì trang vừa
    * trôi theo tay vừa giật về, và không cử chỉ nào ra hồn cả.
    */
+  /**
+   * Đang phóng to mà đã kéo tới sát mép trái/phải của ảnh chưa? Tới mép rồi
+   * thì kéo tiếp cũng không di chuyển được nữa — lúc đó cử chỉ ấy chuyển
+   * thành lật trang, giống lật sang trang kế khi đọc báo giấy đã phóng to.
+   */
+  const atPanEdge = useCallback((direction: 1 | -1) => {
+    const instance = transformRef.current?.instance;
+    const bounds = instance?.bounds;
+    if (!instance || !bounds) return false;
+    const x = instance.state.positionX;
+    // direction 1 = kéo sang TRÁI (xem trang sau) → đang ở mép PHẢI của ảnh.
+    return direction === 1 ? x <= bounds.minPositionX + 1 : x >= bounds.maxPositionX - 1;
+  }, []);
+
   const drag = useRef<{
     id: number;
     startX: number;
@@ -483,8 +497,9 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
 
       if (g.axis === "undecided") {
         if (Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy) * 1.2) {
-          // Đã phóng to thì kéo ngang là di chuyển vùng xem, không phải lật.
-          if (scaleRef.current > 1.02) {
+          // Đã phóng to thì kéo ngang là di chuyển vùng xem — trừ khi vùng
+          // xem đã chạm mép ảnh theo đúng hướng đang kéo, lúc đó lật trang.
+          if (scaleRef.current > 1.02 && !atPanEdge(dx < 0 ? 1 : -1)) {
             g.axis = "off";
             return;
           }
@@ -502,7 +517,7 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
       const blocked = (moved < 0 && !nextPages) || (moved > 0 && !prevPages);
       place(blocked ? moved * EDGE_RESISTANCE : moved, false);
     },
-    [nextPages, prevPages, place]
+    [nextPages, prevPages, place, atPanEdge]
   );
 
   const onPointerUp = useCallback(

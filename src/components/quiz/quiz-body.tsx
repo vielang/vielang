@@ -66,7 +66,19 @@ export function QuizBody({
 
   return (
     <>
-      <div className="mb-4 flex h-6 items-center justify-between gap-2 text-xs text-muted-foreground">
+      <div
+        className={cn(
+          "flex items-center justify-between gap-2 text-xs text-muted-foreground",
+          numbered ? "mb-3" : "mb-4 h-6"
+        )}
+      >
+        {/* Kiểu bài học: tiêu đề mục đứng cùng hàng với bộ đếm, khỏi tốn thêm
+            một dòng cho mỗi thứ. */}
+        {numbered ? (
+          <h3 className="font-heading text-base font-semibold text-foreground">
+            {sections[0]?.title}
+          </h3>
+        ) : null}
         <span className="tabular-nums">
           {gradable.length > 0
             ? `${done.length}/${gradable.length} câu` +
@@ -77,6 +89,7 @@ export function QuizBody({
           <Button
             variant="ghost"
             size="icon-sm"
+            className={cn(numbered && "-my-1 -mr-2")}
             onClick={() => resetQuiz(quizId)}
             aria-label="Làm lại từ đầu"
             title="Làm lại từ đầu"
@@ -89,7 +102,7 @@ export function QuizBody({
       {/* Thanh tiến độ chỉ có nghĩa khi đủ vài câu; panel bên sách thường chỉ
           một hai câu nên để nguyên như cũ. */}
       {numbered && gradable.length > 1 && (
-        <div className="mb-5 h-1 overflow-hidden rounded-full bg-muted">
+        <div className="mb-5 h-0.5 overflow-hidden rounded-full bg-muted">
           <div
             className={cn(
               "h-full rounded-full transition-all duration-300",
@@ -100,11 +113,10 @@ export function QuizBody({
         </div>
       )}
 
-      <div className={cn("flex flex-col", numbered ? "gap-5" : "gap-7")}>
+      <div className={cn("flex flex-col", numbered ? "gap-6" : "gap-7")}>
         {sections.map((section) => (
           <section key={section.title} className={cn("flex flex-col", numbered ? "gap-5" : "gap-4")}>
-            {/* Ở bài học, tiêu đề mục đã là thẻ h2 "Tự kiểm tra" của chính bài
-                nên không nhắc lại; chỉ dòng hướng dẫn là còn việc để làm. */}
+            {/* Kiểu bài học đã in tiêu đề mục ở hàng trên cùng rồi. */}
             {!numbered && (
               <div className="flex flex-col gap-1">
                 <h3 className="text-xs font-semibold tracking-wide text-foreground/70 uppercase">
@@ -116,6 +128,11 @@ export function QuizBody({
                   </p>
                 )}
               </div>
+            )}
+            {numbered && section.instruction && (
+              <p className="text-xs leading-relaxed text-muted-foreground">
+                {section.instruction}
+              </p>
             )}
 
             {section.items.map((item) => (
@@ -199,10 +216,10 @@ function QuizItemView({
     <div
       className={cn(
         "flex flex-col gap-2",
-        // Kiểu bài học: mỗi câu là một thẻ riêng, đọc trên trang dài thì biết
-        // câu bắt đầu và kết thúc ở đâu.
-        stt !== undefined &&
-          "gap-3 rounded-xl border border-border bg-background px-4 py-3.5"
+        // Kiểu bài học: nhãn "CÂU n" và khoảng trống là đủ để tách câu —
+        // bọc thêm khung nữa thì thành ba lớp viền lồng nhau (khung ngoài,
+        // thẻ câu, ô phương án) và tốn diện tích vô ích.
+        stt !== undefined && "gap-2.5"
       )}
     >
       {stt !== undefined && (

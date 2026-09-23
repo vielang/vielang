@@ -120,10 +120,7 @@ export function LessonView({
       <div className={LESSON_PROSE_CLASS} dangerouslySetInnerHTML={{ __html: lesson.html }} />
 
       {lesson.quiz && (
-        <section
-          aria-label="Câu tự kiểm tra"
-          className="rounded-xl border border-border bg-muted/30 px-4 py-4"
-        >
+        <section aria-label="Câu tự kiểm tra" className="border-t border-border pt-6">
           <QuizBody quizId={lessonQuizId(courseId, lesson.slug)} sections={lesson.quiz} numbered />
         </section>
       )}

@@ -213,6 +213,42 @@
 }
 
 /*
+ * Khung bao khối code: nút "Chép" nằm góc trên phải, hiện rõ khi rê chuột
+ * (máy tính) và luôn hiện mờ trên màn hình cảm ứng, vì không có hover.
+ */
+.prose .code-block {
+  position: relative;
+}
+
+.prose .copy-code {
+  @apply absolute top-2 right-2 rounded-md border border-border bg-background/90 px-2 py-0.5 text-xs text-muted-foreground opacity-70 transition-opacity;
+}
+
+.prose .code-block:hover .copy-code,
+.prose .copy-code:focus-visible {
+  @apply opacity-100;
+}
+
+.prose .copy-code:hover {
+  @apply text-foreground;
+}
+
+@media (hover: hover) {
+  .prose .copy-code {
+    @apply opacity-0;
+  }
+}
+
+/* Cặp phản ví dụ: viền trái đỏ cho khối "// SAI", xanh cho khối "// ĐÚNG". */
+.prose pre[data-verdict="wrong"] {
+  border-left: 3px solid var(--destructive);
+}
+
+.prose pre[data-verdict="right"] {
+  border-left: 3px solid oklch(0.65 0.15 150);
+}
+
+/*
  * Câu tự kiểm tra cuối bài học IT — viết bằng thẻ details trong Markdown để
  * đáp án ẩn đi, người học tự nghĩ trước rồi mới mở. Trình duyệt lo phần
  * đóng/mở, ở đây chỉ cho nó ra dáng một thẻ câu hỏi thay vì đoạn văn trần.

@@ -693,11 +693,27 @@ function lessonMarkdown(highlighter: CodeHighlighter, render: MermaidRenderer, a
             return renderDiagram(render, at, text, space > 0 ? info.slice(space + 1).trim() : "");
           }
           const resolved = LANG_ALIASES[name] ?? name;
-          return highlighter.codeToHtml(text, {
+          const html = highlighter.codeToHtml(text, {
             lang: loaded.has(resolved) ? resolved : "text",
             themes: CODE_THEMES,
             defaultColor: false,
           });
+          // Cặp phản ví dụ "SAI / ĐÚNG" nhận ra qua comment ở dòng đầu (//, #,
+          // --). Gắn data-verdict để CSS tô viền đỏ / xanh: quét qua là biết
+          // khối nào là cách sai.
+          const firstLine = text.trimStart().split("\n", 1)[0];
+          const verdict = /^(\/\/|#|--)\s*SAI\b/.test(firstLine)
+            ? "wrong"
+            : /^(\/\/|#|--)\s*ĐÚNG/.test(firstLine)
+              ? "right"
+              : "";
+          const pre = verdict ? html.replace("<pre ", `<pre data-verdict="${verdict}" `) : html;
+          // Nút chép code: bài nào cũng dặn "chép vào Program.cs". Click được
+          // xử lý bằng event delegation ở LessonView, ở đây chỉ cần markup.
+          return (
+            `<div class="code-block">${pre}` +
+            `<button type="button" class="copy-code" data-copy-code aria-label="Chép code">Chép</button></div>`
+          );
         },
       },
     }

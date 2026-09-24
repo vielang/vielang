@@ -134,16 +134,20 @@ export interface CourseCard {
   level: string;
   total: number;
   minutes: number;
+  /** Tên và đường dẫn từng bài theo thứ tự học, để thẻ "Học tiếp" biết bài đang dở. */
+  lessons: { title: string; slug: string }[];
 }
 
 export function courseCard(course: Course): CourseCard {
+  const lessons = courseLessons(course);
   return {
     id: course.id,
     title: course.title,
     summary: course.summary,
     level: course.level,
-    total: courseLessons(course).length,
+    total: lessons.length,
     minutes: courseMinutes(course),
+    lessons: lessons.map((l) => ({ title: l.title, slug: l.slug })),
   };
 }
 

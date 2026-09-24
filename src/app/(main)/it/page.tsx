@@ -22,9 +22,8 @@ export default function ItLibraryPage() {
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Lộ trình .NET developer</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Học theo thứ tự: C# Core → OOP → SQL với Oracle → ASP.NET Core → WinForms → data structures
-          &amp; algorithms → kiến trúc và chất lượng code. Giải thích bằng tiếng Việt, thuật ngữ giữ
-          nguyên tiếng Anh để bạn đọc được tài liệu gốc và đi phỏng vấn.
+          Học lần lượt từ trên xuống, khoá trước là nền cho khoá sau. Giải thích bằng tiếng Việt,
+          thuật ngữ giữ nguyên tiếng Anh để bạn đọc được tài liệu gốc và đi phỏng vấn.
         </p>
       </div>
 

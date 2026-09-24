@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useSyncExternalStore } from "react";
+import { useEffect, useSyncExternalStore, type MouseEvent } from "react";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, Check, Clock, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,20 @@ import { getBookProgress, useProgressStore } from "@/lib/progress-store";
 
 const NO_SUBSCRIBE = () => () => {};
 
+/**
+ * Nút "Chép" trong khối code (markup dựng sẵn lúc build). Bắt click ở khung
+ * nội dung thay vì gắn từng nút, vì HTML bài học là chuỗi dựng sẵn.
+ */
+function handleCopyClick(event: MouseEvent<HTMLDivElement>) {
+  const button = (event.target as HTMLElement).closest<HTMLButtonElement>("[data-copy-code]");
+  const code = button?.parentElement?.querySelector("pre");
+  if (!button || !code) return;
+  void navigator.clipboard.writeText(code.innerText).then(() => {
+    button.textContent = "Đã chép";
+    window.setTimeout(() => (button.textContent = "Chép"), 1500);
+  });
+}
+
 /*
  * Bài học có RẤT nhiều tên hàm, tên kiểu viết trong `code` giữa dòng. Mặc
  * định plugin typography chèn dấu backtick vào trước/sau nên đọc rất rối —
@@ -24,7 +38,7 @@ const NO_SUBSCRIBE = () => () => {};
  * (khối code đã được Shiki tô màu, xem globals.css).
  */
 const LESSON_PROSE_CLASS =
-  "prose prose-sm dark:prose-invert max-w-none prose-headings:font-heading prose-headings:scroll-mt-20 " +
+  "prose prose-base dark:prose-invert max-w-none prose-headings:font-heading prose-headings:scroll-mt-20 " +
   "prose-table:text-sm prose-pre:border prose-pre:border-border prose-pre:leading-relaxed " +
   // Khối trích dẫn trong bài học là hộp "Học xong bạn sẽ / Cần biết trước",
   // không phải lời ai đó nói — bỏ chữ nghiêng, thêm nền cho ra dáng cái hộp.
@@ -122,7 +136,11 @@ export function LessonView({
 
       {/* Nội dung do mình viết trong content/it, dựng sang HTML lúc build —
           không phải dữ liệu người dùng nhập. */}
-      <div className={LESSON_PROSE_CLASS} dangerouslySetInnerHTML={{ __html: lesson.html }} />
+      <div
+        className={LESSON_PROSE_CLASS}
+        onClick={handleCopyClick}
+        dangerouslySetInnerHTML={{ __html: lesson.html }}
+      />
 
       {lesson.quiz && (
         <section aria-label="Câu tự kiểm tra" className="border-t border-border pt-6">

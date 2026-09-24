@@ -26,8 +26,8 @@ dotnet publish -c Release -r win-x64 --self-contained -p:PublishSingleFile=true 
 - `PublishSingleFile=true` gom tất cả vào một file `ShopDesk.exe`.
 - `-o publish` đặt kết quả vào thư mục `publish`.
 
-Thư mục `publish` có `ShopDesk.exe` nặng khoảng 120 MB. Phần lớn dung lượng là .NET,
-Windows Forms, EF Core và thư viện Oracle đi kèm.
+Thư mục `publish` có `ShopDesk.exe` nặng khoảng 120 MB. Phần lớn dung lượng
+là .NET, Windows Forms, EF Core và thư viện Oracle đi kèm.
 
 ## Thử ngay
 
@@ -70,8 +70,9 @@ var cs = "User Id=shopapi;Password=shopapi_pw;"
 ```
 
 Mật khẩu viết trong code sẽ nằm luôn trong file `.exe`, ai có file cũng đọc
-được. App thật thường cấp cho mỗi nhân viên một tài khoản Oracle riêng, hoặc cho
-app gọi API thay vì nối thẳng vào database.
+được, và đổi máy chủ là phải publish lại. App thật đọc chuỗi kết nối từ file
+cấu hình như bài Cấu hình của khoá ASP.NET Core, cấp cho mỗi nhân viên một
+tài khoản Oracle riêng, hoặc cho app gọi API thay vì nối thẳng vào database.
 
 ## Tóm tắt
 

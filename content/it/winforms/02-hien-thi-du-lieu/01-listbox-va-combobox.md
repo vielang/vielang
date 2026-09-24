@@ -85,7 +85,9 @@ public class Product
 - `DataSource = _products` đưa cả danh sách vào. `DisplayMember = "Name"`
   cho mỗi dòng hiện tên sản phẩm.
 - `SelectedItem` có kiểu `object`, vì `ListBox` chứa được mọi loại object.
-  `(Product)item` ép nó về `Product`, giống `(int)` ở bài Toán tử và ép kiểu.
+  `(Product)item` ép nó về `Product`. Khác `(int)` ở bài Toán tử và ép kiểu
+  của khoá C# Core, ép kiểu ở đây không đổi object, chỉ báo compiler object
+  thật là `Product`. Sai kiểu thì báo `InvalidCastException`.
 - `SelectedIndexChanged` chỉ chạy khi lựa chọn thay đổi. Lúc mở form, dòng
   đầu được chọn sẵn nhưng event chưa chạy, nên nhãn giá còn trống cho tới
   khi bạn chọn dòng khác.

@@ -5,12 +5,11 @@ minutes: 6
 
 Tới giờ danh sách sản phẩm chỉ nằm trong bộ nhớ, tắt app là mất. Bài này
 nối app với database `shopapi` mà API của khoá ASP.NET Core đang dùng. Hai app
-cùng đọc một bảng `PRODUCTS`, nên sản phẩm thêm qua API cũng hiện trên màn
-hình kho.
+cùng đọc ghi một bảng `PRODUCTS`.
 
 ## Khái niệm
 
-🔌 **DbContextOptionsBuilder**: class dựng cấu hình cho `DbContext`, gồm loại database, chuỗi kết nối và quy ước đặt tên.
+🧾 **DbContextOptionsBuilder**: class dựng cấu hình cho `DbContext`, gồm loại database, chuỗi kết nối và quy ước đặt tên.
 
 Ở khoá ASP.NET Core, `AddDbContext` dựng cấu hình này và container tạo
 `ShopDbContext` cho controller. WinForms không có container sẵn, nên ta tự
@@ -32,8 +31,9 @@ dotnet add package Oracle.EntityFrameworkCore
 dotnet add package EFCore.NamingConventions
 ```
 
-Bảng `PRODUCTS` đã được migration của API tạo, app này chỉ đọc ghi. Thay
-toàn bộ `Program.cs`:
+Các bảng `PRODUCTS` (có cột `STOCK`), `ORDERS`, `ORDER_LINES` đã được
+migration của API tạo ở chương EF Core, app này chỉ đọc ghi. Thay toàn bộ
+`Program.cs`:
 
 ```csharp
 using Microsoft.EntityFrameworkCore;
@@ -115,31 +115,38 @@ public class Product
 - `Main` là nơi ghép các phần: dựng `options`, tạo `db`, rồi đưa vào
   constructor của `MainForm`. Form không tự tạo `ShopDbContext` mà nhận từ
   bên ngoài.
-- Viết chuỗi kết nối thẳng trong code chỉ để thử trên máy, như bài Cấu hình
-  đã nhắc.
+- Mật khẩu viết thẳng trong code là trái với bài Cấu hình của khoá ASP.NET
+  Core. Ở đây chỉ để thử trên máy, bài Đóng gói ứng dụng sẽ nói lại.
+- Ở khoá ASP.NET Core mỗi request có một `DbContext` riêng. Ở đây một
+  `DbContext` sống suốt đời form, nên nó nhớ các dòng đã đọc.
 - Event `Load` chạy ngay trước khi cửa sổ hiện lần đầu, hợp để đọc dữ liệu.
 
 ## Thử ngay
 
-Trong VS Code, tạo kết nối Oracle với user `shopapi`, rồi chạy câu sau nhưng
-**chưa** `COMMIT`:
+Bảng `PRODUCTS` của `shopapi` còn trống, vì API chưa thêm sản phẩm nào vào
+Oracle. Trong VS Code, tạo kết nối với user `shopapi`, mật khẩu `shopapi_pw`,
+service name `FREEPDB1`, rồi chạy các câu sau nhưng **chưa** `COMMIT`:
 
 ```sql
 INSERT INTO PRODUCTS (NAME, PRICE, STOCK)
-VALUES ('Thước', 3000, 40);
+VALUES ('Bút bi', 5000, 120);
+INSERT INTO PRODUCTS (NAME, PRICE, STOCK)
+VALUES ('Vở', 12000, 0);
+INSERT INTO PRODUCTS (NAME, PRICE, STOCK)
+VALUES ('Thước', 7000, 50);
 ```
 
 Chạy app bằng `dotnet run`.
 
-**Đoán trước khi chạy:** lưới có dòng "Thước" không? Nếu chưa có, cần làm
-gì để nó hiện?
+**Đoán trước khi chạy:** lưới có ba sản phẩm vừa thêm không? Nếu chưa có,
+cần làm gì để chúng hiện?
 
 <details>
 <summary>Xem kết quả</summary>
 
 ```text
-Chưa có "Thước".
-Chạy COMMIT trong VS Code, đóng app rồi mở lại: có "Thước".
+Lưới trống.
+Chạy COMMIT trong VS Code, đóng app rồi mở lại: đủ 3 dòng.
 ```
 
 App mở một kết nối riêng tới Oracle. Như bài Transaction của khoá SQL, thay
@@ -151,7 +158,7 @@ App mở một kết nối riêng tới Oracle. Như bài Transaction của kho�
 
 **Quên `UseUpperSnakeCaseNamingConvention()`.** EF Core tìm bảng
 `"Products"` thay vì `PRODUCTS`. Mở app là hiện hộp thoại lỗi `ORA-00942`,
-cùng lỗi đã gặp ở bài EF Core và DbContext của khoá ASP.NET Core.
+cùng mã lỗi đã gặp ở bài EF Core và DbContext của khoá ASP.NET Core.
 
 ```csharp
 // SAI — tìm bảng "Products", không có

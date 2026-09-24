@@ -10,13 +10,11 @@ Core.
 
 ## Khái niệm
 
-🧩 **Composition root**: nơi duy nhất trong app tạo các object và ghép chúng lại với nhau.
+🔩 **Composition root**: nơi duy nhất trong app tạo các object và ghép chúng lại với nhau.
 
 Trong app WinForms, chỗ đó là `Main`. Đây vẫn là DIP của khoá OOP: ở đó ta
 tự `new` rồi truyền vào constructor. Ở khoá ASP.NET Core, container làm hộ
 việc này qua `AddScoped<IProductStore, DbProductStore>()`.
-
-WinForms không có container sẵn, nên ta lại tự `new` trong `Main`.
 
 ## Ví dụ
 
@@ -116,7 +114,7 @@ class MainForm : Form
 - `_source.Current` là dòng đang chọn trên lưới, kiểu `object`, ép về
   `Product` như bài ListBox.
 - Bấm "Hết hàng" thì tồn kho về 0, danh sách tải lại, dòng đó biến mất.
-- Cùng một class `DbProductStore` giờ phục vụ cả API lẫn app kho.
+- API và app kho dùng cùng một đoạn code `DbProductStore`, chép nguyên.
 
 ```mermaid Main chọn store nào, MainForm chỉ nhận IProductStore
 flowchart LR
@@ -128,8 +126,8 @@ flowchart LR
 
 ## Thử ngay
 
-Viết một bản giả giữ dữ liệu trong bộ nhớ, giống `InMemoryProductStore` ở
-bài Dependency injection trong ASP.NET Core:
+Viết một bản giả giữ dữ liệu trong bộ nhớ, giống ý tưởng
+`InMemoryProductStore` ở bài Dependency injection trong ASP.NET Core:
 
 ```csharp
 class FakeProductStore : IProductStore
@@ -139,11 +137,13 @@ class FakeProductStore : IProductStore
         {
             new Product
             {
-                Id = 1, Name = "Bút bi", Stock = 100
+                Id = 1, Name = "Bút bi",
+                Price = 5000m, Stock = 120
             },
             new Product
             {
-                Id = 2, Name = "Vở", Stock = 5
+                Id = 2, Name = "Thước",
+                Price = 7000m, Stock = 50
             }
         };
 
@@ -181,8 +181,8 @@ tạo `store` thành `IProductStore store = new FakeProductStore();`.
 <summary>Xem kết quả</summary>
 
 ```text
-App mở bình thường, lưới có Bút bi và Vở.
-Chọn Vở, bấm "Hết hàng": dòng Vở biến mất.
+App mở bình thường, lưới có Bút bi và Thước.
+Chọn Thước, bấm "Hết hàng": dòng Thước biến mất.
 ```
 
 `MainForm` không đổi một chữ nào mà vẫn chạy trên dữ liệu giả. Thử xong,
@@ -226,21 +226,21 @@ class MainForm : Form
 - Form chỉ phụ thuộc `IProductStore`, không biết `DbContext`.
 - `Main` là composition root: tạo `DbContext`, `DbProductStore`, form, rồi
   ghép lại.
-- `DbProductStore` dùng chung được cho API và app WinForms.
+- API và app WinForms dùng cùng code `DbProductStore`.
 - Đổi sang `FakeProductStore` là chạy được giao diện khi không có Oracle.
 
 ```quiz
 [
   {
-    "prompt": "Trong ASP.NET Core, dòng AddScoped<IProductStore, DbProductStore>() làm việc gì mà app WinForms phải tự làm trong Main?",
+    "prompt": "App WinForms có thêm màn hình đơn hàng cần IOrderStore. Nên tạo DbOrderStore ở đâu?",
     "options": [
-      "Tạo bảng PRODUCTS",
-      "Tạo DbProductStore và đưa vào nơi cần IProductStore",
-      "Mở kết nối Oracle",
-      "Vẽ giao diện"
+      "Trong constructor của form đơn hàng",
+      "Trong DbProductStore",
+      "Trong Main, rồi truyền vào constructor của form",
+      "Trong interface IOrderStore"
     ],
-    "answer": 2,
-    "explain": "Container tạo DbProductStore và tiêm vào controller. WinForms không có container nên Main tự new rồi truyền vào form."
+    "answer": 3,
+    "explain": "Main là composition root: mọi object được tạo và ghép ở đó, form chỉ nhận interface qua constructor."
   },
   {
     "prompt": "Muốn chạy thử màn hình kho trên máy chưa cài Oracle, cần sửa ở đâu?",

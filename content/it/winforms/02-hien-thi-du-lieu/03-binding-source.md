@@ -68,7 +68,7 @@ class MainForm : Form
         {
             _source.Add(new Product
             {
-                Id = 3, Name = "Thước", Price = 3000m
+                Id = 3, Name = "Thước", Price = 7000m
             });
         };
 

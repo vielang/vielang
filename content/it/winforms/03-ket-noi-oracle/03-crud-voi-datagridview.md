@@ -11,7 +11,7 @@ EF Core làm được việc này với rất ít code.
 
 👀 **Change tracking (theo dõi thay đổi)**: `DbContext` ghi nhớ mọi object nó đã đọc ra hoặc được thêm vào, và biết object nào mới, bị sửa hay bị xoá.
 
-🔗 **Local.ToBindingList()**: danh sách các object của một `DbSet` mà `DbContext` đang theo dõi, gắn được vào `BindingSource`.
+🪝 **Local.ToBindingList()**: danh sách các object của một `DbSet` mà `DbContext` đang theo dõi, gắn được vào `BindingSource`.
 
 Thêm hay xoá dòng trên lưới gắn với danh sách này thì `DbContext` biết ngay.
 
@@ -66,9 +66,15 @@ class MainForm : Form
         object? sender, EventArgs e)
     {
         _saveButton.Enabled = false;
-        int count = await _db.SaveChangesAsync();
-        Text = $"Kho hàng - đã lưu {count} thay đổi";
-        _saveButton.Enabled = true;
+        try
+        {
+            int count = await _db.SaveChangesAsync();
+            Text = $"Đã lưu {count} thay đổi";
+        }
+        finally
+        {
+            _saveButton.Enabled = true;
+        }
     }
 }
 ```
@@ -78,6 +84,8 @@ class MainForm : Form
   phím Delete.
 - `LoadAsync()` đọc bảng vào `DbContext`. `Local.ToBindingList()` đưa các
   object đó lên lưới.
+- `finally` bật lại nút dù lưu thành công hay lỗi, như bài Exception của
+  khoá C# Core.
 - Cột `Id` (cột 0) chỉ đọc, vì Oracle tự sinh khoá chính.
 - `SaveChangesAsync` trả về số dòng đã ghi.
 
@@ -99,7 +107,7 @@ thay đổi gì?
 <summary>Xem kết quả</summary>
 
 ```text
-Kho hàng - đã lưu 3 thay đổi
+Đã lưu 3 thay đổi
 ```
 
 Ba thay đổi, thành một `UPDATE`, một `INSERT` và một `DELETE` trong Oracle.
@@ -126,6 +134,11 @@ await _db.Products.LoadAsync();
 _source.DataSource =
     _db.Products.Local.ToBindingList();
 ```
+
+**Để trống tên sản phẩm mới.** Oracle coi chuỗi rỗng là `NULL`, như bài NULL
+trong SQL của khoá SQL. Cột `NAME` là `NOT NULL`, nên `SaveChangesAsync` ném
+`DbUpdateException` với mã `ORA-01400`. Không có `finally` thì nút "Lưu" bị
+tắt luôn sau lần lỗi đó.
 
 ## Tóm tắt
 

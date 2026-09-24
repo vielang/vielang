@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 };
 
 /**
- * Trang mảng IT — lộ trình tới backend developer: C# core → OOP → SQL/Oracle →
+ * Trang mảng IT — lộ trình .NET developer: C# Core → OOP → SQL/Oracle →
  * ASP.NET Core → WinForms → DSA → kiến trúc. Route tĩnh `/it` nên nó thắng `[lang]`.
  */
 export default function ItLibraryPage() {
@@ -20,9 +20,9 @@ export default function ItLibraryPage() {
       <TrackNav />
 
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Lộ trình backend developer</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Lộ trình .NET developer</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Học theo thứ tự: C# core → OOP → SQL &amp; Oracle → ASP.NET Core → WinForms → data structures
+          Học theo thứ tự: C# Core → OOP → SQL với Oracle → ASP.NET Core → WinForms → data structures
           &amp; algorithms → kiến trúc và chất lượng code. Giải thích bằng tiếng Việt, thuật ngữ giữ
           nguyên tiếng Anh để bạn đọc được tài liệu gốc và đi phỏng vấn.
         </p>

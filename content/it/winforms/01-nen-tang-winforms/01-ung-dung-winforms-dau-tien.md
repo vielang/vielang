@@ -11,7 +11,7 @@ mềm đó bằng WinForms, dùng chung database Oracle với API.
 
 🪟 **WinForms (Windows Forms)**: thư viện của .NET để viết ứng dụng Windows có cửa sổ, nút bấm, ô nhập.
 
-🖼️ **Form**: class đại diện cho một cửa sổ. Mỗi cửa sổ trong app là một class kế thừa `Form`.
+🖼️ **Form**: class đại diện cho một cửa sổ, mỗi cửa sổ trong app là một class kế thừa `Form`.
 
 `MainForm : Form` là kế thừa như bài Kế thừa của khoá OOP: `MainForm` nhận
 sẵn mọi thứ một cửa sổ cần, như tiêu đề, kích thước, nút đóng, và chỉ thêm
@@ -63,8 +63,8 @@ hàng".
 - `[STAThread]` là attribute, như `[HttpGet]` ở khoá ASP.NET Core. Nó bật chế
   độ chạy mà cửa sổ Windows cần.
 - `namespace ShopDesk;` đặt mọi class trong file vào namespace của project.
-  Template sinh `ApplicationConfiguration` trong namespace này, nên phải giữ
-  dòng này.
+  Template sinh `ApplicationConfiguration` (bật font, độ nét mặc định) trong
+  namespace này, nên phải giữ dòng này.
 - `Text`, `Width`, `Height` là property kế thừa từ `Form`, gán trong
   constructor.
 - `Application.Run` mở cửa sổ và chờ người dùng thao tác, giống `app.Run()`
@@ -93,7 +93,7 @@ Lúc đầu chỉ có cửa sổ "Quản lý cửa hàng".
 ```
 
 `Application.Run` dừng ở đó cho tới khi cửa sổ đóng, rồi mới chạy dòng tiếp
-theo. Mở hai cửa sổ cùng lúc là việc của bài Hộp thoại và form thứ hai.
+theo. Mở form thứ hai từ form chính là việc của bài Hộp thoại và form thứ hai.
 
 </details>
 

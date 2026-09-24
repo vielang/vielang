@@ -58,9 +58,11 @@ class MainForm : Form
 - `addButton.Click += AddButton_Click;` gắn method vào event. Không có dấu
   `()` sau tên method: ta giao method cho nút giữ để gọi sau, không gọi ngay.
 - Handler của `Click` luôn nhận hai tham số: `sender` là object phát ra
-  event (ở đây là nút), `e` chứa thông tin thêm.
+  event (ở đây là nút), `e` chứa thông tin thêm. `sender` có kiểu `object?`:
+  `object` là kiểu chung mà class nào cũng kế thừa, nên giữ được mọi object.
 - `_countLabel` là field, vì cả constructor lẫn handler đều cần dùng nó.
-  Biến `addButton` chỉ dùng trong constructor nên để là biến cục bộ.
+  Biến `addButton` chỉ dùng trong constructor nên để là biến cục bộ
+  (biến khai báo trong method hay constructor).
 
 ## Handler viết bằng lambda
 
@@ -152,7 +154,7 @@ bấm sau chạy gấp đôi. Gắn handler một lần duy nhất, trong constr
       "Để Label tự hiện lên form"
     ],
     "answer": 2,
-    "explain": "Biến cục bộ chỉ sống trong constructor. Field thuộc về object nên mọi method của form đều dùng được."
+    "explain": "Biến cục bộ chỉ sống trong constructor, method riêng không thấy nó. Field thuộc về object nên mọi method của form đều dùng được. Lambda viết ngay trong constructor thì vẫn thấy biến cục bộ."
   },
   {
     "prompt": "Hai nút cùng gắn một handler. Trong handler, làm sao biết nút nào vừa được bấm?",

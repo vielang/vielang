@@ -69,7 +69,8 @@ public class Product
 - `AutoSizeColumnsMode.Fill` giãn các cột cho kín chiều ngang.
 - Cột chỉ có sau khi lưới gắn xong dữ liệu, nên đổi tiêu đề trong event
   `DataBindingComplete`. Cột đánh số từ 0 như `List`, theo thứ tự khai báo
-  property: `Columns[2]` là cột `Price`.
+  property: `Columns[2]` là cột `Price`. Lambda viết trong constructor nên
+  dùng được biến cục bộ `grid`.
 - `Format = "N0"` hiện số có dấu phân cách hàng nghìn, không có phần lẻ.
 
 ## Thử ngay
@@ -88,7 +89,7 @@ addButton.Click += (sender, e) =>
 {
     _products.Add(new Product
     {
-        Id = 3, Name = "Thước", Price = 3000m
+        Id = 3, Name = "Thước", Price = 7000m
     });
 };
 Controls.Add(addButton);
@@ -112,8 +113,7 @@ này.
 ## Lỗi hay gặp
 
 **Dùng field thay cho property.** Lưới chỉ tạo cột từ property, nên class
-chỉ có field thì lưới trống trơn, không có cột nào. JSON ở khoá ASP.NET Core
-cũng vậy: mặc định chỉ lấy property, bỏ qua field.
+chỉ có field thì lưới trống trơn, không có cột nào.
 
 ```csharp
 // SAI — lưới không có cột nào

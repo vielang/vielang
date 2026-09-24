@@ -63,8 +63,9 @@ class MainForm : Form
         _reloadButton.Enabled = false;
         Text = "Kho hàng - đang tải...";
 
-        _source.DataSource =
-            await _db.Products.ToListAsync();
+        _source.DataSource = await _db.Products
+            .AsNoTracking()
+            .ToListAsync();
 
         Text = "Kho hàng";
         _reloadButton.Enabled = true;
@@ -79,6 +80,8 @@ class MainForm : Form
 - Tắt nút trong lúc tải để không ai bấm hai lần. Một `DbContext` chỉ chạy
   được một truy vấn một lúc, bấm lần hai khi lần một chưa xong sẽ báo
   `InvalidOperationException`.
+- `AsNoTracking()` đọc mới từ Oracle, bỏ qua các dòng `DbContext` đã nhớ.
+  Nhờ vậy "Tải lại" thấy cả giá vừa sửa trong VS Code.
 - Lambda `async (sender, e) => ...` là handler `async void` viết gọn.
 
 ```mermaid Trong lúc chờ Oracle, UI thread vẫn lo cửa sổ
@@ -149,8 +152,9 @@ _source.DataSource =
     await _db.Products.ToListAsync();
 ```
 
-**Dùng `.Result` để khỏi viết `async`.** `.Result` bắt UI thread đứng chờ,
-cửa sổ lại treo như bản không async. Đã gọi method async thì `await` nó.
+**Dùng `.Result` để khỏi viết `async`.** Như bài async/await cơ bản của khoá
+C# Core, `.Result` bắt luồng đứng chờ. Ở đây đó là UI thread, nên cửa sổ lại
+treo như bản không async. Đã gọi method async thì `await` nó.
 
 ## Tóm tắt
 

@@ -203,8 +203,14 @@ Riêng bài WinForms:
   vì VS Code không có trình thiết kế kéo thả. Giữ `namespace ShopDesk;` ở
   đầu file.
 - Form chính luôn tên `MainForm`. Từ bài 2, khối code chỉ chứa class
-  `MainForm` (và class phụ); class `Program` giữ nguyên như bài 1.
-- Xếp control bằng `FlowLayoutPanel`, không đặt toạ độ bằng tay.
+  `MainForm` (và class phụ); class `Program` giữ như bài 1, trừ khi bài cần
+  đổi `Main` (chương Kết nối Oracle, Tổ chức ứng dụng).
+- Xếp control bằng `FlowLayoutPanel` hoặc `Dock`, không đặt toạ độ bằng tay.
+- Chương Hiển thị dữ liệu dùng `Product` bỏ `Stock` cho gọn; từ chương Kết
+  nối Oracle dùng đúng `Product` của khoá ASP.NET Core.
+- Dữ liệu mẫu trùng khoá SQL: Bút bi 5000, Vở 12000, Thước 7000.
+- Một `DbContext` sống suốt form (khác Scoped của ASP.NET Core), nên đọc
+  lại dữ liệu mới dùng `AsNoTracking()`.
 - "Thử ngay" là chạy `dotnet run` rồi thao tác trên cửa sổ. Câu đoán hỏi về
   điều hiện ra trên màn hình, kết quả trong `<details>` mô tả màn hình đó.
 - Mỗi bài nối về khoá trước khi khái niệm có họ hàng ở đó: form là class kế

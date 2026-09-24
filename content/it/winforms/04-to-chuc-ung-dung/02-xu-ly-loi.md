@@ -88,15 +88,15 @@ Bấm OK: cửa sổ kho vẫn mở, lưới trống.
 ```
 
 `InStockAsync` thử kết nối vài giây, không được thì ném `OracleException`
-với mã `ORA-50201`. `catch` bắt được nên app không sập. Chạy `docker start oracle`
-rồi mở lại app là có dữ liệu.
+với mã `ORA-50201`. `catch` bắt được nên app không sập. Chạy
+`docker start oracle` rồi mở lại app là có dữ liệu.
 
 </details>
 
 ## Lỗi hay gặp
 
-**`catch (Exception)` rồi bỏ trống.** Mọi lỗi đều bị giấu đi, kể cả lỗi do
-code sai. Nhân viên thấy lưới trống mà không biết vì sao.
+**`catch (Exception)` rồi bỏ trống.** Như bài Exception của khoá C# Core, mọi
+lỗi đều bị giấu đi, kể cả lỗi do code sai. Nhân viên thấy lưới trống mà không biết vì sao.
 
 ```csharp
 // SAI — lỗi gì cũng im lặng

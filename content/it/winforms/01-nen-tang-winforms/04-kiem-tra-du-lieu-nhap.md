@@ -15,12 +15,12 @@ database.
 
 Dữ liệu sản phẩm được kiểm ở ba nơi. Form báo sớm cho người nhập. API có
 `[Required]`, `[Range]` như bài Validation của khoá ASP.NET Core. Database có
-`NOT NULL`, `CHECK` như bài CREATE TABLE và ràng buộc của khoá SQL, làm chốt
-chặn cuối cùng.
+ràng buộc như `NOT NULL`, `CHECK` ở bài CREATE TABLE và ràng buộc của khoá
+SQL, làm chốt chặn cuối cùng cho những gì bảng đã khai báo.
 
 ```mermaid Đường ghi nào cũng phải qua ràng buộc của database
 flowchart LR
-    F["Form WinForms"] --> D[("Database: NOT NULL, CHECK")]
+    F["Form WinForms"] --> D[("Database: ràng buộc")]
     A["API: Required, Range"] --> D
     S["INSERT gõ tay"] --> D
 ```
@@ -129,8 +129,8 @@ var priceBox = new NumericUpDown
 ```
 
 **Chỉ kiểm ở form.** Đường ghi khác, như API hay một câu `INSERT` gõ tay,
-không đi qua form nên vẫn ghi được dữ liệu sai vào database. Kiểm ở form để báo sớm, còn ràng buộc trong
-database vẫn phải giữ.
+không đi qua form nên vẫn ghi được dữ liệu sai vào database. Kiểm ở form để
+báo sớm, còn ràng buộc trong database vẫn phải giữ.
 
 ## Tóm tắt
 

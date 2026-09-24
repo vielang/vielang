@@ -15,7 +15,7 @@ chúng.
 
 Control chỉ hiện ra khi đã được thêm vào danh sách này.
 
-🧱 **FlowLayoutPanel**: control chứa các control khác và tự xếp chúng nối tiếp nhau, không cần đặt toạ độ.
+🪜 **FlowLayoutPanel**: control chứa các control khác và tự xếp chúng nối tiếp nhau, không cần đặt toạ độ.
 
 Form chứa panel, panel chứa nhãn và nút. Đây là composition như bài
 Composition của khoá OOP: object lớn được ghép từ các object nhỏ.

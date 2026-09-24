@@ -45,6 +45,7 @@ public class ShopDbContext : DbContext
     {
     }
 
+    public DbSet<Product> Products => Set<Product>();
     public DbSet<Order> Orders => Set<Order>();
     public DbSet<OrderLine> OrderLines =>
         Set<OrderLine>();

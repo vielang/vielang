@@ -48,8 +48,8 @@ Chuỗi trong SQL đặt trong dấu nháy **đơn**: `'Bút bi'`.
 
 ## Cài Oracle trên máy
 
-Khoá học này và chương EF Core của khoá ASP.NET Core dùng chung một Oracle chạy
-bằng Docker. Cài **Docker Desktop**, rồi chạy lệnh sau một lần:
+Khoá học này, chương EF Core của khoá ASP.NET Core và khoá WinForms dùng chung
+một Oracle chạy bằng Docker. Cài **Docker Desktop**, rồi chạy lệnh sau một lần:
 
 ```bash
 docker run -d --name oracle -p 1521:1521 -e ORACLE_PASSWORD=oracle_pw -e APP_USER=shop -e APP_USER_PASSWORD=shop_pw gvenzl/oracle-free:slim-faststart

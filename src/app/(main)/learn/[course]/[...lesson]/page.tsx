@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import {
   courseLessons,
+  courseOutline,
   getCourse,
   getLesson,
   lessonNeighbours,
@@ -48,11 +49,15 @@ export default async function LessonPage({
 
   const { course, lesson } = hit;
   const { prev, next } = lessonNeighbours(course, lesson.slug);
+  const moduleTitle =
+    courseOutline(course).modules.find((m) => m.lessons.some((l) => l.slug === lesson.slug))
+      ?.title ?? "";
 
   return (
     <LessonView
       courseId={course.id}
       courseTitle={course.title}
+      moduleTitle={moduleTitle}
       total={courseLessons(course).length}
       no={lessonNumber(course, lesson.slug)}
       lesson={lesson}

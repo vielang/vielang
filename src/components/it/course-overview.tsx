@@ -2,7 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Check, Clock } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
@@ -50,10 +50,18 @@ export function CourseOverview({ course }: { course: CourseOutline }) {
         )}
       </section>
 
-      {course.modules.map((mod) => (
+      {course.modules.map((mod, index) => (
         <section key={mod.slug} className="flex flex-col gap-2">
           <div>
-            <h2 className="text-base font-semibold">{mod.title}</h2>
+            <div className="flex items-baseline gap-3">
+              <h2 className="text-base font-semibold">
+                <span className="mr-2 text-sm font-normal text-muted-foreground">Chương {index + 1}</span>
+                {mod.title}
+              </h2>
+              <span className="ml-auto text-xs text-muted-foreground tabular-nums">
+                {mod.lessons.filter((l) => read.has(l.no)).length}/{mod.lessons.length}
+              </span>
+            </div>
             {mod.summary && <p className="text-sm text-muted-foreground">{mod.summary}</p>}
           </div>
           <ul className="flex flex-col divide-y divide-border border-y border-border">
@@ -75,10 +83,6 @@ export function CourseOverview({ course }: { course: CourseOutline }) {
                       {done ? <Check className="size-3" /> : lesson.no}
                     </span>
                     <span className="min-w-0 flex-1 truncate">{lesson.title}</span>
-                    <span className="inline-flex shrink-0 items-center gap-1 text-xs text-muted-foreground tabular-nums">
-                      <Clock className="size-3.5" aria-hidden />
-                      {lesson.minutes} phút
-                    </span>
                   </Link>
                 </li>
               );

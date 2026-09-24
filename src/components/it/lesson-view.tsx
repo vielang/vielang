@@ -2,8 +2,9 @@
 
 import { useEffect, useSyncExternalStore, type MouseEvent } from "react";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Check, Clock, List } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, ChevronRight, Clock, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { QuizBody } from "@/components/quiz/quiz-body";
 import {
@@ -58,6 +59,7 @@ const LESSON_PROSE_CLASS =
 export function LessonView({
   courseId,
   courseTitle,
+  moduleTitle,
   total,
   no,
   lesson,
@@ -66,6 +68,8 @@ export function LessonView({
 }: {
   courseId: string;
   courseTitle: string;
+  /** Tên chương chứa bài, hiện trong đường dẫn khoá › chương. */
+  moduleTitle: string;
   /** Tổng số bài của khoá, để hiện "Bài 3/11". */
   total: number;
   no: number;
@@ -80,7 +84,8 @@ export function LessonView({
   const setLastPage = useProgressStore((s) => s.setLastPage);
 
   const progressId = courseProgressId(courseId);
-  const done = isClient && getBookProgress(progressByBook, progressId).readPages.includes(no);
+  const readPages = isClient ? getBookProgress(progressByBook, progressId).readPages : [];
+  const done = readPages.includes(no);
 
   // Mở bài nào thì đó là chỗ đang học — ghi lại để "Học tiếp" quay về đúng
   // bài. Chờ hydrate xong, không thì ghi đè lên tiến độ đọc từ storage.
@@ -90,97 +95,120 @@ export function LessonView({
 
   const toc = lesson.headings.filter((h) => h.level === 2);
 
-  return (
-    <article className="mx-auto flex w-full max-w-2xl flex-col gap-6">
-      <Link
-        href={`/it/${courseId}`}
-        className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-      >
-        <ArrowLeft className="size-4" aria-hidden />
-        {courseTitle}
-      </Link>
+  // Đánh số ở ĐÂY chứ không gõ số vào tiêu đề trong file .md: chèn thêm một
+  // mục là phải đánh số lại cả bài, kiểu gì cũng sót.
+  const tocList = (
+    <ol className="flex flex-col gap-1 text-sm">
+      {toc.map((h, i) => (
+        <li key={h.id} className="flex gap-2">
+          <span className="w-5 shrink-0 text-right text-muted-foreground tabular-nums">{i + 1}.</span>
+          <a href={`#${h.id}`} className="text-muted-foreground hover:text-foreground">
+            {h.text}
+          </a>
+        </li>
+      ))}
+    </ol>
+  );
 
-      <header className="-mt-2 flex flex-col gap-2">
-        <p className="text-xs text-muted-foreground tabular-nums">
-          Bài {no}/{total}
-        </p>
-        <h1 className="font-heading text-2xl font-semibold tracking-tight">{lesson.title}</h1>
-        <p className="inline-flex items-center gap-1 text-xs text-muted-foreground tabular-nums">
-          <Clock className="size-3.5" aria-hidden />
-          {lesson.minutes} phút đọc
-        </p>
-      </header>
+  return (
+    // Màn hình rộng: bài ở giữa, mục lục cố định ở cột phải. Màn hình hẹp:
+    // một cột, mục lục gập lại thành một dòng bấm để mở.
+    <div className="mx-auto w-full max-w-2xl lg:grid lg:max-w-none lg:grid-cols-[minmax(0,42rem)_11rem] lg:justify-center lg:gap-10">
+      <article className="flex min-w-0 flex-col gap-6">
+        <nav aria-label="Đường dẫn" className="flex min-w-0 items-center gap-1 text-sm text-muted-foreground">
+          <Link href={`/it/${courseId}`} className="inline-flex shrink-0 items-center gap-1 hover:text-foreground">
+            <ArrowLeft className="size-4" aria-hidden />
+            {courseTitle}
+          </Link>
+          <ChevronRight className="size-3.5 shrink-0" aria-hidden />
+          <span className="truncate">{moduleTitle}</span>
+        </nav>
+
+        <header className="-mt-2 flex flex-col gap-2">
+          <div className="flex items-center gap-3 text-xs text-muted-foreground tabular-nums">
+            <span className="shrink-0">
+              Bài {no}/{total}
+            </span>
+            <Progress value={(readPages.length / total) * 100} className="h-1 flex-1" />
+            <span className="inline-flex shrink-0 items-center gap-1">
+              <Clock className="size-3.5" aria-hidden />
+              {lesson.minutes} phút
+            </span>
+          </div>
+          <h1 className="font-heading text-2xl font-semibold tracking-tight">{lesson.title}</h1>
+        </header>
+
+        {toc.length > 1 && (
+          <details className="group rounded-xl border border-border bg-muted/40 px-4 py-3 lg:hidden">
+            <summary className="flex cursor-pointer list-none items-center gap-1.5 text-sm text-muted-foreground">
+              <List className="size-4" aria-hidden />
+              Nội dung bài · {toc.length} mục
+              <ChevronRight className="ml-auto size-4 transition-transform group-open:rotate-90" aria-hidden />
+            </summary>
+            <div className="mt-2">{tocList}</div>
+          </details>
+        )}
+
+        {/* Nội dung do mình viết trong content/it, dựng sang HTML lúc build —
+            không phải dữ liệu người dùng nhập. */}
+        <div
+          className={LESSON_PROSE_CLASS}
+          onClick={handleCopyClick}
+          dangerouslySetInnerHTML={{ __html: lesson.html }}
+        />
+
+        {lesson.quiz && (
+          <section aria-label="Câu tự kiểm tra" className="border-t border-border pt-6">
+            <QuizBody quizId={lessonQuizId(courseId, lesson.slug)} sections={lesson.quiz} numbered />
+          </section>
+        )}
+
+        <footer className="flex flex-col gap-4 border-t border-border pt-6">
+          <Button
+            size="lg"
+            variant={done ? "outline" : "default"}
+            className="self-start"
+            onClick={() => markPageRead(progressId, no)}
+            disabled={done}
+          >
+            <Check className={cn("size-4", done && "text-foreground")} aria-hidden />
+            {done ? "Đã học bài này" : "Đánh dấu đã học"}
+          </Button>
+
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            {prev ? (
+              <Button asChild variant="outline" className="min-w-0 justify-start">
+                <Link href={lessonHref(courseId, prev.slug)}>
+                  <ArrowLeft className="size-4 shrink-0" aria-hidden />
+                  <span className="min-w-0 truncate">{prev.title}</span>
+                </Link>
+              </Button>
+            ) : (
+              <span className="hidden sm:block" />
+            )}
+            {next && (
+              <Button asChild variant="outline" className="min-w-0 justify-end sm:col-start-2">
+                <Link href={lessonHref(courseId, next.slug)}>
+                  <span className="min-w-0 truncate">{next.title}</span>
+                  <ArrowRight className="size-4 shrink-0" aria-hidden />
+                </Link>
+              </Button>
+            )}
+          </div>
+        </footer>
+      </article>
 
       {toc.length > 1 && (
-        <nav aria-label="Nội dung bài" className="rounded-xl border border-border bg-muted/40 px-4 py-3">
-          <p className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-            <List className="size-3.5" aria-hidden />
-            Nội dung bài
-          </p>
-          {/* Đánh số ở ĐÂY chứ không gõ số vào tiêu đề trong file .md: chèn
-              thêm một mục là phải đánh số lại cả bài, kiểu gì cũng sót. */}
-          <ol className="mt-2 flex flex-col gap-1 text-sm">
-            {toc.map((h, i) => (
-              <li key={h.id} className="flex gap-2">
-                <span className="w-6 shrink-0 text-right text-muted-foreground tabular-nums">
-                  {i + 1}.
-                </span>
-                <a href={`#${h.id}`} className="text-muted-foreground hover:text-foreground">
-                  {h.text}
-                </a>
-              </li>
-            ))}
-          </ol>
-        </nav>
+        <aside className="hidden lg:block">
+          <nav aria-label="Nội dung bài" className="sticky top-20 flex flex-col gap-2">
+            <p className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+              <List className="size-3.5" aria-hidden />
+              Nội dung bài
+            </p>
+            {tocList}
+          </nav>
+        </aside>
       )}
-
-      {/* Nội dung do mình viết trong content/it, dựng sang HTML lúc build —
-          không phải dữ liệu người dùng nhập. */}
-      <div
-        className={LESSON_PROSE_CLASS}
-        onClick={handleCopyClick}
-        dangerouslySetInnerHTML={{ __html: lesson.html }}
-      />
-
-      {lesson.quiz && (
-        <section aria-label="Câu tự kiểm tra" className="border-t border-border pt-6">
-          <QuizBody quizId={lessonQuizId(courseId, lesson.slug)} sections={lesson.quiz} numbered />
-        </section>
-      )}
-
-      <footer className="flex flex-col gap-4 border-t border-border pt-6">
-        <Button
-          size="lg"
-          variant={done ? "outline" : "default"}
-          className="self-start"
-          onClick={() => markPageRead(progressId, no)}
-          disabled={done}
-        >
-          <Check className={cn("size-4", done && "text-foreground")} aria-hidden />
-          {done ? "Đã học bài này" : "Đánh dấu đã học"}
-        </Button>
-
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-          {prev ? (
-            <Button asChild variant="outline" className="min-w-0 justify-start">
-              <Link href={lessonHref(courseId, prev.slug)}>
-                <ArrowLeft className="size-4 shrink-0" aria-hidden />
-                <span className="min-w-0 truncate">{prev.title}</span>
-              </Link>
-            </Button>
-          ) : (
-            <span className="hidden sm:block" />
-          )}
-          {next && (
-            <Button asChild variant="outline" className="min-w-0 justify-end sm:col-start-2">
-              <Link href={lessonHref(courseId, next.slug)}>
-                <span className="min-w-0 truncate">{next.title}</span>
-                <ArrowRight className="size-4 shrink-0" aria-hidden />
-              </Link>
-            </Button>
-          )}
-        </div>
-      </footer>
-    </article>
+    </div>
   );
 }

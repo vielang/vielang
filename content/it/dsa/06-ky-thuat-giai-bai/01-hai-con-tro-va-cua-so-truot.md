@@ -1,0 +1,161 @@
+---
+title: Hai con trỏ và cửa sổ trượt
+minutes: 6
+---
+
+Nhiều bài toán trên array có lời giải dễ nghĩ ra là hai vòng lặp lồng nhau,
+O(n²). Hai kỹ thuật trong bài này đưa chúng về một lượt duyệt O(n), mà không
+cần thêm `HashSet` hay `Dictionary`.
+
+## Khái niệm
+
+👉 **Hai con trỏ (two pointers)**: dùng hai chỉ số cùng duyệt một array, thường một từ đầu và một từ cuối, mỗi bước dời một chỉ số dựa theo kết quả so sánh.
+
+🎞️ **Cửa sổ trượt (sliding window)**: xét một đoạn liền nhau có độ dài cố định, mỗi bước trượt đoạn sang phải một ô bằng cách cộng phần tử mới vào và trừ phần tử vừa rời đi.
+
+## Ví dụ
+
+Tìm hai món vừa đúng 19.000đ trên list giá **đã sắp xếp**:
+
+```csharp
+int[] prices = { 3000, 5000, 7000, 12000, 25000 };
+int budget = 19000;
+int left = 0;
+int right = prices.Length - 1;
+while (left < right)
+{
+    int sum = prices[left] + prices[right];
+    if (sum == budget)
+    {
+        Console.WriteLine(
+            $"{prices[left]} + {prices[right]}");
+        break;
+    }
+    if (sum < budget)
+    {
+        left++;
+    }
+    else
+    {
+        right--;
+    }
+}
+```
+
+- Tổng nhỏ quá thì dời `left` sang phải để lấy món đắt hơn. Lớn quá thì dời
+  `right` sang trái để lấy món rẻ hơn.
+- Mỗi bước bỏ đi một món chắc chắn không ghép được, nên nhiều nhất n bước.
+- So với cách dùng `HashSet` ở chương 3, cách này không tốn thêm bộ nhớ,
+  nhưng cần dãy đã sắp xếp như tìm nhị phân.
+
+## Cửa sổ trượt
+
+Doanh thu 7 ngày (triệu đồng). Tìm 3 ngày liên tiếp có tổng doanh thu cao
+nhất. Cộng lại từ đầu cho mỗi đoạn 3 ngày thì tốn n × 3 bước. Cửa sổ trượt chỉ
+cộng một số và trừ một số mỗi bước.
+
+```csharp
+int[] revenue = { 5, 8, 2, 9, 7, 1, 6 };
+int k = 3;
+int window = 0;
+for (int i = 0; i < k; i++)
+{
+    window = window + revenue[i];
+}
+int best = window;
+for (int i = k; i < revenue.Length; i++)
+{
+    window = window + revenue[i] - revenue[i - k];
+    if (window > best)
+    {
+        best = window;
+    }
+}
+Console.WriteLine(best);   // 19
+```
+
+- Vòng đầu tính tổng 3 ngày đầu tiên.
+- Mỗi vòng sau, ngày `i` vào cửa sổ, ngày `i - k` rời cửa sổ.
+
+## Thử ngay
+
+Trong ví dụ cửa sổ trượt, in tổng của từng cửa sổ: thêm
+`Console.Write(window + " ");` ngay sau dòng `int best = window;` và ngay sau
+dòng tính lại `window` trong vòng `for` thứ hai.
+
+**Đoán trước khi chạy:** 7 ngày với cửa sổ 3 ngày thì có mấy cửa sổ, tổng
+từng cửa sổ là bao nhiêu?
+
+<details>
+<summary>Xem kết quả</summary>
+
+```text
+15 19 18 17 14 19
+```
+
+Có 7 - 3 + 1 = 5 cửa sổ: 5+8+2, 8+2+9, 2+9+7, 9+7+1, 7+1+6. Số 19 cuối cùng là
+dòng in `best`. Cửa sổ thứ hai, ngày 2 tới ngày 4, có doanh thu cao nhất.
+
+</details>
+
+## Lỗi hay gặp
+
+**Dùng hai con trỏ trên dãy chưa sắp xếp.** Dời con trỏ dựa trên giả định
+"bên phải lớn hơn", dãy không có thứ tự thì bỏ nhầm cặp đúng.
+
+```csharp
+// SAI — 7000 + 12000 có trong dãy nhưng không tìm ra
+int[] prices = { 12000, 3000, 25000, 7000, 5000 };
+```
+
+```csharp
+// ĐÚNG — sắp xếp trước rồi mới dùng hai con trỏ
+int[] prices = { 12000, 3000, 25000, 7000, 5000 };
+Array.Sort(prices);
+```
+
+## Tóm tắt
+
+- Hai con trỏ: một từ đầu, một từ cuối, dời theo kết quả so sánh. Cần dãy đã
+  sắp xếp.
+- Cửa sổ trượt: đoạn liền nhau, mỗi bước cộng phần tử vào, trừ phần tử ra.
+- Cả hai biến O(n²) thành O(n) mà không tốn thêm bộ nhớ.
+- Gặp bài "cặp có tổng", "đoạn liên tiếp" thì nghĩ tới hai kỹ thuật này.
+
+```quiz
+[
+  {
+    "prompt": "Hai con trỏ trên dãy giá đã sắp xếp: tổng prices[left] + prices[right] lớn hơn ngân sách. Nên làm gì?",
+    "options": [
+      "Tăng left",
+      "Dừng lại, không có cặp nào",
+      "Giảm right để lấy món rẻ hơn",
+      "Tăng cả left và right"
+    ],
+    "answer": 3,
+    "explain": "Tổng lớn quá thì cần món rẻ hơn. Món rẻ hơn nằm bên trái right, nên giảm right."
+  },
+  {
+    "prompt": "Cửa sổ 7 ngày trượt trên dữ liệu 30 ngày. Có bao nhiêu cửa sổ?",
+    "options": [
+      "30",
+      "24",
+      "7",
+      "23"
+    ],
+    "answer": 2,
+    "explain": "Số cửa sổ là n - k + 1 = 30 - 7 + 1 = 24."
+  },
+  {
+    "prompt": "Khi cửa sổ trượt sang phải một ô, tổng mới tính thế nào?",
+    "options": [
+      "Cộng lại toàn bộ k phần tử",
+      "Nhân đôi tổng cũ",
+      "Chỉ cộng phần tử mới",
+      "Tổng cũ cộng phần tử mới vào, trừ phần tử vừa rời đi"
+    ],
+    "answer": 4,
+    "explain": "Chỉ hai phần tử thay đổi, nên chỉ cần một phép cộng và một phép trừ, O(1) mỗi bước."
+  }
+]
+```

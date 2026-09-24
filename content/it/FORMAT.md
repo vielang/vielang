@@ -182,6 +182,37 @@ Riêng bài web:
   `using Microsoft.EntityFrameworkCore;` vì template không tự thêm.
   `check-code` biên dịch bài khoá này như một project web thật.
 
+### WinForms với Oracle (`winforms`)
+
+App quản lý cho nhân viên cửa hàng, chạy trên Windows. Dùng chung database
+`shopapi` với khoá ASP.NET Core: API lo migration tạo bảng, app WinForms chỉ
+đọc ghi. Class `Product`, `Order`, `OrderLine`, `ShopDbContext` và
+`IProductStore` giữ đúng như chương EF Core.
+
+| Chương | Bài |
+|---|---|
+| `01-nen-tang-winforms` | `01-ung-dung-winforms-dau-tien` · `02-control-va-layout` · `03-su-kien` · `04-kiem-tra-du-lieu-nhap` |
+| `02-hien-thi-du-lieu` | `01-listbox-va-combobox` · `02-datagridview` · `03-binding-source` · `04-hop-thoai-va-form-thu-hai` |
+| `03-ket-noi-oracle` | `01-ef-core-trong-winforms` · `02-async-giu-giao-dien-muot` · `03-crud-voi-datagridview` · `04-master-detail` |
+| `04-to-chuc-ung-dung` | `01-tach-giao-dien-va-du-lieu` · `02-xu-ly-loi` · `03-dong-goi-ung-dung` |
+
+Riêng bài WinForms:
+
+- Project tạo bằng `dotnet new winforms -o ShopDesk`. Xoá `Form1.cs`,
+  `Form1.Designer.cs`; toàn bộ giao diện viết bằng code trong `Program.cs`,
+  vì VS Code không có trình thiết kế kéo thả. Giữ `namespace ShopDesk;` ở
+  đầu file.
+- Form chính luôn tên `MainForm`. Từ bài 2, khối code chỉ chứa class
+  `MainForm` (và class phụ); class `Program` giữ nguyên như bài 1.
+- Xếp control bằng `FlowLayoutPanel`, không đặt toạ độ bằng tay.
+- "Thử ngay" là chạy `dotnet run` rồi thao tác trên cửa sổ. Câu đoán hỏi về
+  điều hiện ra trên màn hình, kết quả trong `<details>` mô tả màn hình đó.
+- Mỗi bài nối về khoá trước khi khái niệm có họ hàng ở đó: form là class kế
+  thừa `Form`, handler là lambda, kiểm tra nhập liệu so với validation của
+  API và ràng buộc của SQL.
+- `check-code` biên dịch bài khoá này như project `net9.0-windows` có
+  Windows Forms, EF Core và Oracle.
+
 ### Cú pháp chưa dạy thì chưa dùng
 
 - Method viết đầy đủ `{ return ...; }`. Dạng gọn `=> ...` chỉ dùng sau bài

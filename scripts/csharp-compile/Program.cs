@@ -109,8 +109,63 @@ var webUsingTree = CSharpSyntaxTree.ParseText("""
     global using Microsoft.Extensions.Logging;
     """, parseOptions, path: "GlobalUsings.cs");
 
+// Khoá WinForms: project `dotnet new winforms` (net9.0-windows). Nạp thêm
+// dll Windows Forms từ shared framework Microsoft.WindowsDesktop.App, cùng EF
+// Core và Oracle như khoá web. Bỏ các file trùng tên với BCL đã nạp.
+var desktopRoot = Path.Combine(
+    Path.GetDirectoryName(Path.GetDirectoryName(frameworkDir)!)!,
+    "Microsoft.WindowsDesktop.App");
+var phienBan = Path.GetFileName(frameworkDir);
+var desktopDir = Directory.Exists(Path.Combine(desktopRoot, phienBan))
+    ? Path.Combine(desktopRoot, phienBan)
+    : Directory.Exists(desktopRoot)
+        ? Directory.GetDirectories(desktopRoot)
+            .Where(d => Path.GetFileName(d).Split('.')[0] == phienBan.Split('.')[0])
+            .OrderBy(d => Version.Parse(Path.GetFileName(d).Split('-')[0]))
+            .LastOrDefault()
+        : null;
+var tenDaNap = new HashSet<string>(
+    Directory.GetFiles(frameworkDir, "*.dll").Select(Path.GetFileName)!,
+    StringComparer.OrdinalIgnoreCase);
+var winFormsRefs = desktopDir == null
+    ? webRefs
+    : webRefs
+        .Concat(Directory.GetFiles(desktopDir, "*.dll")
+            .Where(f => Path.GetFileName(f) is var n
+                && !tenDaNap.Contains(n)
+                && (n.StartsWith("System.Windows.Forms")
+                    || n.StartsWith("System.Drawing")
+                    || n.StartsWith("System.Private.Windows")
+                    || n.StartsWith("Microsoft.Win32.SystemEvents")
+                    || n.StartsWith("Accessibility")))
+            .Select(p => MetadataReference.CreateFromFile(p)))
+        .ToImmutableArray();
+
+// Global usings của project WinForms (ImplicitUsings + UseWindowsForms), và
+// ApplicationConfiguration mà WinForms SDK tự sinh trong namespace gốc.
+var winFormsUsingTree = CSharpSyntaxTree.ParseText("""
+    global using System;
+    global using System.Collections.Generic;
+    global using System.Drawing;
+    global using System.IO;
+    global using System.Linq;
+    global using System.Net.Http;
+    global using System.Threading;
+    global using System.Threading.Tasks;
+    global using System.Windows.Forms;
+
+    namespace ShopDesk
+    {
+        internal static class ApplicationConfiguration
+        {
+            public static void Initialize() { }
+        }
+    }
+    """, parseOptions, path: "GlobalUsings.cs");
+
 // Đổi theo từng file: bài thuộc khoá aspnet-core thì biên dịch như project web.
 var cheDoWeb = false;
+var cheDoWinForms = false;
 
 // Kiểu BCL hay bị quên `using` trong khoá này. Dùng để phân biệt "thiếu
 // using" (phải báo) với "tên do bài lược bỏ bối cảnh" (bỏ qua).
@@ -184,7 +239,9 @@ List<Diagnostic> BienDich(string code, out SyntaxTree tree)
             .Select(n => n.Identifier.Text),
         StringComparer.Ordinal);
 
-    var cay = cheDoWeb
+    var cay = cheDoWinForms
+        ? new List<SyntaxTree> { t, winFormsUsingTree }
+        : cheDoWeb
         ? new List<SyntaxTree> { t, webUsingTree }
         : new List<SyntaxTree> { t, stubTree, usingTree };
     var boSung = kieuTrongBai.Where(p => !daKhaiBao.Contains(p.Key)).Select(p => p.Value).ToList();
@@ -196,7 +253,7 @@ List<Diagnostic> BienDich(string code, out SyntaxTree tree)
     var comp = CSharpCompilation.Create(
         "Snippet",
         cay,
-        cheDoWeb ? webRefs : refs,
+        cheDoWinForms ? winFormsRefs : cheDoWeb ? webRefs : refs,
         new CSharpCompilationOptions(
             OutputKind.ConsoleApplication,
             allowUnsafe: false,
@@ -297,6 +354,7 @@ foreach (var file in Directory.GetFiles(root, "*.md", SearchOption.AllDirectorie
     // chung bộ tham chiếu với khoá ASP.NET Core.
     var duongDan = file.Replace('\\', '/');
     cheDoWeb = duongDan.Contains("/aspnet-core/") || duongDan.Contains("/sql/");
+    cheDoWinForms = duongDan.Contains("/winforms/");
 
     foreach (Match m in fence.Matches(text))
     {

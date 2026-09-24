@@ -96,6 +96,7 @@ tắt" đã làm việc đó.
 ```bash
 npm run check-prose   # khuôn bài, độ dài, định nghĩa, quiz
 npm run check-code    # biên dịch mọi khối C#
+npm run check-sql     # chạy thật khối SQL trên Oracle (cần Docker)
 npm run build-content # dựng courses.json
 ```
 
@@ -146,6 +147,34 @@ Riêng bài web:
 - Code C# ghi rõ `using Microsoft.AspNetCore.Mvc;`,
   `using Microsoft.EntityFrameworkCore;` vì template không tự thêm.
   `check-code` biên dịch bài khoá này như một project web thật.
+
+### SQL với Oracle (`sql`)
+
+| Chương | Bài |
+|---|---|
+| `01-doc-du-lieu` | `01-database-bang-va-khoa` · `02-select-va-where` · `03-sap-xep-va-phan-trang` · `04-null-trong-sql` |
+| `02-tong-hop` | `01-ham-tong-hop` · `02-group-by-va-having` |
+| `03-noi-bang` | `01-khoa-ngoai-va-quan-he` · `02-inner-join` · `03-left-join` · `04-subquery` |
+| `04-thay-doi-du-lieu` | `01-insert-update-delete` · `02-create-table-va-rang-buoc` · `03-transaction` |
+| `05-hieu-nang-va-an-toan` | `01-index` · `02-chuan-hoa` · `03-sql-injection` |
+
+Riêng bài SQL:
+
+- Database là **Oracle**. Chỉ dùng cú pháp chạy được từ Oracle 19c trở lên
+  (`FETCH FIRST`, `GENERATED AS IDENTITY`), không dùng tính năng chỉ có ở
+  23ai như kiểu `BOOLEAN` hay `SELECT` không có `FROM`.
+- Người học chạy SQL trên **Oracle Live SQL** (livesql.oracle.com), không cần
+  cài gì.
+- Database mẫu gồm bốn bảng `customers`, `products`, `orders`,
+  `order_lines`. Script tạo bảng và dữ liệu nằm **duy nhất** ở bài
+  `01-database-bang-va-khoa`, trong khối ```` ```sql setup ````. Mọi bài sau
+  dùng đúng dữ liệu đó.
+- Tên bảng, tên cột viết thường, nối bằng dấu gạch dưới: `customer_id`.
+- "Thử ngay" là một khối ```` ```sql ```` chạy trên dữ liệu mẫu. Kết quả trong
+  `<details>` viết thành bảng Markdown, tên cột viết hoa như Oracle trả về.
+  `check-sql` chạy thật câu SQL và so với bảng này.
+- Khối phản ví dụ ghi `-- SAI` ở dòng đầu. Nếu comment nói "lỗi" thì câu
+  lệnh buộc phải báo lỗi khi chạy.
 
 ### Cú pháp chưa dạy thì chưa dùng
 

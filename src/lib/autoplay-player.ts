@@ -1,7 +1,10 @@
 "use client";
 
 import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
 import { buildPlaylist, type AutoplayItem } from "@/lib/autoplay";
+import { syncAcrossTabs } from "@/lib/cross-tab-sync";
+import type { DragPos } from "@/lib/use-draggable";
 import { MAX_AUTO_RETRIES, retryDelay } from "@/lib/use-retrying-media";
 
 /**
@@ -39,6 +42,22 @@ interface AutoplayState {
   visiblePages: number[];
   double: boolean;
   setView: (pages: number[], double: boolean) => void;
+  /**
+   * Lật tới trang `dest` bằng hiệu ứng lật của trình đọc — `ReaderView` gắn
+   * vào khi đang mở. Trả false khi `dest` không liền kề trang đang xem, lúc
+   * đó `AutoplayFollower` tự nhảy trang bằng router.
+   */
+  turnTo: ((dest: number) => boolean) | null;
+  setTurnTo: (fn: ((dest: number) => boolean) | null) => void;
+  /**
+   * Chỗ đứng của thanh điều khiển. Nằm ở store cấp module để sống qua các
+   * lần `ReaderView` dựng lại khi lật trang — cố ý không lưu localStorage,
+   * cùng lý do với `audio-widget-store`.
+   */
+  barPos: DragPos | null;
+  /** Người dùng đã tự kéo thanh đi chưa — chưa thì thanh còn bám chỗ mặc định. */
+  barMoved: boolean;
+  setBarPos: (pos: DragPos, moved: boolean) => void;
 }
 
 export const useAutoplayStore = create<AutoplayState>((set) => ({
@@ -49,7 +68,71 @@ export const useAutoplayStore = create<AutoplayState>((set) => ({
   visiblePages: [],
   double: false,
   setView: (visiblePages, double) => set({ visiblePages, double }),
+  turnTo: null,
+  setTurnTo: (turnTo) => set({ turnTo }),
+  barPos: null,
+  barMoved: false,
+  setBarPos: (barPos, barMoved) => set({ barPos, barMoved }),
 }));
+
+/** Chỗ đang nghe dở của 1 sách: bài nào (theo URL) và tới giây thứ mấy. */
+export interface ResumePosition {
+  /**
+   * Theo URL chứ không theo số thứ tự: sau này bổ sung bài nghe cho trang
+   * nào đó thì số thứ tự dịch đi hết, còn URL của bài thì vẫn thế.
+   */
+  url: string;
+  time: number;
+}
+
+interface AutoplayResumeState {
+  positions: Record<string, ResumePosition>;
+  hasHydrated: boolean;
+  setHasHydrated: (v: boolean) => void;
+}
+
+/**
+ * Chỗ nghe dở của từng sách, để hôm sau bấm "Nghe tiếp" là vào đúng bài,
+ * đúng giây. Nghe hết sách thì xoá, lần sau lại nghe từ đầu.
+ */
+export const useAutoplayResumeStore = create<AutoplayResumeState>()(
+  persist(
+    (set) => ({
+      positions: {},
+      hasHydrated: false,
+      setHasHydrated: (hasHydrated) => set({ hasHydrated }),
+    }),
+    {
+      name: "kiip-autoplay-v1",
+      storage: createJSONStorage(() => localStorage),
+      partialize: (s) => ({ positions: s.positions }),
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
+    }
+  )
+);
+
+syncAcrossTabs(useAutoplayResumeStore);
+
+function savePosition(bookId: string, position: ResumePosition | null) {
+  useAutoplayResumeStore.setState((s) => {
+    const positions = { ...s.positions };
+    if (position) positions[bookId] = position;
+    else delete positions[bookId];
+    return { positions };
+  });
+}
+
+/** Chỗ nghe dở của sách, quy ra vị trí trong danh sách phát hiện tại. */
+export function findResumePoint(
+  queue: AutoplayItem[],
+  position: ResumePosition | undefined
+): { index: number; time: number } | null {
+  if (!position) return null;
+  const index = queue.findIndex((item) => item.url === position.url);
+  return index === -1 ? null : { index, time: position.time };
+}
 
 /** Nghỉ giữa 2 bài — liền tù tì thì chưa kịp định thần đã sang bài khác. */
 export const GAP_MS = 1500;
@@ -58,6 +141,11 @@ let audio: HTMLAudioElement | null = null;
 let gapTimer: ReturnType<typeof setTimeout> | null = null;
 let retryTimer: ReturnType<typeof setTimeout> | null = null;
 let retries = 0;
+/** Giây cần tua tới khi bài vừa đổi `src` nạp xong (nghe tiếp, thử lại sau lỗi). */
+let pendingSeek = 0;
+/** Mốc đã ghi gần nhất — ghi xuống localStorage theo nhịp, không phải mỗi `timeupdate`. */
+let lastSavedTime = 0;
+const SAVE_EVERY_S = 5;
 
 function clearTimers() {
   if (gapTimer) clearTimeout(gapTimer);
@@ -71,6 +159,13 @@ function element(): HTMLAudioElement {
   a.preload = "auto";
   a.addEventListener("ended", onEnded);
   a.addEventListener("error", onError);
+  a.addEventListener("loadedmetadata", () => {
+    if (pendingSeek > 0) a.currentTime = pendingSeek;
+    pendingSeek = 0;
+  });
+  a.addEventListener("timeupdate", () => {
+    if (Math.abs(a.currentTime - lastSavedTime) >= SAVE_EVERY_S) rememberPosition();
+  });
   // Hai sự kiện dưới để trạng thái khớp khi người dùng dừng/phát từ ngoài
   // app: màn hình khoá, tai nghe, trung tâm điều khiển.
   a.addEventListener("play", () => {
@@ -81,6 +176,7 @@ function element(): HTMLAudioElement {
   a.addEventListener("pause", () => {
     // Hết bài cũng bắn `pause` — đó không phải người dùng bấm dừng.
     if (a.ended) return;
+    rememberPosition();
     if (useAutoplayStore.getState().status === "playing") {
       useAutoplayStore.setState({ status: "paused" });
     }
@@ -100,15 +196,30 @@ function play(a: HTMLAudioElement) {
   });
 }
 
-function playIndex(i: number) {
+/** Ghi chỗ đang nghe của sách đang phát. */
+function rememberPosition() {
+  const { bookId, queue, index, status } = useAutoplayStore.getState();
+  const item = queue[index];
+  if (!bookId || !item || status === "idle" || !audio) return;
+  lastSavedTime = audio.currentTime;
+  savePosition(bookId, { url: item.url, time: Math.floor(audio.currentTime) });
+}
+
+function playIndex(i: number, startAt = 0) {
   clearTimers();
-  const { queue } = useAutoplayStore.getState();
+  const { bookId, queue } = useAutoplayStore.getState();
   if (i < 0 || i >= queue.length) {
     stopAutoplay();
+    // Nghe hết sách: xoá chỗ nghe dở, lần sau bắt đầu lại từ đầu. Xoá SAU
+    // khi dừng — `stopAutoplay` tự ghi lại chỗ đang nghe.
+    if (bookId && i >= queue.length) savePosition(bookId, null);
     return;
   }
   retries = 0;
+  pendingSeek = startAt;
+  lastSavedTime = startAt;
   useAutoplayStore.setState({ index: i, status: "playing" });
+  if (bookId) savePosition(bookId, { url: queue[i].url, time: startAt });
   const a = element();
   a.src = queue[i].url;
   play(a);
@@ -139,6 +250,8 @@ function onError() {
   if (retries < MAX_AUTO_RETRIES) {
     const a = audio;
     retryTimer = setTimeout(() => {
+      // Nạp lại là về giây 0 — đang nghe dở thì tua lại đúng chỗ.
+      pendingSeek = a.currentTime;
       a.load();
       play(a);
     }, retryDelay(retries));
@@ -150,17 +263,27 @@ function onError() {
 }
 
 /** Bật nghe tự động — gọi thẳng trong hàm xử lý click (xem đầu file). */
-export function startAutoplay(bookId: string, fromIndex = 0) {
+export function startAutoplay(bookId: string, fromIndex = 0, startAt = 0) {
   const state = useAutoplayStore.getState();
   const queue = state.bookId === bookId && state.queue.length > 0 ? state.queue : buildPlaylist(bookId);
   if (queue.length === 0) return;
   useAutoplayStore.setState({ bookId, queue });
   setMediaSessionHandlers();
-  playIndex(Math.min(Math.max(fromIndex, 0), queue.length - 1));
+  playIndex(Math.min(Math.max(fromIndex, 0), queue.length - 1), startAt);
+}
+
+/** Nghe tiếp từ chỗ dở của sách; chưa nghe lần nào thì từ bài đầu. */
+export function continueAutoplay(bookId: string) {
+  const point = findResumePoint(
+    buildPlaylist(bookId),
+    useAutoplayResumeStore.getState().positions[bookId]
+  );
+  startAutoplay(bookId, point?.index ?? 0, point?.time ?? 0);
 }
 
 export function stopAutoplay() {
   clearTimers();
+  rememberPosition();
   if (audio) {
     audio.pause();
     audio.removeAttribute("src");

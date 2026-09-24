@@ -75,3 +75,9 @@ describe("khoá bài làm đề thi", () => {
     expect(source("src", "lib", "exam-store.ts")).toContain('name: "kiip-exam-v1"');
   });
 });
+
+describe("khoá chỗ nghe dở", () => {
+  it("giữ nguyên tên, nếu không thì mất chỗ nghe tự động đang dở của người dùng", () => {
+    expect(source("src", "lib", "autoplay-player.ts")).toContain('name: "kiip-autoplay-v1"');
+  });
+});

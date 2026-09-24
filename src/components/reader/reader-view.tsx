@@ -287,6 +287,19 @@ export function ReaderView({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- như trên, so theo pagesKey.
   }, [pagesKey, effectiveDouble, setAutoplayView]);
 
+  // Bài kế nằm ở spread liền bên thì cho nghe tự động lật bằng đúng hiệu
+  // ứng của trình đọc.
+  const setAutoplayTurnTo = useAutoplayStore((s) => s.setTurnTo);
+  useEffect(() => {
+    setAutoplayTurnTo((dest) => {
+      if (dest === nextAnchor) turnNext();
+      else if (dest === prevAnchor) turnPrev();
+      else return false;
+      return true;
+    });
+    return () => setAutoplayTurnTo(null);
+  }, [nextAnchor, prevAnchor, turnNext, turnPrev, setAutoplayTurnTo]);
+
   // Gọi thẳng trong click, không qua effect — xem đầu lib/autoplay-player.ts.
   const toggleAutoplay = useCallback(() => {
     if (autoplayActive) stopAutoplay();
@@ -402,7 +415,7 @@ export function ReaderView({
       />
 
       <AudioWidget pages={pages} tracksByPage={audioTracksByPage} />
-      <AutoplayBar bookId={book.id} />
+      <AutoplayBar bookId={book.id} toolbarVisible={toolbarVisible} />
 
       <NoteWidget bookId={book.id} pages={pages} noteContentByPage={noteContentByPage} />
       <NoteSheet bookId={book.id} pages={pages} noteContentByPage={noteContentByPage} />

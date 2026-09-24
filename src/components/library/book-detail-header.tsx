@@ -2,7 +2,12 @@
 
 import Link from "next/link";
 import { Headphones, RotateCcw } from "lucide-react";
-import { startAutoplay } from "@/lib/autoplay-player";
+import { buildPlaylist } from "@/lib/autoplay";
+import {
+  continueAutoplay,
+  findResumePoint,
+  useAutoplayResumeStore,
+} from "@/lib/autoplay-player";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -44,6 +49,17 @@ export function BookDetailHeader({
   const percent = percentRead(progress, book.totalPages);
   const startedReading = hasHydrated && progress.readPages.length > 0;
   const target = startedReading ? resumePage(progress) : 1;
+
+  // Chỗ nghe dở (nếu có) — chờ nạp xong localStorage mới hiện, tránh lệch
+  // với HTML server render.
+  const listenPosition = useAutoplayResumeStore((s) => s.positions[book.id]);
+  const listenHydrated = useAutoplayResumeStore((s) => s.hasHydrated);
+  let resumeListenPage: number | null = null;
+  if (hasAudio && listenHydrated && listenPosition) {
+    const queue = buildPlaylist(book.id);
+    const point = findResumePoint(queue, listenPosition);
+    if (point) resumeListenPage = queue[point.index].page;
+  }
 
   return (
     <div className="flex flex-col gap-3 border-b border-border pb-5">
@@ -99,9 +115,9 @@ export function BookDetailHeader({
           // Phát ngay trong click rồi mới lật vào trình đọc — ra khỏi lượt
           // xử lý lần chạm là trình duyệt không cho phát nữa (xem
           // lib/autoplay-player.ts). Lật trang do AutoplayFollower lo.
-          <Button size="sm" variant="outline" onClick={() => startAutoplay(book.id)}>
+          <Button size="sm" variant="outline" onClick={() => continueAutoplay(book.id)}>
             <Headphones className="size-4" aria-hidden />
-            Nghe tự động
+            {resumeListenPage ? `Nghe tiếp — trang ${resumeListenPage}` : "Nghe tự động"}
           </Button>
         )}
 

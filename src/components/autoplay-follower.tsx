@@ -30,12 +30,15 @@ export function AutoplayFollower() {
   // phát tiếp, tới bài sau mới đưa về.
   useEffect(() => {
     if (!bookId) return;
-    const { queue, visiblePages, double } = useAutoplayStore.getState();
+    const { queue, visiblePages, double, turnTo } = useAutoplayStore.getState();
     const page = queue[index]?.page;
     if (page === undefined) return;
     const inReader = pathRef.current.startsWith(`/read/${bookId}/`);
     if (inReader && visiblePages.includes(page)) return;
     const dest = double ? getSpreadAnchor(bookId, page) : page;
+    // Trang kế liền bên thì lật có hiệu ứng như người dùng tự lật; xa hơn
+    // (bài kế cách vài trang) thì nhảy thẳng.
+    if (inReader && turnTo?.(dest)) return;
     router.push(`/read/${bookId}/${dest}`);
   }, [bookId, index, router]);
 

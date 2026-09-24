@@ -3,9 +3,11 @@ import {
   GAP_MS,
   autoplayNext,
   autoplayPrev,
+  continueAutoplay,
   startAutoplay,
   stopAutoplay,
   toggleAutoplayPause,
+  useAutoplayResumeStore,
   useAutoplayStore,
 } from "./autoplay-player";
 import { buildPlaylist } from "./autoplay";
@@ -34,6 +36,7 @@ beforeEach(() => {
     return playResult();
   });
   load.mockImplementation(() => {});
+  useAutoplayResumeStore.setState({ positions: {} });
 });
 
 afterEach(() => {
@@ -109,5 +112,44 @@ describe("nghe tự động", () => {
     autoplayPrev();
     autoplayPrev();
     expect(useAutoplayStore.getState().index).toBe(0);
+  });
+});
+
+describe("nhớ chỗ nghe dở", () => {
+  it("ghi lại bài đang nghe, tắt đi rồi vẫn còn", () => {
+    startAutoplay("step1", 3);
+    stopAutoplay();
+    expect(useAutoplayResumeStore.getState().positions.step1).toMatchObject({
+      url: queue[3].url,
+    });
+  });
+
+  it("nghe tiếp vào đúng bài và tua tới đúng giây", () => {
+    useAutoplayResumeStore.setState({
+      positions: { step1: { url: queue[5].url, time: 42 } },
+    });
+    continueAutoplay("step1");
+    expect(useAutoplayStore.getState().index).toBe(5);
+    el().dispatchEvent(new Event("loadedmetadata"));
+    expect(el().currentTime).toBe(42);
+  });
+
+  it("chưa nghe lần nào, hoặc bài đã ghi không còn, thì nghe từ đầu", () => {
+    continueAutoplay("step1");
+    expect(useAutoplayStore.getState().index).toBe(0);
+    stopAutoplay();
+
+    useAutoplayResumeStore.setState({
+      positions: { step1: { url: "https://x/khong-con.mp3", time: 10 } },
+    });
+    continueAutoplay("step1");
+    expect(useAutoplayStore.getState().index).toBe(0);
+  });
+
+  it("nghe hết sách thì xoá chỗ dở, lần sau nghe lại từ đầu", () => {
+    startAutoplay("step1", queue.length - 1);
+    el().dispatchEvent(new Event("ended"));
+    vi.advanceTimersByTime(GAP_MS);
+    expect(useAutoplayResumeStore.getState().positions.step1).toBeUndefined();
   });
 });

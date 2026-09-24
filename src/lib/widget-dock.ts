@@ -93,6 +93,30 @@ export function recorderAnchor(width: number, height: number): DragPos {
 }
 
 /**
+ * Thanh nghe tự động: giữa đáy. Thanh lật trang đang hiện thì đứng ngay trên
+ * nó; ẩn thì tụt xuống sát đáy — lọt dưới mép bảng ghi âm (góc dưới trái),
+ * đỡ đè lên nhau trên màn điện thoại. Chỉ là chỗ mặc định: người dùng kéo đi
+ * rồi thì thôi không bám theo nữa.
+ */
+export function autoplayBarAnchor(
+  width: number,
+  height: number,
+  toolbarVisible: boolean
+): DragPos {
+  const bottom = toolbarVisible ? TOOLBAR_BOTTOM + GAP : AUTOPLAY_BOTTOM_HIDDEN;
+  return {
+    x: Math.round((window.innerWidth - width) / 2),
+    y: window.innerHeight - height - bottom,
+  };
+}
+
+/** Thanh lật trang dưới đáy trang đọc. */
+const TOOLBAR_BOTTOM = 64;
+
+/** Cách đáy khi thanh lật trang ẩn — chừa vạch Home của iPhone. */
+const AUTOPLAY_BOTTOM_HIDDEN = 20;
+
+/**
  * Bề ngang cột công cụ bên phải phải chừa ra — thanh vẽ rộng chừng 45px.
  * Panel nào mở ra cũng không được lấn vào đây.
  */

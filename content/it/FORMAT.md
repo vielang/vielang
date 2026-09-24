@@ -219,6 +219,32 @@ Riêng bài WinForms:
 - `check-code` biên dịch bài khoá này như project `net9.0-windows` có
   Windows Forms, EF Core và Oracle.
 
+### Cấu trúc dữ liệu và giải thuật (`dsa`)
+
+Chỉ cần học trước C# Core và OOP. Mỗi bài có hai phần: tự viết một bản nhỏ
+để hiểu bên trong, rồi dùng bản có sẵn của .NET như khi đi làm. Ví dụ lấy
+từ cửa hàng (đơn hàng, sản phẩm, giao hàng), không dùng đề bài thi đấu.
+
+| Chương | Bài |
+|---|---|
+| `01-do-do-hieu-qua` | `01-big-o` · `02-de-quy` |
+| `02-cau-truc-tuyen-tinh` | `01-mang-va-list-ben-trong` · `02-linked-list` · `03-stack` · `04-queue` |
+| `03-bang-bam` | `01-hash-table` · `02-hashset-va-bai-toan-dem` |
+| `04-tim-kiem-va-sap-xep` | `01-tim-kiem-nhi-phan` · `02-sap-xep-chen` · `03-merge-sort` · `04-sap-xep-trong-dotnet` |
+| `05-cay-va-do-thi` | `01-cay-nhi-phan-tim-kiem` · `02-heap-va-priority-queue` · `03-do-thi-va-bfs` · `04-dfs` |
+| `06-ky-thuat-giai-bai` | `01-hai-con-tro-va-cua-so-truot` · `02-quy-hoach-dong` |
+
+Riêng bài DSA:
+
+- Chương trình console như khoá C# Core. "Thử ngay" in ra số bước, thứ tự
+  xử lý hoặc kết quả, để người học tự thấy độ phức tạp.
+- Độ phức tạp ghi bằng Big-O, kèm câu thường ngày: "gấp đôi dữ liệu thì gấp
+  đôi thời gian".
+- Không đo thời gian bằng `Stopwatch` trong "Thử ngay": kết quả mỗi máy mỗi
+  khác. Đếm số bước thay vào đó.
+- Nâng cao (cây đỏ-đen, trie, Dijkstra, quicksort chi tiết) nhiều nhất một
+  dòng trong "Tóm tắt".
+
 ### Cú pháp chưa dạy thì chưa dùng
 
 - Method viết đầy đủ `{ return ...; }`. Dạng gọn `=> ...` chỉ dùng sau bài

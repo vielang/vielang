@@ -12,8 +12,8 @@ liệu.
 
 🧫 **Theory**: method test nhận tham số, được đánh dấu `[Theory]`, chạy một lần cho mỗi bộ dữ liệu `[InlineData]` gắn kèm.
 
-`[Fact]` là một test cố định. `[Theory]` là một khuôn test, mỗi dòng
-`[InlineData]` là một test riêng, qua hay đỏ riêng.
+`[Fact]` là một test với dữ liệu cố định. Với `[Theory]`, mỗi dòng
+`[InlineData]` là một test riêng, qua hay đỏ độc lập với các dòng khác.
 
 ## Ví dụ
 
@@ -42,14 +42,13 @@ public class PriceCalculatorTests
 }
 ```
 
-- Ba dòng `[InlineData]` là ba test. Giá trị truyền vào tham số theo đúng thứ
-  tự: `price`, `quantity`, `expected`.
-- Viết `100000` là số nguyên, xUnit tự đổi sang `decimal` cho tham số
-  `price`.
-- Dòng thứ hai là mốc ranh giới 500.000, chỗ dễ sai nhất như bài trước đã
-  chỉ ra.
+- Ba dòng `[InlineData]` là ba test. Các giá trị được truyền vào tham số
+  theo đúng thứ tự: `price`, `quantity`, `expected`.
+- `100000` là số nguyên, xUnit tự đổi sang `decimal` cho tham số `price`.
+- Dòng thứ hai rơi đúng mốc 500.000, chỗ dễ sai nhất như bài Viết test cho
+  API đã chỉ ra.
 
-Nên chọn dữ liệu theo nhóm: một trường hợp bình thường, các mốc ranh giới, và
+Nên chọn dữ liệu theo nhóm: trường hợp bình thường, các mốc ranh giới, và
 trường hợp sai như số lượng 0 (kiểm bằng `Assert.Throws` ở một test riêng).
 
 ## Thử ngay
@@ -97,17 +96,19 @@ Actual:   450000
 Failed!  - Failed: 1, ...
 ```
 
-Bốn dòng `[InlineData]` là bốn test, ba qua và một đỏ. Số Passed, Total trên
-máy bạn còn cộng thêm các test cũ trong project. Test đỏ ghi rõ bộ dữ liệu
-nào hỏng.
-100000 × 5 là đúng 500.000 nên được giảm 10%, kỳ vọng 500000 là sai.
+Bốn dòng `[InlineData]` là bốn test: ba qua, một đỏ. Test đỏ ghi rõ bộ dữ
+liệu hỏng. 100000 × 5 đúng bằng 500.000 nên được giảm 10% còn 450000, vậy
+kỳ vọng 500000 là sai.
+
+Số test trên máy bạn còn cộng thêm các test cũ trong project.
 
 </details>
 
 ## Lỗi hay gặp
 
 **Viết số `decimal` có hậu tố `m` trong `[InlineData]`.** Tham số của
-attribute chỉ nhận hằng số kiểu cơ bản, mà `decimal` không nằm trong số đó.
+attribute chỉ nhận hằng số của vài kiểu cơ bản như `int`, `string`, và
+`decimal` không thuộc số đó.
 
 ```csharp
 // SAI — lỗi compile CS0182

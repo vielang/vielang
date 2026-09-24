@@ -3,20 +3,21 @@ title: Strategy
 minutes: 5
 ---
 
-Cửa hàng có ba cách giao: tiêu chuẩn, hoả tốc, và khách tự đến lấy. Mỗi cách
-tính phí một kiểu. Viết hết vào một method với `if` theo tên cách giao thì
-mỗi lần thêm cách mới lại phải sửa method đó. Strategy tách mỗi cách tính
-thành một class riêng.
+Cửa hàng có ba cách giao: tiêu chuẩn, hoả tốc và khách tự đến lấy. Mỗi cách
+tính phí một kiểu. Nếu viết hết vào một method, dùng `if` theo tên cách giao,
+thì mỗi lần thêm cách giao lại phải sửa method đó. Strategy tách mỗi cách
+tính thành một class riêng.
 
 ## Khái niệm
 
-📘 **Design pattern**: lời giải đã được đặt tên cho một vấn đề thiết kế hay gặp, để lập trình viên nói với nhau bằng một từ thay vì giải thích cả đoạn code.
+📘 **Design pattern**: cách giải có tên gọi chung cho một vấn đề thiết kế hay gặp.
 
-♟️ **Strategy**: đặt mỗi cách làm của cùng một việc vào một class riêng implement chung một interface, rồi truyền cách làm cần dùng vào nơi sử dụng.
+♟️ **Strategy**: mỗi cách làm một việc nằm trong một class riêng, các class cùng implement một interface, và nơi dùng nhận cách làm qua interface đó.
 
-Đây chính là OCP ở khoá OOP: thêm cách giao mới là thêm class, không sửa code
-cũ. `IProductStore` với `DbProductStore`, `FakeProductStore` cũng cùng ý
-tưởng, và thường được gọi là Repository.
+Strategy là một cách áp dụng OCP của khoá OOP: thêm cách giao là thêm class,
+không sửa code cũ. `IDiscount` ở bài OCP chính là một Strategy.
+`StandardShipping` dưới đây là bản rút gọn của `ShippingCalculator`, bỏ quy
+tắc thành viên và thành phố.
 
 ## Ví dụ
 
@@ -65,8 +66,10 @@ public class Checkout
 }
 ```
 
-- `IShippingStrategy` là "việc tính phí ship". Mỗi class là một cách làm.
-- `Checkout` chỉ biết interface, nhận cách tính qua constructor như DIP.
+- `IShippingStrategy` đại diện cho việc tính phí ship, mỗi class là một
+  cách tính.
+- `Checkout` chỉ biết interface và nhận cách tính qua constructor, như bài
+  DIP và dependency injection.
 - Đổi cách giao là đổi object truyền vào, `Checkout` không đổi dòng nào.
 
 ```mermaid Checkout chỉ biết interface, mỗi cách giao là một class
@@ -116,8 +119,8 @@ mới, `Checkout` và hai cách giao cũ giữ nguyên.
 
 ## Lỗi hay gặp
 
-**`if` theo tên cách giao rải trong code.** Thêm cách giao mới phải tìm và sửa
-mọi chỗ có chuỗi `if` này, sót một chỗ là sai.
+**Rải `if` theo tên cách giao khắp code.** Thêm cách giao mới phải tìm và sửa
+mọi chỗ có các `if` này, sót một chỗ là tính sai.
 
 ```csharp
 // SAI — thêm cách giao mới phải sửa method này

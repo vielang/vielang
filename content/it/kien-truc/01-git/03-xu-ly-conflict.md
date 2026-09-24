@@ -4,16 +4,16 @@ minutes: 5
 ---
 
 Hai người cùng sửa giá Bút bi, mỗi người trên một nhánh: một người ghi 5500,
-người kia ghi 6000. Tới lúc merge, Git không thể tự chọn giá nào đúng. Đó là
-conflict, và người merge phải tự quyết định.
+người kia ghi 6000. Tới lúc merge, Git không biết nên giữ giá nào. Đó là
+conflict, và người merge phải tự chọn.
 
 ## Khái niệm
 
-⚔️ **Conflict (xung đột)**: khi hai nhánh cùng sửa một chỗ trong cùng một file, Git dừng merge lại và đánh dấu chỗ đó để người dùng tự chọn nội dung.
+⚔️ **Conflict (xung đột)**: tình huống hai nhánh cùng sửa một chỗ trong một file, nên Git dừng merge và đánh dấu chỗ đó để bạn tự chọn nội dung.
 
-Sửa hai file khác nhau, hoặc hai chỗ khác nhau trong cùng một file, thì Git
-tự gộp được. Conflict chỉ xảy ra khi cùng một dòng, hoặc các dòng sát nhau, bị sửa ở cả
-hai phía.
+Hai nhánh sửa hai file khác nhau, hoặc hai chỗ xa nhau trong cùng một file,
+thì Git tự gộp được. Conflict chỉ xảy ra khi cùng một dòng, hoặc các dòng sát
+nhau, bị sửa ở cả hai nhánh.
 
 ## Ví dụ
 
@@ -30,7 +30,7 @@ git commit -am "Giá Bút bi 5500"
 git merge tang-gia
 ```
 
-Git dừng lại và mở `prices.txt` ra thì thấy:
+Git dừng merge giữa chừng. Mở `prices.txt` sẽ thấy:
 
 ```text
 <<<<<<< HEAD
@@ -44,12 +44,12 @@ Thước: 7000
 
 - Phần giữa `<<<<<<< HEAD` và `=======` là nội dung của nhánh đang đứng
   (`main`).
-- Phần giữa `=======` và `>>>>>>> tang-gia` là nội dung của nhánh đang merge
-  vào.
-- Các dòng khác không bị hai bên cùng sửa nên Git đã tự gộp.
+- Phần giữa `=======` và `>>>>>>> tang-gia` là nội dung của nhánh được
+  merge vào (`tang-gia`).
+- Các dòng khác không bị hai nhánh cùng sửa nên Git đã tự gộp.
 
-Cách giải quyết: sửa file cho đúng nội dung cuối cùng, xoá cả ba dòng đánh
-dấu, rồi:
+Để giải quyết, sửa file thành nội dung muốn giữ, xoá cả ba dòng đánh dấu,
+rồi chạy:
 
 ```bash
 git add prices.txt
@@ -58,11 +58,16 @@ git commit -m "Merge tang-gia, chốt giá 6000"
 
 ## Thử ngay
 
-Tiếp tục với `prices.txt` của bài trước, làm lại các bước trong ví dụ tới
-lệnh `git merge tang-gia`.
+Tiếp tục với `prices.txt` của bài trước, chạy các lệnh trong ví dụ tới
+`git merge tang-gia`. Sau đó chạy thêm lệnh in trạng thái mỗi file trên một
+dòng:
 
-**Đoán trước khi chạy:** Git in ra gì, và `git status --short` báo gì về
-`prices.txt`?
+```bash
+git status --short
+```
+
+**Đoán trước khi chạy:** `git merge` in ra gì, và `git status --short` báo
+gì về `prices.txt`?
 
 <details>
 <summary>Xem kết quả</summary>
@@ -76,8 +81,8 @@ UU prices.txt
 ```
 
 `CONFLICT (content)` là conflict trong nội dung file. `UU` nghĩa là cả hai
-phía cùng sửa file này và chưa được giải quyết. Merge đang dừng giữa chừng,
-chờ bạn sửa file, `git add` và `git commit`.
+nhánh cùng sửa file này và conflict chưa được giải quyết. Merge đang dừng
+giữa chừng, chờ bạn sửa file, `git add` và `git commit`.
 
 </details>
 

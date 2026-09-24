@@ -3,18 +3,17 @@ title: Factory
 minutes: 5
 ---
 
-Khách chọn cách giao trên trang đặt hàng, API nhận về một chuỗi như
-`"express"`. Phải có một chỗ đổi chuỗi đó thành đúng object `ExpressShipping`.
-Nếu mỗi controller tự làm việc này bằng `if` riêng, thêm cách giao mới lại
-phải sửa khắp nơi. Factory gom việc tạo object về một chỗ.
+Khách chọn cách giao trên trang đặt hàng, API nhận được một chuỗi như
+`"express"`. Cần một chỗ đổi chuỗi đó thành object `ExpressShipping`. Nếu mỗi
+controller tự làm bằng `if` riêng, thêm cách giao mới lại phải sửa khắp nơi.
+Factory gom việc tạo object về một chỗ.
 
 ## Khái niệm
 
-🏭 **Factory**: class hoặc method chuyên tạo object, nhận vào một lựa chọn và trả về object phù hợp dưới dạng interface, để nơi dùng không phải biết class cụ thể.
+🏭 **Factory**: class hoặc method chuyên tạo object, nhận một lựa chọn và trả về object phù hợp dưới kiểu interface.
 
 Strategy trả lời "có những cách làm nào". Factory trả lời "với lựa chọn này
-thì dùng cách nào". Giống `Main` ở khoá WinForms, factory là chỗ duy nhất gọi
-`new` cho các class cụ thể.
+thì dùng cách nào". Nơi dùng chỉ đưa lựa chọn, không phải biết class cụ thể.
 
 ## Ví dụ
 
@@ -46,12 +45,12 @@ public static class ShippingFactory
 }
 ```
 
-- `Create` là `static`, gọi thẳng qua tên class như bài static ở khoá C#
+- `Create` là `static`, gọi thẳng qua tên class như bài static của khoá C#
   Core.
 - Kiểu trả về là interface, nơi gọi không cần biết `ExpressShipping`.
 - `switch` chỉ nằm ở đây. Thêm cách giao mới: thêm class và thêm một `case`.
-- Chuỗi lạ thì ném `ArgumentException` ngay, như bài Exception, thay vì lặng
-  lẽ dùng một cách mặc định.
+- Gặp chuỗi lạ thì ném `ArgumentException` như bài Exception, không lặng lẽ
+  dùng một cách giao mặc định.
 
 Trong controller, lựa chọn của khách đi qua factory rồi vào `Checkout`:
 
@@ -84,15 +83,15 @@ catch (ArgumentException e)
 Không có cách giao: bay
 ```
 
-`default` của `switch` bắt mọi chuỗi không khớp. Ném lỗi rõ ràng như vậy thì
-API trả về lỗi ngay, không tính nhầm phí cho một cách giao không tồn tại.
+`default` của `switch` bắt mọi chuỗi không khớp. Nhờ ném lỗi, API báo sai
+ngay thay vì tính phí cho một cách giao không tồn tại.
 
 </details>
 
 ## Lỗi hay gặp
 
-**Gọi `new` class cụ thể rải rác trong controller.** Mỗi controller tự quyết
-định class nào ứng với chuỗi nào, thêm cách giao mới phải sửa từng nơi.
+**Gọi `new` class cụ thể rải rác trong controller.** Mỗi controller tự chọn
+class theo chuỗi, nên thêm cách giao mới phải sửa từng nơi.
 
 ```csharp
 // SAI — controller tự chọn class cụ thể
@@ -153,7 +152,7 @@ IShippingStrategy shipping =
       "Để chương trình chạy nhanh hơn"
     ],
     "answer": 3,
-    "explain": "Trả mặc định che mất lỗi phía client. Ném exception giúp phát hiện sai sót sớm."
+    "explain": "Trả cách giao mặc định sẽ che mất dữ liệu sai do client gửi lên. Ném exception giúp phát hiện lỗi sớm."
   }
 ]
 ```

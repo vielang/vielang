@@ -9,18 +9,18 @@ request là cách đề nghị gộp một nhánh vào `main` sau khi được n
 
 ## Khái niệm
 
-☁️ **Remote**: bản kho Git nằm trên máy khác, thường là GitHub, mặc định đặt tên `origin`.
+☁️ **Remote**: kho Git nằm trên máy khác, thường là GitHub, hay được đặt tên `origin`.
 
 🔃 **Push / pull**: `git push` gửi commit của nhánh lên remote, `git pull` lấy commit mới từ remote về rồi merge vào nhánh đang đứng.
 
-🙋 **Pull request (PR)**: đề nghị trên GitHub để merge một nhánh vào `main`, người khác xem code và góp ý trước khi merge.
+🙋 **Pull request (PR)**: đề nghị trên GitHub gộp một nhánh vào `main`, để người khác đọc code và góp ý trước khi merge.
 
 ## Ví dụ
 
-Tạo repository rỗng trên GitHub tên `ShopApi`, rồi nối kho trên máy với nó:
+Tạo repository rỗng trên GitHub tên `Shop`, rồi nối kho trên máy với nó:
 
 ```bash
-git remote add origin https://github.com/an/ShopApi.git
+git remote add origin https://github.com/an/Shop.git
 git push -u origin main
 ```
 
@@ -37,9 +37,10 @@ git push -u origin phi-ship
 ```
 
 Sau đó mở trang repository trên GitHub, bấm **Compare & pull request**. Đồng
-nghiệp đọc code, góp ý, bạn sửa và push tiếp lên cùng nhánh. Khi được đồng ý
-thì bấm **Merge**, nhánh `phi-ship` vào `main` trên GitHub. Cuối cùng về
-`main` trên máy và chạy `git pull` để lấy bản đã merge.
+nghiệp đọc code và góp ý, bạn sửa rồi push tiếp lên cùng nhánh. Khi pull
+request được đồng ý, bấm **Merge pull request** để gộp `phi-ship` vào `main`
+trên GitHub. Cuối cùng, trên máy chuyển về `main` và chạy `git pull` để lấy
+bản đã merge.
 
 ```mermaid Một tính năng đi từ nhánh riêng vào main qua pull request
 flowchart LR
@@ -50,15 +51,16 @@ flowchart LR
 
 ## Thử ngay
 
-Chạy một lần để `git pull` gộp bằng merge như bài Branch và merge:
+Chạy lệnh này một lần để `git pull` gộp bằng merge, như bài Branch và merge:
 
 ```bash
 git config --global pull.rebase false
 ```
 
-Bình vừa push một commit lên `main`. Bạn chưa pull, mà cũng đã commit trên
-`main` và chạy `git push`. Không có đồng nghiệp thì tự đóng vai Bình:
-`git clone` repository sang một thư mục khác, commit và push từ đó.
+Bình vừa push một commit lên `main`. Bạn chưa pull, commit trên `main` của
+mình rồi chạy `git push`. Không có đồng nghiệp thì tự đóng vai Bình: chạy
+`git clone` kèm địa chỉ repository để tải nó về một thư mục khác, rồi commit
+và push từ đó.
 
 **Đoán trước khi chạy:** push có thành công không? Nếu không thì phải làm gì?
 
@@ -67,15 +69,15 @@ Bình vừa push một commit lên `main`. Bạn chưa pull, mà cũng đã comm
 
 ```text
  ! [rejected]        main -> main (fetch first)
-error: failed to push some refs to 'https://github.com/an/ShopApi.git'
+error: failed to push some refs to 'https://github.com/an/Shop.git'
 hint: Updates were rejected because the remote contains work that you do not
 hint: have locally.
 ```
 
 Bị từ chối. Remote có commit của Bình mà máy bạn chưa có. Chạy `git pull` để
 lấy về và merge (có conflict thì xử lý như bài trước), rồi `git push` lại.
-Nếu Git mở trình soạn thảo hỏi lời mô tả cho merge, giữ nguyên, lưu và đóng
-lại.
+Nếu Git mở trình soạn thảo để hỏi lời mô tả cho merge, giữ nguyên nội dung,
+lưu rồi đóng lại.
 
 </details>
 

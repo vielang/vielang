@@ -5,18 +5,18 @@ minutes: 6
 
 Sửa code xong, chạy thấy hỏng, mà không nhớ đã đổi những gì. Hoặc muốn quay
 lại bản chạy được hôm qua nhưng đã lưu đè mất. Git lưu lại từng mốc thay đổi
-của project, xem lại hay quay về lúc nào cũng được.
+của project để bạn xem lại hay quay về lúc nào cũng được.
 
 ## Khái niệm
 
-📸 **Commit**: một ảnh chụp trạng thái các file của project tại một thời điểm, kèm lời mô tả và tên người tạo.
+📸 **Commit**: một mốc lưu lại nội dung các file của project tại một thời điểm, kèm lời mô tả và tên người tạo.
 
 🛒 **Staging area**: nơi gom những thay đổi sẽ đi vào commit tiếp theo, thêm vào bằng `git add`.
 
 🙈 **.gitignore**: file liệt kê những file, thư mục Git bỏ qua, không bao giờ đưa vào commit.
 
-Mỗi file đi qua ba chỗ: sửa trong thư mục làm việc, `git add` vào staging
-area, rồi `git commit` thành một mốc trong lịch sử.
+Một thay đổi đi qua ba chỗ: sửa trong thư mục làm việc, `git add` vào
+staging area, rồi `git commit` để thành một mốc trong lịch sử.
 
 ```mermaid Thay đổi đi từ thư mục làm việc vào lịch sử
 flowchart LR
@@ -26,27 +26,28 @@ flowchart LR
 
 ## Ví dụ
 
-Cài Git một lần, khai báo tên và email để gắn vào mỗi commit:
+Cài Git xong, khai báo tên và email một lần. Git gắn chúng vào mỗi commit:
 
 ```bash
 git config --global user.name "An"
 git config --global user.email "an@shop.vn"
 ```
 
-Đưa project `ShopApi` vào Git:
+Mở terminal ở thư mục chứa `ShopApi`, `ShopApi.Tests` và `ShopDesk`, rồi đưa
+cả ba vào một kho Git:
 
 ```bash
-cd ShopApi
 git init -b main
 dotnet new gitignore
 git add .
-git commit -m "Tạo ShopApi"
+git commit -m "Commit đầu tiên"
 git log --oneline
 ```
 
-- `git init -b main` tạo kho Git trong thư mục, nhánh chính tên `main`.
-- `dotnet new gitignore` tạo sẵn `.gitignore` cho project .NET, bỏ qua
-  `bin/`, `obj/` là những thứ build ra.
+- `git init -b main` tạo kho Git (repository) trong thư mục hiện tại, nhánh
+  chính tên `main`.
+- `dotnet new gitignore` tạo sẵn `.gitignore` cho project .NET, bỏ qua các
+  thư mục do build sinh ra như `bin/`, `obj/`.
 - `git add .` đưa mọi file vào staging area, `git commit -m` tạo commit kèm
   lời mô tả.
 - `git log --oneline` in mỗi commit một dòng: mã commit và lời mô tả.
@@ -88,9 +89,7 @@ Muốn đưa cả hai vào commit tiếp theo thì `git add` chúng.
 ## Lỗi hay gặp
 
 **Commit trước khi có `.gitignore`.** `bin/`, `obj/` nặng và đổi sau mỗi lần
-build, làm lịch sử rối. Tệ hơn, `appsettings.Development.json` chứa mật khẩu
-database bị đẩy lên cho cả nhóm xem, điều bài Cấu hình của khoá ASP.NET Core
-đã cảnh báo.
+build, làm lịch sử rối.
 
 ```bash
 # SAI — add hết khi chưa có .gitignore
@@ -105,8 +104,10 @@ dotnet new gitignore
 git add .
 ```
 
-File chứa mật khẩu thì mở `.gitignore`, thêm một dòng
-`appsettings.Development.json` ở cuối, trước khi `git add`.
+`appsettings.Development.json` đang chứa mật khẩu Oracle từ bài EF Core và
+DbContext. Bài Cấu hình với appsettings đã dặn không commit mật khẩu, nên
+thêm dòng `appsettings.Development.json` vào cuối `.gitignore` trước khi
+`git add`.
 
 ## Tóm tắt
 

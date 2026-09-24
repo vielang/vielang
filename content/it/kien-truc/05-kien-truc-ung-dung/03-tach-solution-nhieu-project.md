@@ -10,12 +10,13 @@ code chung chỉ có một bản.
 
 ## Khái niệm
 
-📁 **Solution**: file `.sln` gom nhiều project lại, build và mở cùng lúc.
+📁 **Solution**: file `.sln` (từ .NET 10 là `.slnx`) gom nhiều project lại để mở và build cùng lúc.
 
 📗 **Class library**: project không chạy được một mình, chỉ chứa class để project khác tham chiếu, tạo bằng `dotnet new classlib`.
 
-Project reference cho project này dùng class `public` của project kia. Chiều
-tham chiếu chính là chiều phụ thuộc của bài Clean Architecture.
+Như bài Viết test cho API, `dotnet add A reference B` cho project A dùng class
+`public` của project B. Chiều tham chiếu chính là chiều phụ thuộc của bài
+Clean Architecture.
 
 ## Ví dụ
 
@@ -25,7 +26,7 @@ Trong thư mục chứa `ShopApi` và `ShopDesk`:
 dotnet new sln -n Shop
 dotnet new classlib -o Shop.Core
 dotnet new classlib -o Shop.Infrastructure
-dotnet sln add Shop.Core Shop.Infrastructure ShopApi ShopDesk
+dotnet sln add Shop.Core Shop.Infrastructure ShopApi ShopDesk ShopApi.Tests
 dotnet add Shop.Infrastructure reference Shop.Core
 dotnet add ShopApi reference Shop.Core Shop.Infrastructure
 dotnet add ShopDesk reference Shop.Core Shop.Infrastructure
@@ -36,9 +37,16 @@ Sau đó chuyển code:
 
 | Project | Nhận những file |
 |---|---|
-| `Shop.Core` | `Product`, `IProductStore`, `OrderService` |
-| `Shop.Infrastructure` | `ShopDbContext`, `DbProductStore`, package EF Core và Oracle |
+| `Shop.Core` | `Product`, `Order`, `OrderLine`, `IProductStore`, `OrderService` |
+| `Shop.Infrastructure` | `ShopDbContext`, `DbProductStore`, thư mục `Migrations`, package EF Core và Oracle |
 | `ShopApi`, `ShopDesk` | xoá bản chép, chỉ giữ controller, form và phần ghép ở `Program.cs` |
+
+Migration giờ nằm cùng `ShopDbContext` ở Infrastructure, nên lệnh `dotnet ef`
+ghi rõ project chứa migration và project khởi động:
+
+```bash
+dotnet ef migrations add Ten --project Shop.Infrastructure --startup-project ShopApi
+```
 
 ```csharp
 // Shop.Core/Product.cs

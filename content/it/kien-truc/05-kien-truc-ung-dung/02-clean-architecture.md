@@ -10,7 +10,7 @@ gì về database hay giao diện.
 
 ## Khái niệm
 
-🧅 **Clean Architecture**: đặt nghiệp vụ ở lõi, còn database, API, giao diện ở vòng ngoài, mọi phụ thuộc chỉ hướng từ ngoài vào lõi.
+🧅 **Clean Architecture**: cách tổ chức ứng dụng đặt nghiệp vụ ở lõi, database và giao diện ở vòng ngoài, mọi phụ thuộc chỉ hướng từ ngoài vào lõi.
 
 | Vòng | Chứa gì | Được biết tới |
 |---|---|---|
@@ -19,7 +19,7 @@ gì về database hay giao diện.
 | Giao diện | API `ShopApi`, app `ShopDesk` | Core và Infrastructure |
 
 Điểm mấu chốt: `IProductStore` nằm trong Core, còn class implement nó nằm ở
-Infrastructure. Đây là DIP của khoá OOP ở quy mô cả ứng dụng.
+Infrastructure. Đây là DIP của khoá OOP, áp dụng cho cả ứng dụng.
 
 ```mermaid Phụ thuộc hướng vào lõi
 flowchart LR
@@ -72,14 +72,15 @@ public class ConsoleEmailSender : IEmailSender
 - `CheckoutService` chỉ biết `IEmailSender`. Nó không biết email gửi bằng
   gì.
 - Đổi sang dịch vụ email khác chỉ cần viết một class mới ở Infrastructure.
-- Nơi ghép hai phần là composition root: `Program.cs` của API hay `Main` của
-  WinForms.
+- Hai phần được ghép ở composition root như bài Tách giao diện và dữ liệu:
+  `Program.cs` của API hay `Main` của WinForms.
 
 ## Thử ngay
 
 Ghép hai phần ở composition root rồi chạy:
 
 ```csharp
+// Console, đóng vai composition root
 IEmailSender sender = new ConsoleEmailSender();
 var checkout = new CheckoutService(sender);
 checkout.Complete("DH1", "an@shop.vn");
@@ -102,20 +103,20 @@ không gửi thật.
 
 ## Lỗi hay gặp
 
-**Đặt interface ở Infrastructure.** Core phải tham chiếu Infrastructure để
-dùng interface, tức lõi lại phụ thuộc vòng ngoài và kéo theo EF Core, Oracle.
+**Đặt interface ở Infrastructure.** Core phải dùng tới Infrastructure để
+lấy interface, tức lõi lại phụ thuộc vòng ngoài và kéo theo EF Core, Oracle.
 
 ```text
 # SAI — lõi phụ thuộc vòng ngoài
-Shop.Core            → tham chiếu Shop.Infrastructure
-Shop.Infrastructure  : IProductStore, DbProductStore
+Core            → dùng Infrastructure
+Infrastructure  : IProductStore, DbProductStore
 ```
 
 ```text
 # ĐÚNG — interface ở lõi, vòng ngoài implement
-Shop.Core            : IProductStore, OrderService
-Shop.Infrastructure  → tham chiếu Shop.Core
-                     : DbProductStore implement IProductStore
+Core            : IProductStore, OrderService
+Infrastructure  → dùng Core
+                : DbProductStore implement IProductStore
 ```
 
 ## Tóm tắt

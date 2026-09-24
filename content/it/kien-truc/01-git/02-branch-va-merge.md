@@ -4,8 +4,9 @@ minutes: 5
 ---
 
 Đang làm dở tính năng phí giao hàng thì có lỗi gấp cần sửa trên bản đang chạy.
-Nếu mọi thứ nằm chung một chỗ, code dở dang sẽ lẫn vào bản sửa lỗi. Branch
-cho mỗi việc một nhánh riêng, xong việc nào thì gộp việc đó vào nhánh chính.
+Nếu mọi thứ nằm chung một chỗ, code dở dang sẽ lẫn vào bản sửa lỗi. Với
+branch, mỗi việc nằm trên một nhánh riêng, xong việc nào thì gộp việc đó vào
+nhánh chính.
 
 ## Khái niệm
 
@@ -24,8 +25,8 @@ flowchart LR
 
 ## Ví dụ
 
-Làm trong một thư mục có file `prices.txt` đã commit, nội dung hai dòng
-`Bút bi: 5000` và `Vở: 12000`:
+Tạo một thư mục thử riêng, chạy `git init -b main`, rồi commit file
+`prices.txt` có hai dòng `Bút bi: 5000` và `Vở: 12000`. Sau đó chạy:
 
 ```bash
 git switch -c them-thuoc
@@ -36,8 +37,8 @@ git merge them-thuoc
 ```
 
 - `git switch -c them-thuoc` tạo nhánh mới và chuyển sang nó ngay.
-- `git commit -am` là `add` mọi file đã theo dõi rồi commit luôn. File mới
-  hoàn toàn vẫn phải `git add` riêng.
+- `git commit -am` tự `add` mọi file Git đang theo dõi rồi commit. File mới
+  vẫn phải `git add` riêng.
 - `git switch main` quay về nhánh chính.
 - `git merge them-thuoc` gộp commit "Thêm Thước" vào `main`.
 
@@ -50,13 +51,14 @@ Fast-forward
  1 file changed, 1 insertion(+)
 ```
 
-Mã commit trên máy bạn sẽ khác. `main` không có commit mới nào từ lúc tách
-nhánh, nên Git chỉ cần kéo `main` tới commit cuối của nhánh kia. Kiểu merge này gọi là fast-forward.
+Mã commit trên máy bạn sẽ khác. Từ lúc tách nhánh, `main` chưa có commit
+mới nào, nên Git chỉ cần dời `main` tới commit cuối của `them-thuoc`. Kiểu
+merge này gọi là fast-forward.
 
 ## Thử ngay
 
-Sau lệnh `git commit -am "Thêm Thước"` và `git switch main`, **chưa merge**,
-xem nội dung file:
+Chạy các lệnh của ví dụ nhưng dừng sau `git switch main`, **chưa merge**.
+Xem nội dung file:
 
 ```bash
 cat prices.txt
@@ -80,8 +82,8 @@ nhánh đó. Dòng "Thước" chỉ có trên `them-thuoc`, tới khi merge mớ
 
 ## Lỗi hay gặp
 
-**Commit nhầm nhánh.** Quên đang đứng ở đâu, commit tính năng dở dang thẳng
-vào `main`.
+**Commit nhầm nhánh.** Không để ý đang đứng ở nhánh nào, commit luôn tính
+năng làm dở vào `main`.
 
 ```bash
 # SAI — không kiểm tra nhánh trước khi commit

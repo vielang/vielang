@@ -4,21 +4,22 @@ minutes: 6
 ---
 
 Cần ghi log mỗi lần đọc danh sách sản phẩm để xem vì sao API chậm. Sửa thẳng
-vào `DbProductStore` thì trộn việc log với việc đọc database, và
-`FakeProductStore` muốn log cũng phải sửa theo. Decorator thêm việc log bằng
-một class bọc bên ngoài, không đụng tới class gốc.
+`DbProductStore` thì việc log lẫn vào việc đọc database, và muốn
+`FakeProductStore` có log lại phải sửa thêm class đó. Decorator thêm việc log
+bằng một class bọc bên ngoài, không đụng tới class gốc.
 
 ## Khái niệm
 
-🎁 **Decorator**: class implement cùng interface với class gốc, giữ một object gốc bên trong, thêm việc trước hoặc sau rồi chuyển lời gọi cho object đó.
+🎁 **Decorator**: class implement cùng interface với class gốc, giữ object gốc bên trong, và làm thêm việc trước hoặc sau khi chuyển lời gọi cho object đó.
 
 Nơi dùng vẫn chỉ thấy `IProductStore`, không biết mình đang dùng bản gốc hay
 bản đã bọc. Bọc nhiều lớp cũng được, mỗi lớp thêm một việc.
 
 ## Ví dụ
 
-`IProductStore` và `Product` như bài Truy vấn với EF Core. `MemoryProductStore`
-đứng thay `DbProductStore` cho gọn:
+`IProductStore` và `Product` giữ như bài Truy vấn với EF Core. Ví dụ dùng
+`MemoryProductStore` thay cho `DbProductStore` để chạy được không cần
+database:
 
 ```csharp
 IProductStore store =
@@ -87,14 +88,18 @@ public class Product
 - `InStockAsync` in log, gọi `_inner`, in log tiếp. `SetStockAsync` chuyển
   thẳng cho `_inner`.
 - Bọc `DbProductStore` hay `FakeProductStore` đều được, vì decorator chỉ biết
-  interface.
-- Trong ASP.NET Core, đăng ký bản đã bọc vào container là controller dùng
-  ngay, không sửa controller.
+  interface. Nơi dùng không phải sửa.
+
+```mermaid Nơi dùng gọi lớp bọc, lớp bọc chuyển lời gọi vào object gốc
+flowchart LR
+    U["Nơi dùng"] -->|"InStockAsync"| L["LoggingProductStore"]
+    L -->|"InStockAsync"| M["MemoryProductStore"]
+```
 
 ## Thử ngay
 
-Sửa `LoggingProductStore` nhận thêm tên lớp bọc và in tên đó ở hai dòng log,
-rồi bọc hai lớp:
+Sửa `LoggingProductStore` để nhận thêm một cái tên và in tên đó trong hai dòng
+log, rồi bọc hai lớp:
 
 ```csharp
 IProductStore inner = new LoggingProductStore(
@@ -143,15 +148,16 @@ B: xong, 1 sản phẩm
 A: xong, 1 sản phẩm
 ```
 
-Lời gọi đi từ lớp ngoài vào trong, kết quả đi từ trong ra ngoài. Đây đúng là
-cách middleware chạy trong bài Middleware và pipeline của khoá ASP.NET Core.
+Lời gọi đi từ lớp ngoài vào trong, kết quả đi từ trong ra ngoài. Middleware
+trong bài Middleware và pipeline của khoá ASP.NET Core cũng chạy theo thứ tự
+này.
 
 </details>
 
 ## Lỗi hay gặp
 
-**Kế thừa class gốc để thêm log.** Class log chỉ dùng được với đúng một class
-gốc, bọc `FakeProductStore` phải viết thêm một class log khác.
+**Kế thừa class gốc để thêm log.** Class log khi đó chỉ gắn với đúng một class
+gốc, muốn log `FakeProductStore` phải viết thêm class khác.
 
 ```csharp
 // SAI — gắn chặt với DbProductStore
@@ -187,14 +193,14 @@ public class LoggingProductStore : IProductStore
 }
 ```
 
-Đây là "composition hơn kế thừa" ở bài Composition của khoá OOP.
+Đây là dùng composition thay cho kế thừa, như bài Composition của khoá OOP.
 
 ## Tóm tắt
 
 - Decorator bọc object gốc, cùng interface, thêm việc trước hoặc sau.
 - Class gốc và nơi dùng đều không phải sửa.
 - Bọc nhiều lớp: lời gọi đi từ ngoài vào, kết quả đi từ trong ra.
-- Dùng cho log, cache, đo thời gian, kiểm quyền.
+- Hay dùng cho log, cache, đo thời gian, kiểm quyền.
 
 ```quiz
 [
@@ -218,7 +224,7 @@ public class LoggingProductStore : IProductStore
       "Decorator bọc bất kỳ object nào cùng interface, kế thừa gắn với một class cụ thể"
     ],
     "answer": 4,
-    "explain": "Decorator giữ interface bên trong nên bọc được mọi implementation."
+    "explain": "Decorator giữ bên trong một object kiểu interface, nên bọc được mọi class implement interface đó."
   },
   {
     "prompt": "Bọc Timing(Logging(Db)). Gọi InStockAsync thì lớp nào chạy phần \"trước\" đầu tiên?",

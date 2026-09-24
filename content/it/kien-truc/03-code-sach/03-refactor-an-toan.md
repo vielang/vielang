@@ -3,10 +3,9 @@ title: Refactor an toàn
 minutes: 6
 ---
 
-Hai bài trước chỉ ra code nên sửa thế nào. Nhưng sửa code đang chạy là việc
-dễ gây lỗi: đổi một dấu `>=` thành `>` là khách mua đúng 500.000 bị tính phí
-ship. Refactor an toàn là sửa từng bước nhỏ, có test đứng sau bảo đảm hành vi
-không đổi.
+Hai bài trước chỉ ra chỗ nên sửa. Nhưng sửa code đang chạy rất dễ gây lỗi: gõ
+nhầm `>=` thành `>` là đơn đúng 500.000 bị tính phí ship. Bài này sửa từng
+bước nhỏ, sau mỗi bước chạy test để chắc hành vi không đổi.
 
 ## Khái niệm
 
@@ -18,15 +17,16 @@ Quy trình một bước refactor:
 |---|---|
 | 1 | Chạy test, bảo đảm tất cả đang xanh |
 | 2 | Sửa một chỗ nhỏ: đổi tên, đặt hằng, tách method |
-| 3 | Chạy lại test. Đỏ thì hoàn tác ngay bước vừa làm |
+| 3 | Chạy lại test. Đỏ thì hoàn tác bằng `git restore .` |
 | 4 | Xanh thì commit, rồi quay lại bước 2 |
 
 Chưa có test thì viết test trước, như chương Test, rồi mới refactor.
 
 ## Ví dụ
 
-`ShippingFee` của bài Đặt tên và method ngắn, đưa vào một class trong
-`ShopApi` để test được. Test chốt hành vi hiện tại, gồm cả mốc 500.000:
+Đưa `ShippingFee` của bài Đặt tên và method ngắn vào class
+`ShippingCalculator` trong `ShopApi`. Test trong `ShopApi.Tests` chốt hành
+vi hiện tại, gồm cả mốc 500.000:
 
 ```csharp
 using Xunit;
@@ -133,8 +133,8 @@ Expected: 0
 Actual:   20000
 ```
 
-Bắt được, nhờ có dòng dữ liệu ở đúng mốc 500.000. Ba dòng còn lại vẫn xanh,
-nên thiếu dòng mốc là lỗi lọt qua. Sửa lại `>=` thì cả bốn xanh.
+Bắt được, nhờ dòng dữ liệu ở đúng mốc 500.000. Ba dòng còn lại vẫn xanh,
+nên nếu thiếu dòng này thì lỗi lọt qua. Sửa lại `>=` thì cả bốn xanh.
 
 </details>
 

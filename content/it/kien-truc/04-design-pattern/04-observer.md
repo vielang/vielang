@@ -3,17 +3,17 @@ title: Observer
 minutes: 5
 ---
 
-Đặt hàng xong phải gửi email, trừ kho, cộng điểm thành viên. Nếu
+Đặt hàng xong phải gửi email, cộng điểm thành viên, gửi SMS. Nếu
 `OrderService` tự gọi cả ba, mỗi việc mới lại phải sửa `OrderService`, và nó
-phải biết mọi phần khác của hệ thống. Observer để `OrderService` chỉ thông báo
-"đã đặt hàng", ai quan tâm thì tự đăng ký nghe.
+phải biết mọi phần khác của hệ thống. Với Observer, `OrderService` chỉ thông
+báo "đã đặt hàng", việc nào cần thì tự đăng ký nghe.
 
 ## Khái niệm
 
-📣 **Observer**: một object phát thông báo khi có chuyện xảy ra, các object khác đăng ký nghe và tự phản ứng, bên phát không cần biết có ai nghe.
+📣 **Observer**: một object phát thông báo khi có việc xảy ra, các object khác đăng ký nghe và tự xử lý, bên phát không cần biết ai đang nghe.
 
-C# có sẵn cơ chế này là event, đã dùng ở bài Sự kiện của khoá WinForms: nút
-`Click` là bên phát, handler gắn bằng `+=` là bên nghe.
+C# có sẵn cơ chế này là event, đã gặp ở bài Sự kiện của khoá WinForms: nút là
+bên phát event `Click`, handler gắn bằng `+=` là bên nghe.
 
 ## Ví dụ
 
@@ -22,7 +22,7 @@ var service = new OrderService();
 service.OrderPlaced += (sender, code) =>
     Console.WriteLine("Gửi email cho " + code);
 service.OrderPlaced += (sender, code) =>
-    Console.WriteLine("Trừ kho cho " + code);
+    Console.WriteLine("Cộng điểm cho " + code);
 
 service.Place("DH1");
 
@@ -38,18 +38,19 @@ public class OrderService
 }
 ```
 
-- `event EventHandler<string>` khai báo event mang theo một `string`, ở đây
-  là mã đơn. Handler nhận `sender` và giá trị đó.
-- `OrderPlaced?.Invoke(this, code)` phát thông báo. `?.` nghĩa là chỉ gọi khi
-  có ít nhất một handler, không có thì bỏ qua.
-- `OrderService` không biết gì về email hay kho. Thêm việc cộng điểm là thêm
-  một `+=` ở ngoài, không sửa `OrderService`.
+- `event EventHandler<string>?` khai báo một event gửi kèm một `string`, ở
+  đây là mã đơn. Handler nhận `sender` (bên phát) và giá trị đó.
+- `OrderPlaced?.Invoke(this, code)` gọi lần lượt mọi handler. Chưa có handler
+  nào thì event là `null`, và `?.` như bài null và nullable sẽ bỏ qua lời
+  gọi.
+- `OrderService` ở đây là bản rút gọn, chỉ giữ phần thông báo. Nó không biết
+  gì về email hay điểm. Thêm việc gửi SMS là thêm một `+=` ở ngoài.
 
 ```mermaid OrderService phát một thông báo, nhiều bên cùng nghe
 flowchart LR
     O["OrderService: OrderPlaced"] --> E["Gửi email"]
-    O --> K["Trừ kho"]
-    O --> P["Cộng điểm"]
+    O --> K["Cộng điểm"]
+    O --> P["Gửi SMS"]
 ```
 
 ## Thử ngay
@@ -70,7 +71,7 @@ không có ai nghe thì có lỗi không?
 ```text
 Đã lưu DH1
 Gửi email cho DH1
-Trừ kho cho DH1
+Cộng điểm cho DH1
 Đã lưu DH2
 ```
 
@@ -131,11 +132,11 @@ public class OrderService
     "explain": "OrderService chỉ phát thông báo. Việc mới đăng ký nghe từ bên ngoài bằng +=."
   },
   {
-    "prompt": "Ba handler đăng ký vào OrderPlaced theo thứ tự email, kho, điểm. Chúng chạy theo thứ tự nào?",
+    "prompt": "Ba handler đăng ký vào OrderPlaced theo thứ tự email, điểm, SMS. Chúng chạy theo thứ tự nào?",
     "options": [
-      "Email, kho, điểm",
+      "Email, điểm, SMS",
       "Ngẫu nhiên",
-      "Điểm, kho, email",
+      "SMS, điểm, email",
       "Chỉ handler cuối chạy"
     ],
     "answer": 1,

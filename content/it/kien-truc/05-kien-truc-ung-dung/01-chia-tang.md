@@ -31,6 +31,7 @@ Controller mỏng: nhận request, gọi tầng nghiệp vụ, trả kết quả
 hàng nằm trong `OrderService` của bài Fake thay phụ thuộc:
 
 ```csharp
+// ShopApi
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
@@ -59,9 +60,11 @@ public class OrdersController : ControllerBase
 }
 ```
 
-- Controller không biết tồn kho được kiểm thế nào, cũng không biết có
-  database. Nó chỉ dịch kết quả sang HTTP: `BadRequest` hay `Ok`.
-- `OrderService` không biết mình được gọi từ API hay từ form.
+- Controller không biết tồn kho được kiểm tra thế nào, cũng không biết có
+  database. Nó chỉ đổi kết quả thành response HTTP: `BadRequest` hay `Ok`.
+- `OrderService` không biết mình được gọi từ API hay từ form. Đăng ký nó như
+  bài Dependency injection trong ASP.NET Core:
+  `builder.Services.AddScoped<OrderService>();`.
 - Form WinForms gọi đúng `OrderService.PlaceAsync`, nên hai app luôn dùng
   cùng một quy tắc.
 
@@ -71,6 +74,7 @@ Gọi tầng nghiệp vụ từ một chương trình console, không cần API 
 `OrderService` và `FakeProductStore` của bài Fake thay phụ thuộc:
 
 ```csharp
+// Console
 var store = new FakeProductStore();
 store.Products.Add(new Product
 {
@@ -103,11 +107,11 @@ nghiệp vụ chạy được mà không có giao diện nào, nên test đượ
 ## Lỗi hay gặp
 
 **Để quy tắc nghiệp vụ và `DbContext` trong controller.** Controller vừa đọc
-database, vừa kiểm tồn kho, vừa trả HTTP. App WinForms không dùng lại được,
-test phải dựng cả API.
+database, vừa kiểm tra tồn kho, vừa trả HTTP. App WinForms không dùng lại
+được, còn test thì phải dựng cả API.
 
 ```csharp
-// SAI — quy tắc nghiệp vụ nằm trong controller
+// SAI — ShopApi: quy tắc nghiệp vụ trong controller
 [HttpPost]
 public async Task<IActionResult> Place(int id, int qty)
 {
@@ -123,7 +127,7 @@ public async Task<IActionResult> Place(int id, int qty)
 ```
 
 ```csharp
-// ĐÚNG — controller chỉ gọi tầng nghiệp vụ
+// ĐÚNG — ShopApi: controller chỉ gọi service
 using Microsoft.AspNetCore.Mvc;
 
 public class OrdersController : ControllerBase
@@ -172,7 +176,7 @@ public class OrdersController : ControllerBase
   {
     "prompt": "Controller nên làm những việc gì?",
     "options": [
-      "Đọc database và kiểm tồn kho",
+      "Đọc database và kiểm tra tồn kho",
       "Tính phí ship",
       "Gửi email",
       "Nhận request, gọi service, đổi kết quả thành response HTTP"

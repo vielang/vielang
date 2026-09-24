@@ -3,15 +3,15 @@ title: Đặt tên và method ngắn
 minutes: 5
 ---
 
-Code được đọc nhiều hơn được viết rất nhiều lần: khi sửa lỗi, khi review pull
-request, khi thêm tính năng. Tên mơ hồ và `if` lồng nhiều tầng làm người đọc
-phải đoán. Bài này nói hai thói quen giúp code tự giải thích.
+Code được đọc nhiều hơn được viết: khi sửa lỗi, khi review pull request, khi
+thêm tính năng. Tên mơ hồ và `if` lồng nhiều tầng bắt người đọc phải đoán. Bài
+này dạy hai thói quen giúp code dễ đọc mà không cần comment.
 
 ## Khái niệm
 
 📛 **Tên rõ ý định (intention-revealing name)**: tên cho biết biến, method dùng để làm gì mà không cần đọc code bên trong hay comment.
 
-✍️ **Guard clause (điều kiện chặn đầu)**: kiểm các trường hợp đặc biệt ở đầu method và `return` ngay, để phần chính của method không phải lồng trong `if`.
+✍️ **Guard clause (điều kiện chặn đầu)**: lệnh `if` ở đầu method xử lý một trường hợp đặc biệt rồi `return` ngay.
 
 | Loại | Quy ước | Ví dụ |
 |---|---|---|
@@ -80,13 +80,14 @@ decimal ShippingFee(
 
 - `t`, `m`, `c`, `r` bắt người đọc lần ngược xem chúng là gì. `orderTotal`,
   `isMember`, `city` đọc là hiểu.
-- Mỗi guard clause xử lý xong một trường hợp rồi `return`. Không còn `if`
-  lồng ba tầng.
-- Method làm đúng một việc như SRP ở khoá OOP, nên ngắn và dễ đặt tên.
+- Mỗi guard clause xử lý xong một trường hợp rồi `return`, nên phần sau
+  không phải lồng trong `if`.
+- Method chỉ làm một việc, cùng tinh thần với SRP ở khoá OOP, nên ngắn và dễ
+  đặt tên.
 
 ## Thử ngay
 
-Gọi cả hai bản với cùng dữ liệu:
+Gọi `ShippingFee` với bốn bộ dữ liệu:
 
 ```csharp
 Console.WriteLine(ShippingFee(600000, false, "Hà Nội"));
@@ -109,15 +110,15 @@ Console.WriteLine(
 35000
 ```
 
-`Calc` cho đúng bốn con số này. Đổi tên và bỏ `if` lồng không làm thay đổi
-hành vi, chỉ làm code dễ đọc hơn.
+`Calc` cho đúng bốn con số này. Đổi tên và bỏ `if` lồng không đổi hành vi,
+chỉ làm code dễ đọc hơn.
 
 </details>
 
 ## Lỗi hay gặp
 
-**Dùng comment để chữa tên dở.** Comment dễ lỗi thời khi code đổi, còn tên
-thì đi theo biến tới mọi chỗ nó được dùng.
+**Dùng comment để chữa tên dở.** Code đổi mà quên sửa comment thì comment
+thành sai. Tên thì đi theo biến tới mọi chỗ biến được dùng.
 
 ```csharp
 // SAI — cần comment mới hiểu d là gì
@@ -129,8 +130,8 @@ int d = 3;   // số ngày giao hàng
 int deliveryDays = 3;
 ```
 
-Comment nên dành để giải thích **vì sao** code làm vậy, ví dụ một quy định
-của công ty, chứ không để giải thích code làm **gì**.
+Comment dùng để giải thích **vì sao** code làm vậy, ví dụ một quy định của
+công ty, không phải để giải thích code làm **gì**.
 
 ## Tóm tắt
 

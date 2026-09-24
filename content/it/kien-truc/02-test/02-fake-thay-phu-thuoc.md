@@ -3,17 +3,26 @@ title: Fake thay phụ thuộc
 minutes: 6
 ---
 
-`OrderService` kiểm tồn kho rồi trừ kho qua `IProductStore`. Test nó bằng
-`DbProductStore` thật thì phải bật Oracle, chuẩn bị dữ liệu, và test chậm,
-lúc qua lúc đỏ tuỳ database. Thay `IProductStore` bằng một bản giả trong bộ
-nhớ thì test chạy trong vài mili giây, lần nào cũng cho cùng kết quả.
+`OrderService` kiểm tồn kho rồi trừ kho qua `IProductStore`. Test nó với
+`DbProductStore` thật thì phải bật Oracle và chuẩn bị dữ liệu, test chạy
+chậm và lúc qua lúc đỏ tuỳ dữ liệu trong database. Thay `IProductStore` bằng
+một bản giả trong bộ nhớ thì test chạy trong vài mili giây, lần nào cũng cho
+cùng kết quả.
 
 ## Khái niệm
 
 ♻️ **Fake**: class tự viết implement cùng interface với phụ thuộc thật, giữ dữ liệu trong bộ nhớ để test dùng thay cho database hay API.
 
-`FakeProductStore` của khoá WinForms là một fake. Nhờ DIP ở khoá OOP,
-`OrderService` chỉ biết `IProductStore`, nên nhận fake hay bản thật đều được.
+`FakeProductStore` ở bài Tách giao diện và dữ liệu của khoá WinForms là một
+fake. Bài này viết lại nó, thêm bộ đếm số lần ghi. Theo bài DIP và dependency injection, `OrderService` chỉ biết
+`IProductStore`, nên nhận fake hay bản thật đều được.
+
+```mermaid OrderService chỉ biết IProductStore, test truyền fake vào
+flowchart LR
+    S["OrderService"] --> I["IProductStore"]
+    I -- "app thật" --> D["DbProductStore"]
+    I -- "test" --> F["FakeProductStore"]
+```
 
 ## Ví dụ
 
@@ -113,11 +122,14 @@ public class OrderServiceTests
 }
 ```
 
-- Test có `await` thì khai báo `async Task`, như method async ở khoá C# Core.
+- `Find` giống `FindAll` nhưng chỉ trả về phần tử đầu tiên thoả điều kiện,
+  không có thì trả về `null`.
+- Test có `await` thì khai báo `async Task`, như bài async/await cơ bản.
 - Arrange tạo fake và nạp đúng dữ liệu test cần, không phụ thuộc database.
-- `SetStockCalls` đếm số lần service gọi lưu, để test kiểm được cả việc "có
-  ghi xuống kho hay không".
-- `Task.FromResult` như bài Tách giao diện và dữ liệu của khoá WinForms.
+- `SetStockCalls` đếm số lần service gọi `SetStockAsync`, để test kiểm được
+  service có ghi tồn kho hay không.
+- `Task.FromResult` bọc sẵn kết quả thành `Task`, như ở bài Tách giao diện
+  và dữ liệu.
 
 ## Thử ngay
 
@@ -198,8 +210,8 @@ public class OrderServiceTests
 }
 ```
 
-Đừng viết test `async void`: xUnit đã cảnh báo (`xUnit1048`) và sẽ bỏ hỗ trợ
-kiểu này.
+Cũng đừng viết test `async void`: xUnit báo cảnh báo `xUnit1048`, vì các bản
+sau sẽ bỏ hỗ trợ kiểu này.
 
 ## Tóm tắt
 

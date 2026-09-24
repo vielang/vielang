@@ -3,24 +3,24 @@ title: Code smell
 minutes: 5
 ---
 
-Code chạy đúng chưa chắc đã dễ sửa. Có những dấu hiệu nhìn là biết lần sửa
-sau sẽ khổ: cùng một con số chép ở ba nơi, method dài hai trăm dòng. Nhận ra
+Code chạy đúng chưa chắc đã dễ sửa. Có những dấu hiệu báo trước lần sửa sau
+sẽ vất vả: cùng một con số chép ở ba nơi, method dài hai trăm dòng. Nhận ra
 chúng sớm thì sửa rẻ hơn nhiều so với lúc chúng đã gây lỗi.
 
 ## Khái niệm
 
-👃 **Code smell**: dấu hiệu trên bề mặt code cho thấy thiết kế có thể có vấn đề, chưa chắc là lỗi nhưng làm code khó hiểu, khó sửa.
+👃 **Code smell**: dấu hiệu trong code cho thấy code khó hiểu, khó sửa, dù chưa chắc đã là lỗi.
 
 | Smell | Dấu hiệu | Cách sửa thường dùng |
 |---|---|---|
 | Trùng lặp | cùng một công thức chép ở nhiều nơi | tách thành một method |
 | Method dài | phải cuộn mới đọc hết một method | tách thành nhiều method nhỏ có tên |
-| Số trần (magic number) | `0.1m`, `500000` đứng trơ trọi giữa code | đặt thành hằng có tên |
+| Số trần (magic number) | `0.1m`, `500000` nằm giữa code, không có tên | đặt thành hằng có tên |
 | Danh sách tham số dài | method nhận năm, sáu tham số | gom thành một class |
 
 ## Ví dụ
 
-Tiền VAT 10% được tính ở hai nơi:
+Tổng tiền có VAT 10% được tính ở hai nơi:
 
 ```csharp
 Console.WriteLine(CartTotal(100000m));
@@ -37,8 +37,8 @@ decimal InvoiceTotal(decimal subtotal)
 }
 ```
 
-Có hai smell cùng lúc: `1.1m` là số trần không nói nó là gì, và công thức bị
-trùng ở hai method. Sửa bằng một hằng và một method dùng chung:
+Có hai smell cùng lúc: `1.1m` là số trần, không cho biết nó là gì, và công
+thức bị trùng ở hai method. Sửa bằng một hằng và một method dùng chung:
 
 ```csharp
 const decimal VatRate = 0.1m;
@@ -100,9 +100,6 @@ git commit -am "Dọn code"
 git commit -am "Đặt hằng VatRate"
 git commit -am "Tách method WithVat"
 ```
-
-Smell cũng không phải luật cứng. Method dài mà chỉ là một danh sách cấu hình
-dễ đọc thì không cần tách.
 
 ## Tóm tắt
 

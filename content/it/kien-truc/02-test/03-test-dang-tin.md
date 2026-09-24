@@ -3,9 +3,9 @@ title: Test đáng tin
 minutes: 5
 ---
 
-Một test hôm qua qua, hôm nay đỏ, mà không ai sửa code. Chạy lại thì qua. Test
-như vậy làm cả nhóm mất lòng tin: thấy đỏ cũng không biết là lỗi thật hay test
-"dở chứng". Bài này chỉ ra các nguyên nhân hay gặp nhất và cách tránh.
+Một test hôm qua còn qua, hôm nay lại đỏ, dù không ai sửa code. Chạy lại thì
+qua. Test như vậy làm cả nhóm mất lòng tin: thấy đỏ mà không biết là code lỗi
+thật hay do chính test. Bài này chỉ ra các nguyên nhân hay gặp và cách tránh.
 
 ## Khái niệm
 
@@ -54,6 +54,7 @@ public class PromoTests
 }
 ```
 
+- `day.DayOfWeek` cho biết ngày đó là thứ mấy.
 - Test tự chọn ngày cố định, nên chạy hôm nào cũng cho cùng kết quả.
 - `DateTime` không viết được trong `[InlineData]`, nên truyền năm, tháng,
   ngày rồi tạo `DateTime` trong test.
@@ -63,7 +64,7 @@ public class PromoTests
 
 ## Thử ngay
 
-xUnit chạy các test theo thứ tự không cố định. Thêm class này rồi chạy
+xUnit không chạy test theo thứ tự viết trong file. Thêm class này rồi chạy
 `dotnet test`:
 
 ```csharp
@@ -100,7 +101,8 @@ Passed!  - Failed: 0, ...
 ```
 
 Cả hai qua. xUnit tạo một object `CounterTests` mới cho mỗi test, nên mỗi test
-có `_count` riêng, bắt đầu từ 0. Nhờ vậy các test không dính nhau qua field.
+có `_count` riêng, bắt đầu từ 0. Nhờ vậy các test không ảnh hưởng nhau qua
+field.
 Đổi `_count` thành `static` thì hai test dùng chung một biến, và test chạy sau
 sẽ đỏ.
 
@@ -148,8 +150,8 @@ public class Promo
 
 - Test đáng tin cho cùng kết quả mỗi lần chạy.
 - Không đọc `DateTime.Now` trong code cần test, truyền ngày vào qua tham số.
-- xUnit tạo object test mới cho mỗi test. Tránh `static` dùng chung giữa các
-  test.
+- xUnit tạo object test mới cho mỗi test. Tránh field `static` dùng chung
+  giữa các test.
 - Tên test nói rõ tình huống, mỗi test kiểm một hành vi.
 
 ```quiz

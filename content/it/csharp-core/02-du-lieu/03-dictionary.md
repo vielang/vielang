@@ -37,7 +37,7 @@ foreach (var item in stock)
 - `stock["PEN-01"] = 120` thêm cặp mới, hoặc ghi đè nếu khoá đã có.
 - `stock["PEN-01"]` đọc giá trị theo khoá.
 - `ContainsKey` kiểm tra khoá có tồn tại không.
-- `foreach` trả về từng cặp, đọc bằng `.Key` và `.Value`.
+- `foreach` lấy ra từng cặp, đọc bằng `.Key` và `.Value`.
 
 ## Thử ngay
 
@@ -122,9 +122,9 @@ stock["PEN-01"] = 80;
 ## Tóm tắt
 
 - Dictionary lưu cặp khoá–giá trị và tra giá trị thẳng theo khoá.
-- Mỗi khoá chỉ có một. Gán `d[key] = value` sẽ thêm mới hoặc ghi đè.
+- Mỗi khoá là duy nhất. Gán `d[key] = value` sẽ thêm mới hoặc ghi đè.
 - Đọc khoá không tồn tại là lỗi, nên kiểm tra bằng `ContainsKey` trước.
-- `foreach` trả về từng cặp với `.Key` và `.Value`.
+- `foreach` lấy ra từng cặp với `.Key` và `.Value`.
 
 ```quiz
 [

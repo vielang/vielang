@@ -3,9 +3,9 @@ title: enum
 minutes: 4
 ---
 
-Đơn hàng chỉ có vài trạng thái: mới, đã thanh toán, đang giao, đã huỷ. Lưu
-trạng thái bằng chuỗi thì gõ nhầm `"paid"` thành `"piad"` compiler cũng không
-phát hiện. enum giới hạn giá trị vào đúng danh sách cho phép.
+Đơn hàng chỉ có vài trạng thái: mới, đã thanh toán, đang giao, đã huỷ. Nếu
+lưu trạng thái bằng chuỗi, gõ nhầm `"paid"` thành `"piad"` thì compiler cũng
+không phát hiện. enum giới hạn giá trị vào đúng danh sách cho phép.
 
 ## Khái niệm
 
@@ -37,7 +37,7 @@ enum OrderStatus
   `OrderStatus.Paid`.
 - Gõ sai tên như `OrderStatus.Piad` là lỗi compile ngay.
 - In ra thì được tên (`Paid`). Mỗi giá trị còn có một số nguyên đi kèm, đánh
-  từ 0: `New` là 0, `Paid` là 1.
+  số từ 0: `New` là 0, `Paid` là 1.
 - enum là value type.
 
 ## Thử ngay
@@ -85,7 +85,7 @@ Console.WriteLine((int)status);
 **Dùng chuỗi cho giá trị cố định.** Gõ nhầm vẫn chạy, chỉ là chạy sai.
 
 ```csharp
-// SAI — "piad" gõ nhầm, điều kiện sai mà không ai biết
+// SAI — gõ nhầm "piad", điều kiện sai mà không ai biết
 string status = "piad";
 if (status == "paid")
 {

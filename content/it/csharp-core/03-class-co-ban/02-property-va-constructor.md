@@ -41,7 +41,7 @@ class Product
   `Name` và `Price`.
 - Constructor không có kiểu trả về, tên trùng với tên class.
 - Class có constructor nhận tham số thì `new Product()` không còn dùng được.
-  Muốn tạo sản phẩm là phải truyền đủ tên và giá.
+  Muốn tạo sản phẩm thì phải truyền đủ tên và giá.
 
 Theo quy ước, property viết hoa chữ cái đầu (`Price`), tham số viết thường
 (`price`).
@@ -74,7 +74,7 @@ Tạo sản phẩm: Vở
 Kết thúc
 ```
 
-Hai lần, mỗi lần `new` một lần. Constructor chạy đúng lúc object được tạo.
+Hai lần, mỗi lần gọi `new` in một lần. Constructor chạy đúng lúc object được tạo.
 
 </details>
 
@@ -151,7 +151,7 @@ class Item
       "Lỗi khi chạy"
     ],
     "answer": 1,
-    "explain": "Khi class đã có constructor nhận tham số, C# không tự tạo constructor rỗng nữa. Phải gọi new Order(5)."
+    "explain": "Khi class đã có constructor nhận tham số, C# không tự tạo constructor không tham số nữa. Phải gọi new Order(5)."
   },
   {
     "prompt": "Property nào nên để { get; set; } thay vì { get; }?",

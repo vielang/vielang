@@ -3,8 +3,8 @@ title: null và nullable
 minutes: 5
 ---
 
-Tìm khách hàng theo số điện thoại, nhưng số đó chưa từng mua hàng. Kết quả
-không phải là một khách nào cả. C# dùng `null` để diễn tả "không có gì", và đây
+Bạn tìm khách hàng theo số điện thoại, nhưng chưa có khách nào dùng số đó. Kết
+quả là không có khách nào. C# dùng `null` để diễn tả "không có gì", và `null`
 cũng là nguồn gây lỗi phổ biến nhất khi chương trình chạy.
 
 ## Khái niệm
@@ -143,7 +143,7 @@ int? stock = null;
     "explain": "points là null nên ?? lấy vế phải là 10."
   },
   {
-    "prompt": "Chương trình dừng với NullReferenceException ở dòng customer.Name.ToUpper(). Nguyên nhân khả dĩ nhất?",
+    "prompt": "Chương trình dừng với NullReferenceException ở dòng customer.Name.ToUpper(). Nguyên nhân nhiều khả năng nhất là gì?",
     "options": [
       "customer hoặc customer.Name đang là null",
       "Name là string nên không gọi ToUpper được",

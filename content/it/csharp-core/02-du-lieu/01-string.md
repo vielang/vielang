@@ -87,7 +87,7 @@ string name = "An";
 Console.WriteLine($"Xin chào {name}");
 ```
 
-**So sánh mà quên chuyện hoa thường.** `==` coi `"Admin"` và `"admin"` là
+**So sánh mà quên để ý chữ hoa, chữ thường.** `==` coi `"Admin"` và `"admin"` là
 khác nhau.
 
 ```csharp

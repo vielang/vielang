@@ -133,7 +133,7 @@ class GiftCard : Product
 ```
 
 **Kế thừa chỉ để dùng lại code.** Khách hàng không phải là một địa chỉ, nên
-`Customer : Address` là sai, dù nó giúp `Customer` có sẵn `Street`.
+`Customer : Address` là sai, dù làm vậy giúp `Customer` có sẵn `Street`.
 
 ```csharp
 // SAI — khách hàng không "là một" địa chỉ
@@ -162,7 +162,7 @@ class Customer
 
 - `class Con : Cha`: class con nhận lại property và method của class cha, rồi
   thêm phần riêng.
-- Constructor không được kế thừa, class con gọi constructor cha bằng
+- Constructor không được kế thừa. Class con gọi constructor của cha bằng
   `: base(...)`.
 - Một class chỉ có một class cha.
 - Chỉ kế thừa khi con **là một** loại của cha.

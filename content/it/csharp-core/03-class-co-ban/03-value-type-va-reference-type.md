@@ -4,14 +4,14 @@ minutes: 5
 ---
 
 Bạn chép giỏ hàng mẫu cho khách A, rồi thêm món vào giỏ của A. Mở giỏ mẫu ra,
-món đó cũng có mặt. Không dòng nào gán nhầm. Lý do nằm ở cách C# chép hai loại
-kiểu khác nhau.
+món đó cũng có mặt. Không có dòng nào gán nhầm. Lý do là C# chép hai loại kiểu
+theo hai cách khác nhau.
 
 ## Khái niệm
 
 🔢 **Value type**: kiểu mà biến chứa trực tiếp giá trị, gán sang biến khác là chép cả giá trị.
 
-🔗 **Reference type**: kiểu mà biến chỉ chứa tham chiếu tới object, gán sang biến khác là chép tham chiếu, và hai biến cùng trỏ một object.
+🔗 **Reference type**: kiểu mà biến chỉ chứa tham chiếu tới object, gán sang biến khác là chép tham chiếu, và hai biến cùng trỏ tới một object.
 
 | Loại | Gồm những kiểu |
 |---|---|
@@ -42,8 +42,8 @@ class Product
   sửa qua biến nào thì biến kia cũng thấy.
 - `new Product { Price = 5000m }` tạo object rồi gán luôn property trong cặp
   `{ }`.
-- `string` là reference type nhưng không sửa được, nên dùng như value type mà
-  không gặp vấn đề này.
+- `string` là reference type nhưng không sửa được nội dung, nên dùng giống
+  value type mà không gặp vấn đề này.
 
 ## Thử ngay
 
@@ -70,8 +70,8 @@ void DiscountProduct(Product product)
 }
 ```
 
-**Đoán trước khi chạy:** hai method làm cùng một việc. Hai dòng in ra có cùng
-bị giảm không?
+**Đoán trước khi chạy:** hai method làm cùng một việc. Cả hai giá trị in ra có
+đều bị giảm không?
 
 <details>
 <summary>Xem kết quả</summary>
@@ -82,8 +82,8 @@ bị giảm không?
 ```
 
 Không. Tham số `int` nhận bản chép của số, nên `price` bên ngoài giữ nguyên.
-Tham số `Product` nhận bản chép của tham chiếu, vẫn trỏ đúng object `pen`, nên
-sửa bên trong method thì `pen` đổi theo.
+Tham số `Product` nhận bản chép của tham chiếu, bản chép này vẫn trỏ tới
+object `pen`, nên sửa bên trong method thì `pen` đổi theo.
 
 </details>
 
@@ -118,7 +118,7 @@ Console.WriteLine(x == y);
 ```
 
 ```csharp
-// ĐÚNG — so sánh đúng dữ liệu cần so
+// ĐÚNG — so sánh chính dữ liệu cần kiểm tra
 var x = new Product { Price = 5000m };
 var y = new Product { Price = 5000m };
 Console.WriteLine(x.Price == y.Price);

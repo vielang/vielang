@@ -98,7 +98,7 @@ var triple = x => x * 3;
 Func<int, int> triple = x => x * 3;
 ```
 
-**Có ngoặc `{ }` mà quên `return`.** Lambda nhiều dòng phải `return` như
+**Có ngoặc `{ }` mà quên `return`.** Lambda nhiều dòng phải có `return` như
 method.
 
 ```csharp

@@ -3,7 +3,7 @@ title: Abstract class
 minutes: 5
 ---
 
-Cửa hàng nhận tiền mặt và thẻ. Mọi phương thức thanh toán đều có số tiền và in
+Cửa hàng nhận tiền mặt và thẻ. Mọi hình thức thanh toán đều có số tiền và in
 biên lai giống nhau, nhưng cách trả tiền thì mỗi loại một kiểu. Một object
 "thanh toán" chung chung, không rõ là tiền mặt hay thẻ, thì không có nghĩa.
 Abstract class diễn tả đúng tình huống này.
@@ -59,7 +59,7 @@ Quẹt thẻ - 120000đ
 - `public abstract string Pay();` không có thân. Mỗi class con tự viết cách
   trả tiền.
 - `Receipt()` là method bình thường, viết một lần ở class cha và dùng chung.
-- Vòng lặp chỉ biết `Payment`, đó là sự trừu tượng: nơi dùng không cần biết
+- Vòng lặp chỉ biết `Payment`. Đó là trừu tượng: nơi dùng không cần biết là
   tiền mặt hay thẻ.
 
 So với `virtual` ở bài trước:
@@ -71,7 +71,7 @@ So với `virtual` ở bài trước:
 
 ## Thử ngay
 
-Chép ví dụ trên vào `Program.cs`. Thêm class dưới vào cuối file, và thêm
+Chép ví dụ trên vào `Program.cs`. Thêm class dưới đây vào cuối file, và thêm
 `new WalletPayment { Amount = 80000m },` vào list:
 
 ```csharp

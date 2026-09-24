@@ -5,7 +5,7 @@ minutes: 5
 
 Đơn trên 500.000đ thì miễn phí ship, khách VIP được giảm giá, mỗi phương thức
 thanh toán xử lý một kiểu. Chương trình cần chọn làm việc này hay việc kia tuỳ
-điều kiện. Đó là việc của `if` và `switch`.
+điều kiện. Đó là nhiệm vụ của `if` và `switch`.
 
 ## Khái niệm
 

@@ -5,7 +5,7 @@ minutes: 5
 
 Giỏ hàng có cả sách giấy lẫn ebook. Sách giấy tính phí ship theo cân nặng,
 ebook thì miễn phí. Viết `if` kiểm tra từng loại thì mỗi lần thêm loại hàng
-mới lại phải sửa giỏ hàng. Đa hình để mỗi loại tự biết cách tính của mình.
+mới lại phải sửa giỏ hàng. Với đa hình, mỗi loại tự biết cách tính của mình.
 
 ## Khái niệm
 
@@ -85,8 +85,8 @@ hay 0?
 ```
 
 In 0. Kiểu của biến là `Product`, nhưng object thật là `DigitalProduct`, và
-C# chạy bản `override` của object thật. `Product` thường không có
-`override` nào nên dùng bản gốc 30000.
+C# chạy bản `override` của object thật. Còn `other` là `Product` thường nên
+chạy bản gốc, in 30000.
 
 </details>
 

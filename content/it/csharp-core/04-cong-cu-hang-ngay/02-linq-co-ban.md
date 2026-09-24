@@ -4,8 +4,8 @@ minutes: 5
 ---
 
 Lọc sản phẩm còn hàng, sắp xếp theo giá, lấy tên, tính tổng tiền. Viết bằng
-`foreach` thì mỗi việc tốn năm sáu dòng. LINQ làm từng việc đó trong một dòng,
-dùng lambda của bài trước.
+`foreach` thì mỗi việc tốn năm sáu dòng. LINQ làm mỗi việc chỉ trong một dòng,
+bằng lambda đã học ở bài trước.
 
 ## Khái niệm
 
@@ -131,9 +131,9 @@ Console.WriteLine(item?.Name ?? "Không có");
 ## Tóm tắt
 
 - LINQ gồm các method như `Where`, `Select`, `OrderBy`, `Sum`, nhận lambda.
-- Nối nhiều method bằng dấu chấm, `ToList()` để lấy kết quả thành list.
-- LINQ không sửa collection gốc, phải lưu kết quả vào biến.
-- Có thể không tìm thấy thì dùng `FirstOrDefault`, rồi kiểm tra `null`.
+- Nối nhiều method bằng dấu chấm, gọi `ToList()` để lấy kết quả dạng list.
+- LINQ không sửa collection gốc, muốn dùng kết quả thì lưu vào biến.
+- Nếu có thể không tìm thấy, dùng `FirstOrDefault` rồi kiểm tra `null`.
 
 ```quiz
 [

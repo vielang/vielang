@@ -34,7 +34,7 @@ void PrintLine(string message)
 }
 ```
 
-Một method gồm bốn phần: `decimal CalculateTotal(decimal price, int quantity)`.
+Một method gồm bốn phần, lấy `CalculateTotal` làm ví dụ:
 
 - `decimal`: kiểu của giá trị trả về.
 - `CalculateTotal`: tên method, viết hoa chữ cái đầu, thường là động từ.
@@ -83,7 +83,7 @@ sửa bản chép, còn `price` giữ nguyên.
 `return`.
 
 ```csharp
-// SAI — lỗi compile: nhánh else không trả về gì
+// SAI — lỗi compile: total < 500000 thì không có return
 Console.WriteLine(ShippingFee(100000m));
 
 decimal ShippingFee(decimal total)
@@ -136,8 +136,8 @@ void PrintLine(string message)
 - Method là khối code có tên, viết một lần và gọi nhiều lần.
 - Khai báo: `kiểu_trả_về Tên(tham số) { ... }`.
 - `return` gửi kết quả về, `void` nghĩa là không trả về gì.
-- Tham số nhận bản chép của giá trị truyền vào, sửa tham số không đổi biến bên
-  ngoài.
+- Tham số nhận bản chép của giá trị truyền vào, nên sửa tham số không làm đổi
+  biến bên ngoài.
 
 ```quiz
 [

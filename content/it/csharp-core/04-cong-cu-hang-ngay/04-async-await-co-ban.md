@@ -29,7 +29,7 @@ async Task<decimal> GetPriceAsync(string code)
 - Method có `await` bên trong phải khai báo `async`.
 - Kiểu trả về là `Task<decimal>` chứ không phải `decimal`. Method không trả về
   gì thì dùng `Task`.
-- Tên method async kết thúc bằng `Async`, theo quy ước .NET.
+- Theo quy ước .NET, tên method async kết thúc bằng `Async`.
 - `await` lấy ra giá trị `decimal` từ `Task<decimal>`.
 - `Task.Delay(1000)` chờ 1 giây mà không chặn chương trình, dùng để giả lập
   việc chậm.
@@ -69,8 +69,8 @@ async Task<decimal> GetPriceAsync(string code)
 3. Giá: 5000
 ```
 
-In trước. Gọi `GetPriceAsync` là việc bắt đầu chạy ngay, tới `await
-Task.Delay` thì nhường lại. Chương trình in dòng 2 trong lúc việc tra giá vẫn
+In trước. Gọi `GetPriceAsync` thì việc tra giá bắt đầu chạy ngay, tới `await
+Task.Delay` thì quay về nơi gọi. Chương trình in dòng 2 trong lúc việc tra giá vẫn
 đang chờ. Chỉ tới `await task` mới thật sự đứng đợi kết quả.
 
 </details>
@@ -95,7 +95,7 @@ async Task<decimal> GetPriceAsync(string code)
 decimal price = await GetPriceAsync("PEN-01");
 ```
 
-**Dùng `.Result` để lấy kết quả.** `.Result` chặn cả luồng đứng đợi. Trong
+**Dùng `.Result` để lấy kết quả.** `.Result` chặn luồng hiện tại cho tới khi có kết quả. Trong
 ứng dụng web, việc này làm server chậm đi, có khi treo hẳn.
 
 ```csharp

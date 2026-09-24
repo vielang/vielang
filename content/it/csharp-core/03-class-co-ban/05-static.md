@@ -69,8 +69,8 @@ class Product
 }
 ```
 
-**Đoán trước khi chạy:** mỗi object tăng `Count` một lần. `Product.Count` in
-ra 1 hay 3?
+**Đoán trước khi chạy:** mỗi lần tạo object, `Count` tăng thêm 1.
+`Product.Count` in ra 1 hay 3?
 
 <details>
 <summary>Xem kết quả</summary>
@@ -86,8 +86,8 @@ Là 3. `Count` là static nên cả ba object dùng chung một biến đếm. N
 
 ## Lỗi hay gặp
 
-**Static method dùng field thường.** Compiler không biết lấy field của object
-nào.
+**Static method dùng thành viên thường.** Compiler không biết lấy `Price` của
+object nào.
 
 ```csharp
 // SAI — lỗi compile: Price thuộc về từng object

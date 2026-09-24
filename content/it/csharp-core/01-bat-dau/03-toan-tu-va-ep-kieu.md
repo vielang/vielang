@@ -4,7 +4,7 @@ minutes: 5
 ---
 
 Tính tổng tiền, so sánh tồn kho, đổi chuỗi người dùng nhập thành số: việc nào
-cũng cần toán tử và ép kiểu. Bài này gom những phép bạn dùng hằng ngày, kèm hai
+cũng cần toán tử và ép kiểu. Bài này gom những toán tử dùng hằng ngày, kèm hai
 cái bẫy mà người mới hay rơi vào.
 
 ## Khái niệm

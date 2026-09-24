@@ -3,8 +3,8 @@ title: Array và List
 minutes: 5
 ---
 
-Một giỏ hàng có nhiều món, một cửa hàng có nhiều sản phẩm. Tạo từng biến
-`price1`, `price2`, `price3` thì không thể dùng được khi có hàng trăm món. Bài
+Một giỏ hàng có nhiều món, một cửa hàng có nhiều sản phẩm. Khi có hàng trăm món, không
+thể tạo từng biến `price1`, `price2`, `price3`. Bài
 này giới thiệu cách lưu nhiều giá trị trong một biến.
 
 ## Khái niệm
@@ -44,7 +44,7 @@ Console.WriteLine(cart[1]);        // Thước
 ## Duyệt bằng foreach
 
 `foreach` lấy lần lượt từng phần tử, không cần biến đếm. List dưới đây được
-tạo sẵn phần tử bằng cặp `{ }` ngay lúc khai báo:
+điền sẵn phần tử trong cặp `{ }` ngay lúc khai báo:
 
 ```csharp
 List<decimal> prices = new List<decimal>
@@ -178,7 +178,7 @@ tags.Add("hot");
       "for (int i = 1; i < ids.Count; i++)"
     ],
     "answer": 1,
-    "explain": "Vị trí hợp lệ là 0 đến Count - 1. Bắt đầu từ 0 và dừng khi i < Count là đúng đủ."
+    "explain": "Vị trí hợp lệ là 0 đến Count - 1. Bắt đầu từ 0 và lặp khi i < Count là duyệt vừa đủ."
   }
 ]
 ```

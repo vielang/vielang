@@ -100,8 +100,8 @@ Là 2. Bán 3 cái thành công. Lệnh bán 10 bị `Sell` chặn trước khi 
 
 ## Lỗi hay gặp
 
-**Để `set` công khai.** Ai cũng gán được, và quy tắc trong `Sell` bị đi vòng
-qua.
+**Để `set` công khai.** Nơi nào cũng gán thẳng được, và quy tắc trong `Sell`
+bị bỏ qua.
 
 ```csharp
 // SAI — nơi khác gán thẳng, bỏ qua mọi kiểm tra
@@ -138,7 +138,7 @@ class Cup
 ## Tóm tắt
 
 - Đóng gói: dữ liệu để `private`, chỉ đổi qua method của class.
-- `public` dùng ở mọi nơi, `private` chỉ dùng trong class.
+- `public` dùng được ở mọi nơi, `private` chỉ dùng được trong class.
 - `{ get; private set; }` cho bên ngoài đọc mà không cho ghi.
 - Quy tắc kiểm tra nằm trong method của class, không rải ở nơi gọi.
 
@@ -164,7 +164,7 @@ class Cup
       "Không cần kiểm tra"
     ],
     "answer": 1,
-    "explain": "Đặt quy tắc trong method của class thì chỉ có một chỗ phải viết và không nơi nào đi vòng qua được."
+    "explain": "Đặt quy tắc trong method của class thì chỉ có một chỗ phải viết và không nơi nào bỏ qua được."
   },
   {
     "prompt": "Một field khai báo int _count; mà không ghi access modifier. Nó là gì?",

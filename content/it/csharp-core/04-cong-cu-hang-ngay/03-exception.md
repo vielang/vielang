@@ -11,9 +11,9 @@ Bài này hướng dẫn cách bắt lỗi và cách tự báo lỗi.
 
 💥 **Exception**: object mô tả một lỗi xảy ra lúc chạy, làm chương trình dừng nếu không ai bắt.
 
-🧯 **try/catch**: cặp khối dùng để chạy thử code trong `try`, và xử lý exception trong `catch` nếu có lỗi.
+🧯 **try/catch**: cặp khối dùng để chạy thử code trong `try` và xử lý exception trong `catch` nếu có lỗi.
 
-🚨 **throw**: câu lệnh tự tạo và ném ra một exception khi dữ liệu không hợp lệ.
+🚨 **throw**: câu lệnh ném ra một exception, thường viết kèm `new` để tạo exception đó.
 
 ## Ví dụ
 
@@ -39,7 +39,7 @@ catch (FormatException)
   có lỗi hay không.
 
 Tên exception hay gặp: `FormatException` (sai định dạng),
-`NullReferenceException` (dùng `null`), `ArgumentException` (tham số không
+`NullReferenceException` (dùng biến đang là `null`), `ArgumentException` (tham số không
 hợp lệ), `InvalidOperationException` (thao tác không hợp lệ lúc đó).
 
 ## Tự ném exception
@@ -63,7 +63,7 @@ Console.WriteLine(Total(5000m, 2));   // 10000
 
 ## Thử ngay
 
-Chép method `Total` ở trên vào `Program.cs`, thay dòng gọi bằng:
+Chép method `Total` ở trên vào `Program.cs`, thay dòng gọi `Total` bằng:
 
 ```csharp
 try
@@ -164,7 +164,7 @@ catch (Exception)
 
 - Exception là lỗi lúc chạy, không bắt thì chương trình dừng.
 - `try` chạy thử, `catch` xử lý lỗi, `finally` luôn chạy.
-- Bắt đúng loại exception cụ thể, loại cụ thể đứng trước `Exception`.
+- Bắt đúng loại exception cụ thể và đặt nó trước `Exception`.
 - Dùng `throw` khi dữ liệu vô lý, đừng âm thầm chạy tiếp.
 - Không để `catch` rỗng.
 

@@ -9,7 +9,7 @@ dùng vòng lặp.
 
 ## Khái niệm
 
-🔁 **Vòng lặp (loop)**: khối code được chạy lặp lại nhiều lần cho tới khi điều kiện dừng thành sai.
+🔁 **Vòng lặp (loop)**: khối code được chạy lặp lại nhiều lần, chừng nào điều kiện lặp còn đúng.
 
 🔢 **for**: vòng lặp dùng khi biết trước số lần lặp, có sẵn biến đếm.
 
@@ -40,7 +40,7 @@ Dòng `for` có ba phần, cách nhau bằng dấu `;`:
 
 ## while và break
 
-`while` chỉ có điều kiện. Vòng lặp chạy mãi cho tới khi điều kiện sai:
+`while` chỉ có điều kiện. Vòng lặp chạy chừng nào điều kiện còn đúng:
 
 ```csharp
 int stock = 10;
@@ -90,8 +90,8 @@ Ba dòng. Khi `i` bằng 4, `break` thoát vòng lặp trước khi kịp in.
 
 ## Lỗi hay gặp
 
-**Vòng lặp vô tận.** Quên thay đổi biến trong điều kiện, nên điều kiện đúng
-mãi và chương trình treo.
+**Vòng lặp vô tận.** Bạn quên thay đổi biến dùng trong điều kiện, nên điều
+kiện đúng mãi và chương trình treo.
 
 ```csharp
 // SAI — stock không bao giờ giảm

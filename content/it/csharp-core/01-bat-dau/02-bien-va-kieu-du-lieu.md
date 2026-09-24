@@ -53,7 +53,7 @@ var name = "Bút bi";     // string
 ```
 
 `var` không phải kiểu "gì cũng được". Compiler tự suy ra kiểu từ giá trị, và
-kiểu đó cố định từ đây về sau.
+kiểu đó cố định từ đó về sau.
 
 ## Thử ngay
 
@@ -115,7 +115,7 @@ decimal price = 9.99m;
 - Khai báo biến: `kiểu tên = giá trị;`.
 - `int` cho số nguyên, `decimal` cho tiền, `bool` cho đúng/sai, `string` cho
   chữ.
-- `var` để compiler tự suy ra kiểu, nhưng kiểu vẫn cố định.
+- `var` cho compiler tự suy ra kiểu, nhưng kiểu vẫn cố định.
 - Tiền dùng `decimal`, không dùng `double`.
 
 ```quiz

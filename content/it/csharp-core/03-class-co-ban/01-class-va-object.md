@@ -15,8 +15,8 @@ sẵn nào chứa hết được. Bài này hướng dẫn bạn tự tạo ki�
 
 🏷️ **Field**: biến khai báo bên trong class, mỗi object giữ một bản riêng.
 
-Class chỉ là phần mô tả. Muốn dùng thì phải tạo object từ nó, và một class
-tạo được bao nhiêu object cũng được.
+Class chỉ là phần mô tả. Muốn dùng thì phải tạo object từ nó, và từ một
+class tạo bao nhiêu object cũng được.
 
 ## Ví dụ
 
@@ -42,7 +42,7 @@ class Product
 - `class Product` khai báo hai field (`Name`, `Price`) và một method
   (`TotalFor`).
 - `new Product()` tạo một object, biến `pen` giữ object đó.
-- Dấu chấm truy cập field và method của object: `pen.Price`,
+- Dùng dấu chấm để truy cập field và method của object: `pen.Price`,
   `pen.TotalFor(2)`. Bên trong `TotalFor`, `Price` chính là giá của `pen`.
 
 ## Thử ngay
@@ -102,7 +102,7 @@ pen.Price = 5000;
 
 - Class mô tả dữ liệu (field) và hành vi (method).
 - `new` tạo object từ class, mỗi object giữ field riêng.
-- Dấu chấm truy cập field và method: `pen.Price`, `pen.TotalFor(2)`.
+- Dùng dấu chấm để truy cập field và method: `pen.Price`, `pen.TotalFor(2)`.
 
 ```quiz
 [

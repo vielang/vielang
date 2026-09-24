@@ -10,7 +10,7 @@ này đi từ lúc cài đặt tới lúc màn hình in ra dòng chữ đầu ti
 
 🧰 **.NET SDK**: bộ công cụ để tạo, build và chạy chương trình C#, dùng qua lệnh `dotnet`.
 
-🖥️ **Console app**: chương trình chạy trong cửa sổ dòng lệnh, nhập và in ra bằng chữ.
+🖥️ **Console app**: chương trình chạy trong cửa sổ dòng lệnh, nhập và xuất dữ liệu đều bằng chữ.
 
 📝 **Câu lệnh (statement)**: một chỉ thị cho máy tính, trong C# kết thúc bằng dấu `;`.
 
@@ -63,8 +63,8 @@ Xin chào cửa hàng!
 Mở cửa lúc 8 giờ
 ```
 
-Hai dòng. `Console.Write` in xong thì đứng yên, còn `Console.WriteLine` in
-xong mới xuống dòng.
+Hai dòng. `Console.Write` in xong vẫn ở nguyên dòng đó, còn `Console.WriteLine`
+in xong mới xuống dòng.
 
 </details>
 

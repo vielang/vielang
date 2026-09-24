@@ -98,6 +98,7 @@ npm run check-prose   # khuôn bài, độ dài, định nghĩa, quiz
 npm run check-code    # biên dịch mọi khối C#
 npm run check-sql     # chạy thật khối SQL trên Oracle (cần Docker)
 npm run build-content # dựng courses.json
+npx tsc --noEmit      # next build kiểm kiểu cả scripts/*.mts
 ```
 
 ## Mục lục

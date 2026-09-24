@@ -245,6 +245,31 @@ Riêng bài DSA:
 - Nâng cao (cây đỏ-đen, trie, Dijkstra, quicksort chi tiết) nhiều nhất một
   dòng trong "Tóm tắt".
 
+### Kiến trúc và chất lượng code (`kien-truc`)
+
+Khoá cuối, dùng tiếp dự án `ShopApi` và `ShopDesk`. Thứ tự chương: Git để
+lưu lại mọi thay đổi, test để biết code còn đúng, rồi mới refactor, pattern
+và chia tầng.
+
+| Chương | Bài |
+|---|---|
+| `01-git` | `01-commit-va-lich-su` · `02-branch-va-merge` · `03-xu-ly-conflict` · `04-github-va-pull-request` |
+| `02-test` | `01-theory-va-nhieu-truong-hop` · `02-fake-thay-phu-thuoc` · `03-test-dang-tin` |
+| `03-code-sach` | `01-dat-ten-va-method-ngan` · `02-code-smell` · `03-refactor-an-toan` |
+| `04-design-pattern` | `01-strategy` · `02-factory` · `03-decorator` · `04-observer` |
+| `05-kien-truc-ung-dung` | `01-chia-tang` · `02-clean-architecture` · `03-tach-solution-nhieu-project` |
+
+Riêng bài khoá này:
+
+- Bài Git: lệnh trong khối ```` ```bash ````, kết quả trong `<details>` lấy từ
+  chạy thật (Git tiếng Anh, bỏ các dòng `warning: ... LF will be replaced`).
+  Thử ngay dùng file `prices.txt` nhỏ để kết quả ngắn.
+- Chương Test dùng xUnit như bài Viết test cho API: không dạy lại `[Fact]`,
+  `Assert`, Arrange-Act-Assert.
+- Chương Kiến trúc: mỗi khối code ghi tên project ở dòng comment đầu.
+- Nâng cao (CQRS, microservices, DDD, event sourcing, thư viện mock) nhiều
+  nhất một dòng trong "Tóm tắt".
+
 ### Cú pháp chưa dạy thì chưa dùng
 
 - Method viết đầy đủ `{ return ...; }`. Dạng gọn `=> ...` chỉ dùng sau bài

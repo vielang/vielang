@@ -94,8 +94,7 @@ HAVING SUM(quantity * unit_price) > 100000;
 ```
 
 **Lấy cột không có trong `GROUP BY`.** Một đơn có nhiều sản phẩm, Oracle không
-biết hiện `product_id` nào cho mỗi đơn, nên báo
-`ORA-00979: not a GROUP BY expression`.
+biết hiện `product_id` nào cho mỗi đơn, nên báo lỗi `ORA-00979`.
 
 ```sql
 -- SAI — lỗi: product_id không được gom

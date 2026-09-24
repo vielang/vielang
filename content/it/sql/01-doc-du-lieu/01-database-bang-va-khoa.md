@@ -171,8 +171,8 @@ cột hiện chữ hoa vì Oracle lưu tên không đặt trong nháy kép ở d
 
 ## Lỗi hay gặp
 
-**Thêm dòng trùng khoá chính.** Khoá chính không được trùng, Oracle báo
-`ORA-00001: unique constraint violated`.
+**Thêm dòng trùng khoá chính.** Khoá chính không được trùng, Oracle báo lỗi
+`ORA-00001`: vi phạm ràng buộc không trùng.
 
 ```sql
 -- SAI — lỗi: đã có sản phẩm mã 1

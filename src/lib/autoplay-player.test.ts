@@ -4,6 +4,7 @@ import {
   autoplayNext,
   autoplayPrev,
   continueAutoplay,
+  restoreAutoplaySession,
   startAutoplay,
   stopAutoplay,
   toggleAutoplayPause,
@@ -207,5 +208,86 @@ describe("các ca dễ hỏng", () => {
     expect(play).toHaveBeenCalledTimes(2);
     // Thẻ audio dùng chung cho mọi test — gỡ giá trị giả ra.
     delete (el() as { currentTime?: number }).currentTime;
+  });
+});
+
+describe("sống sót qua một lần tải lại cả trang", () => {
+  /** Giả lập trang vừa tải lại: bộ nhớ sạch, chỉ còn sessionStorage/localStorage. */
+  function simulateReload() {
+    // Tải lại thật thì module chạy lại từ đầu, không có lượt "chuyển sang
+    // idle" nào để xoá dấu — giữ dấu lại qua bước đưa store về ban đầu.
+    const kept = sessionStorage.getItem("kiip-autoplay-session");
+    useAutoplayStore.setState({ bookId: null, queue: [], index: 0, status: "idle" });
+    if (kept) sessionStorage.setItem("kiip-autoplay-session", kept);
+  }
+
+  function session() {
+    const raw = sessionStorage.getItem("kiip-autoplay-session");
+    return raw ? JSON.parse(raw) : null;
+  }
+
+  it("đang nghe thì ghi dấu vào tab, tắt thì xoá dấu", () => {
+    startAutoplay("step1", 3);
+    expect(session()).toMatchObject({ bookId: "step1", paused: false });
+    toggleAutoplayPause();
+    expect(session()).toMatchObject({ paused: true });
+    stopAutoplay();
+    expect(session()).toBeNull();
+  });
+
+  it("tải lại giữa chừng thì nghe tiếp đúng bài, đúng giây", () => {
+    startAutoplay("step1", 3);
+    useAutoplayResumeStore.setState({
+      positions: { step1: { url: queue[4].url, time: 17 } },
+    });
+    simulateReload();
+    play.mockClear();
+
+    restoreAutoplaySession(`/read/step1/${queue[4].page}`);
+    expect(useAutoplayStore.getState()).toMatchObject({ bookId: "step1", index: 4, status: "playing" });
+    expect(play).toHaveBeenCalledTimes(1);
+    el().dispatchEvent(new Event("loadedmetadata"));
+    expect(el().currentTime).toBe(17);
+  });
+
+  it("trình duyệt chặn tự phát sau tải lại thì vẫn giữ thanh, ở trạng thái chờ bấm", async () => {
+    startAutoplay("step1", 3);
+    simulateReload();
+    playResult = () => Promise.reject(new DOMException("chặn", "NotAllowedError"));
+
+    restoreAutoplaySession(`/read/step1/${queue[3].page}`);
+    await vi.waitFor(() => expect(useAutoplayStore.getState().status).toBe("paused"));
+    expect(useAutoplayStore.getState().bookId).toBe("step1");
+  });
+
+  it("đang tạm dừng lúc tải lại thì khôi phục ở trạng thái dừng, không tự phát", () => {
+    startAutoplay("step1", 3);
+    toggleAutoplayPause();
+    simulateReload();
+    play.mockClear();
+
+    restoreAutoplaySession(`/read/step1/${queue[3].page}`);
+    expect(useAutoplayStore.getState()).toMatchObject({ bookId: "step1", status: "paused" });
+    expect(play).not.toHaveBeenCalled();
+  });
+
+  it("quay lại tab sau lâu quá thì không tự phát tiếng", () => {
+    startAutoplay("step1", 3);
+    vi.advanceTimersByTime(10 * 60 * 1000);
+    simulateReload();
+    play.mockClear();
+
+    restoreAutoplaySession(`/read/step1/${queue[3].page}`);
+    expect(useAutoplayStore.getState().status).toBe("paused");
+    expect(play).not.toHaveBeenCalled();
+  });
+
+  it("không ở trình đọc của sách đó thì không khôi phục, và bỏ dấu cũ", () => {
+    startAutoplay("step1", 3);
+    simulateReload();
+
+    restoreAutoplaySession("/books/step1");
+    expect(useAutoplayStore.getState().status).toBe("idle");
+    expect(session()).toBeNull();
   });
 });

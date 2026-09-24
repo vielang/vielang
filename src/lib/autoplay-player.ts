@@ -206,9 +206,94 @@ function rememberPosition() {
   if (pendingSeek > 0) return;
   lastSavedTime = audio.currentTime;
   savePosition(bookId, { url: item.url, time: Math.floor(audio.currentTime) });
+  writeSession();
 }
 
-function playIndex(i: number, startAt = 0) {
+/**
+ * Dấu "tab này đang nghe tự động", để sống sót qua một lần TẢI LẠI CẢ TRANG.
+ *
+ * Lật trang là điều hướng phía client, nhưng khi lần xin trang mới không
+ * thành (máy chủ chậm/lỗi, mạng chập, vừa deploy bản mới) Next không báo lỗi
+ * mà lặng lẽ tải lại cả trang (`doMpaNavigation` trong
+ * `fetch-server-response.js`). Mọi thứ ở module này nằm trong bộ nhớ nên mất
+ * sạch — người dùng chỉ thấy nghe được vài trang thì tự tắt.
+ *
+ * sessionStorage chứ không phải localStorage: đúng phạm vi một tab, còn qua
+ * tải lại, mất khi đóng tab — mở sách ở tab khác không tự dưng phát tiếng.
+ * Chỗ nghe dở (bài, giây) thì đã có `useAutoplayResumeStore`, ở đây chỉ cần
+ * biết sách nào và lúc đó có đang phát không.
+ */
+const SESSION_KEY = "kiip-autoplay-session";
+
+interface AutoplaySession {
+  bookId: string;
+  paused: boolean;
+  /** Lần ghi gần nhất (ms) — dấu cũ quá thì khôi phục ở trạng thái dừng, không tự phát. */
+  at: number;
+}
+
+/** Quá mốc này mới quay lại tab thì không tự phát tiếng nữa, chỉ hiện thanh chờ bấm. */
+const SESSION_FRESH_MS = 2 * 60 * 1000;
+
+function writeSession() {
+  const { bookId, status } = useAutoplayStore.getState();
+  try {
+    if (!bookId || status === "idle") {
+      sessionStorage.removeItem(SESSION_KEY);
+      return;
+    }
+    const session: AutoplaySession = { bookId, paused: status === "paused", at: Date.now() };
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
+  } catch {
+    // Chế độ riêng tư chặn bộ nhớ: mất khả năng khôi phục, không sao.
+  }
+}
+
+function readSession(): AutoplaySession | null {
+  try {
+    const raw = sessionStorage.getItem(SESSION_KEY);
+    return raw ? (JSON.parse(raw) as AutoplaySession) : null;
+  } catch {
+    return null;
+  }
+}
+
+// Ghi dấu mỗi khi bật/tắt/dừng — kèm nhịp 5 giây ở `rememberPosition`.
+useAutoplayStore.subscribe((s, prev) => {
+  if (s.bookId !== prev.bookId || s.status !== prev.status || s.index !== prev.index) {
+    writeSession();
+  }
+});
+
+/**
+ * Trang vừa tải lại giữa phiên nghe tự động (xem `SESSION_KEY`): dựng lại
+ * đúng bài, đúng giây. Chỉ khôi phục khi vẫn đang ở trình đọc của sách đó.
+ *
+ * Thử phát luôn, nhưng thường sẽ bị chặn — trang mới tải chưa có lần chạm
+ * nào. Khi đó `play()` chuyển sang tạm dừng: thanh vẫn hiện, bấm ▶ một cái
+ * là nghe tiếp, thay vì mất hẳn như trước.
+ */
+export function restoreAutoplaySession(pathname: string) {
+  const session = readSession();
+  if (!session || useAutoplayStore.getState().status !== "idle") return;
+  if (!pathname.startsWith(`/read/${session.bookId}/`)) {
+    writeSession(); // đang idle -> xoá dấu cũ
+    return;
+  }
+  const queue = buildPlaylist(session.bookId);
+  const point = findResumePoint(queue, useAutoplayResumeStore.getState().positions[session.bookId]);
+  if (!point) {
+    writeSession();
+    return;
+  }
+  const autoplay = !session.paused && Date.now() - session.at < SESSION_FRESH_MS;
+  useAutoplayStore.setState({ bookId: session.bookId, queue });
+  setMediaSessionHandlers(true);
+  playIndex(point.index, point.time, autoplay);
+}
+
+/** `autoplay = false`: nạp sẵn bài và tua đúng chỗ nhưng đứng chờ người dùng bấm ▶. */
+function playIndex(i: number, startAt = 0, autoplay = true) {
   clearTimers();
   const { bookId, queue } = useAutoplayStore.getState();
   if (i < 0 || i >= queue.length) {
@@ -221,11 +306,11 @@ function playIndex(i: number, startAt = 0) {
   retries = 0;
   pendingSeek = startAt;
   lastSavedTime = startAt;
-  useAutoplayStore.setState({ index: i, status: "playing" });
+  useAutoplayStore.setState({ index: i, status: autoplay ? "playing" : "paused" });
   if (bookId) savePosition(bookId, { url: queue[i].url, time: startAt });
   const a = element();
   a.src = queue[i].url;
-  play(a);
+  if (autoplay) play(a);
   updateMediaSession();
 }
 

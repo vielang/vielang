@@ -3,7 +3,11 @@
 import { useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { getSpreadAnchor } from "@/lib/chapters";
-import { stopAutoplay, useAutoplayStore } from "@/lib/autoplay-player";
+import {
+  restoreAutoplaySession,
+  stopAutoplay,
+  useAutoplayStore,
+} from "@/lib/autoplay-player";
 
 /**
  * Nửa "lật trang" của nghe tự động — nửa phát tiếng ở `lib/autoplay-player`.
@@ -21,6 +25,13 @@ export function AutoplayFollower() {
   useEffect(() => {
     pathRef.current = pathname;
   }, [pathname]);
+
+  // Trang vừa bị tải lại giữa phiên nghe (xem `restoreAutoplaySession`):
+  // dựng lại ngay lúc mở. Chạy một lần — đường dẫn lúc này là trang đích mà
+  // lần lật hỏng định tới.
+  useEffect(() => {
+    restoreAutoplaySession(pathRef.current);
+  }, []);
 
   const bookId = useAutoplayStore((s) => s.bookId);
   const index = useAutoplayStore((s) => s.index);

@@ -139,6 +139,9 @@ Riêng bài web:
   bằng `dotnet run --urls http://localhost:5000` để mọi bài cùng một địa chỉ.
 - "Thử ngay" là chạy server rồi gọi API bằng `curl -i`. Câu đoán hỏi về
   status code hoặc JSON trả về. Kết quả trong `<details>` là response.
+- Request có body: lưu JSON vào file rồi gửi bằng `-d @ten-file.json`, kèm
+  `-H "Content-Type: application/json"`. Viết JSON thẳng trong lệnh dễ vỡ
+  dấu nháy khác nhau giữa PowerShell, cmd và bash.
 - Request, response mẫu viết trong khối ```` ```http ````.
 - Code C# ghi rõ `using Microsoft.AspNetCore.Mvc;`,
   `using Microsoft.EntityFrameworkCore;` vì template không tự thêm.

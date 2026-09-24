@@ -17,8 +17,8 @@ control và để nó tự hiện tên.
 
 ## Ví dụ
 
-`Product` giữ đúng như chương EF Core của khoá ASP.NET Core. Chương sau sẽ
-đọc nó từ Oracle, còn bài này tạo sẵn trong bộ nhớ.
+`Product` lấy từ chương EF Core của khoá ASP.NET Core, tạm bỏ `Stock` cho
+gọn. Chương sau sẽ đọc nó từ Oracle, còn bài này tạo sẵn trong bộ nhớ.
 
 ```csharp
 class MainForm : Form

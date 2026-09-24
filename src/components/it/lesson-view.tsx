@@ -15,6 +15,8 @@ import {
   type LessonOutline,
 } from "@/lib/courses";
 import { getBookProgress, useProgressStore } from "@/lib/progress-store";
+import { useQuizAnswers } from "@/lib/quiz-store";
+import { isGradable } from "@/lib/quiz";
 
 const NO_SUBSCRIBE = () => () => {};
 
@@ -86,6 +88,15 @@ export function LessonView({
   const progressId = courseProgressId(courseId);
   const readPages = isClient ? getBookProgress(progressByBook, progressId).readPages : [];
   const done = readPages.includes(no);
+
+  // Làm xong mọi câu tự kiểm tra thì coi như đã học bài: tự đánh dấu, khỏi
+  // bắt người học nhớ bấm nút. Nút bấm tay vẫn giữ cho bài không có quiz.
+  const { checked } = useQuizAnswers(lessonQuizId(courseId, lesson.slug));
+  const gradable = (lesson.quiz ?? []).flatMap((s) => s.items.filter(isGradable));
+  const quizFinished = gradable.length > 0 && gradable.every((i) => checked.includes(i.id));
+  useEffect(() => {
+    if (hasHydrated && quizFinished && !done) markPageRead(progressId, no);
+  }, [hasHydrated, quizFinished, done, markPageRead, progressId, no]);
 
   // Mở bài nào thì đó là chỗ đang học — ghi lại để "Học tiếp" quay về đúng
   // bài. Chờ hydrate xong, không thì ghi đè lên tiến độ đọc từ storage.

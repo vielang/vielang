@@ -239,6 +239,14 @@
   }
 }
 
+/*
+ * Dòng định nghĩa "emoji **Thuật ngữ**: …" (class gắn lúc build): nền nhạt,
+ * các dòng liền nhau xếp sát lại thành một khối khái niệm.
+ */
+.prose p.definition {
+  @apply my-2 rounded-lg bg-muted/50 px-3 py-2;
+}
+
 /* Cặp phản ví dụ: viền trái đỏ cho khối "// SAI", xanh cho khối "// ĐÚNG". */
 .prose pre[data-verdict="wrong"] {
   border-left: 3px solid var(--destructive);

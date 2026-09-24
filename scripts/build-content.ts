@@ -678,6 +678,18 @@ function renderDiagram(
  * ngôn ngữ) rơi về `text`: vẫn ra đúng khung code, chỉ là không có màu —
  * tốt hơn là làm hỏng cả lần build.
  */
+/**
+ * Dòng định nghĩa theo FORMAT.md có dạng "🧬 **Thuật ngữ**: một câu". Gắn class
+ * `definition` cho đoạn đó để CSS cho nó một nền nhạt, người đọc quét là thấy
+ * các khái niệm chính của bài.
+ */
+function markDefinitions(html: string): string {
+  return html.replace(
+    /<p>(?=\p{Extended_Pictographic}[️‍\p{Extended_Pictographic}]*\s*<strong>)/gu,
+    '<p class="definition">'
+  );
+}
+
 function lessonMarkdown(highlighter: CodeHighlighter, render: MermaidRenderer, at: string) {
   const loaded = new Set(highlighter.getLoadedLanguages());
   return new Marked(
@@ -749,7 +761,9 @@ async function buildCourses(): Promise<number> {
         const { body, quiz } = buildLessonQuiz(at, raw.body);
         // Marked dựng riêng cho từng bài để báo lỗi sơ đồ kèm tên file.
         const lessonMarked = lessonMarkdown(highlighter, renderMermaidSVG, at);
-        const { html, headings } = withHeadingIds((lessonMarked.parse(body) as string).trim());
+        const { html, headings } = withHeadingIds(
+          markDefinitions((lessonMarked.parse(body) as string).trim())
+        );
         lessons.push({
           slug: `${unprefix(moduleDir)}/${lessonSlug(file)}`,
           title: meta.title ?? lessonSlug(file),

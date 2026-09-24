@@ -9,8 +9,8 @@ export const metadata: Metadata = {
 };
 
 /**
- * Trang mảng IT — lộ trình tới backend developer: C# core → OOP → .NET →
- * SQL/Oracle → DSA → kiến trúc. Route tĩnh `/it` nên nó thắng `[lang]`.
+ * Trang mảng IT — lộ trình tới backend developer: C# core → OOP → SQL/Oracle →
+ * .NET → DSA → kiến trúc. Route tĩnh `/it` nên nó thắng `[lang]`.
  */
 export default function ItLibraryPage() {
   const courses = listCourses().map(courseCard);

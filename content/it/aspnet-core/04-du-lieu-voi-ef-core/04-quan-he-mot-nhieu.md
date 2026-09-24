@@ -73,9 +73,10 @@ public class OrdersController : ControllerBase
 - `Order.Lines` là navigation property, cho biết một đơn có nhiều dòng.
 - `OrderLine.OrderId` là khoá ngoại. EF Core tự nhận ra nhờ tên theo mẫu
   `TênClass` + `Id`.
-- Migration tạo hai bảng `Orders` và `OrderLine`, nối với nhau qua cột
-  `OrderId`.
+- Migration tạo hai bảng `ORDERS` và `ORDER_LINE`, nối với nhau qua cột
+  `ORDER_ID`.
 - `Include(o => o.Lines)` bảo EF Core đọc luôn các dòng hàng cùng đơn hàng.
+  Câu SQL được sinh ra là một `LEFT JOIN` từ `ORDERS` sang `ORDER_LINE`.
 
 ```mermaid Một Order có nhiều OrderLine, nối qua OrderId
 erDiagram
@@ -142,7 +143,7 @@ Có Include:   {"id":1,"customerName":"An","lines":[{...},{...}]}
 Bỏ Include:   {"id":1,"customerName":"An","lines":[]}
 ```
 
-Mảng rỗng. Không có `Include`, EF Core chỉ đọc bảng `Orders`. `Lines` giữ giá
+Mảng rỗng. Không có `Include`, EF Core chỉ đọc bảng `ORDERS`. `Lines` giữ giá
 trị khởi tạo là list rỗng, dù trong database vẫn có hai dòng hàng.
 
 </details>

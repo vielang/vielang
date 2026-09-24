@@ -43,12 +43,29 @@ Ba kiểu dữ liệu hay dùng nhất trong Oracle:
 
 Chuỗi trong SQL đặt trong dấu nháy **đơn**: `'Bút bi'`.
 
-## Chuẩn bị dữ liệu mẫu
+## Cài Oracle trên máy
+
+Khoá này và chương EF Core của khoá ASP.NET Core dùng chung một Oracle chạy
+bằng Docker. Cài **Docker Desktop**, rồi chạy lệnh sau một lần:
+
+```bash
+docker run -d --name oracle -p 1521:1521 -e ORACLE_PASSWORD=oracle_pw -e APP_USER=shop -e APP_USER_PASSWORD=shop_pw gvenzl/oracle-free:slim-faststart
+```
+
+- Lệnh tải Oracle Database Free và tạo sẵn user `shop`, mật khẩu `shop_pw`.
+- Lần đầu mất vài phút. Chạy `docker logs -f oracle`, thấy dòng
+  `DATABASE IS READY TO USE!` là dùng được.
+- Tắt máy xong, bật lại bằng `docker start oracle`.
+
+Để gõ SQL, cài VS Code và extension **Oracle SQL Developer**. Tạo kết nối mới
+với user `shop`, mật khẩu `shop_pw`, host `localhost`, port `1521`,
+service name `FREEPDB1`.
+
+## Tạo dữ liệu mẫu
 
 Mọi bài trong khoá dùng chung một database cửa hàng với bốn bảng: khách hàng,
-sản phẩm, đơn hàng và dòng hàng. Vào **livesql.oracle.com**, đăng nhập bằng
-tài khoản Oracle miễn phí, mở **SQL Worksheet**, dán toàn bộ script dưới đây
-rồi bấm **Run**. Chỉ cần chạy một lần.
+sản phẩm, đơn hàng và dòng hàng. Mở kết nối `shop`, dán toàn bộ script dưới
+đây rồi chạy cả script. Chỉ cần chạy một lần.
 
 ```sql setup
 CREATE TABLE customers (
@@ -143,7 +160,7 @@ khi thêm dòng mới mà không ghi mã.
 
 ## Thử ngay
 
-Chạy câu lệnh sau trong SQL Worksheet:
+Chạy câu lệnh sau bằng kết nối `shop`:
 
 ```sql
 SELECT * FROM products ORDER BY product_id;

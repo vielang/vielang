@@ -1,11 +1,12 @@
 ---
 title: EF Core và DbContext
-minutes: 5
+minutes: 6
 ---
 
 Dữ liệu trong bộ nhớ mất mỗi lần tắt server. Cửa hàng thật cần lưu sản phẩm
-vào database. EF Core cho phép làm việc với database bằng class và LINQ quen
-thuộc, không phải tự viết SQL cho từng thao tác.
+vào database, và bạn đã có sẵn Oracle từ khoá SQL. EF Core cho phép làm việc
+với Oracle bằng class và LINQ quen thuộc, không phải tự viết SQL cho từng thao
+tác.
 
 ## Khái niệm
 
@@ -13,19 +14,43 @@ thuộc, không phải tự viết SQL cho từng thao tác.
 
 🧭 **DbContext**: class đại diện cho một phiên làm việc với database. Mỗi `DbSet<T>` trong nó ứng với một bảng.
 
-| C# | Database |
+| C# | Oracle |
 |---|---|
-| class `Product` | bảng `Products` |
-| property `Name` | cột `Name` |
+| class `Product`, `DbSet` tên `Products` | bảng `PRODUCTS` |
+| property `Name` | cột `NAME` |
 | một object `Product` | một dòng trong bảng |
 | property `Id` | khoá chính, tự tăng |
 
+## Tạo user cho API
+
+API dùng một user riêng tên `shopapi`, tách khỏi user `shop` của khoá SQL.
+Mở VS Code, kết nối Oracle bằng user `system`, mật khẩu `oracle_pw`, service
+name `FREEPDB1`, rồi chạy một lần:
+
+```sql
+CREATE USER shopapi IDENTIFIED BY shopapi_pw
+  QUOTA UNLIMITED ON USERS;
+GRANT CREATE SESSION, CREATE TABLE, CREATE SEQUENCE
+  TO shopapi;
+```
+
+User mới chưa có bảng nào. Bài sau dùng migration để EF Core tự tạo bảng.
+
 ## Ví dụ
 
-Cài package cho SQLite:
+Cài package cho Oracle:
 
 ```bash
-dotnet add package Microsoft.EntityFrameworkCore.Sqlite
+dotnet add package Oracle.EntityFrameworkCore
+dotnet add package EFCore.NamingConventions
+```
+
+Thêm chuỗi kết nối vào `appsettings.json`:
+
+```json
+"ConnectionStrings": {
+  "Shop": "User Id=shopapi;Password=shopapi_pw;Data Source=localhost:1521/FREEPDB1"
+}
 ```
 
 Tạo `DbContext` và đăng ký vào `Program.cs`:
@@ -35,9 +60,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+var cs = builder.Configuration
+    .GetConnectionString("Shop");
+
 builder.Services.AddControllers();
 builder.Services.AddDbContext<ShopDbContext>(options =>
-    options.UseSqlite("Data Source=shop.db"));
+    options.UseOracle(cs)
+        .UseUpperSnakeCaseNamingConvention());
 
 var app = builder.Build();
 app.MapControllers();
@@ -78,10 +107,10 @@ public class ProductsController : ControllerBase
 }
 ```
 
-- `ShopDbContext` kế thừa `DbContext`, có một `DbSet<Product>` ứng với bảng
-  `Products`.
-- `UseSqlite("Data Source=shop.db")` chọn SQLite, dữ liệu lưu trong file
-  `shop.db` cạnh project.
+- `UseOracle(cs)` chọn Oracle, đọc chuỗi kết nối từ cấu hình.
+- `UseUpperSnakeCaseNamingConvention()` đổi tên sang chữ hoa nối gạch dưới:
+  `Products` thành `PRODUCTS`, `CustomerName` thành `CUSTOMER_NAME`. Tên
+  khớp với cách viết của khoá SQL.
 - `AddDbContext` đăng ký `ShopDbContext` với vòng đời `Scoped`, mỗi request
   một phiên làm việc.
 - `ToListAsync()` đọc cả bảng. Dùng bản `Async` vì đọc database là việc chậm.
@@ -104,11 +133,11 @@ gọi này trả về danh sách rỗng hay lỗi?
 HTTP/1.1 500 Internal Server Error
 
 Log của server:
-SQLite Error 1: 'no such table: Products'.
+ORA-00942: table or view "SHOPAPI"."PRODUCTS" does not exist
 ```
 
-Lỗi 500. EF Core mở được file `shop.db`, nhưng trong đó chưa có bảng
-`Products`. Class C# không tự sinh ra bảng. Bài sau dùng migration để tạo
+Lỗi 500. EF Core kết nối được Oracle, nhưng user `shopapi` chưa có bảng
+`PRODUCTS`. Class C# không tự sinh ra bảng. Bài sau dùng migration để tạo
 bảng.
 
 </details>
@@ -125,40 +154,31 @@ builder.Services.AddControllers();
 var app = builder.Build();
 ```
 
-**Viết cứng chuỗi kết nối trong code.** Mỗi môi trường thường dùng một
-database khác nhau.
-Đặt chuỗi kết nối vào `appsettings.json` như bài Cấu hình:
-
-```csharp
-// ĐÚNG — đọc từ mục ConnectionStrings:Shop
-using Microsoft.EntityFrameworkCore;
-
-var builder = WebApplication.CreateBuilder(args);
-var cs = builder.Configuration
-    .GetConnectionString("Shop");
-builder.Services.AddDbContext<ShopDbContext>(options =>
-    options.UseSqlite(cs));
-```
+**Bỏ `UseUpperSnakeCaseNamingConvention()`.** EF Core với Oracle đặt tên bảng
+trong ngoặc kép, giữ nguyên chữ hoa chữ thường, ví dụ `"Products"`. Viết
+`SELECT * FROM products` như khoá SQL sẽ báo `ORA-00942`, vì Oracle đổi
+`products` không có ngoặc kép thành `PRODUCTS`, khác với `"Products"`.
 
 ## Tóm tắt
 
 - EF Core là ORM: class thành bảng, object thành dòng.
 - `DbContext` là phiên làm việc với database, mỗi `DbSet<T>` là một bảng.
-- Đăng ký bằng `AddDbContext` trong `Program.cs`, nhận qua constructor.
-- Chỉ có class thì chưa đủ, phải tạo bảng trong database trước khi dùng.
+- Kết nối Oracle bằng `UseOracle`, đặt tên chữ hoa bằng
+  `UseUpperSnakeCaseNamingConvention()`.
+- API dùng user riêng. Có class chưa đủ, phải tạo bảng trước khi dùng.
 
 ```quiz
 [
   {
-    "prompt": "DbContext có DbSet<Customer> Customers. Trong database, nó ứng với gì?",
+    "prompt": "DbContext có DbSet<Customer> Customers. Với UseUpperSnakeCaseNamingConvention, bảng trong Oracle tên là gì?",
     "options": [
-      "Một dòng dữ liệu",
-      "Một cột",
-      "Bảng Customers",
-      "Một file database"
+      "customers",
+      "\"Customers\"",
+      "CUSTOMERS",
+      "Customer"
     ],
     "answer": 3,
-    "explain": "Mỗi DbSet<T> ứng với một bảng. Mỗi object Customer là một dòng trong bảng đó."
+    "explain": "Tên DbSet Customers được đổi sang chữ hoa nối gạch dưới thành CUSTOMERS, khớp với cách Oracle lưu tên không có ngoặc kép."
   },
   {
     "prompt": "AddDbContext đăng ký DbContext với vòng đời nào?",
@@ -172,15 +192,15 @@ builder.Services.AddDbContext<ShopDbContext>(options =>
     "explain": "Mặc định là Scoped: mỗi request có một DbContext riêng, xong request thì bỏ đi."
   },
   {
-    "prompt": "Gọi API nhận 500, log báo \"no such table: Orders\". Nguyên nhân?",
+    "prompt": "Gọi API nhận 500, log báo ORA-00942 table or view \"SHOPAPI\".\"ORDERS\" does not exist. Nguyên nhân?",
     "options": [
       "Thiếu [ApiController]",
       "Chưa cài .NET",
       "Sai địa chỉ server",
-      "Database chưa có bảng Orders, cần tạo bằng migration"
+      "User shopapi chưa có bảng ORDERS, cần tạo bằng migration"
     ],
     "answer": 4,
-    "explain": "EF Core kết nối được database nhưng bảng chưa tồn tại. Class trong C# không tự tạo bảng."
+    "explain": "EF Core kết nối được Oracle nhưng bảng chưa tồn tại. Class trong C# không tự tạo bảng."
   }
 ]
 ```

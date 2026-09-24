@@ -3,7 +3,7 @@ title: Migration
 minutes: 5
 ---
 
-Bài trước dừng ở lỗi "no such table". Class `Product` đã có, nhưng database
+Bài trước dừng ở lỗi `ORA-00942`, bảng chưa tồn tại. Class `Product` đã có, nhưng database
 chưa có bảng. Về sau, thêm property `Stock` thì database cũng phải đổi theo.
 Migration giữ cho cấu trúc database luôn khớp với class trong code.
 
@@ -43,22 +43,24 @@ public partial class InitialCreate : Migration
 {
     protected override void Up(MigrationBuilder mb)
     {
-        mb.CreateTable("Products", t => new
+        mb.CreateTable("PRODUCTS", t => new
         {
-            Id = t.Column<int>(nullable: false),
-            Name = t.Column<string>(nullable: false),
-            Price = t.Column<decimal>(nullable: false),
+            ID = t.Column<int>(nullable: false)
+                .Annotation("Oracle:Identity",
+                    "START WITH 1 INCREMENT BY 1"),
+            NAME = t.Column<string>(nullable: false),
+            PRICE = t.Column<decimal>(nullable: false),
         },
         constraints: t =>
-            t.PrimaryKey("PK_Products", x => x.Id));
+            t.PrimaryKey("PK_PRODUCTS", x => x.ID));
     }
 
     protected override void Down(MigrationBuilder mb) =>
-        mb.DropTable(name: "Products");
+        mb.DropTable(name: "PRODUCTS");
 }
 ```
 
-- `Up` chạy khi áp dụng migration: tạo bảng `Products`.
+- `Up` chạy khi áp dụng migration: tạo bảng `PRODUCTS`, cột `ID` là khoá tự tăng.
 - `Down` chạy khi huỷ migration: xoá bảng đó.
 - Migration là code, được commit lên git cùng project. Cả team và server dùng
   chung một lịch sử thay đổi database.
@@ -85,7 +87,7 @@ dotnet ef migrations add AddStock
 dotnet ef database update
 ```
 
-**Đoán trước khi chạy:** migration `AddStock` sẽ tạo lại cả bảng `Products`,
+**Đoán trước khi chạy:** migration `AddStock` sẽ tạo lại cả bảng `PRODUCTS`,
 hay chỉ thêm một cột?
 
 <details>
@@ -99,11 +101,11 @@ public partial class AddStock : Migration
 {
     protected override void Up(MigrationBuilder mb) =>
         mb.AddColumn<int>(
-            name: "Stock", table: "Products",
+            name: "STOCK", table: "PRODUCTS",
             nullable: false, defaultValue: 0);
 
     protected override void Down(MigrationBuilder mb) =>
-        mb.DropColumn(name: "Stock", table: "Products");
+        mb.DropColumn(name: "STOCK", table: "PRODUCTS");
 }
 ```
 
@@ -119,7 +121,7 @@ sinh phần khác nhau. Các dòng đã có vẫn giữ nguyên, `Stock` nhận 
 database chưa có cột mới.
 
 ```text
-SQLite Error 1: 'no such column: p.Stock'.
+ORA-00904: "p"."STOCK": invalid identifier
 ```
 
 Mỗi lần thêm, bớt hay đổi property của entity, chạy lại hai lệnh

@@ -83,6 +83,8 @@ public class ShopDbContext : DbContext
 - Sửa: chỉ cần đổi property rồi gọi `SaveChangesAsync`. `DbContext` tự biết
   object nào đã đổi và sinh câu `UPDATE`.
 - Mọi method đọc ghi database đều có bản `Async`, dùng kèm `await`.
+- Giá trị lấy từ biến C# được EF Core gửi bằng bind variable, như bài SQL
+  injection của khoá SQL, nên truy vấn LINQ không bị chèn SQL.
 
 ```mermaid Where được dịch sang SQL, database chỉ trả dòng khớp
 flowchart TD
@@ -111,13 +113,13 @@ hết bảng, hay nằm ngay trong câu SQL?
 <summary>Xem kết quả</summary>
 
 ```sql
-SELECT "p"."Id", "p"."Name", "p"."Stock"
-FROM "Products" AS "p"
-WHERE "p"."Stock" > 0
+SELECT "p"."ID", "p"."NAME", "p"."STOCK"
+FROM "PRODUCTS" "p"
+WHERE "p"."STOCK" > 0
 ```
 
 Nằm trong câu SQL. EF Core dịch lambda `p => p.Stock > 0` thành
-`WHERE "p"."Stock" > 0`, nên database chỉ trả về các dòng còn hàng.
+`WHERE "p"."STOCK" > 0`, nên Oracle chỉ trả về các dòng còn hàng.
 
 </details>
 

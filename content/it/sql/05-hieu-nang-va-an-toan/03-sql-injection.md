@@ -50,8 +50,6 @@ cmd.Parameters.Add(new OracleParameter("email", email));
   so sánh.
 - Bind variable còn giúp Oracle dùng lại kế hoạch thực thi khi cùng một câu
   SQL chạy với giá trị khác nhau, nên nhanh hơn.
-- Truy vấn EF Core viết bằng LINQ tự dùng tham số. Lỗi chỉ xảy ra khi bạn tự
-  viết SQL thô bằng cách ghép chuỗi.
 
 ```mermaid Cùng một đoạn nhập vào, hai cách đưa vào SQL
 flowchart TD
@@ -113,7 +111,7 @@ Chỉ bind variable mới tách hẳn dữ liệu khỏi code SQL.
 - SQL injection xảy ra khi dữ liệu người dùng được ghép thẳng vào câu SQL.
 - Kẻ tấn công chèn đoạn như `' OR '1'='1` để đổi ý nghĩa câu lệnh.
 - Dùng bind variable (`:ten`) cho mọi giá trị, không tự ghép chuỗi.
-- EF Core với LINQ đã tự dùng tham số.
+- Tự lọc dấu nháy không thay được bind variable.
 
 ```quiz
 [
@@ -140,15 +138,15 @@ Chỉ bind variable mới tách hẳn dữ liệu khỏi code SQL.
     "explain": "Đoạn nhập vào đóng chuỗi rồi thêm OR '1'='1', làm điều kiện WHERE đúng với mọi dòng."
   },
   {
-    "prompt": "Dự án dùng EF Core, viết truy vấn bằng LINQ như db.Customers.Where(c => c.Email == email). Có bị SQL injection không?",
+    "prompt": "Ngoài chặn SQL injection, bind variable còn giúp gì?",
     "options": [
-      "Có, vì email do người dùng nhập",
-      "Có, EF Core luôn ghép chuỗi",
-      "Chỉ bị nếu email có dấu nháy",
-      "Không, EF Core tự chuyển email thành tham số"
+      "Tự thêm index cho bảng",
+      "Tự COMMIT sau mỗi câu lệnh",
+      "Cho phép bỏ WHERE",
+      "Oracle dùng lại kế hoạch thực thi khi cùng câu SQL chạy với giá trị khác"
     ],
     "answer": 4,
-    "explain": "EF Core dịch LINQ thành SQL có tham số. Nguy cơ chỉ còn khi tự viết SQL thô bằng cách ghép chuỗi."
+    "explain": "Câu SQL giữ nguyên, chỉ giá trị thay đổi, nên Oracle không phải phân tích lại câu lệnh mỗi lần chạy."
   }
 ]
 ```

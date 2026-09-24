@@ -80,7 +80,8 @@ var webRefs = refs
     .Concat(Directory.GetFiles(AppContext.BaseDirectory, "*.dll")
         .Where(p => Path.GetFileName(p) is var f
             && (f.StartsWith("Microsoft.EntityFrameworkCore")
-                || f.StartsWith("Microsoft.Data.Sqlite")
+                || f.StartsWith("Oracle.")
+                || f.StartsWith("EFCore.NamingConventions")
                 || f.StartsWith("xunit")
                 || f.StartsWith("Microsoft.AspNetCore.Authentication.JwtBearer")
                 || f.StartsWith("Microsoft.IdentityModel")
@@ -292,7 +293,10 @@ foreach (var file in Directory.GetFiles(root, "*.md", SearchOption.AllDirectorie
     var ten = Path.GetFileName(file);
     kieuTrongBai.Clear();   // mỗi bài một thế giới riêng
     usingTrongBai.Clear();
-    cheDoWeb = file.Replace('\\', '/').Contains("/aspnet-core/");
+    // Khoá SQL cũng cần tham chiếu Oracle (Oracle.ManagedDataAccess) nên dùng
+    // chung bộ tham chiếu với khoá ASP.NET Core.
+    var duongDan = file.Replace('\\', '/');
+    cheDoWeb = duongDan.Contains("/aspnet-core/") || duongDan.Contains("/sql/");
 
     foreach (Match m in fence.Matches(text))
     {

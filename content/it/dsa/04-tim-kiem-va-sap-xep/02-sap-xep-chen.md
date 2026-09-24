@@ -105,7 +105,7 @@ Dãy đã có thứ tự: mỗi phần tử so một lần với phần tử li�
 
 **Dùng sắp xếp chèn cho dữ liệu lớn.** Một trăm nghìn đơn hàng xếp ngược thì
 tốn khoảng 5 tỉ lần so. Dữ liệu lớn nên dùng thuật toán O(n log n) như merge
-sort, hoặc hàm có sẵn của .NET.
+sort, hoặc method có sẵn của .NET.
 
 ```csharp
 // SAI — tự viết O(n²) cho dữ liệu lớn
@@ -152,22 +152,22 @@ Array.Sort(prices);
     "prompt": "Danh sách đơn hàng gần như đã xếp theo ngày, chỉ vài đơn lệch chỗ. Sắp xếp chèn chạy thế nào?",
     "options": [
       "Rất chậm, luôn O(n²)",
-      "Báo lỗi vì dãy đã có thứ tự",
-      "Không làm gì cả",
-      "Nhanh, gần O(n), vì hầu hết phần tử chỉ so một lần"
+      "Chậm như dãy xếp ngược",
+      "Nhanh, gần O(n)",
+      "Vừa phải, O(n log n)"
     ],
-    "answer": 4,
-    "explain": "Phần tử đã đúng chỗ chỉ so với phần tử liền trước là dừng."
+    "answer": 3,
+    "explain": "Phần tử đã đúng chỗ chỉ so với phần tử liền trước là dừng. Hầu hết phần tử chỉ so một lần nên gần O(n)."
   },
   {
     "prompt": "Vì sao sắp xếp chèn xấu nhất là O(n²)?",
     "options": [
-      "Vì dùng array",
-      "Vì phải tạo array mới",
-      "Vì mỗi phần tử có thể phải so với mọi phần tử đứng trước nó",
-      "Vì dùng đệ quy"
+      "Vì mỗi vòng phải tạo array mới",
+      "Vì mỗi phần tử được so hai lần",
+      "Vì mỗi lần gọi đệ quy lại chia đôi dãy",
+      "Vì mỗi phần tử có thể so với mọi phần tử trước"
     ],
-    "answer": 3,
+    "answer": 4,
     "explain": "Tổng 1 + 2 + ... + (n - 1) lần so, cỡ n²/2, bỏ hằng số là O(n²)."
   }
 ]

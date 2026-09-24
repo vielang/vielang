@@ -9,7 +9,7 @@ Phòng marketing muốn gửi mã giảm giá cho những khách chưa từng mu
 
 ## Khái niệm
 
-🫲 **LEFT JOIN**: giữ mọi dòng của bảng bên trái. Dòng nào không có dòng khớp ở bảng bên phải thì các cột của bảng phải là NULL.
+🫲 **LEFT JOIN**: giữ mọi dòng của bảng bên trái, dòng không khớp với bảng bên phải thì các cột của bảng phải là NULL.
 
 ## Ví dụ
 
@@ -63,9 +63,17 @@ JOIN orders o ON o.customer_id = c.customer_id
 WHERE o.order_id IS NULL;
 ```
 
+```sql
+-- ĐÚNG — LEFT JOIN giữ Dũng lại để WHERE tìm ra
+SELECT c.name
+FROM customers c
+LEFT JOIN orders o ON o.customer_id = c.customer_id
+WHERE o.order_id IS NULL;
+```
+
 **Lọc bảng bên phải ở `WHERE`.** Điều kiện `o.status = 'PAID'` loại mọi dòng
-không phải `PAID`, kể cả dòng có `o.status` là NULL của khách không có đơn,
-nên `LEFT JOIN` hoạt động như `JOIN`.
+không phải `PAID`, kể cả dòng của khách không có đơn (ở đó `o.status` là
+NULL), nên `LEFT JOIN` hoạt động như `JOIN`.
 Điều kiện cho bảng bên phải đặt trong `ON`.
 
 ```sql
@@ -99,10 +107,10 @@ LEFT JOIN orders o ON o.customer_id = c.customer_id
     "options": [
       "products JOIN order_lines",
       "order_lines JOIN products",
-      "products LEFT JOIN order_lines",
-      "Chỉ SELECT từ order_lines"
+      "Chỉ SELECT từ order_lines",
+      "products LEFT JOIN order_lines"
     ],
-    "answer": 3,
+    "answer": 4,
     "explain": "products đứng bên trái của LEFT JOIN thì sản phẩm chưa bán vẫn được giữ, với các cột của order_lines là NULL."
   },
   {
@@ -120,11 +128,11 @@ LEFT JOIN orders o ON o.customer_id = c.customer_id
     "prompt": "Đếm số đơn của mỗi khách, khách chưa có đơn thì hiện 0. Hàm nào đúng sau LEFT JOIN và GROUP BY c.name?",
     "options": [
       "COUNT(*)",
+      "COUNT(o.order_id)",
       "SUM(o.order_id)",
-      "MAX(o.order_id)",
-      "COUNT(o.order_id)"
+      "MAX(o.order_id)"
     ],
-    "answer": 4,
+    "answer": 2,
     "explain": "COUNT(o.order_id) bỏ qua NULL, nên khách không có đơn được đếm là 0. COUNT(*) đếm cả dòng NULL, ra 1."
   }
 ]

@@ -4,12 +4,12 @@ minutes: 5
 ---
 
 Bạn chép giỏ hàng mẫu cho khách A, rồi thêm món vào giỏ của A. Mở giỏ mẫu ra,
-món đó cũng có mặt. Không có dòng nào gán nhầm. Lý do là C# chép hai loại kiểu
-theo hai cách khác nhau.
+món đó cũng có mặt. Không có dòng nào gán nhầm. Lý do: C# sao chép value type
+và reference type theo hai cách khác nhau.
 
 ## Khái niệm
 
-🔢 **Value type**: kiểu mà biến chứa trực tiếp giá trị, gán sang biến khác là chép cả giá trị.
+📑 **Value type**: kiểu mà biến chứa trực tiếp giá trị, gán sang biến khác là chép cả giá trị.
 
 🔗 **Reference type**: kiểu mà biến chỉ chứa tham chiếu tới object, gán sang biến khác là chép tham chiếu, và hai biến cùng trỏ tới một object.
 
@@ -79,7 +79,7 @@ void DiscountProduct(Product product)
 ```
 
 **Đoán trước khi chạy:** hai method làm cùng một việc. Cả hai giá trị in ra có
-đều bị giảm không?
+cùng bị giảm không?
 
 <details>
 <summary>Xem kết quả</summary>
@@ -154,25 +154,25 @@ Console.WriteLine(x.Price == y.Price);
     "explain": "List là reference type. b = a làm hai biến cùng trỏ một list, nên thêm qua b thì a cũng có 2 phần tử."
   },
   {
-    "prompt": "decimal total = 100m; void AddFee(decimal t) { t = t + 20m; } Gọi AddFee(total); rồi in total. Kết quả?",
+    "prompt": "int x = 7; int y = x; x = 0; Console.WriteLine(y); In ra gì?",
     "options": [
-      "100",
-      "120",
-      "20",
-      "Lỗi compile"
+      "0",
+      "null",
+      "Lỗi compile",
+      "7"
     ],
-    "answer": 1,
-    "explain": "decimal là value type. Method nhận bản chép, nên total bên ngoài vẫn là 100."
+    "answer": 4,
+    "explain": "int là value type. y = x chép số 7 sang y, nên đổi x sau đó không đụng tới y."
   },
   {
     "prompt": "Kiểu nào là value type?",
     "options": [
+      "bool",
       "string",
       "List<int>",
-      "Một class Customer bạn tự viết",
-      "bool"
+      "Một class Customer bạn tự viết"
     ],
-    "answer": 4,
+    "answer": 1,
     "explain": "bool là value type. string, List và mọi class đều là reference type."
   }
 ]

@@ -3,8 +3,7 @@ title: Đa hình
 minutes: 5
 ---
 
-Giỏ hàng có cả sách giấy lẫn ebook. Sách giấy tính phí ship theo cân nặng,
-ebook thì miễn phí. Viết `if` kiểm tra từng loại thì mỗi lần thêm loại hàng
+Giỏ hàng có sách giấy tính phí ship theo cân nặng và ebook miễn phí ship. Viết `if` kiểm tra từng loại thì mỗi lần thêm loại hàng
 mới lại phải sửa giỏ hàng. Với đa hình, mỗi loại tự biết cách tính của mình.
 
 ## Khái niệm
@@ -55,9 +54,9 @@ Sách: 8000
 Ebook C#: 0
 ```
 
-- Bài này dùng `{ get; set; }` và object initializer `new ... { Name = ... }`
-  (đã gặp ở bài Value type và reference type) cho code ngắn, và
-  `ShippingFee()` giờ đưa lên `Product` với `virtual`.
+- Để code ngắn, bài này dùng `{ get; set; }` và object initializer
+  `new ... { Name = ... }` đã gặp ở bài Value type và reference type.
+- `ShippingFee()` nằm ở `Product` và được đánh dấu `virtual`.
 - `List<Product>` chứa được cả `PhysicalProduct` và `DigitalProduct`, vì
   cả hai đều là `Product`.
 - Vòng lặp chỉ gọi `item.ShippingFee()`, không cần biết món hàng thuộc loại
@@ -151,7 +150,21 @@ class Gift : Item
 }
 ```
 
-Thêm `override` vào method của `Gift` thì dòng trên in ra 0 như mong muốn.
+```csharp
+// ĐÚNG — có override, in ra 0
+Item gift = new Gift();
+Console.WriteLine(gift.Fee());
+
+class Item
+{
+    public virtual decimal Fee() => 30000m;
+}
+
+class Gift : Item
+{
+    public override decimal Fee() => 0m;
+}
+```
 
 ## Tóm tắt
 
@@ -179,21 +192,21 @@ Thêm `override` vào method của `Gift` thì dòng trên in ra 0 như mong mu�
     "options": [
       "Chạy được, class con dùng bản mới",
       "Chạy được nhưng luôn dùng bản của cha",
-      "Lỗi khi chạy",
-      "Lỗi compile vì method của cha thiếu virtual"
+      "Lỗi compile",
+      "Lỗi khi chạy"
     ],
-    "answer": 4,
-    "explain": "Chỉ override được method có virtual (hoặc abstract) ở class cha."
+    "answer": 3,
+    "explain": "Lỗi compile vì method của cha thiếu virtual. Chỉ override được method có virtual (hoặc abstract) ở class cha."
   },
   {
     "prompt": "Cửa hàng thêm loại hàng mới là \"voucher\" với phí ship riêng. Nếu đã dùng đa hình, cần làm gì?",
     "options": [
-      "Thêm class Voucher : Product với override ShippingFee",
-      "Thêm một nhánh if trong vòng lặp giỏ hàng",
-      "Sửa method ShippingFee của Product",
-      "Tạo một List<Voucher> riêng và vòng lặp riêng"
+      "Thêm nhánh if cho voucher trong vòng lặp",
+      "Sửa method ShippingFee trong Product",
+      "Tạo List<Voucher> và vòng lặp riêng",
+      "Thêm class Voucher có override ShippingFee"
     ],
-    "answer": 1,
+    "answer": 4,
     "explain": "Với đa hình, loại mới tự mang cách tính của nó. Vòng lặp giỏ hàng và class Product không phải sửa."
   }
 ]

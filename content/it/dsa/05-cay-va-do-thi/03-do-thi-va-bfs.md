@@ -9,7 +9,7 @@ hỏi "ít bước nhất" được giải bằng BFS, dùng đúng `Queue` củ
 
 ## Khái niệm
 
-🕸️ **Đồ thị (graph)**: tập các đỉnh nối với nhau bằng cạnh, ví dụ các điểm giao hàng nối bằng đường.
+🕸️ **Đồ thị (graph)**: tập các đỉnh (vertex) nối với nhau bằng cạnh (edge), ở bài này đỉnh là điểm giao hàng, cạnh là con đường.
 
 🌊 **BFS (breadth-first search, tìm theo chiều rộng)**: đi từ điểm xuất phát, thăm hết các điểm cách 1 bước, rồi tới các điểm cách 2 bước, cứ thế ra xa dần.
 
@@ -73,7 +73,8 @@ Dictionary<string, int> Bfs(string start)
 - `distance` vừa ghi số bước, vừa đánh dấu điểm đã thăm để không thăm lại.
 - Queue bảo đảm điểm gần được xử lý hết trước điểm xa, nên số bước ghi lần
   đầu cho mỗi điểm là ít nhất.
-- Mỗi điểm và mỗi con đường được xét một lần: O(số đỉnh + số cạnh).
+- Mỗi điểm vào queue một lần, mỗi con đường được xét từ hai đầu:
+  O(số đỉnh + số cạnh).
 
 ```mermaid Các điểm giao hàng, có vòng Kho - A - C - B - Kho
 flowchart LR
@@ -151,35 +152,35 @@ foreach (string next in roads[current])
   {
     "prompt": "BFS dùng cấu trúc nào để giữ các đỉnh chờ thăm?",
     "options": [
+      "Queue",
       "Stack",
       "HashSet",
-      "Queue",
       "SortedSet"
     ],
-    "answer": 3,
+    "answer": 1,
     "explain": "Queue vào trước ra trước, nên đỉnh gần xuất phát được thăm hết trước đỉnh xa."
   },
   {
     "prompt": "Đồ thị có 1.000 điểm và 3.000 con đường. BFS tốn cỡ bao nhiêu bước?",
     "options": [
-      "Cỡ vài nghìn, tức O(số đỉnh + số cạnh)",
-      "1.000.000",
-      "3.000.000",
-      "10"
+      "Khoảng 1.000.000",
+      "Khoảng 7.000",
+      "Khoảng 3.000.000",
+      "Khoảng 10"
     ],
-    "answer": 1,
-    "explain": "Mỗi điểm vào queue một lần, mỗi con đường được xét từ hai đầu. Tổng cộng tỉ lệ với số điểm cộng số đường."
+    "answer": 2,
+    "explain": "Mỗi điểm vào queue một lần, mỗi con đường được xét từ hai đầu: 1.000 + 2 × 3.000 = 7.000, tức O(số đỉnh + số cạnh)."
   },
   {
     "prompt": "Vì sao BFS cần đánh dấu đỉnh đã thăm?",
     "options": [
-      "Để in đẹp hơn",
+      "Vì Dictionary báo lỗi khi gán key trùng",
       "Vì Queue không chứa được chuỗi trùng",
-      "Để BFS chạy nhanh gấp đôi",
-      "Vì đồ thị có thể có vòng, không đánh dấu thì đi vòng mãi"
+      "Vì đồ thị có vòng thì sẽ đi vòng mãi",
+      "Để đỉnh gần được thăm trước đỉnh xa"
     ],
-    "answer": 4,
-    "explain": "Có vòng thì từ một đỉnh đi một vòng lại quay về nó. Đánh dấu giúp mỗi đỉnh chỉ vào queue một lần."
+    "answer": 3,
+    "explain": "Có vòng thì từ một đỉnh đi một vòng lại quay về nó. Đánh dấu giúp mỗi đỉnh chỉ vào queue một lần. Thăm gần trước xa là việc của Queue, không phải của việc đánh dấu."
   }
 ]
 ```

@@ -43,8 +43,8 @@ app.Run();
 - `MapControllers()` nối URL tới các controller trong project.
 - `Run()` bắt đầu nhận request, chạy cho tới khi bạn bấm Ctrl+C.
 
-Template còn vài dòng khác trong `Program.cs`. Các chương sau sẽ nói tới
-chúng.
+Template còn vài dòng khác trong `Program.cs`, như `AddOpenApi()` hay
+`UseHttpsRedirection()`. Cứ giữ nguyên chúng, khoá này không cần sửa.
 
 ## Thử ngay
 
@@ -116,10 +116,10 @@ thấy service cần thiết và nhắc bạn gọi `AddControllers`. Hai dòng
     "options": [
       "Thiếu builder.Build()",
       "Thiếu app.Run()",
-      "Thiếu app.MapControllers()",
-      "Thiếu dotnet new"
+      "Thiếu AddControllers()",
+      "Thiếu app.MapControllers()"
     ],
-    "answer": 3,
+    "answer": 4,
     "explain": "Không có MapControllers thì không URL nào được nối tới controller, nên mọi request đều 404."
   },
   {
@@ -137,11 +137,11 @@ thấy service cần thiết và nhắc bạn gọi `AddControllers`. Hai dòng
     "prompt": "Lệnh nào tạo project Web API dùng controller?",
     "options": [
       "dotnet new console -o ShopApi",
+      "dotnet new webapi --use-controllers -o ShopApi",
       "dotnet run --use-controllers",
-      "dotnet new webapi -o ShopApi --no-controllers",
-      "dotnet new webapi --use-controllers -o ShopApi"
+      "dotnet new webapi -o ShopApi --no-controllers"
     ],
-    "answer": 4,
+    "answer": 2,
     "explain": "Template webapi kèm tuỳ chọn --use-controllers tạo project có sẵn thư mục Controllers và controller mẫu."
   }
 ]

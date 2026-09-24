@@ -10,7 +10,7 @@ phổ biến.
 
 ## Khái niệm
 
-💉 **SQL injection**: kiểu tấn công chèn đoạn SQL vào dữ liệu người dùng nhập, khiến câu lệnh làm việc khác với ý định.
+🧨 **SQL injection**: kiểu tấn công chèn đoạn SQL vào dữ liệu người dùng nhập, khiến câu lệnh làm việc khác với ý định.
 
 🧷 **Bind variable (tham số)**: chỗ giữ trong câu SQL như `:email`, giá trị được gửi riêng nên Oracle luôn coi là dữ liệu, không bao giờ coi là code SQL.
 
@@ -46,7 +46,8 @@ var cmd = new OracleCommand(
 cmd.Parameters.Add(new OracleParameter("email", email));
 ```
 
-`conn` là kết nối đã mở tới Oracle; khối chỉ minh hoạ cách truyền tham số.
+`conn` là kết nối đã mở tới Oracle. Đoạn C# này chỉ để đọc hiểu; muốn chạy
+thật thì cần package NuGet `Oracle.ManagedDataAccess.Core`.
 
 - `:email` là chỗ giữ, giá trị thật truyền qua `Parameters`.
 - Người dùng gõ gì vào ô email thì Oracle cũng chỉ coi đó là một chuỗi để
@@ -96,8 +97,9 @@ dòng. Thông tin của mọi khách bị lộ chỉ vì một ô nhập liệu.
 người đổi thành lấy từ ô nhập liệu. Luôn dùng bind variable cho mọi giá trị
 đưa vào SQL.
 
-**Tự lọc dấu nháy thay vì dùng tham số.** Tự thay `'` bằng `''` dễ sót trường
-hợp và không chặn được mọi kiểu tấn công.
+**Tự lọc dấu nháy thay vì dùng tham số.** Tự thay `'` bằng `''` chặn được ví
+dụ trên, nhưng dễ quên ở một chỗ nào đó, và không giúp gì khi giá trị ghép vào
+không nằm trong nháy, như một con số.
 
 ```csharp
 // SAI — tự "làm sạch" vẫn là ghép chuỗi
@@ -107,7 +109,17 @@ string sql =
     + safe + "'";
 ```
 
-Chỉ bind variable mới tách hẳn dữ liệu khỏi code SQL.
+```csharp
+// ĐÚNG — không tự thay dấu nháy, dùng tham số
+using Oracle.ManagedDataAccess.Client;
+
+var cmd = new OracleCommand(
+    "SELECT name FROM customers WHERE email = :email",
+    conn);
+cmd.Parameters.Add(new OracleParameter("email", email));
+```
+
+Bind variable tách hẳn dữ liệu khỏi code SQL, nên không cần tự lọc gì.
 
 ## Tóm tắt
 
@@ -121,23 +133,23 @@ Chỉ bind variable mới tách hẳn dữ liệu khỏi code SQL.
   {
     "prompt": "Câu SQL nào an toàn trước SQL injection?",
     "options": [
+      "\"... WHERE code = :code\"",
       "\"... WHERE code = '\" + input + \"'\"",
       "\"... WHERE code = '\" + input.Replace(\"'\", \"''\") + \"'\"",
-      "\"... WHERE code = :code\" kèm tham số code",
       "\"... WHERE code = \" + input"
     ],
-    "answer": 3,
-    "explain": "Chỉ bind variable gửi dữ liệu tách khỏi câu SQL. Mọi cách ghép chuỗi đều có thể bị chèn code."
+    "answer": 1,
+    "explain": "Bind variable gửi dữ liệu tách khỏi câu SQL. Tự thay dấu nháy vẫn dễ sót, còn ghép giá trị không có nháy như phương án cuối thì không chặn được gì."
   },
   {
     "prompt": "Ô tìm kiếm ghép thẳng vào SQL. Người dùng nhập ' OR '1'='1. Chuyện gì xảy ra?",
     "options": [
-      "Điều kiện luôn đúng, câu lệnh trả về mọi dòng",
       "Oracle tự chặn, báo lỗi",
+      "Điều kiện luôn đúng, câu lệnh trả về mọi dòng",
       "Không tìm thấy gì",
       "Chỉ trả về dòng có dấu nháy"
     ],
-    "answer": 1,
+    "answer": 2,
     "explain": "Đoạn nhập vào đóng chuỗi rồi thêm OR '1'='1', làm điều kiện WHERE đúng với mọi dòng."
   },
   {
@@ -145,11 +157,11 @@ Chỉ bind variable mới tách hẳn dữ liệu khỏi code SQL.
     "options": [
       "Tự thêm index cho bảng",
       "Tự COMMIT sau mỗi câu lệnh",
-      "Cho phép bỏ WHERE",
-      "Oracle dùng lại kế hoạch thực thi khi cùng câu SQL chạy với giá trị khác"
+      "Chạy lại câu SQL nhanh hơn",
+      "Cho phép bỏ qua WHERE"
     ],
-    "answer": 4,
-    "explain": "Câu SQL giữ nguyên, chỉ giá trị thay đổi, nên Oracle không phải phân tích lại câu lệnh mỗi lần chạy."
+    "answer": 3,
+    "explain": "Câu SQL giữ nguyên, chỉ giá trị thay đổi, nên Oracle dùng lại cách chạy đã tính, không phải phân tích lại câu lệnh mỗi lần."
   }
 ]
 ```

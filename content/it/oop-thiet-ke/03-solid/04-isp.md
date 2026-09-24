@@ -4,10 +4,9 @@ minutes: 5
 ---
 
 Interface `IOrderStore` có ba method: đọc, lưu, xoá. Trang báo cáo chỉ cần
-đọc, nhưng class của nó vẫn phải implement đủ ba method, hai method thừa chỉ
-để `throw new NotImplementedException()` (exception có sẵn báo method chưa
-viết). ISP giúp tránh việc ép class
-nhận những thứ nó không dùng.
+đọc nhưng vẫn phải implement đủ ba method, hai method thừa chỉ ném
+`NotImplementedException` (exception có sẵn báo method chưa viết). ISP tránh
+việc ép class nhận những thứ nó không dùng.
 
 ## Khái niệm
 
@@ -125,8 +124,13 @@ class ReportSource : IOrderStore
 }
 ```
 
-Cách sửa: tách thành `IOrderReader` và `IOrderWriter`, để `ReportSource` chỉ
-implement `IOrderReader`.
+```csharp
+// ĐÚNG — trang báo cáo chỉ implement phần đọc
+class ReportSource : IOrderReader
+{
+    public string Get(int id) => $"Đơn #{id}";
+}
+```
 
 ## Tóm tắt
 
@@ -142,34 +146,34 @@ implement `IOrderReader`.
     "prompt": "IPrinter có Print(), Scan(), Fax(). Máy in rẻ chỉ in được, nên Scan và Fax ném NotImplementedException. Theo ISP nên làm gì?",
     "options": [
       "Giữ nguyên, ném exception là đủ",
-      "Bỏ class máy in rẻ",
       "Tách thành IPrint, IScan, IFax",
+      "Bỏ class máy in rẻ",
       "Thêm method CanScan() vào IPrinter"
     ],
-    "answer": 3,
+    "answer": 2,
     "explain": "Máy in rẻ chỉ nên implement IPrint. Máy đa năng thì implement cả ba interface nhỏ."
   },
   {
     "prompt": "Class Dashboard chỉ đọc dữ liệu đơn hàng. Constructor của nó nên nhận kiểu nào?",
     "options": [
-      "IOrderReader",
       "IOrderWriter",
       "IOrderStore có đủ đọc, ghi, xoá",
+      "IOrderReader",
       "OrderRepository"
     ],
-    "answer": 1,
+    "answer": 3,
     "explain": "Dashboard chỉ cần đọc, nên chỉ phụ thuộc vào interface đọc. Nhận thứ lớn hơn là tự kéo thêm phụ thuộc không cần."
   },
   {
-    "prompt": "Một class implement cả IOrderReader và IOrderWriter. Điều nào đúng?",
+    "prompt": "IAccountService có Login(), Logout(), ChangePassword() và được năm class implement. Team thêm ResetPassword() vào interface này. Class nào phải sửa?",
     "options": [
-      "Không hợp lệ, class chỉ implement được một interface",
-      "Phải chọn một trong hai",
-      "Chỉ hợp lệ nếu hai interface có cùng method",
-      "Hợp lệ, dùng được ở cả hai vai"
+      "Không class nào phải sửa",
+      "Chỉ class đang gọi Login()",
+      "Chỉ class cần ResetPassword()",
+      "Cả năm class implement nó"
     ],
     "answer": 4,
-    "explain": "Một class implement được nhiều interface. Nơi cần đọc thấy nó là IOrderReader, nơi cần ghi thấy nó là IOrderWriter."
+    "explain": "Thêm method vào interface thì mọi class implement phải viết thêm, kể cả class không cần. Interface nhỏ theo từng việc giới hạn những lần sửa lan rộng như vậy."
   }
 ]
 ```

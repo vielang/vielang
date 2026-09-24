@@ -135,35 +135,35 @@ catch (OracleException)
   {
     "prompt": "Handler async void của nút Lưu ném exception sau một lệnh await, không có try/catch. Main đã gắn Application.ThreadException. Chuyện gì xảy ra?",
     "options": [
-      "App sập ngay",
+      "App sập ngay lập tức",
       "Exception bị bỏ qua, không ai biết",
-      "Handler của ThreadException nhận exception đó",
+      "ThreadException nhận nó",
       "Lỗi compile vì thiếu try/catch"
     ],
     "answer": 3,
-    "explain": "Exception trong handler async void được đưa về UI thread và đi vào Application.ThreadException."
+    "explain": "Exception trong handler async void được đưa về UI thread và đi vào handler của Application.ThreadException."
   },
   {
     "prompt": "Nên bắt OracleException ở đâu?",
     "options": [
-      "Ở chỗ gọi database, nơi biết cách báo lỗi cho người dùng",
       "Trong constructor của Product",
-      "Không bao giờ bắt",
-      "Trong class Program, bằng catch (Exception)"
+      "Không bắt, để app tự dừng",
+      "Trong Main, bằng catch (Exception)",
+      "Ở chỗ gọi database"
     ],
-    "answer": 1,
-    "explain": "Bắt lỗi ở nơi biết cách xử lý nó. Mọi lỗi khác để ThreadException lo."
+    "answer": 4,
+    "explain": "Bắt lỗi ở nơi biết cách xử lý nó: chỗ gọi database biết cách báo lỗi cho người dùng. Mọi lỗi khác để ThreadException lo."
   },
   {
     "prompt": "Vì sao catch (Exception) { } bỏ trống là lỗi?",
     "options": [
-      "Vì compiler không cho",
-      "Vì làm app chạy chậm",
-      "Vì Exception không bắt được lỗi Oracle",
-      "Vì mọi lỗi bị giấu đi, kể cả lỗi do code sai, không ai biết để sửa"
+      "Lỗi bị giấu, không ai biết mà sửa",
+      "Compiler không cho viết vậy",
+      "App chạy chậm hơn hẳn",
+      "Exception không bắt được lỗi Oracle"
     ],
-    "answer": 4,
-    "explain": "Khối catch rỗng giấu mọi lỗi. App chạy sai mà không có dấu hiệu gì."
+    "answer": 1,
+    "explain": "Khối catch rỗng giấu mọi lỗi, kể cả lỗi do code sai. App chạy sai mà không có dấu hiệu gì."
   }
 ]
 ```

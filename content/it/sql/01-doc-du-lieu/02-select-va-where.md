@@ -125,23 +125,23 @@ WHERE (city = 'Hà Nội' OR city = 'Đà Nẵng')
   {
     "prompt": "WHERE stock > 0 AND price < 10000 OR price > 400000 được Oracle hiểu thế nào?",
     "options": [
-      "(stock > 0 AND price < 10000) OR price > 400000",
       "stock > 0 AND (price < 10000 OR price > 400000)",
       "Báo lỗi vì thiếu ngoặc",
-      "Chỉ xét điều kiện đầu tiên"
+      "Chỉ xét điều kiện đầu tiên",
+      "(stock > 0 AND price < 10000) OR price > 400000"
     ],
-    "answer": 1,
+    "answer": 4,
     "explain": "AND được tính trước OR. Muốn nghĩa khác thì phải tự thêm ngoặc."
   },
   {
     "prompt": "Cách nào gọn nhất để lấy khách ở Hà Nội, Đà Nẵng hoặc Huế?",
     "options": [
+      "WHERE city IN ('Hà Nội', 'Đà Nẵng', 'Huế')",
       "WHERE city = 'Hà Nội, Đà Nẵng, Huế'",
       "WHERE city BETWEEN 'Hà Nội' AND 'Huế'",
-      "WHERE city LIKE 'Hà Nội%'",
-      "WHERE city IN ('Hà Nội', 'Đà Nẵng', 'Huế')"
+      "WHERE city LIKE 'Hà Nội%'"
     ],
-    "answer": 4,
+    "answer": 1,
     "explain": "IN so giá trị với từng phần tử trong danh sách, gọn hơn viết ba điều kiện nối bằng OR."
   }
 ]

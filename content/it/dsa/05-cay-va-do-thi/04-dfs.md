@@ -63,8 +63,10 @@ Thăm D
 ```
 
 Không giống. Từ A, DFS đi thẳng sang C rồi sang B, hết đường mới quay lui
-về C để sang D. BFS thì thăm A và B (cùng cách kho 1 bước) trước C. DFS vẫn tới đủ 5 điểm, nhưng
-thứ tự thăm không cho biết số bước ít nhất.
+về C để sang D.
+
+BFS thì thăm A và B (cùng cách kho 1 bước) trước C. DFS vẫn tới đủ 5 điểm,
+nhưng thứ tự thăm không cho biết số bước ít nhất.
 
 </details>
 
@@ -134,13 +136,13 @@ while (stack.Count > 0)
   {
     "prompt": "Sau khi chạy DFS từ kho, visited có 5 điểm trong khi đồ thị có 8 điểm. Điều đó nghĩa là gì?",
     "options": [
-      "DFS bị lỗi",
-      "Có 3 điểm không tới được từ kho",
-      "Đồ thị có vòng",
-      "Cần chạy lại BFS"
+      "DFS dừng sớm khi gặp vòng",
+      "Có 3 điểm không nối tới kho",
+      "Có 3 điểm bị thăm hai lần",
+      "BFS sẽ thăm đủ 8 điểm"
     ],
     "answer": 2,
-    "explain": "DFS thăm mọi điểm tới được. Điểm không có trong visited là không có đường nối từ kho."
+    "explain": "DFS thăm mọi điểm tới được. Điểm không có trong visited là không có đường nối từ kho, nên BFS cũng không tới được."
   }
 ]
 ```

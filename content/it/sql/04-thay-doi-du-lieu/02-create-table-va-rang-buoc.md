@@ -85,6 +85,9 @@ báo lỗi `ORA-02290`: vi phạm ràng buộc kiểm tra.
 INSERT INTO coupons (code, percent) VALUES ('BIG', 80);
 ```
 
+Mã giảm trong khoảng 1 đến 50, như `VALUES ('BIG', 50)`, thì được thêm bình
+thường.
+
 **Khai báo `VARCHAR2(n)` rồi lưu chữ tiếng Việt.** Mặc định `n` tính theo
 **byte**, mà chữ có dấu như "ũ" chiếm 2 byte. "Dũng" có 4 chữ nhưng tới 5
 byte, nên Oracle báo lỗi `ORA-12899`: giá trị quá dài.
@@ -114,34 +117,34 @@ INSERT INTO staff (name) VALUES ('Dũng');
   {
     "prompt": "Email của khách không được trùng nhưng được phép để trống. Khai báo nào đúng?",
     "options": [
+      "email VARCHAR2(100) UNIQUE",
       "email VARCHAR2(100) NOT NULL",
       "email VARCHAR2(100) PRIMARY KEY",
-      "email VARCHAR2(100) UNIQUE",
       "email VARCHAR2(100) CHECK (email IS NULL)"
     ],
-    "answer": 3,
+    "answer": 1,
     "explain": "UNIQUE chặn trùng nhưng vẫn cho NULL. NOT NULL và PRIMARY KEY đều bắt buộc phải có giá trị."
   },
   {
     "prompt": "Số lượng tồn kho không được âm. Ràng buộc nào phù hợp?",
     "options": [
-      "CHECK (stock >= 0)",
       "UNIQUE (stock)",
+      "CHECK (stock >= 0)",
       "DEFAULT 0",
       "NOT NULL"
     ],
-    "answer": 1,
+    "answer": 2,
     "explain": "CHECK kiểm tra điều kiện trên giá trị. DEFAULT chỉ đặt giá trị ban đầu, không chặn được số âm."
   },
   {
     "prompt": "Cột city VARCHAR2(10). Lưu 'Đà Nẵng' (7 chữ) bị lỗi ORA-12899. Vì sao?",
     "options": [
-      "Vì chuỗi có dấu cách",
-      "Vì city phải là NUMBER",
-      "Vì thiếu NOT NULL",
-      "Vì chữ có dấu chiếm nhiều byte, tổng vượt 10 byte"
+      "Chuỗi có dấu cách",
+      "city phải là NUMBER",
+      "Chữ có dấu tốn nhiều byte",
+      "Cột thiếu NOT NULL"
     ],
-    "answer": 4,
+    "answer": 3,
     "explain": "VARCHAR2(10) mặc định là 10 byte. Đ, à, ẵ mỗi chữ chiếm 2 đến 3 byte, nên 7 chữ vượt quá 10 byte. Dùng VARCHAR2(10 CHAR)."
   }
 ]

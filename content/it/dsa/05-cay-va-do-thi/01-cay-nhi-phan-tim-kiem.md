@@ -5,8 +5,8 @@ minutes: 6
 
 Tìm nhị phân nhanh nhưng cần array đã sắp xếp, mà chèn vào array thì phải dời
 chỗ, tốn O(n). Cây nhị phân tìm kiếm giữ dữ liệu luôn có thứ tự, vừa tìm vừa
-thêm đều nhanh. Index của Oracle ở khoá SQL cũng dựa trên một loại cây tìm
-kiếm tên là B-tree.
+thêm đều nhanh. Index của database thường dựa trên B-tree, một loại cây tìm
+kiếm.
 
 ## Khái niệm
 
@@ -147,8 +147,8 @@ xếp sẵn, nên cây lệch hẳn về một bên và mất hết ưu điểm.
 ```csharp
 // SAI — nạp giá đã sắp xếp: cây lệch thành O(n)
 TreeNode? root = null;
-int[] fromDb = { 3000, 5000, 7000 };
-foreach (int price in fromDb)
+int[] sortedPrices = { 3000, 5000, 7000 };
+foreach (int price in sortedPrices)
 {
     root = Insert(root, price);
 }
@@ -175,33 +175,33 @@ Console.WriteLine(prices.Contains(5000));   // True
     "options": [
       "Gốc",
       "Con phải của 50",
-      "Con trái của 70",
-      "Con trái của 50"
+      "Con trái của 50",
+      "Con trái của 70"
     ],
-    "answer": 4,
+    "answer": 3,
     "explain": "50 là gốc. 30 nhỏ hơn 50 nên đặt ở nhánh trái."
   },
   {
     "prompt": "Duyệt BST theo thứ tự trái, node, phải thì các giá trị ra thế nào?",
     "options": [
       "Ngẫu nhiên",
-      "Tăng dần",
       "Giảm dần",
-      "Theo thứ tự đã thêm"
+      "Theo thứ tự đã thêm",
+      "Tăng dần"
     ],
-    "answer": 2,
+    "answer": 4,
     "explain": "Mọi giá trị bên trái nhỏ hơn node, bên phải lớn hơn, nên in trái trước rồi node rồi phải sẽ ra dãy tăng dần."
   },
   {
     "prompt": "Vì sao nên dùng SortedDictionary thay vì tự viết BST?",
     "options": [
+      "SortedDictionary tự cân đối cây",
       "SortedDictionary dùng hash table",
       "SortedDictionary không cần so sánh key",
-      "SortedDictionary tự cân đối nên luôn O(log n), kể cả khi thêm dữ liệu đã sắp xếp",
-      "BST tự viết không chạy được trong .NET"
+      "SortedDictionary lưu key trong array"
     ],
-    "answer": 3,
-    "explain": "Cây tự cân đối xoay lại khi bị lệch, nên chiều cao luôn khoảng log n."
+    "answer": 1,
+    "explain": "Cây tự cân đối xoay lại khi bị lệch, nên chiều cao luôn khoảng log n, kể cả khi thêm dữ liệu đã sắp xếp."
   }
 ]
 ```

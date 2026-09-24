@@ -103,7 +103,9 @@ C
 ```
 
 "B" không được in. Exception xảy ra ở dòng giữa, nên phần còn lại của `try` bị
-bỏ qua. `ex.Message` là nội dung đã truyền lúc `throw`. `finally` vẫn chạy.
+bỏ qua.
+
+`ex.Message` là nội dung đã truyền lúc `throw`. `finally` vẫn chạy.
 
 </details>
 
@@ -180,25 +182,25 @@ catch (Exception)
 ```quiz
 [
   {
-    "prompt": "Trong try có 3 dòng. Dòng thứ 2 ném exception và có catch phù hợp. Dòng thứ 3 có chạy không?",
+    "prompt": "Trong try, int.Parse(\"abc\") ném FormatException. Sau try chỉ có catch (ArgumentException). Chuyện gì xảy ra?",
     "options": [
-      "Có, chạy sau khi catch xong",
-      "Có, chạy trước catch",
-      "Không, phần còn lại của try bị bỏ qua",
-      "Chỉ chạy nếu có finally"
+      "Chương trình dừng lại",
+      "catch đó vẫn bắt được lỗi",
+      "Lỗi bị bỏ qua, chạy tiếp",
+      "Lỗi compile"
     ],
-    "answer": 3,
-    "explain": "Khi exception xảy ra, chương trình nhảy thẳng sang catch. Code còn lại trong try không chạy nữa."
+    "answer": 1,
+    "explain": "catch chỉ bắt đúng loại exception ghi trong ngoặc. FormatException không phải ArgumentException nên không ai bắt, chương trình dừng."
   },
   {
     "prompt": "Method SetPrice(decimal price) nhận giá âm. Cách xử lý nào hợp lý nhất?",
     "options": [
-      "throw new ArgumentException(\"Giá không được âm\")",
-      "Âm thầm đổi thành 0",
-      "Bỏ qua, không làm gì",
-      "In ra màn hình rồi vẫn gán giá âm"
+      "Âm thầm đổi giá thành 0",
+      "Ném ArgumentException",
+      "Bỏ qua, không gán giá",
+      "In cảnh báo rồi vẫn gán"
     ],
-    "answer": 1,
+    "answer": 2,
     "explain": "Dữ liệu vô lý thì báo lỗi ngay. Âm thầm sửa hay bỏ qua làm lỗi lộ ra ở chỗ khác, khó tìm hơn nhiều."
   },
   {
@@ -206,10 +208,10 @@ catch (Exception)
     "options": [
       "catch",
       "throw",
-      "Khối if sau try",
-      "finally"
+      "finally",
+      "Khối if sau try"
     ],
-    "answer": 4,
+    "answer": 3,
     "explain": "finally luôn chạy sau try và catch, thường dùng để dọn dẹp như đóng file."
   }
 ]

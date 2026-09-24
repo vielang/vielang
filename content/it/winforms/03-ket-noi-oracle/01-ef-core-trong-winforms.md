@@ -118,35 +118,31 @@ public class Product
 - Mật khẩu viết thẳng trong code là trái với bài Cấu hình của khoá ASP.NET
   Core. Ở đây chỉ để thử trên máy, bài Đóng gói ứng dụng sẽ nói lại.
 - Ở khoá ASP.NET Core mỗi request có một `DbContext` riêng. Ở đây một
-  `DbContext` sống suốt đời form, nên nó nhớ các dòng đã đọc.
+  `DbContext` sống suốt vòng đời của form, nên nó nhớ các dòng đã đọc.
 - Event `Load` chạy ngay trước khi cửa sổ hiện lần đầu, hợp để đọc dữ liệu.
 
 ## Thử ngay
 
-Bảng `PRODUCTS` của `shopapi` còn trống, vì API chưa thêm sản phẩm nào vào
-Oracle. Trong VS Code, tạo kết nối với user `shopapi`, mật khẩu `shopapi_pw`,
-service name `FREEPDB1`, rồi chạy các câu sau nhưng **chưa** `COMMIT`:
+Bảng `PRODUCTS` của `shopapi` đã có Bút bi, Vở, Thước thêm ở khoá ASP.NET
+Core. Trong VS Code, tạo kết nối với user `shopapi`, mật khẩu `shopapi_pw`,
+service name `FREEPDB1`, rồi chạy câu sau nhưng **chưa** `COMMIT`:
 
 ```sql
 INSERT INTO PRODUCTS (NAME, PRICE, STOCK)
-VALUES ('Bút bi', 5000, 120);
-INSERT INTO PRODUCTS (NAME, PRICE, STOCK)
-VALUES ('Vở', 12000, 0);
-INSERT INTO PRODUCTS (NAME, PRICE, STOCK)
-VALUES ('Thước', 7000, 50);
+VALUES ('Balo', 350000, 8);
 ```
 
 Chạy app bằng `dotnet run`.
 
-**Đoán trước khi chạy:** lưới có ba sản phẩm vừa thêm không? Nếu chưa có,
-cần làm gì để chúng hiện?
+**Đoán trước khi chạy:** lưới có "Balo" không? Nếu chưa có, cần làm gì để
+nó hiện?
 
 <details>
 <summary>Xem kết quả</summary>
 
 ```text
-Lưới trống.
-Chạy COMMIT trong VS Code, đóng app rồi mở lại: đủ 3 dòng.
+Lưới có Bút bi, Vở, Thước, không có Balo.
+Chạy COMMIT trong VS Code, đóng app rồi mở lại: Balo hiện.
 ```
 
 App mở một kết nối riêng tới Oracle. Như bài Transaction của khoá SQL, thay
@@ -191,34 +187,34 @@ var options =
     "prompt": "Trong ASP.NET Core, AddDbContext làm hộ việc gì mà trong WinForms ta phải tự làm?",
     "options": [
       "Tạo bảng trong database",
-      "Dựng options và tạo object ShopDbContext",
-      "Viết câu SQL",
-      "Mở Docker"
+      "Viết câu SQL cho mỗi truy vấn",
+      "Cài package Oracle cho project",
+      "Dựng options, tạo ShopDbContext"
     ],
-    "answer": 2,
+    "answer": 4,
     "explain": "AddDbContext dựng cấu hình và để container tạo ShopDbContext. WinForms không có container sẵn nên ta tự làm trong Main."
   },
   {
-    "prompt": "Đồng nghiệp UPDATE giá trong VS Code nhưng chưa COMMIT. App kho mở lại thấy giá nào?",
+    "prompt": "App đang mở thì đồng nghiệp đổi giá Bút bi và COMMIT. App gọi lại _db.Products.ToList() trên cùng _db. Lưới hiện giá nào?",
     "options": [
-      "Giá mới",
-      "Không thấy sản phẩm nào",
-      "Báo lỗi khoá dòng",
-      "Giá cũ"
+      "Giá cũ",
+      "Giá mới vừa COMMIT",
+      "Lưới trống, phải mở lại app",
+      "Báo lỗi vì dữ liệu đã đổi"
     ],
-    "answer": 4,
-    "explain": "Thay đổi chưa COMMIT chỉ phiên của đồng nghiệp thấy. Kết nối của app vẫn đọc giá đã COMMIT."
+    "answer": 1,
+    "explain": "DbContext sống suốt vòng đời của form nên nhớ các dòng đã đọc. Truy vấn thường trả về đúng object cũ, giá vẫn là giá cũ."
   },
   {
-    "prompt": "MainForm nhận ShopDbContext qua constructor thay vì tự new bên trong. Đây là cách làm của bài nào ở khoá OOP?",
+    "prompt": "Muốn app kho chạy với Oracle trên máy chủ thử nghiệm thay vì localhost. Sửa ở đâu?",
     "options": [
-      "Đóng gói",
-      "Kế thừa",
-      "DIP và dependency injection",
-      "Abstract class"
+      "Constructor của MainForm",
+      "Chuỗi cs trong Main",
+      "Class ShopDbContext",
+      "Handler MainForm_Load"
     ],
-    "answer": 3,
-    "explain": "Nhận phụ thuộc từ ngoài qua constructor là dependency injection. Main là nơi ghép các phần lại."
+    "answer": 2,
+    "explain": "Main dựng options từ chuỗi kết nối rồi truyền ShopDbContext vào form. Form chỉ nhận từ ngoài nên không phải sửa."
   }
 ]
 ```

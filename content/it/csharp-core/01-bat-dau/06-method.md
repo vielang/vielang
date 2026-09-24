@@ -153,34 +153,34 @@ void PrintLine(string message)
   {
     "prompt": "Method int Square(int n) { return n * n; } Gọi Console.WriteLine(Square(4) + 1); in ra gì?",
     "options": [
-      "16",
       "17",
+      "16",
       "25",
       "Lỗi compile"
     ],
-    "answer": 2,
+    "answer": 1,
     "explain": "Square(4) trả về 16, cộng thêm 1 được 17."
   },
   {
     "prompt": "Method nào nên khai báo void?",
     "options": [
       "Method tính thuế của đơn hàng",
+      "Method in hoá đơn ra màn hình",
       "Method kiểm tra email có hợp lệ không",
-      "Method đổi chuỗi thành số",
-      "Method in hoá đơn ra màn hình"
+      "Method đổi chuỗi thành số"
     ],
-    "answer": 4,
+    "answer": 2,
     "explain": "In ra màn hình là một hành động, nơi gọi không cần nhận lại kết quả gì. Ba method còn lại đều phải trả về một giá trị."
   },
   {
     "prompt": "int count = 5; AddOne(count); Console.WriteLine(count); với void AddOne(int n) { n = n + 1; }. In ra gì?",
     "options": [
-      "5",
       "6",
       "0",
+      "5",
       "Lỗi compile"
     ],
-    "answer": 1,
+    "answer": 3,
     "explain": "n nhận bản chép giá trị của count. Tăng n không làm count thay đổi, nên vẫn in 5."
   }
 ]

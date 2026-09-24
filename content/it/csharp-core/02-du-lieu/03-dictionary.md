@@ -138,11 +138,11 @@ stock["PEN-01"] = 80;
     "prompt": "Bạn cần tra nhanh tên khách hàng theo số điện thoại. Kiểu nào phù hợp nhất?",
     "options": [
       "List<string>",
-      "string[]",
       "Dictionary<string, string>",
+      "string[]",
       "string"
     ],
-    "answer": 3,
+    "answer": 2,
     "explain": "Số điện thoại là khoá duy nhất, tên là giá trị. Dictionary tra thẳng theo khoá, không phải duyệt cả danh sách."
   },
   {
@@ -150,21 +150,21 @@ stock["PEN-01"] = 80;
     "options": [
       "45",
       "30",
-      "25",
-      "35"
+      "35",
+      "25"
     ],
-    "answer": 4,
+    "answer": 3,
     "explain": "Gán \"A\" lần hai ghi đè 10 thành 15. Dictionary còn A = 15 và B = 20, tổng là 35."
   },
   {
     "prompt": "stock[\"PEN\"] làm chương trình dừng với KeyNotFoundException. Nguyên nhân?",
     "options": [
-      "Dictionary chưa có khoá \"PEN\"",
       "Giá trị của \"PEN\" bằng 0",
       "Giá trị kiểu int nên không đọc bằng [ ] được",
-      "Phải viết stock.PEN"
+      "Phải viết stock.PEN",
+      "Dictionary chưa có khoá \"PEN\""
     ],
-    "answer": 1,
+    "answer": 4,
     "explain": "KeyNotFoundException nghĩa là khoá cần đọc không tồn tại. Kiểm tra bằng ContainsKey trước khi đọc."
   }
 ]

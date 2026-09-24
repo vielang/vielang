@@ -13,7 +13,7 @@ này giới thiệu cách lưu nhiều giá trị trong một biến.
 
 📋 **List**: danh sách các phần tử cùng kiểu, thêm và bớt phần tử được, viết là `List<kiểu>`.
 
-🔁 **foreach**: vòng lặp đi qua lần lượt từng phần tử của một danh sách.
+👣 **foreach**: vòng lặp đi qua lần lượt từng phần tử của một danh sách.
 
 Phần tử được đánh số từ **0**. Phần tử đầu là `[0]`, phần tử cuối là
 `[số lượng - 1]`.
@@ -152,22 +152,22 @@ tags.Add("hot");
     "options": [
       "8",
       "10",
-      "Lỗi khi chạy",
-      "9"
+      "9",
+      "Lỗi khi chạy"
     ],
-    "answer": 4,
+    "answer": 3,
     "explain": "Vị trí đánh số từ 0: scores[0] là 8, scores[1] là 9."
   },
   {
     "prompt": "Bạn cần lưu danh sách món khách thêm vào giỏ, số món thay đổi liên tục. Nên dùng gì?",
     "options": [
-      "Array, vì nhanh hơn",
-      "List, vì thêm bớt phần tử được",
-      "Nhiều biến riêng item1, item2, item3",
-      "string, nối các món bằng dấu phẩy"
+      "Array string[]",
+      "Các biến item1, item2, item3",
+      "Một string nối bằng dấu phẩy",
+      "List<string>"
     ],
-    "answer": 2,
-    "explain": "Số món thay đổi nên cần thêm bớt được. Array cố định số lượng ngay khi tạo."
+    "answer": 4,
+    "explain": "Số món thay đổi nên cần thêm bớt được, và List làm được việc đó. Array cố định số lượng ngay khi tạo."
   },
   {
     "prompt": "List<int> ids có 5 phần tử. Vòng lặp for nào duyệt đúng hết, không lỗi?",

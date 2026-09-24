@@ -58,8 +58,9 @@ public class PromoTests
 - Test tự chọn ngày cố định, nên chạy hôm nào cũng cho cùng kết quả.
 - `DateTime` không viết được trong `[InlineData]`, nên truyền năm, tháng,
   ngày rồi tạo `DateTime` trong test.
-- Tên test theo mẫu `Method_TìnhHuống` hoặc `Method_TìnhHuống_KếtQuả`, như bài
-  Viết test cho API. Đọc tên là biết test kiểm gì.
+- Tên test theo mẫu `Method_TìnhHuống` hoặc `Method_TìnhHuống_KếtQuả`, như
+  `Total_Under500k_NoDiscount` ở bài Viết test cho API. Đọc tên là biết test
+  kiểm gì.
 - Mỗi test chỉ kiểm một hành vi. Đỏ thì biết ngay hành vi nào hỏng.
 
 ## Thử ngay
@@ -103,6 +104,7 @@ Passed!  - Failed: 0, ...
 Cả hai qua. xUnit tạo một object `CounterTests` mới cho mỗi test, nên mỗi test
 có `_count` riêng, bắt đầu từ 0. Nhờ vậy các test không ảnh hưởng nhau qua
 field.
+
 Đổi `_count` thành `static` thì hai test dùng chung một biến, và test chạy sau
 sẽ đỏ.
 
@@ -157,37 +159,37 @@ public class Promo
 ```quiz
 [
   {
-    "prompt": "Test tính phí ship đêm khuya qua lúc 23 giờ nhưng đỏ lúc 9 giờ sáng. Nguyên nhân nhiều khả năng nhất?",
+    "prompt": "Test tính phí giao hàng đêm khuya qua lúc 23 giờ nhưng đỏ lúc 9 giờ sáng. Nguyên nhân nhiều khả năng nhất?",
     "options": [
-      "Máy chạy test yếu",
-      "Code đọc giờ hệ thống bên trong method cần test",
-      "xUnit bị lỗi",
-      "Test thiếu [Fact]"
+      "Buổi sáng máy chạy test chậm hơn",
+      "xUnit chạy test theo thứ tự khác",
+      "Method tự đọc giờ hệ thống",
+      "Test dùng [Fact] thay vì [Theory]"
     ],
-    "answer": 2,
+    "answer": 3,
     "explain": "Kết quả phụ thuộc giờ chạy test. Truyền giờ vào qua tham số để test tự chọn giờ cố định."
   },
   {
     "prompt": "Hai test trong cùng class cùng thêm phần tử vào một field List (không static). Test thứ hai có thấy phần tử của test thứ nhất không?",
     "options": [
-      "Có, vì cùng một class",
-      "Tuỳ thứ tự chạy",
-      "Có, nếu chạy trên cùng máy",
-      "Không, vì xUnit tạo object mới cho mỗi test"
+      "Có, vì hai test cùng một class",
+      "Có, nếu test thứ nhất chạy trước",
+      "Có, nếu chạy trên cùng một máy",
+      "Không thấy"
     ],
     "answer": 4,
-    "explain": "Mỗi test có một object riêng nên field không dùng chung. Field static thì khác."
+    "explain": "xUnit tạo object mới cho mỗi test, nên field không dùng chung. Field static thì khác."
   },
   {
     "prompt": "Một test kiểm cùng lúc giá, tồn kho, email và log, rồi đỏ. Vấn đề là gì?",
     "options": [
-      "Không có vấn đề",
-      "Test quá ngắn",
-      "Khó biết ngay hành vi nào hỏng, nên mỗi test chỉ kiểm một hành vi",
-      "Phải dùng [Theory]"
+      "Đỏ mà không rõ hành vi nào hỏng",
+      "Không có vấn đề, test càng đủ càng tốt",
+      "Test phải dùng [Theory] thay vì [Fact]",
+      "Test chạy chậm vì có quá nhiều Assert"
     ],
-    "answer": 3,
-    "explain": "Test nhỏ, mỗi test một ý thì tên test đỏ đã cho biết chỗ hỏng."
+    "answer": 1,
+    "explain": "Test kiểm nhiều hành vi thì đỏ không cho biết chỗ hỏng. Mỗi test một hành vi thì tên test đỏ đã chỉ ra chỗ đó."
   }
 ]
 ```

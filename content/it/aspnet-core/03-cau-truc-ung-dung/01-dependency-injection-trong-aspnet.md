@@ -69,8 +69,8 @@ public class ProductsController : ControllerBase
   Container tự tạo object và truyền vào. Ở bài DIP khoá OOP bạn tự tạo
   object rồi truyền vào constructor, ở đây container làm việc đó.
 - Dữ liệu trong bộ nhớ phải sống suốt ứng dụng, nên đăng ký `Singleton`.
-- Sang chương 4, muốn đổi sang database chỉ cần đổi dòng đăng ký,
-  controller không phải sửa.
+- Sang chương 4, controller vẫn nhận `IProductStore` qua constructor như
+  cũ, còn phần đọc ghi database nằm trong một class store mới.
 
 ```mermaid Container tạo store rồi đưa vào constructor controller
 flowchart LR
@@ -115,7 +115,7 @@ public class CountController : ControllerBase
 }
 ```
 
-Gọi `curl http://localhost:5000/api/count` ba lần. Sau đó đổi `AddScoped`
+Gọi `curl -i http://localhost:5000/api/count` ba lần. Sau đó đổi `AddScoped`
 thành `AddSingleton`, chạy lại server và gọi thêm ba lần.
 
 **Đoán trước khi chạy:** với `AddScoped`, ba lần gọi trả về những số nào?
@@ -124,6 +124,7 @@ thành `AddSingleton`, chạy lại server và gọi thêm ba lần.
 <summary>Xem kết quả</summary>
 
 ```text
+Status 200 cả sáu lần, body lần lượt là:
 AddScoped:    1, 1, 1
 AddSingleton: 1, 2, 3
 ```
@@ -149,6 +150,18 @@ app.MapControllers();
 app.Run();
 ```
 
+```csharp
+// ĐÚNG
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddControllers();
+builder.Services.AddSingleton<
+    IProductStore, InMemoryProductStore>();
+
+var app = builder.Build();
+app.MapControllers();
+app.Run();
+```
+
 **Singleton phụ thuộc vào Scoped.** Object sống suốt ứng dụng lại giữ một
 object vốn chỉ nên sống trong một request. Ở môi trường Development, ứng dụng dừng
 ngay lúc khởi động và báo lỗi này.
@@ -159,6 +172,19 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<Counter>();
 builder.Services.AddSingleton<Report>();
 var app = builder.Build();   // báo lỗi tại đây
+
+public class Report
+{
+    public Report(Counter counter) { }
+}
+```
+
+```csharp
+// ĐÚNG — Report cũng chỉ sống trong một request
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddScoped<Counter>();
+builder.Services.AddScoped<Report>();
+var app = builder.Build();
 
 public class Report
 {
@@ -179,34 +205,34 @@ public class Report
   {
     "prompt": "Service lưu cấu hình đọc một lần lúc khởi động và dùng chung cho mọi request. Nên đăng ký bằng gì?",
     "options": [
+      "AddSingleton",
       "AddTransient",
       "AddScoped",
-      "AddSingleton",
       "Không cần đăng ký"
     ],
-    "answer": 3,
+    "answer": 1,
     "explain": "Dùng chung cho cả ứng dụng và không đổi theo request, nên một object duy nhất là đủ."
   },
   {
     "prompt": "Gọi API thì nhận 500, log báo \"Unable to resolve service for type 'IEmailSender'\". Nguyên nhân?",
     "options": [
-      "Chưa đăng ký IEmailSender trong Program.cs",
       "IEmailSender phải là class",
+      "Chưa đăng ký IEmailSender",
       "Controller thiếu [Route]",
-      "Sai địa chỉ server"
+      "Constructor thiếu [FromServices]"
     ],
-    "answer": 1,
+    "answer": 2,
     "explain": "Container không biết tạo gì khi có nơi cần IEmailSender. Phải thêm builder.Services.AddScoped<IEmailSender, ...>()."
   },
   {
     "prompt": "Service đăng ký bằng AddScoped được dùng ở controller và ở một service khác trong CÙNG một request. Có bao nhiêu object được tạo?",
     "options": [
       "Hai, mỗi nơi một object",
-      "Ba",
-      "Không object nào",
-      "Một, dùng chung trong request đó"
+      "Một, dùng chung cả ứng dụng",
+      "Một, dùng chung trong request",
+      "Mỗi lần gọi method tạo một"
     ],
-    "answer": 4,
+    "answer": 3,
     "explain": "Scoped nghĩa là một object cho mỗi request. Mọi nơi trong cùng request nhận chung object đó."
   }
 ]

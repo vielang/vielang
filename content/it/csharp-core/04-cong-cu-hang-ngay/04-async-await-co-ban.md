@@ -9,7 +9,9 @@ hướng dẫn cách viết code chờ việc chậm bằng `async` và `await`.
 
 ## Khái niệm
 
-📦 **Task**: object đại diện cho một việc đang chạy và sẽ xong sau. `Task<T>` là việc sẽ trả về một giá trị kiểu `T`.
+📨 **Task**: object đại diện cho một việc đang chạy và sẽ xong sau.
+
+`Task<T>` là việc sẽ trả về một giá trị kiểu `T`.
 
 ⏳ **async/await**: `async` đánh dấu method có chờ việc chậm bên trong, `await` chờ một `Task` xong rồi lấy kết quả mà không chặn chương trình.
 
@@ -81,9 +83,11 @@ async Task<decimal> GetPriceAsync(string code)
 3. Giá: 5000
 ```
 
-In trước. Gọi `GetPriceAsync` thì việc tra giá bắt đầu chạy ngay, tới `await
-Task.Delay` thì quay về nơi gọi. Chương trình in dòng 2 trong lúc việc tra giá vẫn
-đang chờ. Chỉ tới `await task` mới thật sự đứng đợi kết quả.
+In trước. Gọi `GetPriceAsync` thì việc tra giá bắt đầu chạy ngay, tới
+`await Task.Delay` thì quay về nơi gọi.
+
+Chương trình in dòng 2 trong lúc việc tra giá vẫn đang chờ. Chỉ tới
+`await task` mới thật sự đứng đợi kết quả.
 
 </details>
 
@@ -134,33 +138,33 @@ decimal price = await GetPriceAsync("PEN-01");
     "prompt": "Method async không trả về giá trị nào nên khai báo kiểu trả về là gì?",
     "options": [
       "void",
-      "Task",
       "Task<void>",
-      "object"
+      "object",
+      "Task"
     ],
-    "answer": 2,
+    "answer": 4,
     "explain": "Method async không trả về giá trị thì dùng Task, để nơi gọi vẫn await được."
   },
   {
     "prompt": "async Task<string> GetNameAsync() trả về \"An\". Dòng nào lấy đúng chuỗi \"An\"?",
     "options": [
+      "string name = await GetNameAsync();",
       "string name = GetNameAsync();",
       "Task name = await GetNameAsync;",
-      "string name = await GetNameAsync();",
       "string name = GetNameAsync().ToString();"
     ],
-    "answer": 3,
+    "answer": 1,
     "explain": "await lấy giá trị string ra từ Task<string>. Thiếu await thì chỉ nhận được Task."
   },
   {
     "prompt": "Việc nào nên viết bằng async/await?",
     "options": [
-      "Cộng hai số",
+      "Cộng hai số nguyên",
+      "Gọi API kiểm tra thanh toán",
       "Viết hoa một chuỗi",
-      "Tính tổng một list 10 phần tử",
-      "Gọi API của ngân hàng để kiểm tra thanh toán"
+      "Tính tổng list 10 phần tử"
     ],
-    "answer": 4,
+    "answer": 2,
     "explain": "async/await dành cho việc phải chờ bên ngoài như gọi mạng, database, file. Tính toán trong bộ nhớ thì không cần."
   }
 ]

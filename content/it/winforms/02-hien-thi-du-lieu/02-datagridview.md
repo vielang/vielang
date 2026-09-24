@@ -146,11 +146,11 @@ public class Product
     "prompt": "Class Customer có property Id, Name, Email. Gắn List<Customer> vào DataGridView thì lưới có mấy cột?",
     "options": [
       "1 cột",
-      "3 cột",
       "0 cột, phải tự khai báo",
+      "3 cột",
       "Tuỳ số khách hàng"
     ],
-    "answer": 2,
+    "answer": 3,
     "explain": "Mỗi property public thành một cột, nên có 3 cột Id, Name, Email."
   },
   {
@@ -167,13 +167,13 @@ public class Product
   {
     "prompt": "Gắn List<Order> vào lưới, sau đó gọi list.Add(...) thêm một đơn mới. Trên lưới thì sao?",
     "options": [
+      "Lưới không đổi",
       "Dòng mới hiện ngay",
       "Chương trình báo lỗi",
-      "Lưới không hiện dòng mới, vì List<T> không báo thay đổi",
-      "Lưới hiện dòng mới sau 1 giây"
+      "Lưới tự vẽ lại sau một lúc"
     ],
-    "answer": 3,
-    "explain": "List<T> không phát thông báo khi thay đổi, nên lưới không biết mà vẽ lại."
+    "answer": 1,
+    "explain": "Lưới không hiện dòng mới: List<T> không phát thông báo khi thay đổi, nên lưới không biết mà vẽ lại."
   }
 ]
 ```

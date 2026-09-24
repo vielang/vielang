@@ -153,12 +153,12 @@ tắt luôn sau lần lỗi đó.
   {
     "prompt": "Lưới gắn với Local.ToBindingList(). Nhân viên sửa giá 2 dòng và xoá 1 dòng, chưa bấm Lưu. Trong bảng PRODUCTS có gì thay đổi?",
     "options": [
-      "Chưa có gì thay đổi",
       "Giá 2 dòng đã đổi",
+      "Chưa có gì thay đổi",
       "Dòng bị xoá đã mất",
       "Đổi hết, vì lưới nối thẳng với Oracle"
     ],
-    "answer": 1,
+    "answer": 2,
     "explain": "Lưới nối với DbContext chứ không nối thẳng Oracle. Chỉ SaveChangesAsync mới gửi thay đổi xuống."
   },
   {

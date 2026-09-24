@@ -52,11 +52,12 @@ public static class ShippingFactory
 - Gặp chuỗi lạ thì ném `ArgumentException` như bài Exception, không lặng lẽ
   dùng một cách giao mặc định.
 
-Trong controller, lựa chọn của khách đi qua factory rồi vào `Checkout`:
+Trong controller, chuỗi `method` khách gửi lên đi qua factory rồi vào
+`Checkout`:
 
 ```csharp
 var checkout = new Checkout(
-    ShippingFactory.Create(request.ShippingMethod));
+    ShippingFactory.Create(method));
 ```
 
 ## Thử ngay
@@ -122,37 +123,37 @@ IShippingStrategy shipping =
 ```quiz
 [
   {
-    "prompt": "ShippingFactory.Create(\"pickup\") trả về kiểu gì ở chỗ gọi?",
+    "prompt": "Controller tính phí cho cách giao khách chọn qua ShippingFactory. Controller cần biết những kiểu nào?",
     "options": [
-      "IShippingStrategy",
-      "PickupShipping, và nơi gọi phải biết class đó",
-      "string",
-      "ShippingFactory"
+      "Cả ba class cách giao cụ thể",
+      "ShippingFactory và IShippingStrategy",
+      "Class cụ thể ứng với lựa chọn",
+      "StandardShipping để làm mặc định"
     ],
-    "answer": 1,
-    "explain": "Factory trả về interface, nơi gọi dùng Fee mà không cần biết class cụ thể."
+    "answer": 2,
+    "explain": "Factory trả về interface, nên controller gọi Fee mà không cần biết class cụ thể nào."
   },
   {
     "prompt": "Thêm cách giao \"cod\" với cặp Strategy và Factory. Cần sửa những đâu?",
     "options": [
-      "Mọi controller",
-      "Checkout",
-      "Interface IShippingStrategy",
-      "Thêm class CodShipping và một case trong factory"
+      "Mọi controller có chọn cách giao",
+      "Checkout và IShippingStrategy",
+      "Class CodShipping và một case",
+      "Chỉ cần thêm class CodShipping"
     ],
-    "answer": 4,
-    "explain": "Chỉ factory biết ánh xạ từ chuỗi sang class, nên chỉ cần thêm class mới và một case."
+    "answer": 3,
+    "explain": "Chỉ factory biết ánh xạ từ chuỗi sang class, nên cần thêm class mới và một case trong factory. Thiếu case thì \"cod\" rơi vào default."
   },
   {
     "prompt": "Khi chuỗi không khớp case nào, vì sao nên ném exception thay vì trả StandardShipping?",
     "options": [
-      "Vì switch bắt buộc phải throw",
-      "Vì StandardShipping bị lỗi",
-      "Để lỗi dữ liệu lộ ra ngay, không lặng lẽ tính sai phí",
-      "Để chương trình chạy nhanh hơn"
+      "Vì default của switch bắt buộc throw",
+      "Vì return ở default là lỗi compile",
+      "Để API trả kết quả nhanh hơn",
+      "Để dữ liệu sai lộ ra ngay"
     ],
-    "answer": 3,
-    "explain": "Trả cách giao mặc định sẽ che mất dữ liệu sai do client gửi lên. Ném exception giúp phát hiện lỗi sớm."
+    "answer": 4,
+    "explain": "Trả cách giao mặc định sẽ lặng lẽ tính sai phí và che mất dữ liệu sai do client gửi lên. Ném exception giúp phát hiện lỗi sớm."
   }
 ]
 ```

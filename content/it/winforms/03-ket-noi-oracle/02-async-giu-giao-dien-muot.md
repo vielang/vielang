@@ -180,23 +180,23 @@ treo như bản không async. Đã gọi method async thì `await` nó.
   {
     "prompt": "Method tự viết LoadOrdersAsync có await bên trong. Kiểu trả về nên là gì?",
     "options": [
-      "Task",
       "async void",
       "void",
-      "object"
+      "object",
+      "Task"
     ],
-    "answer": 1,
+    "answer": 4,
     "explain": "async void chỉ dành cho event handler. Method async tự viết trả về Task để nơi gọi await được."
   },
   {
     "prompt": "Nhân viên bấm \"Tải lại\" hai lần thật nhanh, cả hai lần dùng chung một DbContext. Chuyện gì có thể xảy ra?",
     "options": [
+      "InvalidOperationException vì DbContext đang bận truy vấn trước",
       "Dữ liệu được tải hai lần, không sao",
       "Lần hai tự chờ lần một xong",
-      "Oracle tự huỷ lần một",
-      "InvalidOperationException vì DbContext đang bận truy vấn trước"
+      "Oracle tự huỷ lần một"
     ],
-    "answer": 4,
+    "answer": 1,
     "explain": "Một DbContext không chạy được hai truy vấn cùng lúc. Tắt nút trong lúc tải để tránh chuyện này."
   }
 ]

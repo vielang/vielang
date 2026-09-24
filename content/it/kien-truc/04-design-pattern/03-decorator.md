@@ -207,34 +207,34 @@ public class LoggingProductStore : IProductStore
   {
     "prompt": "Muốn cache kết quả InStockAsync mà không sửa DbProductStore. Cách nào hợp nhất?",
     "options": [
-      "Sửa DbProductStore thêm cache",
-      "Viết CachingProductStore implement IProductStore, bọc DbProductStore",
-      "Kế thừa DbProductStore",
-      "Thêm cache vào controller"
+      "Viết CachingProductStore bọc bản gốc",
+      "Thêm cache vào mọi controller",
+      "Kế thừa DbProductStore, override method",
+      "Thêm static cache vào Product"
     ],
-    "answer": 2,
-    "explain": "Decorator thêm việc cache bên ngoài, class gốc giữ nguyên và bản cache bọc được mọi IProductStore."
+    "answer": 1,
+    "explain": "CachingProductStore implement IProductStore và bọc DbProductStore. Class gốc giữ nguyên, và bản cache bọc được mọi IProductStore."
   },
   {
     "prompt": "Decorator khác kế thừa ở điểm nào?",
     "options": [
-      "Decorator chạy nhanh hơn",
-      "Không khác gì",
-      "Decorator chỉ dùng cho log",
-      "Decorator bọc bất kỳ object nào cùng interface, kế thừa gắn với một class cụ thể"
+      "Decorator chạy nhanh hơn kế thừa",
+      "Decorator bọc được mọi class cùng interface",
+      "Decorator chỉ dùng được cho việc log",
+      "Kế thừa không thêm được việc trước, sau"
     ],
-    "answer": 4,
-    "explain": "Decorator giữ bên trong một object kiểu interface, nên bọc được mọi class implement interface đó."
+    "answer": 2,
+    "explain": "Decorator giữ bên trong một object kiểu interface, nên bọc được mọi class implement interface đó. Class kế thừa chỉ gắn với đúng một class cha."
   },
   {
     "prompt": "Bọc Timing(Logging(Db)). Gọi InStockAsync thì lớp nào chạy phần \"trước\" đầu tiên?",
     "options": [
-      "Timing",
       "Logging",
       "Db",
+      "Timing",
       "Cùng lúc"
     ],
-    "answer": 1,
+    "answer": 3,
     "explain": "Lời gọi đi từ lớp ngoài cùng vào trong, nên Timing chạy trước, rồi Logging, rồi Db."
   }
 ]

@@ -89,7 +89,8 @@ tắt" đã làm việc đó.
 - Sơ đồ dùng ```` ```mermaid Chú thích ````, chỉ khi hình rõ hơn chữ. Tối đa 3
   nhánh ngang.
 - Thuật ngữ giữ tiếng Anh khi đó là từ dân IT dùng hằng ngày (class, method,
-  interface), kèm tiếng Việt trong định nghĩa.
+  interface). Chỉ giải nghĩa tiếng Việt trong định nghĩa khi thuật ngữ không
+  tự hiểu được.
 
 ## Kiểm tra trước khi commit
 
@@ -146,6 +147,8 @@ Riêng bài SQL:
   `order_lines`. Script tạo bảng và dữ liệu nằm **duy nhất** ở bài
   `01-database-bang-va-khoa`, trong khối ```` ```sql setup ````. Mọi bài sau
   dùng đúng dữ liệu đó.
+- Ngay sau đó là khối ```` ```sql reset ```` (PL/SQL xoá MỌI bảng của user
+  `shop`) để người học làm lại từ đầu. `check-sql` bỏ qua khối này.
 - Tên bảng, tên cột viết thường, nối bằng dấu gạch dưới: `customer_id`.
 - "Thử ngay" là một khối ```` ```sql ```` chạy trên dữ liệu mẫu. Kết quả trong
   `<details>` viết thành bảng Markdown, tên cột viết hoa như Oracle trả về.

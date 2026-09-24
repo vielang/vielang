@@ -4,9 +4,8 @@ minutes: 6
 ---
 
 Cửa hàng phát voucher mệnh giá 10, 30 và 40 nghìn. Khách được hoàn 60 nghìn,
-cần đưa ít voucher nhất. Cách tham lam (lấy voucher lớn nhất trước) cho
-40 + 10 + 10, tức 3 tờ, trong khi 30 + 30 chỉ cần 2 tờ. Quy hoạch động luôn
-tìm ra cách ít tờ nhất.
+cần đưa ít voucher nhất. Cách tham lam (lấy voucher lớn nhất trước) nghe hợp
+lý nhưng không phải lúc nào cũng ít tờ nhất. Quy hoạch động thì luôn tìm ra.
 
 ## Khái niệm
 
@@ -191,22 +190,22 @@ số tiền × số mệnh giá, như bản tính dần trong ví dụ.
     "options": [
       "Không dùng đệ quy nữa",
       "Chạy song song nhiều luồng",
-      "Không cần điểm dừng",
-      "Lưu kết quả đã tính, gặp lại đầu vào cũ thì trả luôn"
-    ],
-    "answer": 4,
-    "explain": "Mỗi đầu vào chỉ tính một lần. Các lần gọi sau với cùng đầu vào chỉ tra Dictionary."
-  },
-  {
-    "prompt": "Khi nào cách tham lam (lấy mệnh giá lớn nhất trước) cho kết quả sai?",
-    "options": [
-      "Không bao giờ sai",
-      "Khi chỉ có một mệnh giá",
-      "Khi lấy tờ lớn nhất làm phần còn lại khó ghép, như 60 với mệnh giá 10, 30, 40",
-      "Khi số tiền chia hết cho 10"
+      "Lưu kết quả đã tính để dùng lại",
+      "Không cần điểm dừng"
     ],
     "answer": 3,
-    "explain": "Lấy 40 trước để lại 20, chỉ ghép được bằng hai tờ 10. Bỏ qua 40 thì 30 + 30 tốt hơn."
+    "explain": "Gặp lại đầu vào cũ thì trả luôn kết quả đã lưu. Mỗi đầu vào chỉ tính một lần. Các lần gọi sau với cùng đầu vào chỉ tra Dictionary."
+  },
+  {
+    "prompt": "Mệnh giá 10, 50, 60 nghìn, cần hoàn 100 nghìn. Vì sao cách tham lam (lấy mệnh giá lớn nhất trước) không cho ít tờ nhất?",
+    "options": [
+      "Vì 100 không chia hết cho 60",
+      "Vì tham lam lấy tờ nhỏ nhất trước",
+      "Vì tham lam bỏ qua tờ 10",
+      "Vì lấy 60 trước thì phần còn lại khó ghép"
+    ],
+    "answer": 4,
+    "explain": "Tham lam lấy 60, còn 40 phải dùng bốn tờ 10, tổng 5 tờ. Bỏ qua 60 thì 50 + 50 chỉ cần 2 tờ."
   }
 ]
 ```

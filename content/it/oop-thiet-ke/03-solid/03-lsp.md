@@ -5,14 +5,14 @@ minutes: 5
 
 Vòng lặp hoàn tiền chạy ổn với mọi hình thức thanh toán, cho tới khi có thêm
 thẻ quà tặng. Class thẻ quà tặng kế thừa `Payment` nhưng `Refund()` lại ném
-lỗi, vì thẻ quà tặng không hoàn tiền được. Chương trình sập ở chỗ không ai ngờ. LSP giúp tránh
-loại lỗi này.
+lỗi, vì thẻ quà tặng không hoàn tiền được. Chương trình sập ở chỗ không ai
+ngờ, và LSP giúp tránh loại lỗi này.
 
 ## Khái niệm
 
-🔁 **LSP (Liskov Substitution Principle)**: object của class con phải dùng thay được cho object của class cha mà chương trình vẫn chạy đúng.
+🦆 **LSP (Liskov Substitution Principle)**: object của class con phải dùng thay được cho object của class cha mà chương trình vẫn chạy đúng.
 
-Nói cách khác, class con không được làm **ít hơn** những gì class cha đã hứa.
+Class con không được làm **ít hơn** những gì class cha đã hứa.
 Class cha có `Refund()` thì mọi class con đều phải hoàn tiền được.
 
 ## Ví dụ
@@ -99,21 +99,21 @@ class GiftCardPayment : Payment
 
 ## Thử ngay
 
-Chép khối **SAI** ở phần Ví dụ vào `Program.cs` rồi chạy `dotnet run`.
+Chép khối **SAI** ở phần Ví dụ vào `Program.cs`, đổi chỗ hai phần tử trong
+list để `new GiftCardPayment()` đứng đầu, rồi chạy `dotnet run`.
 
-**Đoán trước khi chạy:** dòng "Hoàn về thẻ" có được in ra trước khi chương
-trình sập không?
+**Đoán trước khi chạy:** dòng "Hoàn về thẻ" có được in ra không?
 
 <details>
 <summary>Xem kết quả</summary>
 
 ```text
-Hoàn về thẻ
 Unhandled exception. System.NotSupportedException: Thẻ quà tặng không hoàn được
 ```
 
-Có. Phần tử đầu chạy đúng, tới phần tử thứ hai thì sập. Lỗi kiểu này chỉ lộ
-ra khi dữ liệu thật có thẻ quà tặng, nên rất khó phát hiện sớm.
+Không. Vòng lặp sập ngay ở phần tử đầu, nên `CardPayment` chưa kịp hoàn tiền.
+Lỗi kiểu này chỉ lộ ra khi dữ liệu thật có thẻ quà tặng, nên rất khó phát hiện
+sớm.
 
 </details>
 
@@ -140,6 +140,28 @@ class StorePickup : Shipment
 Nếu class con không làm được một việc của class cha, thì nó không phải là một
 loại của class cha. Hãy dùng interface nhỏ hơn hoặc composition.
 
+```csharp
+// ĐÚNG — chỉ loại có mã vận đơn mới hứa Track
+abstract class Shipment
+{
+    public string Address { get; set; } = "";
+}
+
+interface ITrackable
+{
+    string Track();
+}
+
+class HomeDelivery : Shipment, ITrackable
+{
+    public string Track() => "VN123456";
+}
+
+class StorePickup : Shipment
+{
+}
+```
+
 ## Tóm tắt
 
 - LSP: class con phải thay được class cha mà chương trình vẫn chạy đúng.
@@ -153,21 +175,21 @@ loại của class cha. Hãy dùng interface nhỏ hơn hoặc composition.
   {
     "prompt": "Class Bird có method Fly(). Class Penguin : Bird override Fly() bằng cách ném exception. Vấn đề là gì?",
     "options": [
-      "Không có vấn đề, override là để làm vậy",
-      "Vi phạm LSP: code dùng Bird sẽ sập khi gặp Penguin",
+      "Không sao, override sinh ra để vậy",
       "Vi phạm SRP",
-      "Chỉ là lỗi đặt tên"
+      "Vi phạm LSP",
+      "Chỉ là lỗi đặt tên method"
     ],
-    "answer": 2,
-    "explain": "Code gọi bird.Fly() tin rằng mọi Bird đều bay được. Penguin phá lời hứa đó nên không thay được cho Bird."
+    "answer": 3,
+    "explain": "Vi phạm LSP: code dùng Bird sẽ sập khi gặp Penguin. Code gọi bird.Fly() tin rằng mọi Bird đều bay được. Penguin phá lời hứa đó nên không thay được cho Bird."
   },
   {
     "prompt": "Cách sửa hợp lý cho ví dụ Bird và Penguin?",
     "options": [
-      "Bắt mọi nơi gọi Fly() kiểm tra có phải Penguin không",
-      "Để Fly() của Penguin im lặng, không làm gì",
-      "Xoá class Penguin",
-      "Tách interface IFlyable, chỉ loài biết bay mới implement"
+      "Mọi nơi gọi Fly() kiểm tra Penguin",
+      "Cho Fly() của Penguin không làm gì",
+      "Xoá class Penguin khỏi chương trình",
+      "Tách IFlyable cho loài biết bay"
     ],
     "answer": 4,
     "explain": "Bay là một khả năng, không phải chim nào cũng có. Tách ra interface thì chỉ loài bay được mới hứa bay."
@@ -175,10 +197,10 @@ loại của class cha. Hãy dùng interface nhỏ hơn hoặc composition.
   {
     "prompt": "Dấu hiệu nào cho thấy có thể đang vi phạm LSP?",
     "options": [
-      "Class con override method và ném NotSupportedException",
+      "Override chỉ để ném exception",
       "Class con thêm property mới",
       "Class con gọi base(...) trong constructor",
-      "Class có nhiều method"
+      "Class có rất nhiều method"
     ],
     "answer": 1,
     "explain": "Class con từ chối làm việc class cha đã hứa, nên thay nó vào chỗ class cha sẽ làm chương trình lỗi."

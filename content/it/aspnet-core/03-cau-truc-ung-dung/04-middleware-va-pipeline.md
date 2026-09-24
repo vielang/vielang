@@ -47,8 +47,9 @@ app.MapControllers();
 app.Run();
 ```
 
-- `app.Use(...)` thêm một middleware vào pipeline. Lambda cũng đánh dấu
-  `async` được như method.
+- `app.Use(...)` thêm một middleware vào pipeline. Tham số là lambda nhận
+  hai tham số `(context, next)`, thân nhiều câu lệnh đặt trong `{ }`.
+- Lambda cũng đánh dấu `async` được như method.
 - `context` chứa request và response hiện tại.
 - Code trước `await next()` chạy khi request đi vào. Code sau nó chạy khi
   response đi ra.
@@ -82,7 +83,7 @@ app.MapControllers();
 app.Run();
 ```
 
-Chạy server, gọi `curl http://localhost:5000/api/products` rồi xem cửa sổ
+Chạy server, gọi `curl -i http://localhost:5000/api/products` rồi xem cửa sổ
 đang chạy server.
 
 **Đoán trước khi chạy:** bốn dòng in ra theo thứ tự nào?
@@ -116,6 +117,16 @@ app.Use(async (context, next) =>
 });
 ```
 
+```csharp
+// ĐÚNG
+var app = WebApplication.Create(args);
+app.Use(async (context, next) =>
+{
+    Console.WriteLine("Có request");
+    await next();
+});
+```
+
 **Sửa response sau khi đã gửi.** Sau `await next()`, response thường đã bắt
 đầu gửi về client. Đổi header lúc đó sẽ báo lỗi.
 
@@ -131,6 +142,16 @@ app.Use(async (context, next) =>
 
 Muốn thêm header thì đặt code đó trước `await next()`.
 
+```csharp
+// ĐÚNG — đổi header khi response chưa gửi
+var app = WebApplication.Create(args);
+app.Use(async (context, next) =>
+{
+    context.Response.Headers["X-Shop"] = "An";
+    await next();
+});
+```
+
 ## Tóm tắt
 
 - Pipeline là chuỗi middleware mà mọi request đi qua.
@@ -144,31 +165,31 @@ Muốn thêm header thì đặt code đó trước `await next()`.
     "prompt": "Ba middleware X, Y, Z được thêm theo thứ tự đó. Response đi ra qua chúng theo thứ tự nào?",
     "options": [
       "X, Y, Z",
-      "Y, X, Z",
       "Z, Y, X",
+      "Y, X, Z",
       "Chỉ qua Z"
     ],
-    "answer": 3,
+    "answer": 2,
     "explain": "Request đi xuôi X, Y, Z. Response đi ngược lại Z, Y, X."
   },
   {
     "prompt": "Việc nào hợp để làm bằng middleware?",
     "options": [
-      "Ghi log đường dẫn và thời gian của mọi request",
       "Tính phí ship của một đơn hàng",
       "Kiểm tra tên sản phẩm không rỗng",
+      "Ghi log thời gian của mọi request",
       "Lấy sản phẩm theo id"
     ],
-    "answer": 1,
+    "answer": 3,
     "explain": "Middleware dành cho việc chung của mọi request. Ba việc còn lại là nghiệp vụ, thuộc về controller và service."
   },
   {
     "prompt": "Một middleware không gọi await next(). Chuyện gì xảy ra với request?",
     "options": [
-      "Request vẫn tới controller bình thường",
-      "Server dừng hẳn",
-      "Lỗi compile",
-      "Request dừng ở middleware đó, controller không chạy"
+      "Vẫn tới controller bình thường",
+      "ASP.NET Core tự gọi next() thay",
+      "Trả 500 vì thiếu next()",
+      "Dừng ở đó, controller không chạy"
     ],
     "answer": 4,
     "explain": "next() là bước chuyển sang middleware tiếp theo. Không gọi thì pipeline dừng tại đó."

@@ -123,21 +123,21 @@ decimal price = 9.99m;
   {
     "prompt": "Bạn cần lưu tổng tiền của một hoá đơn. Kiểu nào phù hợp nhất?",
     "options": [
+      "decimal",
       "int",
       "double",
-      "string",
-      "decimal"
+      "string"
     ],
-    "answer": 4,
+    "answer": 1,
     "explain": "decimal lưu số thập phân chính xác, không có sai số như double. int không chứa được phần lẻ."
   },
   {
     "prompt": "Sau dòng var count = 10; thì dòng count = \"mười\"; có chạy được không?",
     "options": [
-      "Được, vì var chứa được mọi kiểu",
-      "Không, count đã là int nên không gán chuỗi được",
+      "Được, var chứa được mọi kiểu",
+      "Không, count đã là int",
       "Được, nhưng count thành null",
-      "Không, vì phải viết var count = \"mười\""
+      "Không, phải khai báo lại count"
     ],
     "answer": 2,
     "explain": "var chỉ để compiler tự suy ra kiểu. count được suy ra là int và giữ kiểu int mãi mãi."
@@ -145,12 +145,12 @@ decimal price = 9.99m;
   {
     "prompt": "Biến lưu trạng thái \"đơn hàng đã thanh toán hay chưa\" nên dùng kiểu gì?",
     "options": [
-      "bool",
       "string",
       "int",
+      "bool",
       "decimal"
     ],
-    "answer": 1,
+    "answer": 3,
     "explain": "Chỉ có hai trạng thái: rồi hoặc chưa. bool với true/false diễn tả đúng điều đó."
   }
 ]

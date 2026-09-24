@@ -9,7 +9,7 @@ giúp code đặt hàng chỉ cần biết "có ai đó gửi được thông b�
 
 ## Khái niệm
 
-📜 **Interface**: danh sách method và property mà một class phải có, không kèm cách làm.
+📜 **Interface**: danh sách method và property mà một class phải có, thường không kèm cách làm.
 
 🤝 **Implement**: class ghi `: TênInterface` thì cam kết viết đủ mọi thành viên của interface đó, thiếu một cái là lỗi compile.
 
@@ -75,8 +75,7 @@ new PlaceOrder(new EmailNotifier()).Run();
 new PlaceOrder(new SmsNotifier()).Run();
 ```
 
-**Đoán trước khi chạy:** `PlaceOrder` không đổi một dòng nào. Hai lần chạy in
-ra giống hay khác nhau?
+**Đoán trước khi chạy:** dòng thứ hai in ra gì?
 
 <details>
 <summary>Xem kết quả</summary>
@@ -86,7 +85,8 @@ Email: Đã đặt hàng
 SMS: Đã đặt hàng
 ```
 
-Khác nhau. `PlaceOrder` gọi `Send` của object được truyền vào. Thêm cách gửi
+Dòng thứ hai là `SMS: Đã đặt hàng`. `PlaceOrder` gọi `Send` của object được
+truyền vào. Thêm cách gửi
 mới chỉ cần viết class mới, không sửa `PlaceOrder`.
 
 </details>
@@ -130,6 +130,8 @@ INotifier notifier = new EmailNotifier();
 - Code chỉ phụ thuộc vào interface thì đổi được cách làm mà không phải
   sửa code đó.
 - Không `new` được interface. Một class implement được nhiều interface.
+- Từ C# 8, method trong interface có thể kèm thân sẵn (default method), class
+  không bắt buộc viết lại method đó.
 
 ```quiz
 [
@@ -138,19 +140,19 @@ INotifier notifier = new EmailNotifier();
     "options": [
       "class A : IPrinter { }",
       "class A : IPrinter { void Print(string text) { } }",
-      "class A : IPrinter { public void Print(string text) { } }",
-      "class A : IPrinter { public void Print() { } }"
+      "class A : IPrinter { public void Print() { } }",
+      "class A : IPrinter { public void Print(string text) { } }"
     ],
-    "answer": 3,
+    "answer": 4,
     "explain": "Phải có đúng method Print(string) và để public. Thiếu method, thiếu public hay sai tham số đều là lỗi compile."
   },
   {
     "prompt": "Class ReportService nhận IExporter qua constructor. Muốn xuất thêm định dạng Excel, cần làm gì?",
     "options": [
-      "Viết class ExcelExporter : IExporter rồi truyền vào ReportService",
+      "Viết ExcelExporter : IExporter, truyền vào",
       "Sửa ReportService, thêm if cho Excel",
-      "Sửa interface IExporter, thêm method ExportExcel",
-      "Tạo ReportService mới cho Excel"
+      "Thêm method ExportExcel vào IExporter",
+      "Tạo một ReportService mới cho Excel"
     ],
     "answer": 1,
     "explain": "ReportService chỉ phụ thuộc vào IExporter, nên thêm cách xuất mới chỉ cần thêm một class implement nó."
@@ -159,11 +161,11 @@ INotifier notifier = new EmailNotifier();
     "prompt": "Dòng nào KHÔNG biên dịch được, biết EmailNotifier implement INotifier?",
     "options": [
       "INotifier n = new EmailNotifier();",
+      "var n = new INotifier();",
       "EmailNotifier e = new EmailNotifier();",
-      "var list = new List<INotifier> { new EmailNotifier() };",
-      "var n = new INotifier();"
+      "var list = new List<INotifier> { new EmailNotifier() };"
     ],
-    "answer": 4,
+    "answer": 2,
     "explain": "Không tạo object từ interface được. Biến hay list kiểu INotifier thì hợp lệ, miễn object bên trong là class implement nó."
   }
 ]

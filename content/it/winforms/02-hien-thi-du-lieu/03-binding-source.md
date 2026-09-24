@@ -163,10 +163,10 @@ var grid = new DataGridView
     "options": [
       "emailBox.Text = _source.Email;",
       "_source.DataBindings.Add(\"Email\", emailBox);",
-      "emailBox.DataSource = _source;",
-      "emailBox.DataBindings.Add(\"Text\", _source, \"Email\");"
+      "emailBox.DataBindings.Add(\"Text\", _source, \"Email\");",
+      "emailBox.DataSource = _source;"
     ],
-    "answer": 4,
+    "answer": 3,
     "explain": "DataBindings.Add nhận tên property của control, nguồn dữ liệu, rồi tên property của object."
   },
   {
@@ -174,10 +174,10 @@ var grid = new DataGridView
     "options": [
       "Đã đổi theo từng phím",
       "Không bao giờ đổi",
-      "Chưa, chỉ đổi khi ô nhập mất focus",
-      "Chỉ đổi khi tắt app"
+      "Chỉ đổi khi tắt app",
+      "Chưa, chỉ đổi khi ô nhập mất focus"
     ],
-    "answer": 3,
+    "answer": 4,
     "explain": "Mặc định binding chỉ ghi giá trị vào object khi ô nhập mất focus, tức lúc người dùng rời khỏi ô."
   }
 ]

@@ -160,7 +160,23 @@ public class CustomersController : ControllerBase
 }
 ```
 
-Sửa bằng cách cho action thứ hai một URL riêng, ví dụ `[HttpGet("active")]`.
+Sửa bằng cách cho action thứ hai một URL riêng.
+
+```csharp
+// ĐÚNG — GET /api/customers/active
+using Microsoft.AspNetCore.Mvc;
+
+[ApiController]
+[Route("api/customers")]
+public class CustomersController : ControllerBase
+{
+    [HttpGet]
+    public string GetAll() => "all";
+
+    [HttpGet("active")]
+    public string GetActive() => "active";
+}
+```
 
 ## Tóm tắt
 
@@ -186,24 +202,24 @@ Sửa bằng cách cho action thứ hai một URL riêng, ví dụ `[HttpGet("ac
   {
     "prompt": "Action GetById(int id) trả về null khi không tìm thấy. Client nhận status code nào?",
     "options": [
-      "204 No Content",
       "404 Not Found",
       "500 Internal Server Error",
-      "200 OK với body null"
+      "200 OK với body null",
+      "204 No Content"
     ],
-    "answer": 1,
+    "answer": 4,
     "explain": "ASP.NET Core đổi kết quả null thành 204. Muốn trả 404 thì phải chủ động trả NotFound()."
   },
   {
-    "prompt": "Vì sao một class trở thành controller trong ví dụ trên?",
+    "prompt": "OrdersController có [ApiController], [Route(\"api/orders\")] và một method private string Load() gắn [HttpGet]. Gọi GET /api/orders nhận gì?",
     "options": [
-      "Vì tên file nằm trong thư mục Controllers",
-      "Vì có method tên GetAll",
-      "Vì được đăng ký trong appsettings.json",
-      "Vì kế thừa ControllerBase"
+      "404 vì không có action nào",
+      "200 kèm chuỗi Load trả về",
+      "204 vì chưa có dữ liệu",
+      "500 vì Load thiếu tham số"
     ],
-    "answer": 4,
-    "explain": "ASP.NET Core nhận ra controller nhờ kế thừa ControllerBase. Còn [Route] và [HttpGet] cho biết URL nào gọi tới action nào."
+    "answer": 1,
+    "explain": "Action phải là method public. Method private không được nối với URL nào, nên GET /api/orders không khớp action và nhận 404."
   }
 ]
 ```

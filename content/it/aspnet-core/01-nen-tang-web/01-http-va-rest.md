@@ -10,11 +10,11 @@ và SQL (Oracle) đã học thành một API.
 
 ## Khái niệm
 
-🌐 **HTTP**: giao thức để client và server trao đổi dữ liệu. Client gửi request, server trả về response.
+🌐 **HTTP**: giao thức để client và server trao đổi dữ liệu, trong đó client gửi request và server trả về response.
 
 📮 **HTTP method**: phần của request cho biết client muốn làm gì, gồm GET, POST, PUT, DELETE.
 
-🔢 **Status code**: số ba chữ số trong response cho biết kết quả. 2xx là thành công, 4xx là lỗi phía client, 5xx là lỗi phía server.
+🔢 **Status code**: số ba chữ số trong response cho biết kết quả: 2xx là thành công, 4xx là lỗi phía client, 5xx là lỗi phía server.
 
 🧭 **REST**: cách thiết kế API mà mỗi URL trỏ tới một tài nguyên (danh từ), còn việc cần làm thể hiện bằng HTTP method.
 
@@ -133,23 +133,23 @@ HTTP/1.1 404 Not Found
   {
     "prompt": "Client muốn cập nhật giá của đơn hàng số 7. Request nào đúng kiểu REST?",
     "options": [
+      "PUT /api/orders/7",
       "GET /api/updateOrder?id=7",
       "POST /api/orders/7/update",
-      "PUT /api/orders/7",
       "DELETE /api/orders/7"
     ],
-    "answer": 3,
+    "answer": 1,
     "explain": "PUT dùng để cập nhật, URL chỉ đúng tài nguyên là đơn hàng số 7. Không đặt động từ vào URL."
   },
   {
     "prompt": "Client gửi email sai định dạng khi đăng ký. Server nên trả status code nào?",
     "options": [
-      "400 Bad Request",
       "200 OK",
+      "400 Bad Request",
       "404 Not Found",
       "500 Internal Server Error"
     ],
-    "answer": 1,
+    "answer": 2,
     "explain": "Dữ liệu client gửi lên sai là lỗi phía client, nhóm 4xx. 400 Bad Request đúng cho trường hợp này."
   },
   {
@@ -157,10 +157,10 @@ HTTP/1.1 404 Not Found
     "options": [
       "2xx",
       "3xx",
-      "4xx",
-      "5xx"
+      "5xx",
+      "4xx"
     ],
-    "answer": 4,
+    "answer": 3,
     "explain": "Lỗi nằm ở phía server, client không làm gì sai, nên thuộc nhóm 5xx."
   }
 ]

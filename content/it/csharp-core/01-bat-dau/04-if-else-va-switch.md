@@ -184,20 +184,20 @@ switch (status)
     "prompt": "Trong switch, không case nào khớp với giá trị của biến. Chuyện gì xảy ra?",
     "options": [
       "Lỗi khi chạy",
-      "Nhánh default chạy, nếu có",
       "Case đầu tiên chạy",
-      "Case cuối cùng chạy"
+      "Case cuối cùng chạy",
+      "Nhánh default chạy, nếu có"
     ],
-    "answer": 2,
+    "answer": 4,
     "explain": "default là nhánh dành cho mọi giá trị không khớp case nào. Không có default thì switch không làm gì."
   },
   {
     "prompt": "Bạn cần phân loại khách theo 4 hạng cố định: \"silver\", \"gold\", \"platinum\", \"diamond\". Cách viết nào gọn nhất?",
     "options": [
-      "switch với 4 case",
-      "4 câu if riêng rẽ, không có else",
-      "Một if duy nhất với điều kiện dài",
-      "Vòng lặp"
+      "switch với bốn case",
+      "Bốn câu if rời, không có else",
+      "Một if với điều kiện thật dài",
+      "Một vòng lặp qua bốn hạng"
     ],
     "answer": 1,
     "explain": "So một biến với nhiều giá trị cụ thể là đúng việc của switch. Bốn if rời nhau vẫn chạy nhưng dài và dễ sót."

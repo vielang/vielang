@@ -142,34 +142,34 @@ Console.WriteLine(Product.Count);
   {
     "prompt": "Math.Max(3, 7) được gọi mà không cần new Math(). Điều đó cho biết gì về Max?",
     "options": [
-      "Max là property",
       "Max là static method",
+      "Max là property",
       "Math là một biến",
       "Max là constructor"
     ],
-    "answer": 2,
+    "answer": 1,
     "explain": "Gọi thẳng qua tên class mà không tạo object nghĩa là Max là thành viên static."
   },
   {
     "prompt": "Class Order có public static int NextId = 1; Tạo 5 object Order, mỗi constructor tăng NextId thêm 1. NextId cuối cùng là bao nhiêu?",
     "options": [
       "1",
+      "6",
       "5",
-      "2",
-      "6"
+      "2"
     ],
-    "answer": 4,
+    "answer": 2,
     "explain": "NextId dùng chung một bản. Bắt đầu từ 1, tăng 5 lần thành 6."
   },
   {
     "prompt": "Thứ nào nên khai báo static?",
     "options": [
-      "Phí vận chuyển cố định áp dụng cho mọi đơn hàng",
       "Tên của từng khách hàng",
-      "Số lượng của từng dòng trong đơn",
-      "Địa chỉ giao hàng của một đơn"
+      "Số lượng của từng dòng đơn",
+      "Phí ship cố định cho mọi đơn",
+      "Địa chỉ giao của từng đơn"
     ],
-    "answer": 1,
+    "answer": 3,
     "explain": "Phí cố định dùng chung cho mọi đơn, không thuộc về đơn nào. Ba thứ còn lại khác nhau theo từng object."
   }
 ]

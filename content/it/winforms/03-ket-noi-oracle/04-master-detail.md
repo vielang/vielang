@@ -146,26 +146,26 @@ _lines.DataMember = "Lines";
     "explain": "BindingSource phụ lấy nguồn là BindingSource chính, DataMember là tên property danh sách con Orders."
   },
   {
-    "prompt": "Lưới đơn hiện đủ, nhưng lưới dòng hàng luôn trống dù database có dữ liệu. Nguyên nhân hay gặp nhất?",
+    "prompt": "Chọn đơn khác ở lưới trên thì lưới dưới đổi theo. Việc đổi đó do đâu?",
     "options": [
-      "Thiếu AllowUserToAddRows = false",
-      "Quên .Include(o => o.Lines) khi đọc đơn",
-      "Lưới dòng hàng phải ReadOnly",
-      "Oracle chưa COMMIT"
+      "Handler SelectionChanged mà ta tự viết",
+      "_lines theo dòng đang chọn của _orders",
+      "EF Core đọc lại ORDER_LINES mỗi lần",
+      "DataGridView tự lọc dòng theo OrderId"
     ],
     "answer": 2,
-    "explain": "Không Include thì EF Core không đọc ORDER_LINES, Lines của mỗi đơn là list rỗng."
+    "explain": "BindingSource phụ có DataMember = \"Lines\" nên tự lấy Lines của đơn đang chọn. Các dòng hàng đã có sẵn trong bộ nhớ nhờ Include, không đọc lại database."
   },
   {
-    "prompt": "Class Order có Id, CustomerId, Lines. Gắn List<Order> vào DataGridView thì lưới có những cột nào?",
+    "prompt": "Form đang mở thì có người tạo thêm một đơn qua API. Lưới đơn trên form thì sao?",
     "options": [
-      "Id, CustomerId, Lines",
-      "Chỉ Lines",
-      "Id, CustomerId",
-      "Không có cột nào"
+      "Hiện ngay vì EF Core theo dõi bảng",
+      "Hiện khi chọn sang một đơn khác",
+      "Không hiện tới khi đọc lại danh sách",
+      "Báo lỗi vì dữ liệu trong bảng đã đổi"
     ],
     "answer": 3,
-    "explain": "Property kiểu danh sách không thành cột. Muốn xem Lines thì dùng một lưới phụ với DataMember."
+    "explain": "Danh sách đơn được đọc một lần lúc Load. EF Core không tự báo khi database đổi, nên phải đọc lại mới thấy đơn mới."
   }
 ]
 ```

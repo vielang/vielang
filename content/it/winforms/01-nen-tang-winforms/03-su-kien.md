@@ -138,22 +138,22 @@ bấm sau chạy gấp đôi. Gắn handler một lần duy nhất, trong constr
     "prompt": "Dòng nào gắn method SaveButton_Click vào nút saveButton đúng cách?",
     "options": [
       "saveButton.Click += SaveButton_Click();",
-      "saveButton.Click = SaveButton_Click;",
       "saveButton.Click += SaveButton_Click;",
+      "saveButton.Click = SaveButton_Click;",
       "SaveButton_Click += saveButton.Click;"
     ],
-    "answer": 3,
+    "answer": 2,
     "explain": "Dùng += và tên method không kèm (). Có () là gọi method ngay, còn = thì compiler không cho với event."
   },
   {
     "prompt": "Handler cần đổi chữ trên một Label. Vì sao Label đó thường là field chứ không phải biến trong constructor?",
     "options": [
       "Label không thể là biến cục bộ",
-      "Handler là method khác, không thấy biến cục bộ của constructor",
       "Field chạy nhanh hơn",
+      "Handler là method khác, không thấy biến cục bộ của constructor",
       "Để Label tự hiện lên form"
     ],
-    "answer": 2,
+    "answer": 3,
     "explain": "Biến cục bộ chỉ sống trong constructor, method riêng không thấy nó. Field thuộc về object nên mọi method của form đều dùng được. Lambda viết ngay trong constructor thì vẫn thấy biến cục bộ."
   },
   {

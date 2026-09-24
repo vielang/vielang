@@ -95,6 +95,16 @@ không còn tồn tại, nên Oracle chặn lại với lỗi `ORA-02292`: vẫn
 DELETE FROM customers WHERE customer_id = 1;
 ```
 
+```sql
+-- ĐÚNG — xoá dòng con trước (đơn 1 và 2 của An), rồi mới xoá khách
+DELETE FROM order_lines WHERE order_id IN (1, 2);
+DELETE FROM orders WHERE customer_id = 1;
+DELETE FROM customers WHERE customer_id = 1;
+```
+
+Hai khối ĐÚNG ở trên sửa dữ liệu mẫu. Thử xong, chạy `ROLLBACK;` để huỷ
+(bài Transaction sẽ giải thích).
+
 ## Tóm tắt
 
 - Khoá ngoại là cột trỏ tới khoá chính của bảng khác.
@@ -108,31 +118,31 @@ DELETE FROM customers WHERE customer_id = 1;
     "prompt": "Bảng order_lines có cột product_id trỏ tới products. Thêm một dòng hàng với product_id = 50 trong khi chỉ có 5 sản phẩm. Chuyện gì xảy ra?",
     "options": [
       "Thêm được, product_id để trống",
-      "Thêm được, Oracle tự tạo sản phẩm số 50",
       "Báo lỗi vì không có sản phẩm số 50",
+      "Thêm được, Oracle tự tạo sản phẩm số 50",
       "Thêm được nhưng không hiện khi SELECT"
     ],
-    "answer": 3,
+    "answer": 2,
     "explain": "Khoá ngoại bắt buộc giá trị phải có bên bảng cha. Không có sản phẩm 50 thì Oracle báo ORA-02291."
   },
   {
     "prompt": "Trong quan hệ khách hàng và đơn hàng, cột khoá ngoại nằm ở bảng nào?",
     "options": [
-      "orders, vì mỗi đơn thuộc về một khách",
       "customers, vì khách có nhiều đơn",
       "Cả hai bảng",
+      "orders, vì mỗi đơn thuộc về một khách",
       "Không bảng nào"
     ],
-    "answer": 1,
+    "answer": 3,
     "explain": "Khoá ngoại nằm ở phía \"nhiều\". Mỗi đơn lưu customer_id của khách đã đặt nó."
   },
   {
     "prompt": "Vì sao orders chỉ lưu customer_id mà không lưu luôn tên và email của khách?",
     "options": [
-      "Vì Oracle không cho lưu chuỗi trong orders",
-      "Vì customer_id là số nên chạy nhanh hơn",
-      "Vì tên khách không quan trọng",
-      "Để thông tin khách chỉ nằm một chỗ, đổi email thì chỉ sửa một dòng"
+      "Để bảng orders ít cột, đỡ tốn chỗ",
+      "Để JOIN chạy nhanh hơn khi nối bằng số",
+      "Vì khoá ngoại bắt buộc phải là cột số",
+      "Để thông tin khách chỉ nằm ở một chỗ"
     ],
     "answer": 4,
     "explain": "Chép tên và email vào mọi đơn thì khi khách đổi email phải sửa hàng loạt dòng, dễ sót. Lưu khoá ngoại thì chỉ sửa ở customers."

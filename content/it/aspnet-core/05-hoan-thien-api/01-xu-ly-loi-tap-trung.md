@@ -3,14 +3,10 @@ title: Xử lý lỗi tập trung
 minutes: 5
 ---
 
-Database mất kết nối, code ném ra một exception mà không ai bắt. Ở môi trường
-Development, client nhận về trang lỗi dài kèm stack trace. Trên server thật,
-client chỉ nhận 500 với body rỗng, không biết chuyện gì đã xảy ra. Bọc
-`try/catch` vào từng action thì code lặp lại khắp nơi. Bài này bắt mọi lỗi ở
-một chỗ.
-
-Vẫn dùng `try/catch` như bài Exception khi xử lý được một lỗi cụ thể. Lỗi
-không lường trước thì để bộ xử lý tập trung bắt.
+Database mất kết nối, code ném exception mà không ai bắt, client chỉ nhận 500
+không rõ lý do. Bọc `try/catch` vào từng action thì code lặp lại khắp nơi.
+Bài này bắt mọi lỗi không lường trước ở một chỗ, còn lỗi cụ thể xử lý được
+thì vẫn dùng `try/catch` như bài Exception.
 
 ## Khái niệm
 
@@ -107,7 +103,8 @@ public class TestController : ControllerBase
 }
 ```
 
-Chạy server rồi gọi `curl -i http://localhost:5000/api/test/boom`.
+`=> throw ...` cho method ném exception ngay thay vì trả về giá trị. Chạy
+server rồi gọi `curl -i http://localhost:5000/api/test/boom`.
 
 **Đoán trước khi chạy:** câu "Mất kết nối tới kho ở Hà Nội" có xuất hiện
 trong response mà client nhận không?
@@ -153,6 +150,20 @@ public class OrdersController : ControllerBase
 }
 ```
 
+```csharp
+// ĐÚNG — lỗi để bộ xử lý tập trung bắt
+using Microsoft.AspNetCore.Mvc;
+
+public class OrdersController : ControllerBase
+{
+    [HttpGet("{id}")]
+    public IActionResult Get(int id)
+    {
+        return Ok(id);
+    }
+}
+```
+
 **Trả thẳng `exception.Message` hay stack trace cho client.** Thông báo lỗi
 có thể chứa tên bảng, đường dẫn file, chuỗi kết nối. Chỉ ghi chúng vào log.
 
@@ -166,25 +177,25 @@ có thể chứa tên bảng, đường dẫn file, chuỗi kết nối. Chỉ g
 ```quiz
 [
   {
-    "prompt": "Service ném exception khi đọc database, không ai bắt. Với bộ xử lý lỗi tập trung ở trên, client nhận status code nào?",
+    "prompt": "App có AddExceptionHandler và UseExceptionHandler(). Handler đặt StatusCode = 503 rồi trả ProblemDetails. Một action ném exception không ai bắt. Client nhận gì?",
     "options": [
-      "200",
-      "404",
-      "500",
-      "Không nhận được gì"
+      "503 kèm ProblemDetails",
+      "200 với body rỗng",
+      "404 vì action bị lỗi",
+      "500 mặc định, bỏ qua handler"
     ],
-    "answer": 3,
-    "explain": "Bộ xử lý bắt exception, đặt StatusCode = 500 và trả ProblemDetails."
+    "answer": 1,
+    "explain": "Exception chưa ai bắt đi tới handler, và handler quyết định response. Nó đặt 503 nên client nhận 503 kèm ProblemDetails."
   },
   {
     "prompt": "Thông tin chi tiết của exception (message, stack trace) nên đi đâu?",
     "options": [
-      "Vào log của server",
       "Vào body response cho client",
+      "Vào log của server",
       "Vào URL",
       "Bỏ đi, không cần lưu"
     ],
-    "answer": 1,
+    "answer": 2,
     "explain": "Team cần chi tiết để sửa lỗi, nên ghi vào log. Client chỉ cần biết có lỗi, không cần biết bên trong."
   },
   {
@@ -192,10 +203,10 @@ có thể chứa tên bảng, đường dẫn file, chuỗi kết nối. Chỉ g
     "options": [
       "Không có lỗi nào xảy ra",
       "Yêu cầu chạy lại request",
-      "Tắt server",
-      "Lỗi đã được xử lý xong, không cần bộ xử lý nào khác"
+      "Lỗi đã xử lý xong, dừng ở đây",
+      "Ném lại exception lên trên"
     ],
-    "answer": 4,
+    "answer": 3,
     "explain": "true báo cho ASP.NET Core biết response đã được ghi xong. Trả false thì bộ xử lý tiếp theo sẽ thử."
   }
 ]

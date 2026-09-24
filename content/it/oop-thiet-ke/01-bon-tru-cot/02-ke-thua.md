@@ -187,10 +187,10 @@ class Customer
   {
     "prompt": "Class Employee có method GetInfo(). Class Manager : Employee không khai báo gì thêm. Gọi new Manager(...).GetInfo() thì sao?",
     "options": [
-      "Lỗi compile vì Manager không có GetInfo",
+      "Lỗi compile, Manager không có GetInfo",
       "Lỗi khi chạy",
-      "Chạy được, dùng GetInfo kế thừa từ Employee",
-      "Chạy được nhưng trả về rỗng"
+      "Chạy được, dùng GetInfo của Employee",
+      "Chạy được nhưng trả về chuỗi rỗng"
     ],
     "answer": 3,
     "explain": "Manager kế thừa mọi method public của Employee, nên GetInfo có sẵn mà không cần viết lại."
@@ -198,23 +198,23 @@ class Customer
   {
     "prompt": "Class Vehicle chỉ có constructor Vehicle(string plate). Class Truck : Vehicle viết constructor Truck(string plate) { } mà không có : base(plate). Chuyện gì xảy ra?",
     "options": [
-      "Lỗi compile: Vehicle không có constructor rỗng để gọi",
-      "Chạy được, plate tự được truyền lên class cha",
+      "Chạy được, plate tự truyền lên Vehicle",
       "Chạy được, plate của Vehicle là null",
-      "Lỗi khi chạy lúc new Truck(...)"
+      "Lỗi khi chạy lúc new Truck(...)",
+      "Lỗi compile ở constructor của Truck"
     ],
-    "answer": 1,
+    "answer": 4,
     "explain": "Không ghi base(...) thì compiler tìm constructor rỗng của Vehicle. Không có thì báo lỗi. Phải viết : base(plate)."
   },
   {
     "prompt": "Trường hợp nào dùng kế thừa là hợp lý?",
     "options": [
-      "Order : Customer, để đơn hàng có sẵn tên khách",
-      "SavingsAccount : BankAccount",
-      "Invoice : List<string>, để hoá đơn có sẵn Add",
-      "Car : Engine, để xe có sẵn công suất"
+      "SavingsAccount : BankAccount, để có sẵn số dư",
+      "Order : Customer, để có sẵn tên khách",
+      "Invoice : List<string>, để có sẵn Add",
+      "Car : Engine, để có sẵn công suất"
     ],
-    "answer": 2,
+    "answer": 1,
     "explain": "Tài khoản tiết kiệm là một loại tài khoản ngân hàng. Các trường hợp còn lại là quan hệ \"có một\", nên đặt object kia làm property thay vì kế thừa."
   }
 ]

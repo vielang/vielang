@@ -3,8 +3,8 @@ title: Abstract class
 minutes: 5
 ---
 
-Cửa hàng nhận tiền mặt và thẻ. Mọi hình thức thanh toán đều có số tiền và in
-biên lai giống nhau, nhưng cách trả tiền thì mỗi loại một kiểu. Một object
+Cửa hàng nhận tiền mặt và thẻ: hình thức nào cũng có số tiền và in biên lai
+giống nhau, nhưng cách trả tiền thì mỗi loại một kiểu. Một object
 "thanh toán" chung chung, không rõ là tiền mặt hay thẻ, thì không có nghĩa.
 Abstract class diễn tả đúng tình huống này.
 
@@ -99,8 +99,7 @@ class WalletPayment : Payment
 }
 ```
 
-**Đoán trước khi chạy:** có phải sửa vòng lặp `foreach` để in biên lai cho
-ví điện tử không?
+**Đoán trước khi chạy:** dòng biên lai thứ ba in ra gì?
 
 <details>
 <summary>Xem kết quả</summary>
@@ -111,8 +110,8 @@ Quẹt thẻ - 120000đ
 Ví điện tử - 80000đ
 ```
 
-Không phải sửa. `WalletPayment` kế thừa `Receipt()` và tự viết `Pay()`, vòng
-lặp vẫn chỉ làm việc với `Payment`.
+Dòng thứ ba là `Ví điện tử - 80000đ`. `WalletPayment` kế thừa `Receipt()` và
+tự viết `Pay()`, nên vòng lặp không phải sửa gì.
 
 </details>
 
@@ -161,23 +160,23 @@ class BankTransfer : Payment
   {
     "prompt": "abstract class Shape { public abstract double Area(); } Dòng var s = new Shape(); thì sao?",
     "options": [
+      "Lỗi compile",
       "Chạy được, Area trả về 0",
       "Lỗi khi chạy",
-      "Lỗi compile vì không tạo object từ abstract class",
       "Chạy được nhưng Area báo lỗi khi gọi"
     ],
-    "answer": 3,
-    "explain": "Abstract class chỉ dùng làm class cha. Phải tạo object từ class con cụ thể, ví dụ new Circle()."
+    "answer": 1,
+    "explain": "Không tạo object từ abstract class được, nên compiler báo lỗi. Phải tạo object từ class con cụ thể, ví dụ new Circle()."
   },
   {
     "prompt": "Khi nào dùng abstract method thay vì virtual method?",
     "options": [
-      "Khi mọi class con đều phải tự viết cách làm, không có cách làm mặc định hợp lý",
-      "Khi method chạy nhanh hơn",
+      "Khi muốn method chạy nhanh hơn",
+      "Khi mọi class con phải tự viết cách làm",
       "Khi muốn class con không override được",
-      "Khi method không có tham số"
+      "Khi class cha có sẵn cách làm mặc định"
     ],
-    "answer": 1,
+    "answer": 2,
     "explain": "abstract bắt buộc class con viết. virtual có sẵn cách làm mặc định, class con muốn thì mới viết lại."
   },
   {
@@ -185,10 +184,10 @@ class BankTransfer : Payment
     "options": [
       "Cả Build() và Print()",
       "Chỉ Print()",
-      "Không cần viết gì",
-      "Chỉ override Build()"
+      "Chỉ override Build()",
+      "Không cần viết gì"
     ],
-    "answer": 4,
+    "answer": 3,
     "explain": "Chỉ abstract method là bắt buộc override. Print() đã có thân ở class cha nên được kế thừa sẵn."
   }
 ]

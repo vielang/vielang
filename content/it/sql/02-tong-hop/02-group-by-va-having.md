@@ -103,6 +103,13 @@ FROM order_lines
 GROUP BY order_id;
 ```
 
+```sql
+-- ĐÚNG — cột nào lấy ra thì cũng có trong GROUP BY
+SELECT order_id, product_id, COUNT(*)
+FROM order_lines
+GROUP BY order_id, product_id;
+```
+
 ## Tóm tắt
 
 - `GROUP BY cột` chia dữ liệu thành nhóm, hàm tổng hợp tính cho từng nhóm.
@@ -126,23 +133,23 @@ GROUP BY order_id;
   {
     "prompt": "Chỉ lấy những thành phố có từ 2 khách trở lên. Điều kiện đặt ở đâu?",
     "options": [
-      "HAVING COUNT(*) >= 2",
       "WHERE COUNT(*) >= 2",
       "GROUP BY COUNT(*) >= 2",
-      "ORDER BY COUNT(*) >= 2"
+      "ORDER BY COUNT(*) >= 2",
+      "HAVING COUNT(*) >= 2"
     ],
-    "answer": 1,
+    "answer": 4,
     "explain": "Điều kiện áp lên kết quả đã gom nhóm thì đặt ở HAVING. WHERE chạy trước khi có nhóm."
   },
   {
     "prompt": "Chỉ tính doanh thu các dòng hàng của sản phẩm số 1, rồi gom theo đơn. Điều kiện product_id = 1 đặt ở đâu?",
     "options": [
+      "WHERE product_id = 1",
       "HAVING product_id = 1",
       "Trong SUM(product_id = 1)",
-      "ORDER BY product_id = 1",
-      "WHERE product_id = 1"
+      "ORDER BY product_id = 1"
     ],
-    "answer": 4,
+    "answer": 1,
     "explain": "Điều kiện xét từng dòng và không dùng hàm tổng hợp thì đặt ở WHERE để lọc trước khi gom."
   }
 ]

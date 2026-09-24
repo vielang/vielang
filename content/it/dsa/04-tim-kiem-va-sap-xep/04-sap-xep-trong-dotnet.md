@@ -4,8 +4,8 @@ minutes: 5
 ---
 
 Hai bài trước tự viết thuật toán sắp xếp để hiểu bên trong. Khi đi làm, bạn
-gần như luôn dùng hàm có sẵn của .NET vì nhanh, đã được kiểm kỹ và gọn. Điều
-cần biết là nên chọn hàm nào, và hàm nào đổi luôn list gốc.
+gần như luôn dùng method có sẵn của .NET vì nhanh, đã được kiểm kỹ và gọn.
+Điều cần biết là nên chọn method nào, và method nào đổi luôn list gốc.
 
 ## Khái niệm
 
@@ -17,7 +17,7 @@ cần biết là nên chọn hàm nào, và hàm nào đổi luôn list gốc.
 | `OrderBy`, `ThenBy` của LINQ | không, trả về dãy mới | có |
 
 Cả hai đều O(n log n). `OrderBy` đã gặp ở bài LINQ cơ bản của khoá C# Core.
-Nó giống `ORDER BY` ở bài Sắp xếp và phân trang của khoá SQL.
+Nếu đã học khoá SQL, nó giống `ORDER BY` trong câu truy vấn.
 
 ## Ví dụ
 
@@ -88,7 +88,7 @@ Vở: 12000
 
 `OrderBy` ổn định: hai món cùng giá giữ thứ tự trong list gốc, nên "Bút chì"
 đứng trước "Bút bi". Muốn các món cùng giá xếp theo tên thì thêm
-`.ThenBy(p => p.Name)`, giống `ORDER BY price, name` trong SQL.
+`.ThenBy(p => p.Name)`, giống `ORDER BY price, name` nếu đã học SQL.
 
 </details>
 
@@ -122,33 +122,33 @@ Console.WriteLine(sorted[0].Name);   // Bút chì
     "prompt": "Cần sắp xếp đơn hàng theo ngày, đơn cùng ngày giữ nguyên thứ tự nhận được. Nên dùng gì?",
     "options": [
       "list.Sort với lambda so ngày",
-      "OrderBy(o => o.Date), vì OrderBy ổn định",
       "Array.Sort",
-      "HashSet"
+      "SortedSet theo ngày",
+      "OrderBy(o => o.Date)"
     ],
-    "answer": 2,
-    "explain": "OrderBy là sắp xếp ổn định: đơn cùng ngày giữ thứ tự ban đầu. List.Sort không đảm bảo điều này."
+    "answer": 4,
+    "explain": "OrderBy là sắp xếp ổn định: đơn cùng ngày giữ thứ tự ban đầu. List.Sort không đảm bảo điều này, còn SortedSet bỏ mất các đơn trùng ngày."
   },
   {
     "prompt": "list.Sort((a, b) => b.Price.CompareTo(a.Price)) sắp xếp thế nào?",
     "options": [
+      "Giảm dần theo giá",
       "Tăng dần theo giá",
       "Theo tên",
-      "Không đổi gì",
-      "Giảm dần theo giá"
+      "Không đổi gì"
     ],
-    "answer": 4,
+    "answer": 1,
     "explain": "Đổi chỗ a và b khi so sánh là đảo chiều sắp xếp, thành giảm dần."
   },
   {
     "prompt": "Gọi products.OrderBy(p => p.Name); rồi in products[0]. Kết quả?",
     "options": [
       "Sản phẩm có tên đứng đầu theo bảng chữ cái",
+      "Phần tử đầu của list gốc",
       "Lỗi compile",
-      "Phần tử đầu của list gốc, vì OrderBy không đổi list",
       "null"
     ],
-    "answer": 3,
+    "answer": 2,
     "explain": "OrderBy trả về dãy mới. Kết quả không được gán vào đâu nên products giữ nguyên."
   }
 ]

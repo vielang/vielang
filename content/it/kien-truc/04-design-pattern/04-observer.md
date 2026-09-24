@@ -41,8 +41,7 @@ public class OrderService
 - `event EventHandler<string>?` khai báo một event gửi kèm một `string`, ở
   đây là mã đơn. Handler nhận `sender` (bên phát) và giá trị đó.
 - `OrderPlaced?.Invoke(this, code)` gọi lần lượt mọi handler. Chưa có handler
-  nào thì event là `null`, và `?.` như bài null và nullable sẽ bỏ qua lời
-  gọi.
+  nào thì event là `null`, và `?.` (bài null và nullable) bỏ qua lời gọi.
 - `OrderService` ở đây là bản rút gọn, chỉ giữ phần thông báo. Nó không biết
   gì về email hay điểm. Thêm việc gửi SMS là thêm một `+=` ở ngoài.
 
@@ -124,34 +123,34 @@ public class OrderService
     "prompt": "Thêm việc \"gửi SMS khi đặt hàng\" với Observer. Cần sửa OrderService không?",
     "options": [
       "Có, thêm lời gọi SmsSender vào Place",
-      "Có, thêm một event mới",
-      "Không, chỉ cần đăng ký thêm một handler cho OrderPlaced",
-      "Không làm được"
-    ],
-    "answer": 3,
-    "explain": "OrderService chỉ phát thông báo. Việc mới đăng ký nghe từ bên ngoài bằng +=."
-  },
-  {
-    "prompt": "Ba handler đăng ký vào OrderPlaced theo thứ tự email, điểm, SMS. Chúng chạy theo thứ tự nào?",
-    "options": [
-      "Email, điểm, SMS",
-      "Ngẫu nhiên",
-      "SMS, điểm, email",
-      "Chỉ handler cuối chạy"
-    ],
-    "answer": 1,
-    "explain": "Event gọi các handler theo thứ tự đăng ký."
-  },
-  {
-    "prompt": "OrderPlaced(this, code) ném NullReferenceException. Nguyên nhân?",
-    "options": [
-      "code bằng null",
-      "OrderService chưa được new",
-      "Sai kiểu EventHandler",
-      "Chưa có handler nào đăng ký nên event là null"
+      "Có, thêm event OrderPlacedSms mới",
+      "Không, nhưng phải xoá handler cũ",
+      "Không, đăng ký thêm handler"
     ],
     "answer": 4,
-    "explain": "Event không có handler thì là null. Dùng OrderPlaced?.Invoke(this, code) để an toàn."
+    "explain": "OrderService chỉ phát thông báo. Việc mới đăng ký một handler cho OrderPlaced từ bên ngoài bằng +=."
+  },
+  {
+    "prompt": "Handler gửi email đăng ký trước và ném exception. Handler cộng điểm đăng ký sau nó có chạy không?",
+    "options": [
+      "Không, exception bay ra khỏi Invoke",
+      "Có, event luôn gọi đủ mọi handler",
+      "Có, nhưng chạy trước handler email",
+      "Có, event tự bắt exception của handler"
+    ],
+    "answer": 1,
+    "explain": "Invoke gọi lần lượt từng handler như gọi method thường. Handler ném exception thì các handler sau không chạy, exception đi tiếp ra Place như bài Exception."
+  },
+  {
+    "prompt": "Place gọi OrderPlaced?.Invoke(this, code) trước dòng lưu đơn vào database. Rủi ro là gì?",
+    "options": [
+      "Không sao, thứ tự không quan trọng",
+      "Email có thể gửi cho đơn chưa lưu",
+      "Lỗi compile vì event phải gọi cuối",
+      "Handler không chạy vì chưa có đơn"
+    ],
+    "answer": 2,
+    "explain": "Handler chạy ngay khi event được phát. Lưu đơn sau đó mà lỗi thì khách đã nhận email cho một đơn không tồn tại, nên phát event sau khi lưu xong."
   }
 ]
 ```

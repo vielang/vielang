@@ -134,8 +134,10 @@ một ô?
 ```
 
 "Bút bi" (6 ký tự) và "Vở" (2 ký tự) cùng ở ô 2. "Balo" (4) và "Máy tính"
-(8) cùng ở ô 0. Đó là va chạm: tìm trong ô này phải so từng key trong list
-của ô. Nếu mọi key rơi vào một ô, hash table chậm như duyệt list, O(n).
+(8) cùng ở ô 0.
+
+Đó là va chạm: tìm trong ô này phải so từng key trong list của ô. Nếu mọi
+key rơi vào một ô, hash table chậm như duyệt list, O(n).
 
 </details>
 
@@ -148,9 +150,9 @@ hệt. Mặc định, `Dictionary` cũng băm và so key theo tham chiếu.
 ```csharp
 // SAI — tạo object mới thì không tìm lại được
 var prices = new Dictionary<ProductCode, decimal>();
-prices[new ProductCode { Sku = "PEN" }] = 5000m;
+prices[new ProductCode { Sku = "PEN-01" }] = 5000m;
 Console.WriteLine(prices.ContainsKey(
-    new ProductCode { Sku = "PEN" }));   // False
+    new ProductCode { Sku = "PEN-01" }));   // False
 
 class ProductCode
 {
@@ -161,8 +163,8 @@ class ProductCode
 ```csharp
 // ĐÚNG — dùng chính mã string làm key
 var prices = new Dictionary<string, decimal>();
-prices["PEN"] = 5000m;
-Console.WriteLine(prices.ContainsKey("PEN"));   // True
+prices["PEN-01"] = 5000m;
+Console.WriteLine(prices.ContainsKey("PEN-01")); // True
 ```
 
 Muốn dùng class làm key thì class đó phải `override` hai method `Equals` và
@@ -181,35 +183,35 @@ Muốn dùng class làm key thì class đó phải `override` hai method `Equals
   {
     "prompt": "Vì sao Dictionary tìm theo key nhanh hơn List tìm theo giá trị?",
     "options": [
+      "Hàm băm chỉ ra ngay ô cần xem",
       "Dictionary sắp xếp sẵn các key",
-      "Hàm băm chỉ ra ngay ô cần xem, không phải so mọi phần tử",
-      "Dictionary chỉ chứa được ít phần tử",
-      "List bị lỗi khi có nhiều phần tử"
+      "Dictionary xếp các key liền nhau",
+      "Mỗi lần so key rẻ hơn so giá trị"
     ],
-    "answer": 2,
-    "explain": "Tính hàm băm là biết ô, chỉ so vài key trong ô đó thay vì cả bảng."
+    "answer": 1,
+    "explain": "Tính hàm băm là biết ô, chỉ so vài key trong ô đó thay vì so mọi phần tử. Dictionary không sắp xếp key, và mỗi lần so thì tốn như nhau."
   },
   {
     "prompt": "Hàm băm tồi đưa mọi key vào cùng một ô. Tra theo key lúc này tốn bao nhiêu?",
     "options": [
       "O(1)",
+      "O(n)",
       "O(log n)",
-      "O(n), vì phải so từng key trong ô duy nhất",
-      "Không tra được"
+      "O(n²)"
     ],
-    "answer": 3,
-    "explain": "Một ô chứa tất cả thì chẳng khác gì duyệt list."
+    "answer": 2,
+    "explain": "Tính hàm băm vẫn một bước, nhưng ô duy nhất chứa cả n key nên phải so từng key, chẳng khác gì duyệt list."
   },
   {
     "prompt": "Dictionary<Customer, int> với Customer là class thường. Thêm new Customer { Id = 1 }, rồi ContainsKey(new Customer { Id = 1 }) trả về gì?",
     "options": [
-      "True, vì Id giống nhau",
+      "True",
       "Lỗi compile",
-      "Ném KeyNotFoundException",
-      "False, vì mặc định so theo tham chiếu"
+      "False",
+      "Ném KeyNotFoundException"
     ],
-    "answer": 4,
-    "explain": "Class chưa override Equals và GetHashCode thì hai object khác nhau luôn là hai key khác nhau."
+    "answer": 3,
+    "explain": "Mặc định Dictionary so key theo tham chiếu. Class chưa override Equals và GetHashCode thì hai object khác nhau luôn là hai key khác nhau."
   }
 ]
 ```

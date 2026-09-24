@@ -16,6 +16,7 @@
  *
  * Quy ước trong bài (xem content/it/FORMAT.md):
  * - ```sql setup  : script tạo dữ liệu mẫu, chỉ có ở bài đầu của khoá.
+ * - ```sql reset  : xoá mọi bảng của user shop để làm lại; không chạy.
  * - ```sql        : chạy được trên dữ liệu mẫu, không được lỗi.
  * - "-- SAI" ở dòng đầu: phản ví dụ, được phép lỗi; nếu comment nói "lỗi"
  *   thì BẮT BUỘC lỗi.

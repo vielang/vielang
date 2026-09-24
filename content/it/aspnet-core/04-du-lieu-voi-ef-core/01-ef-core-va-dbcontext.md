@@ -10,9 +10,9 @@ tác.
 
 ## Khái niệm
 
-🗄️ **ORM (Object-Relational Mapper)**: thư viện chuyển qua lại giữa object C# và dòng trong bảng database. EF Core là ORM chính thức của .NET.
+🗄️ **ORM (Object-Relational Mapper)**: thư viện chuyển qua lại giữa object C# và dòng trong bảng database, như EF Core của .NET.
 
-🧭 **DbContext**: class đại diện cho một phiên làm việc với database. Mỗi `DbSet<T>` trong nó ứng với một bảng.
+🎒 **DbContext**: class đại diện cho một phiên làm việc với database, trong đó mỗi `DbSet<T>` ứng với một bảng.
 
 | C# | Oracle |
 |---|---|
@@ -21,7 +21,7 @@ tác.
 | một object `Product` | một dòng trong bảng |
 | property `Id` | khoá chính, tự tăng |
 
-## Tạo user cho API
+## Ví dụ
 
 API dùng một user riêng tên `shopapi`, tách khỏi user `shop` của khoá SQL.
 Mở VS Code, kết nối Oracle bằng user `system`, mật khẩu `oracle_pw`, service
@@ -37,8 +37,6 @@ GRANT CREATE SESSION, CREATE TABLE, CREATE SEQUENCE
 `GRANT` cấp cho user mới quyền đăng nhập và tạo bảng. User mới chưa có bảng
 nào, bài sau dùng migration để EF Core tự tạo bảng.
 
-## Ví dụ
-
 Cài package cho Oracle:
 
 ```bash
@@ -46,8 +44,12 @@ dotnet add package Oracle.EntityFrameworkCore
 dotnet add package EFCore.NamingConventions
 ```
 
-Thêm chuỗi kết nối vào `appsettings.Development.json`. Mật khẩu này chỉ để
-thử trên máy, như bài Cấu hình:
+Bản mới nhất của các package EF Core cần .NET 10. Project dùng .NET 9 thì
+thêm `--version 9.*` vào lệnh `dotnet add package` và `dotnet tool install`.
+
+Thêm chuỗi kết nối vào `appsettings.Development.json`. Mật khẩu `shopapi_pw`
+chỉ để thử trên máy, còn mật khẩu thật thì bài Cấu hình khuyên lưu bằng
+`dotnet user-secrets`:
 
 ```json
 "ConnectionStrings": {
@@ -110,6 +112,8 @@ public class ProductsController : ControllerBase
 ```
 
 - `UseOracle(cs)` chọn Oracle, đọc chuỗi kết nối từ cấu hình.
+- `Products => Set<Product>()` là property chỉ đọc viết gọn bằng `=>`, trả
+  về `DbSet` của bảng sản phẩm.
 - Để gọn, controller nhận thẳng `ShopDbContext`. Bài Truy vấn sẽ đặt nó sau
   một interface như bài Dependency injection.
 - `UseUpperSnakeCaseNamingConvention()` đổi tên sang chữ hoa nối gạch dưới:
@@ -142,7 +146,7 @@ ORA-00942: table or view "SHOPAPI"."PRODUCTS" does not exist
 ```
 
 Lỗi 500. EF Core kết nối được Oracle, nhưng user `shopapi` chưa có bảng
-`PRODUCTS`. Class C# không tự sinh ra bảng. Bài sau dùng migration để tạo
+`PRODUCTS`, vì class C# không tự sinh ra bảng. Bài sau dùng migration để tạo
 bảng.
 
 </details>
@@ -156,6 +160,18 @@ không biết cách tạo, nên request trả 500.
 // SAI — thiếu AddDbContext
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
+var app = builder.Build();
+```
+
+```csharp
+// ĐÚNG
+using Microsoft.EntityFrameworkCore;
+
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddControllers();
+builder.Services.AddDbContext<ShopDbContext>(options =>
+    options.UseOracle(cs)
+        .UseUpperSnakeCaseNamingConvention());
 var app = builder.Build();
 ```
 
@@ -177,35 +193,35 @@ trong ngoặc kép, giữ nguyên chữ hoa chữ thường, ví dụ `"Products
   {
     "prompt": "DbContext có DbSet<Customer> Customers. Với UseUpperSnakeCaseNamingConvention, bảng trong Oracle tên là gì?",
     "options": [
+      "CUSTOMERS",
       "customers",
       "\"Customers\"",
-      "CUSTOMERS",
       "Customer"
     ],
-    "answer": 3,
+    "answer": 1,
     "explain": "Tên DbSet Customers được đổi sang chữ hoa nối gạch dưới thành CUSTOMERS, khớp với cách Oracle lưu tên không có ngoặc kép."
   },
   {
     "prompt": "AddDbContext đăng ký DbContext với vòng đời nào?",
     "options": [
+      "Singleton, cả ứng dụng một",
       "Scoped, mỗi request một phiên",
-      "Singleton",
-      "Transient",
+      "Transient, mỗi lần cần một",
       "Không đăng ký vào container"
     ],
-    "answer": 1,
+    "answer": 2,
     "explain": "Mặc định là Scoped: mỗi request có một DbContext riêng, xong request thì bỏ đi."
   },
   {
     "prompt": "Gọi API nhận 500, log báo ORA-00942 table or view \"SHOPAPI\".\"ORDERS\" does not exist. Nguyên nhân?",
     "options": [
-      "Thiếu [ApiController]",
-      "Chưa cài .NET",
-      "Sai địa chỉ server",
-      "User shopapi chưa có bảng ORDERS, cần tạo bằng migration"
+      "Quên gọi AddDbContext",
+      "Sai mật khẩu trong chuỗi kết nối",
+      "User shopapi chưa có bảng ORDERS",
+      "Thiếu [ApiController]"
     ],
-    "answer": 4,
-    "explain": "EF Core kết nối được Oracle nhưng bảng chưa tồn tại. Class trong C# không tự tạo bảng."
+    "answer": 3,
+    "explain": "EF Core kết nối được Oracle nhưng bảng chưa tồn tại, vì class trong C# không tự tạo bảng. Cần tạo bảng bằng migration."
   }
 ]
 ```

@@ -14,8 +14,11 @@ cùng kết quả.
 ♻️ **Fake**: class tự viết implement cùng interface với phụ thuộc thật, giữ dữ liệu trong bộ nhớ để test dùng thay cho database hay API.
 
 `FakeProductStore` ở bài Tách giao diện và dữ liệu của khoá WinForms là một
-fake. Bài này viết lại nó, thêm bộ đếm số lần ghi. Theo bài DIP và dependency injection, `OrderService` chỉ biết
-`IProductStore`, nên nhận fake hay bản thật đều được.
+fake. Bài này viết lại nó, thêm bộ đếm số lần ghi.
+
+Bài DIP và dependency injection cho `OrderService` nhận `IOrderRepository`
+qua constructor. Ở đây `OrderService` cũng chỉ biết `IProductStore`, nên
+nhận fake hay bản thật đều được.
 
 ```mermaid OrderService chỉ biết IProductStore, test truyền fake vào
 flowchart LR
@@ -223,36 +226,36 @@ sau sẽ bỏ hỗ trợ kiểu này.
 ```quiz
 [
   {
-    "prompt": "Vì sao test OrderService bằng fake tốt hơn bằng DbProductStore thật?",
+    "prompt": "Thêm method GetByIdAsync vào IProductStore. FakeProductStore trong project test sẽ thế nào?",
     "options": [
-      "Vì fake chứa logic đúng hơn",
-      "Nhanh, không cần Oracle, lần chạy nào cũng cùng kết quả",
-      "Vì DbProductStore không chạy được trong test",
-      "Vì fake tự sửa lỗi"
-    ],
-    "answer": 2,
-    "explain": "Fake giữ dữ liệu trong bộ nhớ nên test không phụ thuộc mạng hay trạng thái database."
-  },
-  {
-    "prompt": "Điều gì khiến OrderService dùng được fake trong test?",
-    "options": [
-      "Nó kế thừa FakeProductStore",
-      "Nó dùng static",
-      "Nó tự new DbProductStore bên trong",
-      "Nó nhận IProductStore qua constructor"
+      "Không sao, vì fake chỉ dùng trong test",
+      "xUnit tự thêm method đó vào fake",
+      "Chỉ test nào gọi GetByIdAsync mới đỏ",
+      "Lỗi compile tới khi fake có method đó"
     ],
     "answer": 4,
-    "explain": "Phụ thuộc vào interface và nhận qua constructor là DIP. Test truyền fake, app thật truyền DbProductStore."
+    "explain": "Fake implement IProductStore nên phải có đủ mọi method của interface. Thiếu một method là project test không build được."
+  },
+  {
+    "prompt": "Mọi test OrderService dùng fake đều qua, nhưng app thật vẫn trừ kho sai trên Oracle. Vì sao có thể như vậy?",
+    "options": [
+      "Test không chạy code của DbProductStore",
+      "xUnit bỏ qua lỗi trong method async",
+      "Test dùng fake thì luôn qua",
+      "OrderService chạy khác khi ở trong test"
+    ],
+    "answer": 1,
+    "explain": "Fake thay chỗ DbProductStore, nên test chỉ kiểm logic của OrderService. Lỗi nằm trong phần ghi xuống Oracle thì test với fake không bắt được."
   },
   {
     "prompt": "Test có dùng await nên khai báo thế nào?",
     "options": [
       "public void",
-      "public async void",
       "public async Task",
+      "public async void",
       "public static void"
     ],
-    "answer": 3,
+    "answer": 2,
     "explain": "async Task để xUnit chờ test chạy xong và bắt được lỗi. async void bị cảnh báo xUnit1048."
   }
 ]

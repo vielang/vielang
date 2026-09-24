@@ -130,10 +130,10 @@ Console.WriteLine("Tổng: " + (1 + 2));
     "options": [
       "2.5",
       "3",
-      "2",
-      "Lỗi compile"
+      "Lỗi compile",
+      "2"
     ],
-    "answer": 3,
+    "answer": 4,
     "explain": "Cả hai vế là int nên đây là phép chia nguyên. 10 / 4 được 2, phần lẻ bị bỏ."
   },
   {
@@ -145,17 +145,17 @@ Console.WriteLine("Tổng: " + (1 + 2));
       "input.ToInt()"
     ],
     "answer": 1,
-    "explain": "Ép bằng ngoặc chỉ dùng giữa các kiểu số. Chuỗi sang số phải dùng int.Parse."
+    "explain": "Không ép chuỗi sang số bằng ngoặc được. Chuỗi sang số phải dùng int.Parse."
   },
   {
     "prompt": "Biểu thức nào đúng khi đơn hàng trên 500000 VÀ khách là thành viên?",
     "options": [
       "total > 500000 || isMember",
+      "total > 500000 && isMember",
       "total > 500000 & isMember == false",
-      "total = 500000 && isMember",
-      "total > 500000 && isMember"
+      "total = 500000 && isMember"
     ],
-    "answer": 4,
+    "answer": 2,
     "explain": "&& là \"và\": cả hai điều kiện phải đúng. || là \"hoặc\", còn = là phép gán chứ không phải so sánh."
   }
 ]

@@ -36,6 +36,9 @@ WHERE line_id = 6;
 - `SET` dùng được giá trị cũ của cột: `SET stock = stock - 1`.
 - `WHERE` của `UPDATE` và `DELETE` giống hệt `WHERE` của `SELECT`.
 
+Các khối trong bài này sửa dữ liệu mẫu. Thử xong mỗi khối, chạy `ROLLBACK;`
+để huỷ (bài Transaction sẽ giải thích).
+
 ## Thử ngay
 
 Tăng giá 10% cho mọi sản phẩm dưới 10.000đ, rồi xem lại:
@@ -93,6 +96,11 @@ rồi mới đổi thành `DELETE`.
 DELETE FROM order_lines;
 ```
 
+```sql
+-- ĐÚNG — chỉ xoá dòng hàng nhập nhầm
+DELETE FROM order_lines WHERE line_id = 6;
+```
+
 ## Tóm tắt
 
 - `INSERT INTO bảng (cột...) VALUES (giá_trị...)` thêm dòng mới.
@@ -107,31 +115,31 @@ DELETE FROM order_lines;
     "prompt": "Khách số 2 đổi email thành binh2@shop.vn. Câu nào đúng?",
     "options": [
       "UPDATE customers SET email = 'binh2@shop.vn'",
-      "INSERT INTO customers (email) VALUES ('binh2@shop.vn')",
       "UPDATE customers SET email = 'binh2@shop.vn' WHERE customer_id = 2",
+      "INSERT INTO customers (email) VALUES ('binh2@shop.vn')",
       "UPDATE customers WHERE customer_id = 2"
     ],
-    "answer": 3,
+    "answer": 2,
     "explain": "UPDATE kèm WHERE chỉ sửa đúng khách số 2. Thiếu WHERE thì mọi khách đều đổi email."
   },
   {
     "prompt": "Nhập thêm 20 cây bút (product_id = 1) vào kho. Viết thế nào?",
     "options": [
-      "UPDATE products SET stock = stock + 20 WHERE product_id = 1",
       "UPDATE products SET stock = 20 WHERE product_id = 1",
       "INSERT INTO products (stock) VALUES (20)",
+      "UPDATE products SET stock = stock + 20 WHERE product_id = 1",
       "UPDATE products SET stock + 20"
     ],
-    "answer": 1,
+    "answer": 3,
     "explain": "SET stock = stock + 20 cộng thêm vào số cũ. Viết stock = 20 là ghi đè, mất số tồn cũ."
   },
   {
     "prompt": "Trước khi chạy DELETE FROM orders WHERE status = 'CANCELLED', thói quen nào an toàn nhất?",
     "options": [
-      "Chạy luôn, nếu sai thì INSERT lại",
-      "Bỏ WHERE cho nhanh",
-      "Đổi thành UPDATE",
-      "Chạy SELECT * FROM orders WHERE status = 'CANCELLED' để xem trước"
+      "Chạy luôn, sai thì INSERT lại",
+      "Bỏ WHERE cho câu lệnh gọn",
+      "Đổi thành UPDATE status",
+      "SELECT với cùng WHERE trước"
     ],
     "answer": 4,
     "explain": "SELECT với cùng điều kiện cho thấy chính xác những dòng sắp bị xoá. Thấy đúng rồi mới đổi SELECT * thành DELETE."

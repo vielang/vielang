@@ -11,7 +11,7 @@ có sẵn của Windows.
 
 💬 **MessageBox**: hộp thông báo có sẵn của Windows, mở bằng `MessageBox.Show` và trả về nút người dùng đã bấm.
 
-🗔 **ShowDialog**: method mở một form dạng hộp thoại, khoá form chính cho tới khi hộp thoại đóng rồi trả về kết quả.
+⏸️ **ShowDialog**: method mở một form dạng hộp thoại, khoá form chính cho tới khi hộp thoại đóng rồi trả về kết quả.
 
 ↩️ **DialogResult**: enum cho biết hộp thoại đóng bằng nút nào: `OK`, `Cancel`, `Yes`, `No`...
 
@@ -180,23 +180,23 @@ if (dialog.ShowDialog() == DialogResult.OK)
   {
     "prompt": "Hộp thoại có nút \"Đồng ý\" với DialogResult = DialogResult.OK. Người dùng bấm nút đó thì chuyện gì xảy ra?",
     "options": [
-      "Hộp thoại đóng, ShowDialog trả về DialogResult.OK",
+      "Hộp thoại đóng, trả về OK",
       "Không có gì, phải tự gọi Close()",
-      "Cả app thoát",
-      "ShowDialog trả về true"
+      "Cả app thoát theo hộp thoại",
+      "Hộp thoại đóng, trả về true"
     ],
     "answer": 1,
-    "explain": "Nút có DialogResult tự đóng hộp thoại và đó chính là giá trị ShowDialog trả về."
+    "explain": "Nút có DialogResult tự đóng hộp thoại, và ShowDialog trả về đúng giá trị đó: DialogResult.OK."
   },
   {
     "prompt": "Muốn gõ Enter trong hộp thoại là lưu luôn, đặt gì?",
     "options": [
       "CancelButton = okButton",
+      "AcceptButton = okButton",
       "okButton.Focus()",
-      "KeyPreview = true",
-      "AcceptButton = okButton"
+      "KeyPreview = true"
     ],
-    "answer": 4,
+    "answer": 2,
     "explain": "AcceptButton là nút được bấm khi gõ Enter trong form."
   },
   {

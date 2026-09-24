@@ -37,10 +37,11 @@ git push -u origin phi-ship
 ```
 
 Sau đó mở trang repository trên GitHub, bấm **Compare & pull request**. Đồng
-nghiệp đọc code và góp ý, bạn sửa rồi push tiếp lên cùng nhánh. Khi pull
-request được đồng ý, bấm **Merge pull request** để gộp `phi-ship` vào `main`
-trên GitHub. Cuối cùng, trên máy chuyển về `main` và chạy `git pull` để lấy
-bản đã merge.
+nghiệp đọc code và góp ý, bạn sửa rồi push tiếp lên cùng nhánh.
+
+Khi pull request được đồng ý, bấm **Merge pull request** để gộp `phi-ship`
+vào `main` trên GitHub. Cuối cùng, trên máy chuyển về `main` và chạy
+`git pull` để lấy bản đã merge.
 
 ```mermaid Một tính năng đi từ nhánh riêng vào main qua pull request
 flowchart LR
@@ -74,9 +75,10 @@ hint: Updates were rejected because the remote contains work that you do not
 hint: have locally.
 ```
 
-Bị từ chối. Remote có commit của Bình mà máy bạn chưa có. Chạy `git pull` để
-lấy về và merge (có conflict thì xử lý như bài trước), rồi `git push` lại.
-Nếu Git mở trình soạn thảo để hỏi lời mô tả cho merge, giữ nguyên nội dung,
+Bị từ chối. Remote có commit của Bình mà máy bạn chưa có.
+
+Chạy `git pull` để lấy về và merge (có conflict thì xử lý như bài trước),
+rồi `git push` lại. Nếu Git mở trình soạn thảo để hỏi lời mô tả cho merge, giữ nguyên nội dung,
 lưu rồi đóng lại.
 
 </details>
@@ -112,10 +114,10 @@ mọi thay đổi phải qua pull request.
   {
     "prompt": "Chạy git push và nhận \"rejected ... (fetch first)\". Nguyên nhân là gì?",
     "options": [
-      "Sai mật khẩu GitHub",
-      "Remote có commit mà máy bạn chưa có",
-      "Chưa commit gì",
-      "Nhánh đã bị xoá"
+      "Sai mật khẩu hoặc token GitHub",
+      "Remote có commit máy bạn chưa có",
+      "Máy bạn chưa có commit nào mới",
+      "Nhánh main trên GitHub đã bị xoá"
     ],
     "answer": 2,
     "explain": "Git không cho push khi remote có commit mới hơn, để tránh ghi đè. Pull về trước rồi push lại."
@@ -123,20 +125,20 @@ mọi thay đổi phải qua pull request.
   {
     "prompt": "Vì sao nên merge vào main qua pull request thay vì push thẳng?",
     "options": [
-      "Vì push thẳng không chạy được",
-      "Vì pull request nhanh hơn",
-      "Để người khác đọc code và góp ý trước khi code vào main",
-      "Vì GitHub bắt buộc với mọi repository"
+      "Để GitHub tự sửa conflict giúp",
+      "Để main tự chạy build sau mỗi lần push",
+      "Để có người review trước khi vào main",
+      "Vì GitHub không cho push thẳng lên main"
     ],
     "answer": 3,
-    "explain": "Pull request là chỗ review code. Lỗi được phát hiện trước khi vào nhánh chung."
+    "explain": "Pull request là chỗ đồng nghiệp đọc code và góp ý, nên lỗi được phát hiện trước khi vào nhánh chung. GitHub chỉ chặn push thẳng khi bạn bật bảo vệ nhánh."
   },
   {
     "prompt": "Lệnh nào gửi nhánh phi-ship lên GitHub lần đầu và ghi nhớ nhánh tương ứng?",
     "options": [
-      "git pull phi-ship",
-      "git remote add phi-ship",
-      "git merge origin phi-ship",
+      "git pull -u origin phi-ship",
+      "git remote add origin phi-ship",
+      "git switch -c origin/phi-ship",
       "git push -u origin phi-ship"
     ],
     "answer": 4,

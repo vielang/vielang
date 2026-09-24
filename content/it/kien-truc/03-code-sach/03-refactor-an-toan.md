@@ -4,7 +4,7 @@ minutes: 6
 ---
 
 Hai bài trước chỉ ra chỗ nên sửa. Nhưng sửa code đang chạy rất dễ gây lỗi: gõ
-nhầm `>=` thành `>` là đơn đúng 500.000 bị tính phí ship. Bài này sửa từng
+nhầm `>=` thành `>` là đơn đúng 500.000 bị tính phí giao hàng. Bài này sửa từng
 bước nhỏ, sau mỗi bước chạy test để chắc hành vi không đổi.
 
 ## Khái niệm
@@ -20,7 +20,9 @@ Quy trình một bước refactor:
 | 3 | Chạy lại test. Đỏ thì hoàn tác bằng `git restore .` |
 | 4 | Xanh thì commit, rồi quay lại bước 2 |
 
-Chưa có test thì viết test trước, như chương Test, rồi mới refactor.
+`git restore .` bỏ mọi thay đổi chưa commit, đưa các file về đúng commit
+gần nhất. Chưa có test thì viết test trước, như chương Test, rồi mới
+refactor.
 
 ## Ví dụ
 
@@ -145,7 +147,7 @@ hỏng hay do tính năng mới, và commit trộn hai việc rất khó review.
 
 ```text
 # SAI — một commit vừa dọn code vừa thêm phí hoả tốc
-git commit -am "Refactor phí ship + thêm hoả tốc"
+git commit -am "Refactor phí giao hàng + hoả tốc"
 ```
 
 ```text
@@ -166,35 +168,35 @@ git commit -am "Thêm phí giao hoả tốc"
   {
     "prompt": "Đang refactor, chạy test thấy đỏ. Nên làm gì trước tiên?",
     "options": [
-      "Sửa test cho xanh",
-      "Hoàn tác bước vừa làm, vì bước đó đã đổi hành vi",
-      "Commit rồi sửa sau",
-      "Xoá test đỏ"
+      "Sửa kỳ vọng trong test cho xanh",
+      "Commit trước rồi sửa sau",
+      "Tạm bỏ qua test đỏ đó",
+      "Hoàn tác bước vừa làm"
     ],
-    "answer": 2,
-    "explain": "Refactor không được đổi hành vi. Bước nhỏ nên hoàn tác rẻ, rồi làm lại cẩn thận hơn."
+    "answer": 4,
+    "explain": "Test đỏ nghĩa là bước vừa làm đã đổi hành vi, điều refactor không được làm. Bước nhỏ nên hoàn tác rẻ, rồi làm lại cẩn thận hơn."
   },
   {
     "prompt": "Việc nào KHÔNG phải refactor?",
     "options": [
+      "Thêm phí giao hàng hoả tốc",
       "Đổi tên biến t thành orderTotal",
       "Tách một đoạn code thành method riêng",
-      "Đặt hằng cho số trần",
-      "Thêm phí giao hàng hoả tốc"
+      "Đặt hằng cho số trần"
     ],
-    "answer": 4,
+    "answer": 1,
     "explain": "Thêm phí hoả tốc làm thay đổi hành vi, đó là thêm tính năng."
   },
   {
     "prompt": "Code chưa có test mà cần refactor. Nên làm gì trước?",
     "options": [
       "Refactor luôn, cẩn thận là được",
-      "Chạy app bằng tay một lần",
-      "Viết test chốt hành vi hiện tại, rồi mới refactor",
-      "Viết lại từ đầu"
+      "Viết test cho hành vi hiện tại",
+      "Chạy thử app bằng tay một lần",
+      "Viết lại cả class cho sạch"
     ],
-    "answer": 3,
-    "explain": "Test là lưới an toàn. Không có test thì không biết refactor có làm đổi hành vi hay không."
+    "answer": 2,
+    "explain": "Test chốt hành vi hiện tại rồi mới refactor. Không có test thì không biết refactor có làm đổi hành vi hay không."
   }
 ]
 ```

@@ -83,6 +83,13 @@ SELECT name FROM products
 OFFSET 2 ROWS FETCH NEXT 2 ROWS ONLY;
 ```
 
+```sql
+-- ĐÚNG
+SELECT name FROM products
+ORDER BY product_id
+OFFSET 2 ROWS FETCH NEXT 2 ROWS ONLY;
+```
+
 **Dùng `ROWNUM` kèm `ORDER BY` trong cùng một câu.** Code Oracle cũ hay viết
 như dưới. `ROWNUM` được đánh số **trước** khi sắp xếp, nên câu này lấy 3 dòng
 bất kỳ rồi mới sắp, không phải 3 món đắt nhất.
@@ -115,34 +122,34 @@ FETCH FIRST 3 ROWS ONLY;
     "prompt": "Mỗi trang 10 sản phẩm. Trang thứ 3 viết thế nào?",
     "options": [
       "OFFSET 3 ROWS FETCH NEXT 10 ROWS ONLY",
-      "OFFSET 30 ROWS FETCH NEXT 10 ROWS ONLY",
       "OFFSET 20 ROWS FETCH NEXT 10 ROWS ONLY",
+      "OFFSET 30 ROWS FETCH NEXT 10 ROWS ONLY",
       "FETCH FIRST 30 ROWS ONLY"
     ],
-    "answer": 3,
+    "answer": 2,
     "explain": "Trang 3 bỏ qua hai trang đầu, tức (3 - 1) × 10 = 20 dòng, rồi lấy 10 dòng."
   },
   {
     "prompt": "Muốn xem khách mới nhất trước, sắp theo ngày tạo. Viết thế nào?",
     "options": [
-      "ORDER BY created_at DESC",
       "ORDER BY created_at",
       "ORDER BY created_at ASC",
+      "ORDER BY created_at DESC",
       "WHERE created_at DESC"
     ],
-    "answer": 1,
+    "answer": 3,
     "explain": "DESC sắp giảm dần, ngày gần nhất đứng đầu. Không ghi gì thì mặc định là ASC, tăng dần."
   },
   {
-    "prompt": "Vì sao câu có WHERE ROWNUM <= 5 ORDER BY price DESC không trả về 5 món đắt nhất?",
+    "prompt": "Danh sách phân trang viết ORDER BY price. Hai món cùng giá 7000, lúc thì nằm ở trang 1, lúc lại ở trang 2. Sửa thế nào?",
     "options": [
-      "Vì ROWNUM chỉ dùng được với bảng nhỏ",
-      "Vì DESC không dùng được với ROWNUM",
-      "Vì cần viết ROWNUM < 5",
-      "Vì ROWNUM được đánh số trước khi sắp xếp"
+      "Đổi thành ORDER BY price DESC",
+      "Thêm DISTINCT sau SELECT",
+      "Tăng số dòng mỗi trang",
+      "ORDER BY price, product_id"
     ],
     "answer": 4,
-    "explain": "Oracle lấy 5 dòng đầu tiên nó gặp rồi mới sắp. Dùng FETCH FIRST 5 ROWS ONLY sau ORDER BY để có đúng kết quả."
+    "explain": "Các dòng trùng giá không có thứ tự cố định giữa chúng. Sắp thêm theo khoá chính thì mỗi dòng có một vị trí duy nhất, trang nào cũng ổn định."
   }
 ]
 ```

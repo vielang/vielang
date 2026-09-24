@@ -95,6 +95,14 @@ CREATE TABLE bad_orders (
 
 Tách thành bảng dòng hàng, mỗi sản phẩm một dòng, như `order_lines`.
 
+```sql
+-- ĐÚNG — mỗi sản phẩm một dòng, tìm đơn có Vở bằng JOIN
+SELECT l.order_id
+FROM order_lines l
+JOIN products p ON p.product_id = l.product_id
+WHERE p.name = 'Vở';
+```
+
 ## Tóm tắt
 
 - Chuẩn hoá chia dữ liệu để mỗi thông tin chỉ nằm ở một chỗ.
@@ -109,22 +117,22 @@ Tách thành bảng dòng hàng, mỗi sản phẩm một dòng, như `order_lin
     "prompt": "Bảng order_lines lưu cả product_name bên cạnh product_id. Vấn đề là gì?",
     "options": [
       "Không có vấn đề gì",
-      "Thiếu khoá chính",
-      "Tên sản phẩm bị lặp ở nhiều dòng, đổi tên thì phải sửa khắp nơi",
+      "Tên sản phẩm bị lặp lại",
+      "Bảng thiếu khoá chính",
       "product_id phải là chuỗi"
     ],
-    "answer": 3,
-    "explain": "Tên sản phẩm phụ thuộc vào product_id, nên chỉ nên nằm ở bảng products. Lưu lặp thì dễ lệch khi sửa."
+    "answer": 2,
+    "explain": "Tên sản phẩm phụ thuộc vào product_id, nên chỉ nên nằm ở bảng products. Lưu lặp ở nhiều dòng thì đổi tên phải sửa khắp nơi, dễ lệch."
   },
   {
     "prompt": "Cột phone_numbers lưu '0901..., 0912...' trong cùng một ô. Bảng vi phạm mức nào?",
     "options": [
-      "1NF",
       "2NF",
       "3NF",
+      "1NF",
       "Không vi phạm"
     ],
-    "answer": 1,
+    "answer": 3,
     "explain": "1NF yêu cầu mỗi ô chỉ chứa một giá trị. Nhiều số điện thoại nên tách ra bảng riêng."
   },
   {

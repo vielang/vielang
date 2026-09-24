@@ -103,12 +103,23 @@ không đổi được và trả về 400.
 GET /api/products/abc
 ```
 
-**Quên header `Content-Type`.** Không có header, server không biết body là
+```http
+// ĐÚNG
+GET /api/products/5
+```
+
+**Quên header `Content-Type`.** Không có `-H`, curl gửi body với kiểu của
+form (`application/x-www-form-urlencoded`). Server không đọc kiểu này như
 JSON và trả về 415 Unsupported Media Type.
 
 ```bash
 # SAI — thiếu -H "Content-Type: application/json"
 curl -i -X POST http://localhost:5000/api/products -d @product.json
+```
+
+```bash
+# ĐÚNG
+curl -i -X POST http://localhost:5000/api/products -H "Content-Type: application/json" -d @product.json
 ```
 
 ## Tóm tắt
@@ -125,22 +136,22 @@ curl -i -X POST http://localhost:5000/api/products -d @product.json
     "prompt": "Action [HttpGet(\"{orderId}/lines\")] GetLines(int orderId, int page). Gọi GET /api/orders/7/lines?page=2 thì orderId và page bằng bao nhiêu?",
     "options": [
       "orderId = 2, page = 7",
-      "orderId = 7, page = 0",
       "orderId = 7, page = 2",
+      "orderId = 7, page = 0",
       "Lỗi 400"
     ],
-    "answer": 3,
+    "answer": 2,
     "explain": "orderId có trong route nên lấy từ URL là 7. page không có trong route nên lấy từ query string là 2."
   },
   {
     "prompt": "Client gửi thông tin đơn hàng mới gồm nhiều trường. Dữ liệu này nên đặt ở đâu trong request?",
     "options": [
-      "Body, dạng JSON",
       "Route",
       "Query string",
+      "Body, dạng JSON",
       "Tên của action"
     ],
-    "answer": 1,
+    "answer": 3,
     "explain": "Dữ liệu nhiều trường để tạo mới gửi trong body JSON. Route và query dùng cho giá trị đơn giản như id hay điều kiện lọc."
   },
   {
@@ -149,7 +160,7 @@ curl -i -X POST http://localhost:5000/api/products -d @product.json
       "Sai tên action",
       "Thiếu [HttpPost]",
       "JSON có chữ viết thường",
-      "Thiếu header Content-Type: application/json"
+      "Thiếu header Content-Type"
     ],
     "answer": 4,
     "explain": "415 nghĩa là server không nhận loại dữ liệu này. Thiếu Content-Type thì server không biết body là JSON."

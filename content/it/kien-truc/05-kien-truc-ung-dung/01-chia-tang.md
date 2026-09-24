@@ -65,40 +65,51 @@ public class OrdersController : ControllerBase
 - `OrderService` không biết mình được gọi từ API hay từ form. Đăng ký nó như
   bài Dependency injection trong ASP.NET Core:
   `builder.Services.AddScoped<OrderService>();`.
-- Form WinForms gọi đúng `OrderService.PlaceAsync`, nên hai app luôn dùng
+- Controller nhận thẳng class `OrderService`, không qua interface: service
+  nghiệp vụ không cần thay bằng bản khác, còn phần cần thay là database đã
+  nằm sau `IProductStore`.
+- Form WinForms có thể gọi đúng `OrderService.PlaceAsync`, nên hai app dùng
   cùng một quy tắc.
 
 ## Thử ngay
 
-Gọi tầng nghiệp vụ từ một chương trình console, không cần API hay form. Dùng
-`OrderService` và `FakeProductStore` của bài Fake thay phụ thuộc:
+Gọi tầng nghiệp vụ từ một test, không cần API hay form. Thêm class này vào
+`ShopApi.Tests`, dùng `FakeProductStore` của bài Fake thay phụ thuộc, rồi
+chạy `dotnet test`:
 
 ```csharp
-// Console
-var store = new FakeProductStore();
-store.Products.Add(new Product
-{
-    Id = 1, Name = "Bút bi", Stock = 120
-});
-var orders = new OrderService(store);
+// ShopApi.Tests
+using Xunit;
 
-Console.WriteLine(await orders.PlaceAsync(1, 20));
-Console.WriteLine(await orders.PlaceAsync(1, 500));
-Console.WriteLine(store.Products[0].Stock);
+public class LayerTests
+{
+    [Fact]
+    public async Task Place_WithoutUi()
+    {
+        var store = new FakeProductStore();
+        store.Products.Add(new Product
+        {
+            Id = 1, Name = "Bút bi", Stock = 120
+        });
+        var orders = new OrderService(store);
+
+        Assert.True(await orders.PlaceAsync(1, 20));
+        Assert.False(await orders.PlaceAsync(1, 500));
+        Assert.Equal(100, store.Products[0].Stock);
+    }
+}
 ```
 
-**Đoán trước khi chạy:** ba dòng in ra là gì?
+**Đoán trước khi chạy:** test qua hay đỏ?
 
 <details>
 <summary>Xem kết quả</summary>
 
 ```text
-True
-False
-100
+Passed!  - Failed: 0, ...
 ```
 
-Đơn 20 cái qua, kho còn 100. Đơn 500 cái bị từ chối vì chỉ còn 100. Tầng
+Qua. Đơn 20 cái được đặt, kho còn 100. Đơn 500 cái bị từ chối vì chỉ còn 100. Tầng
 nghiệp vụ chạy được mà không có giao diện nào, nên test được và dùng chung
 được.
 
@@ -163,37 +174,37 @@ public class OrdersController : ControllerBase
 ```quiz
 [
   {
-    "prompt": "Quy tắc \"đơn trên 500.000 được miễn phí ship\" nên nằm ở tầng nào?",
+    "prompt": "Quy tắc \"đơn trên 500.000 được miễn phí giao hàng\" nên nằm ở tầng nào?",
     "options": [
       "Giao diện, trong controller",
-      "Nghiệp vụ, trong ShippingCalculator hoặc service",
       "Dữ liệu, trong DbProductStore",
-      "Trong file appsettings.json"
+      "Nghiệp vụ, trong service",
+      "Cấu hình, trong appsettings.json"
     ],
-    "answer": 2,
+    "answer": 3,
     "explain": "Đó là quy tắc của cửa hàng, thuộc tầng nghiệp vụ. API và WinForms cùng gọi tới."
   },
   {
     "prompt": "Controller nên làm những việc gì?",
     "options": [
-      "Đọc database và kiểm tra tồn kho",
-      "Tính phí ship",
-      "Gửi email",
-      "Nhận request, gọi service, đổi kết quả thành response HTTP"
+      "Đọc database, kiểm tra tồn kho",
+      "Tính phí giao hàng cho đơn",
+      "Gửi email xác nhận đơn hàng",
+      "Gọi service, trả response HTTP"
     ],
     "answer": 4,
-    "explain": "Controller thuộc tầng giao diện. Việc nghiệp vụ và đọc ghi dữ liệu thuộc các tầng dưới."
+    "explain": "Controller thuộc tầng giao diện: nhận request, gọi service, đổi kết quả thành response HTTP. Việc nghiệp vụ và đọc ghi dữ liệu thuộc các tầng dưới."
   },
   {
     "prompt": "Vì sao đặt quy tắc đặt hàng trong OrderService lại giúp app WinForms?",
     "options": [
-      "WinForms chạy nhanh hơn",
-      "WinForms không cần database nữa",
-      "Form gọi cùng OrderService, không phải viết lại quy tắc",
-      "OrderService tự vẽ giao diện"
+      "Form dùng lại quy tắc có sẵn",
+      "Form chạy nhanh hơn vì bớt code",
+      "Form không cần kết nối database",
+      "Form không phải xử lý lỗi nữa"
     ],
-    "answer": 3,
-    "explain": "Quy tắc nằm một chỗ, cả API lẫn form cùng dùng nên không bao giờ lệch nhau."
+    "answer": 1,
+    "explain": "Form gọi cùng OrderService với API, nên quy tắc nằm một chỗ và hai app không lệch nhau. Form vẫn cần database qua IProductStore và vẫn phải xử lý lỗi."
   }
 ]
 ```

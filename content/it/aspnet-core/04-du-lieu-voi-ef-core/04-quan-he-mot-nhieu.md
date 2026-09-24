@@ -81,7 +81,7 @@ public class OrdersController : ControllerBase
 - `Order.Lines` là navigation property, cho biết một đơn có nhiều dòng.
 - `OrderLine.OrderId` là khoá ngoại. EF Core tự nhận ra nhờ tên theo mẫu
   `TênClass` + `Id`.
-- Hai class khớp với bảng `orders`, `order_lines` của khoá SQL. Đơn chỉ lưu
+- Hai class tương ứng với bảng `orders`, `order_lines` của khoá SQL. Đơn chỉ lưu
   `CustomerId`, dòng hàng lưu `ProductId` và `UnitPrice` là giá lúc bán,
   đúng như bài Chuẩn hoá.
 - Migration tạo hai bảng `ORDERS` và `ORDER_LINES`, nối với nhau qua cột
@@ -137,8 +137,8 @@ public async Task<IActionResult> CreateSample()
 Chạy server, tạo đơn mẫu rồi đọc lại:
 
 ```bash
-curl -X POST http://localhost:5000/api/orders/sample
-curl http://localhost:5000/api/orders/1
+curl -i -X POST http://localhost:5000/api/orders/sample
+curl -i http://localhost:5000/api/orders/1
 ```
 
 Rồi xoá dòng `.Include(o => o.Lines)` và gọi lại.
@@ -150,8 +150,9 @@ mảng rỗng, hay vẫn đủ hai dòng?
 <summary>Xem kết quả</summary>
 
 ```text
-Có Include:   {"id":1,"customerId":1,"lines":[{...},{...}]}
-Bỏ Include:   {"id":1,"customerId":1,"lines":[]}
+POST sample:  200, body là 1
+Có Include:   200 {"id":1,"customerId":1,"lines":[{...},{...}]}
+Bỏ Include:   200 {"id":1,"customerId":1,"lines":[]}
 ```
 
 Mảng rỗng. Không có `Include`, EF Core chỉ đọc bảng `ORDERS`. `Lines` giữ giá
@@ -180,6 +181,15 @@ public class LineWithOrder
 Trả dữ liệu qua DTO như bài **DTO**, chỉ chọn những trường cần gửi, vòng lặp
 sẽ không xảy ra.
 
+```csharp
+// ĐÚNG — DTO chỉ giữ OrderId, không trỏ ngược
+public class LineResponse
+{
+    public int Id { get; set; }
+    public int OrderId { get; set; }
+}
+```
+
 ## Tóm tắt
 
 - Một-nhiều: một đơn hàng có nhiều dòng hàng.
@@ -194,31 +204,31 @@ sẽ không xảy ra.
     "prompt": "Class Comment có property PostId, class Post có List<Comment> Comments. EF Core hiểu PostId là gì?",
     "options": [
       "Khoá chính của Comment",
-      "Một cột bình thường, không liên quan Post",
       "Khoá ngoại trỏ tới Post",
+      "Một cột bình thường, không liên quan Post",
       "Lỗi, phải khai báo thủ công"
     ],
-    "answer": 3,
+    "answer": 2,
     "explain": "Tên theo mẫu TênClass + Id nên EF Core tự nhận PostId là khoá ngoại trỏ tới Post."
   },
   {
-    "prompt": "Đọc khách hàng bằng _db.Customers.FirstOrDefaultAsync(...), rồi thấy customer.Orders rỗng dù database có đơn hàng. Vì sao?",
+    "prompt": "Tạo Post mới, thêm hai Comment vào post.Comments (chưa gán PostId), rồi gọi Add(post) và SaveChangesAsync một lần. PostId của hai Comment là gì?",
     "options": [
-      "Thiếu .Include(c => c.Orders)",
-      "Database bị lỗi",
-      "Thiếu SaveChangesAsync",
-      "Orders phải là mảng"
+      "0, vì chưa ai gán",
+      "Lỗi, phải lưu Post trước",
+      "Id của Post vừa tạo",
+      "null, vì chưa có khoá ngoại"
     ],
-    "answer": 1,
-    "explain": "Không Include thì EF Core không đọc bảng liên quan. Navigation property giữ nguyên giá trị khởi tạo."
+    "answer": 3,
+    "explain": "Hai Comment nằm trong post.Comments nên EF Core biết chúng thuộc Post nào. Nó INSERT Post trước, lấy Id rồi điền vào PostId của từng Comment."
   },
   {
     "prompt": "Trả thẳng entity Order có Lines, mà mỗi OrderLine lại có Order, thì chuyện gì xảy ra?",
     "options": [
-      "JSON gọn hơn",
-      "Lỗi compile",
-      "Không có gì khác",
-      "Lỗi khi tạo JSON vì vòng lặp object"
+      "JSON chỉ có Order, bỏ Lines",
+      "Lỗi compile ở OrderLine",
+      "JSON trả về bình thường",
+      "Lỗi tạo JSON vì vòng lặp"
     ],
     "answer": 4,
     "explain": "Order chứa OrderLine, OrderLine lại chứa Order, nên JSON lặp mãi. Trả qua DTO để tránh."

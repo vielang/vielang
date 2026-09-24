@@ -140,34 +140,34 @@ class MainForm : Form
   {
     "prompt": "Muốn có cửa sổ đăng nhập riêng, ta khai báo nó thế nào?",
     "options": [
-      "var LoginForm = new Form(); ngay trong Main",
-      "class LoginForm : Form, cấu hình trong constructor",
+      "var LoginForm = new Form(); trong Main",
       "interface LoginForm : Form",
-      "static class LoginForm"
+      "static class LoginForm : Form",
+      "class LoginForm : Form"
     ],
-    "answer": 2,
-    "explain": "Mỗi cửa sổ là một class kế thừa Form. Constructor gán tiêu đề, kích thước và thêm control."
+    "answer": 4,
+    "explain": "Mỗi cửa sổ là một class kế thừa Form. Constructor gán tiêu đề, kích thước và thêm control. Class static không kế thừa được Form."
   },
   {
     "prompt": "Main gọi Application.Run(new MainForm()) rồi tới một dòng ghi log. Dòng ghi log chạy lúc nào?",
     "options": [
-      "Ngay khi cửa sổ vừa hiện",
-      "Trước khi cửa sổ hiện",
-      "Không bao giờ chạy",
-      "Sau khi người dùng đóng cửa sổ"
+      "Sau khi cửa sổ đóng",
+      "Ngay khi cửa sổ vừa hiện lên",
+      "Trước khi cửa sổ kịp hiện ra",
+      "Không bao giờ chạy tới"
     ],
-    "answer": 4,
+    "answer": 1,
     "explain": "Application.Run chờ tới khi form chính đóng mới trả về, nên dòng sau nó chạy sau khi cửa sổ đóng."
   },
   {
     "prompt": "Trong MainForm : Form, vì sao gán được Text = \"Kho\" dù MainForm không khai báo property Text?",
     "options": [
-      "Text là property MainForm kế thừa từ Form",
       "C# tự tạo property khi gán",
-      "Text là biến toàn cục",
-      "Phải có [STAThread] mới gán được"
+      "MainForm kế thừa Text từ Form",
+      "Text là biến toàn cục của app",
+      "Nhờ có [STAThread] ở Main"
     ],
-    "answer": 1,
+    "answer": 2,
     "explain": "Class con nhận lại property của class cha. Form có sẵn Text là tiêu đề cửa sổ."
   }
 ]

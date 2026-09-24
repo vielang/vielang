@@ -113,35 +113,35 @@ git commit -am "Tách method WithVat"
   {
     "prompt": "if (total > 500000) xuất hiện ở năm file khác nhau. Smell nào, sửa thế nào?",
     "options": [
-      "Method dài, tách method",
-      "Không có vấn đề gì",
-      "Tham số dài, gom class",
-      "Số trần và trùng lặp: đặt hằng FreeShippingThreshold dùng chung"
+      "Số trần, trùng lặp: đặt hằng dùng chung",
+      "Method dài: tách thành method nhỏ",
+      "Không có smell vì mỗi file chỉ một dòng",
+      "Tham số dài: gom thành class"
     ],
-    "answer": 4,
-    "explain": "500000 không nói nó là gì và bị chép ở năm nơi. Một hằng có tên giải quyết cả hai."
+    "answer": 1,
+    "explain": "500000 không nói nó là gì và bị chép ở năm nơi. Một hằng có tên như FreeShippingThreshold giải quyết cả hai."
   },
   {
     "prompt": "Method CreateOrder(name, phone, email, street, city, district) có smell gì?",
     "options": [
-      "Danh sách tham số dài, nên gom địa chỉ thành class Address",
-      "Tên method dở",
-      "Số trần",
-      "Không có smell"
+      "Tên method không rõ ý định",
+      "Danh sách tham số dài",
+      "Trùng lặp với method khác",
+      "Không có smell, tên đều rõ"
     ],
-    "answer": 1,
-    "explain": "Các tham số street, city, district luôn đi cùng nhau, gom lại thành một class cho gọn và rõ nghĩa."
+    "answer": 2,
+    "explain": "Sáu tham số là quá dài. street, city, district luôn đi cùng nhau, gom thành class Address cho gọn và rõ nghĩa."
   },
   {
     "prompt": "const decimal VatRate = 0.1m; Có đổi được VatRate lúc chương trình đang chạy không?",
     "options": [
       "Có, gán lại như biến thường",
-      "Có, nếu dùng static",
-      "Không, const cố định từ lúc viết code",
+      "Có, nếu khai báo thêm static",
+      "Không đổi được",
       "Chỉ đổi được trong constructor"
     ],
     "answer": 3,
-    "explain": "Hằng const được gán một lần trong code. Muốn đổi thì sửa code và build lại."
+    "explain": "Hằng const cố định từ lúc viết code. Muốn đổi thì sửa code và build lại."
   }
 ]
 ```

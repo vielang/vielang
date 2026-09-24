@@ -4,8 +4,8 @@ minutes: 6
 ---
 
 Tìm một giá trong list một triệu phần tử bằng cách duyệt từ đầu, xấu nhất phải
-so một triệu lần. Nếu list đã sắp xếp, chỉ cần khoảng 20 lần so. Index ở bài
-Index của khoá SQL tìm nhanh cũng nhờ dữ liệu đã sắp xếp như vậy.
+so một triệu lần. Nếu list đã sắp xếp, chỉ cần khoảng 20 lần so. (Nếu đã học
+khoá SQL) index của database tìm nhanh cũng nhờ dữ liệu đã sắp xếp như vậy.
 
 ## Khái niệm
 
@@ -122,7 +122,8 @@ bước.
 ## Lỗi hay gặp
 
 **Tìm nhị phân trên dãy chưa sắp xếp.** Chương trình không báo lỗi, chỉ trả
-về kết quả sai, vì bỏ nửa dãy chỉ đúng khi dãy có thứ tự.
+về kết quả sai, vì bỏ nửa dãy chỉ đúng khi dãy có thứ tự. `Array.Sort` sắp
+xếp array tăng dần (bài Sắp xếp trong .NET).
 
 ```csharp
 // SAI — 3000 có trong dãy nhưng trả về -1
@@ -159,25 +160,25 @@ Console.WriteLine(Array.BinarySearch(prices, 3000));
     "explain": "Mỗi bước bỏ một nửa: 1.000 → 500 → 250... tới 1 mất khoảng 10 bước, vì 2 mũ 10 là 1.024."
   },
   {
-    "prompt": "Tìm 7000 trong dãy { 3000, 5000, 7000, 12000, 25000 }. Phần tử được so đầu tiên là gì?",
+    "prompt": "Tìm 60000 trong dãy { 2000, 4000, 9000, 15000, 30000, 60000, 80000 }. Phần tử được so đầu tiên là gì?",
     "options": [
-      "7000, vì nằm ở giữa",
-      "3000, vì nằm đầu",
-      "25000, vì nằm cuối",
-      "12000"
+      "2000",
+      "80000",
+      "60000",
+      "15000"
     ],
-    "answer": 1,
-    "explain": "low = 0, high = 4, mid = 2. Phần tử ở vị trí 2 là 7000, thấy ngay."
+    "answer": 4,
+    "explain": "low = 0, high = 6, mid = 3. Tìm nhị phân luôn so với phần tử giữa trước, ở vị trí 3 là 15000, rồi mới bỏ nửa trái."
   },
   {
     "prompt": "Vì sao Array.BinarySearch trên dãy chưa sắp xếp có thể trả sai?",
     "options": [
-      "Vì BinarySearch chỉ tìm được số chẵn",
-      "Vì nó ném exception",
-      "Vì dãy chưa sắp xếp quá dài",
-      "Vì bỏ một nửa dãy chỉ đúng khi các phần tử có thứ tự"
+      "Vì nó có thể bỏ nhầm nửa chứa giá trị",
+      "Vì nó bỏ qua phần tử đầu và cuối",
+      "Vì nó dừng ở phần tử lớn hơn đầu tiên",
+      "Vì nó so theo vị trí, không theo giá trị"
     ],
-    "answer": 4,
+    "answer": 1,
     "explain": "Tìm nhị phân dựa vào thứ tự để biết nửa nào chắc chắn không chứa giá trị. Không có thứ tự thì có thể bỏ nhầm nửa chứa nó."
   }
 ]

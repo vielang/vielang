@@ -77,10 +77,12 @@ public class ConsoleEmailSender : IEmailSender
 
 ## Thử ngay
 
-Ghép hai phần ở composition root rồi chạy:
+Tạo một project console bằng `dotnet new console`, dán ba class trên vào
+`Program.cs`, thêm ba dòng này ở đầu file rồi chạy. `Program.cs` đóng vai
+composition root:
 
 ```csharp
-// Console, đóng vai composition root
+// Program.cs của project console
 IEmailSender sender = new ConsoleEmailSender();
 var checkout = new CheckoutService(sender);
 checkout.Complete("DH1", "an@shop.vn");
@@ -132,35 +134,35 @@ Infrastructure  → dùng Core
   {
     "prompt": "Cửa hàng chuyển từ Oracle sang PostgreSQL. Với Clean Architecture, phần nào phải sửa?",
     "options": [
-      "Infrastructure, nơi có DbProductStore và ShopDbContext",
-      "Core",
-      "OrderService",
-      "Mọi project"
+      "Core, nơi có IProductStore",
+      "Infrastructure và dòng UseOracle",
+      "OrderService và Product",
+      "Mọi project trong solution"
     ],
-    "answer": 1,
-    "explain": "Chỉ Infrastructure biết database. Core và quy tắc nghiệp vụ giữ nguyên."
+    "answer": 2,
+    "explain": "Chỉ Infrastructure (DbProductStore, ShopDbContext) và dòng UseOracle ở composition root biết database. Core và quy tắc nghiệp vụ giữ nguyên."
   },
   {
     "prompt": "IProductStore nên đặt ở project nào?",
     "options": [
       "Infrastructure, cạnh DbProductStore",
-      "ShopApi",
-      "ShopDesk",
-      "Core, để lõi dùng mà không phụ thuộc vòng ngoài"
+      "ShopApi, nơi đăng ký DI",
+      "Core, cạnh OrderService",
+      "ShopDesk, nơi có form"
     ],
-    "answer": 4,
-    "explain": "Interface thuộc về bên cần dùng nó. Vòng ngoài implement interface của lõi."
+    "answer": 3,
+    "explain": "Interface thuộc về bên cần dùng nó, để lõi không phụ thuộc vòng ngoài. Vòng ngoài implement interface của lõi."
   },
   {
     "prompt": "Core có nên tham chiếu package Oracle.EntityFrameworkCore không?",
     "options": [
       "Có, để đọc dữ liệu nhanh hơn",
       "Có, vì OrderService cần dữ liệu",
-      "Không, lõi không được biết công nghệ database",
-      "Tuỳ ý"
+      "Chỉ khi ShopDesk cũng dùng EF Core",
+      "Không nên"
     ],
-    "answer": 3,
-    "explain": "Core chỉ biết IProductStore. EF Core và Oracle nằm ở Infrastructure."
+    "answer": 4,
+    "explain": "Lõi không được biết công nghệ database. Core chỉ biết IProductStore, còn EF Core và Oracle nằm ở Infrastructure."
   }
 ]
 ```

@@ -3,10 +3,9 @@ title: Subquery
 minutes: 5
 ---
 
-Muốn tìm sản phẩm đắt hơn giá trung bình thì không viết được
-`WHERE price > AVG(price)`, vì bài GROUP BY và HAVING đã cho thấy hàm tổng hợp
-trong `WHERE` báo lỗi.
-Phải tính giá trung bình trước, rồi dùng con số đó để lọc. Subquery làm được việc này trong một câu.
+Không thể viết `WHERE price > AVG(price)`, vì hàm tổng hợp không dùng được
+trong `WHERE` (bài GROUP BY và HAVING). Phải tính giá trung bình trước rồi mới
+lọc; subquery làm việc này trong một câu.
 
 ## Khái niệm
 
@@ -25,12 +24,6 @@ ORDER BY price;
 - Câu bên ngoài dùng con số đó để lọc, ra Balo và Máy tính.
 - Subquery trả về **một** giá trị thì so sánh bằng `=`, `>`, `<`.
 - Subquery trả về **nhiều** dòng thì dùng `IN`.
-
-```mermaid Subquery chạy trước, câu ngoài dùng kết quả của nó
-flowchart LR
-    sub["SELECT AVG(price) FROM products"] -->|"164800"| outer["WHERE price > 164800"]
-    outer --> res["Balo, Máy tính"]
-```
 
 ## Thử ngay
 
@@ -127,23 +120,23 @@ WHERE email NOT IN (
   {
     "prompt": "Tìm sản phẩm có giá cao nhất. Câu nào đúng?",
     "options": [
-      "WHERE price = (SELECT MAX(price) FROM products)",
       "WHERE price = MAX(price)",
       "WHERE MAX(price)",
-      "HAVING price = MAX(price)"
+      "HAVING price = MAX(price)",
+      "WHERE price = (SELECT MAX(price) FROM products)"
     ],
-    "answer": 1,
+    "answer": 4,
     "explain": "Subquery tính giá lớn nhất trước, câu ngoài lấy sản phẩm có đúng giá đó. Không dùng MAX trực tiếp trong WHERE được."
   },
   {
     "prompt": "WHERE id NOT IN (1, 2, NULL) trả về bao nhiêu dòng?",
     "options": [
+      "Không dòng nào",
       "Mọi dòng trừ id 1 và 2",
       "Chỉ các dòng có id NULL",
-      "Báo lỗi",
-      "Không dòng nào"
+      "Báo lỗi"
     ],
-    "answer": 4,
+    "answer": 1,
     "explain": "So sánh với NULL không bao giờ cho kết quả đúng, nên điều kiện NOT IN không đúng với dòng nào. Phải loại NULL khỏi danh sách."
   }
 ]

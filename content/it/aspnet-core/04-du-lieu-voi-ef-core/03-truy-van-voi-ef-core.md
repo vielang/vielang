@@ -138,6 +138,20 @@ flowchart TD
 
 ## Thử ngay
 
+Bảng `PRODUCTS` vẫn còn trống. Trong VS Code, kết nối Oracle bằng user
+`shopapi`, mật khẩu `shopapi_pw`, service name `FREEPDB1`, rồi thêm ba sản
+phẩm mẫu mà các bài sau dùng lại:
+
+```sql
+INSERT INTO PRODUCTS (NAME, PRICE, STOCK)
+  VALUES ('Bút bi', 5000, 120);
+INSERT INTO PRODUCTS (NAME, PRICE, STOCK)
+  VALUES ('Vở', 12000, 0);
+INSERT INTO PRODUCTS (NAME, PRICE, STOCK)
+  VALUES ('Thước', 7000, 50);
+COMMIT;
+```
+
 Để xem câu SQL mà EF Core sinh ra, thêm vào mục `Logging:LogLevel` của
 `appsettings.Development.json`:
 
@@ -145,8 +159,8 @@ flowchart TD
 "Microsoft.EntityFrameworkCore.Database.Command": "Information"
 ```
 
-Chạy server, gọi `curl http://localhost:5000/api/products/in-stock` rồi xem
-cửa sổ đang chạy server.
+Chạy server, gọi `curl -i http://localhost:5000/api/products/in-stock` rồi
+xem cửa sổ đang chạy server.
 
 **Đoán trước khi chạy:** điều kiện `Stock > 0` được lọc trong C# sau khi đọc
 hết bảng, hay nằm ngay trong câu SQL?
@@ -155,13 +169,14 @@ hết bảng, hay nằm ngay trong câu SQL?
 <summary>Xem kết quả</summary>
 
 ```sql
-SELECT "p"."ID", "p"."NAME", "p"."STOCK"
+SELECT "p"."ID", "p"."NAME", "p"."PRICE", "p"."STOCK"
 FROM "PRODUCTS" "p"
 WHERE "p"."STOCK" > 0
 ```
 
 Nằm trong câu SQL. EF Core dịch lambda `p => p.Stock > 0` thành
-`WHERE "p"."STOCK" > 0`, nên Oracle chỉ trả về các dòng còn hàng.
+`WHERE "p"."STOCK" > 0`, nên Oracle chỉ trả về các dòng còn hàng. Response
+là 200 kèm hai sản phẩm Bút bi và Thước, không có Vở.
 
 </details>
 
@@ -202,7 +217,7 @@ database.
       "Có, đổi ngay khi gán",
       "Có, khi request kết thúc",
       "Không, vì thiếu SaveChangesAsync",
-      "Lỗi compile"
+      "Không, vì FindAsync chỉ để đọc"
     ],
     "answer": 3,
     "explain": "Gán property chỉ đổi object trong DbContext. Phải gọi SaveChangesAsync thì mới sinh UPDATE xuống database."
@@ -210,23 +225,23 @@ database.
   {
     "prompt": "Cần 10 đơn hàng mới nhất. Cách nào chỉ lấy đúng 10 dòng từ database?",
     "options": [
-      "await _db.Orders.OrderByDescending(o => o.Id).Take(10).ToListAsync()",
       "(await _db.Orders.ToListAsync()).OrderByDescending(o => o.Id).Take(10)",
       "await _db.Orders.ToListAsync() rồi lấy 10 phần tử cuối",
-      "Đọc từng đơn bằng FindAsync"
+      "Đọc từng đơn bằng FindAsync",
+      "await _db.Orders.OrderByDescending(o => o.Id).Take(10).ToListAsync()"
     ],
-    "answer": 1,
+    "answer": 4,
     "explain": "OrderByDescending và Take đứng trước ToListAsync nên được dịch sang SQL. Database chỉ trả về 10 dòng."
   },
   {
     "prompt": "Vì sao dùng ToListAsync thay vì ToList khi đọc database trong controller?",
     "options": [
+      "Không chặn luồng khi chờ database",
       "ToList không dùng được với DbSet",
       "ToListAsync trả kết quả khác",
-      "ToListAsync tự lọc dữ liệu",
-      "Trong lúc chờ database, server không bị chặn và phục vụ được request khác"
+      "ToListAsync tự lọc dữ liệu"
     ],
-    "answer": 4,
+    "answer": 1,
     "explain": "Đọc database là việc chậm. Dùng async thì luồng được trả lại để phục vụ request khác trong lúc chờ."
   }
 ]

@@ -15,9 +15,11 @@ tính thành một class riêng.
 ♟️ **Strategy**: mỗi cách làm một việc nằm trong một class riêng, các class cùng implement một interface, và nơi dùng nhận cách làm qua interface đó.
 
 Strategy là một cách áp dụng OCP của khoá OOP: thêm cách giao là thêm class,
-không sửa code cũ. `IDiscount` ở bài OCP chính là một Strategy.
-`StandardShipping` dưới đây là bản rút gọn của `ShippingCalculator`, bỏ quy
-tắc thành viên và thành phố.
+không sửa code cũ. `IDiscount` ở bài OCP và `IShipping` ở bài Composition
+đều là Strategy.
+
+`StandardShipping` dưới đây tính đơn giản hơn `ShippingCalculator` của bài
+Refactor an toàn: từ 500.000 thì miễn phí, còn lại 20.000 cho mọi nơi.
 
 ## Ví dụ
 
@@ -66,7 +68,7 @@ public class Checkout
 }
 ```
 
-- `IShippingStrategy` đại diện cho việc tính phí ship, mỗi class là một
+- `IShippingStrategy` đại diện cho việc tính phí giao hàng, mỗi class là một
   cách tính.
 - `Checkout` chỉ biết interface và nhận cách tính qua constructor, như bài
   DIP và dependency injection.
@@ -164,33 +166,33 @@ public class Checkout
     "prompt": "Cửa hàng thêm cách giao \"giao trong 2 giờ\". Với Strategy, cần làm gì?",
     "options": [
       "Sửa Checkout thêm một nhánh if",
-      "Sửa StandardShipping",
-      "Thêm class TwoHourShipping implement IShippingStrategy",
-      "Sửa interface IShippingStrategy"
+      "Sửa StandardShipping cho cả hai",
+      "Thêm class TwoHourShipping",
+      "Thêm method vào IShippingStrategy"
     ],
     "answer": 3,
-    "explain": "Thêm cách làm là thêm class mới. Code cũ giữ nguyên, đúng OCP."
+    "explain": "Thêm cách làm là thêm class mới implement IShippingStrategy. Code cũ giữ nguyên, đúng OCP."
   },
   {
-    "prompt": "Checkout biết gì về cách tính phí ship?",
+    "prompt": "Checkout biết gì về cách tính phí giao hàng?",
     "options": [
-      "Chỉ biết interface IShippingStrategy",
       "Biết cả ba class cụ thể",
       "Biết tên cách giao dạng chuỗi",
-      "Không dùng tới phí ship"
+      "Biết class nào đang được dùng",
+      "Chỉ biết IShippingStrategy"
     ],
-    "answer": 1,
+    "answer": 4,
     "explain": "Checkout chỉ gọi Fee qua interface, nên cách tính nào truyền vào cũng dùng được."
   },
   {
     "prompt": "Nguyên lý SOLID nào đứng sau Strategy rõ nhất?",
     "options": [
+      "OCP",
       "LSP",
       "ISP",
-      "SRP",
-      "OCP"
+      "SRP"
     ],
-    "answer": 4,
+    "answer": 1,
     "explain": "Mở rộng bằng class mới mà không sửa code cũ chính là OCP."
   }
 ]

@@ -36,6 +36,8 @@ Cài package:
 dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer
 ```
 
+Project dùng .NET 9 thì thêm `--version 9.*`, như bài EF Core và DbContext.
+
 Cấu hình trong `Program.cs`:
 
 ```csharp
@@ -71,6 +73,8 @@ app.Run();
 
 - `!` sau `["Jwt:Key"]` báo với compiler giá trị này chắc chắn không
   `null`.
+- `options => options.TokenValidationParameters = ...` là lambda nhận
+  `options` rồi gán một property của nó.
 
 Chặn action bằng `[Authorize]`:
 
@@ -139,13 +143,16 @@ public class AuthController : ControllerBase
 ```
 
 - Token chứa tên người dùng (claim) và hết hạn sau 1 giờ.
+- `claims:`, `expires:` là tham số có tên (named argument): ghi tên tham số
+  trước giá trị, nên chỉ cần truyền những tham số mình dùng.
 - Ví dụ bỏ qua bước kiểm tra mật khẩu để gọn. Dự án thật dùng ASP.NET Core
   Identity để lưu và kiểm tra mật khẩu.
 
 ## Thử ngay
 
 Thêm một khoá đủ dài vào `appsettings.Development.json`. Khoá này chỉ để thử
-trên máy, khoá thật đặt trong biến môi trường như bài Cấu hình.
+trên máy, còn khoá thật thì bài Cấu hình khuyên lưu bằng
+`dotnet user-secrets` khi dev và biến môi trường trên server.
 
 ```json
 "Jwt": { "Key": "day-la-khoa-bi-mat-dai-hon-32-ky-tu-nhe" }
@@ -155,7 +162,7 @@ Chạy server rồi gọi:
 
 ```bash
 curl -i -X POST http://localhost:5000/api/products
-curl -X POST "http://localhost:5000/api/auth/login?userName=an"
+curl -i -X POST "http://localhost:5000/api/auth/login?userName=an"
 curl -i -X POST http://localhost:5000/api/products -H "Authorization: Bearer <token vừa nhận>"
 ```
 
@@ -166,7 +173,8 @@ curl -i -X POST http://localhost:5000/api/products -H "Authorization: Bearer <to
 
 ```text
 Lần 1 (không token):  HTTP/1.1 401 Unauthorized
-Lần 2 (đăng nhập):    eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Lần 2 (đăng nhập):    HTTP/1.1 200 OK
+                      eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 Lần 3 (có token):     HTTP/1.1 201 Created
 ```
 
@@ -189,10 +197,16 @@ app.UseAuthorization();
 app.UseAuthentication();
 ```
 
+```csharp
+// ĐÚNG — biết người gọi là ai rồi mới kiểm tra quyền
+var app = WebApplication.Create(args);
+app.UseAuthentication();
+app.UseAuthorization();
+```
+
 **Nhầm 401 với 403.** 401 là chưa xác thực: không có token hoặc token sai.
 403 là server đã biết người gọi là ai nhưng người đó không đủ quyền, ví dụ
-action có
-`[Authorize(Roles = "Admin")]` mà người gọi không phải Admin.
+action có `[Authorize(Roles = "Admin")]` mà người gọi không phải Admin.
 
 ## Tóm tắt
 
@@ -209,10 +223,10 @@ action có
     "options": [
       "401 Unauthorized",
       "200 OK",
-      "403 Forbidden",
-      "404 Not Found"
+      "404 Not Found",
+      "403 Forbidden"
     ],
-    "answer": 3,
+    "answer": 4,
     "explain": "Server đã biết người gọi là ai (đã xác thực) nhưng người đó không đủ quyền, nên trả 403."
   },
   {
@@ -220,7 +234,7 @@ action có
     "options": [
       "Header Authorization: Bearer <token>",
       "Trong URL, dạng ?token=",
-      "Trong tên action",
+      "Trong body JSON của request",
       "Không cần gửi, server tự nhớ"
     ],
     "answer": 1,
@@ -229,13 +243,13 @@ action có
   {
     "prompt": "Vì sao khoá bí mật Jwt:Key không được lộ ra ngoài?",
     "options": [
-      "Vì làm server chạy chậm",
+      "Vì có khoá là đọc được nội dung token",
+      "Vì ai có khoá là ký được token giả",
       "Vì client cần nó để gửi request",
-      "Vì khoá dài quá",
-      "Vì ai có khoá là tự ký được token giả, đăng nhập thành bất kỳ ai"
+      "Vì lộ khoá thì mọi token hết hạn"
     ],
-    "answer": 4,
-    "explain": "Server tin mọi token có chữ ký đúng. Lộ khoá là người ngoài tự tạo được token hợp lệ."
+    "answer": 2,
+    "explain": "Server tin mọi token có chữ ký đúng, nên ai có khoá là tự tạo được token hợp lệ và đăng nhập thành bất kỳ ai. Khoá dùng để ký chứ không để mã hoá nội dung token."
   }
 ]
 ```

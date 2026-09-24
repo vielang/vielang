@@ -46,7 +46,7 @@ class Product
 }
 ```
 
-- Các method nối nhau bằng dấu chấm, đọc từ trên xuống như một câu: lọc còn
+- Các method nối nhau bằng dấu chấm và chạy lần lượt từ trên xuống: lọc còn
   hàng, xếp theo giá, lấy tên.
 - `ToList()` gom kết quả thành `List`.
 - `string.Join(", ", names)` ghép các phần tử thành một chuỗi.
@@ -149,22 +149,22 @@ Console.WriteLine(item?.Name ?? "Không có");
     "prompt": "var nums = new List<int> { 5, 2, 8 }; var r = nums.OrderBy(n => n).First(); Giá trị của r là gì?",
     "options": [
       "5",
-      "8",
       "2",
+      "8",
       "Lỗi khi chạy"
     ],
-    "answer": 3,
+    "answer": 2,
     "explain": "OrderBy xếp tăng dần thành 2, 5, 8. First lấy phần tử đầu là 2."
   },
   {
     "prompt": "Bạn cần danh sách email của mọi khách hàng trong List<Customer> customers. Dùng method nào?",
     "options": [
-      "customers.Select(c => c.Email).ToList()",
       "customers.Where(c => c.Email).ToList()",
       "customers.Any(c => c.Email)",
+      "customers.Select(c => c.Email).ToList()",
       "customers.Count(c => c.Email)"
     ],
-    "answer": 1,
+    "answer": 3,
     "explain": "Select biến mỗi khách hàng thành email của họ. Where dùng để lọc theo điều kiện bool."
   },
   {

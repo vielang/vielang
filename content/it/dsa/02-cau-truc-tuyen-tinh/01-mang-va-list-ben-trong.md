@@ -4,7 +4,7 @@ minutes: 6
 ---
 
 Ở khoá C# Core, array có số ô cố định, còn `List<T>` thêm bao nhiêu cũng được.
-Thật ra bên trong `List<T>` vẫn là một array. Hiểu cách nó nới rộng, bạn sẽ
+Bên trong `List<T>` vẫn là một array. Hiểu cách nó nới rộng, bạn sẽ
 biết thao tác nào nhanh, thao tác nào chậm.
 
 ## Khái niệm
@@ -151,23 +151,23 @@ Cần vừa lấy ra ở đầu vừa thêm vào ở cuối thì dùng `Queue<T>
   {
     "prompt": "List<string> có Count = 8, Capacity = 8. Gọi Add thêm một phần tử. Capacity sau đó là bao nhiêu?",
     "options": [
-      "9",
       "16",
+      "9",
       "8",
       "12"
     ],
-    "answer": 2,
+    "answer": 1,
     "explain": "Array bên trong đã đầy, List tạo array mới gấp đôi là 16 ô rồi chép 8 phần tử sang."
   },
   {
     "prompt": "Thao tác nào trên List<T> là O(n)?",
     "options": [
       "list[5]",
+      "list.Insert(0, x)",
       "list.Add(x)",
-      "list.Count",
-      "list.Insert(0, x)"
+      "list.Count"
     ],
-    "answer": 4,
+    "answer": 2,
     "explain": "Chèn vào đầu phải dời mọi phần tử phía sau lùi một ô."
   },
   {
@@ -175,11 +175,11 @@ Cần vừa lấy ra ở đầu vừa thêm vào ở cuối thì dùng `Queue<T>
     "options": [
       "Vì chép array không tốn thời gian",
       "Vì List không bao giờ chép",
-      "Vì mỗi lần nới là gấp đôi, nên lần chép hiếm dần; tính trung bình mỗi Add vẫn là O(1)",
+      "Vì gấp đôi nên lần chép hiếm dần",
       "Vì Big-O bỏ qua mọi vòng lặp"
     ],
     "answer": 3,
-    "explain": "Gấp đôi nghĩa là sau mỗi lần chép n phần tử, phải thêm n lần nữa mới chép tiếp. Chia đều ra mỗi Add chỉ tốn thêm một hằng số."
+    "explain": "Gấp đôi nghĩa là sau mỗi lần chép n phần tử, phải thêm n lần nữa mới chép tiếp. Chia đều ra mỗi Add chỉ tốn thêm một hằng số, nên trung bình vẫn là O(1)."
   }
 ]
 ```

@@ -122,13 +122,13 @@ báo `leftover conflict marker` kèm số dòng.
   {
     "prompt": "Nhánh A sửa Product.cs, nhánh B sửa Order.cs. Merge B vào A thì sao?",
     "options": [
-      "Luôn conflict",
-      "Git tự gộp được, vì hai nhánh sửa hai file khác nhau",
-      "Git xoá một trong hai file",
-      "Phải merge bằng tay từng dòng"
+      "Luôn conflict vì hai nhánh cùng đổi",
+      "Git giữ bản của nhánh A cho cả hai",
+      "Git tự gộp được",
+      "Phải merge bằng tay từng file"
     ],
-    "answer": 2,
-    "explain": "Conflict chỉ xảy ra khi cùng một chỗ bị sửa ở cả hai phía."
+    "answer": 3,
+    "explain": "Hai nhánh sửa hai file khác nhau nên Git tự gộp. Conflict chỉ xảy ra khi cùng một chỗ bị sửa ở cả hai phía."
   },
   {
     "prompt": "Trong file conflict, nội dung giữa <<<<<<< HEAD và ======= là của ai?",
@@ -144,12 +144,12 @@ báo `leftover conflict marker` kèm số dòng.
   {
     "prompt": "Đã sửa xong nội dung file conflict. Bước tiếp theo là gì?",
     "options": [
+      "git add file đó rồi git commit",
       "git merge lại từ đầu",
       "Xoá nhánh kia",
-      "git add file đó rồi git commit",
       "Không cần làm gì"
     ],
-    "answer": 3,
+    "answer": 1,
     "explain": "git add đánh dấu conflict đã giải quyết, git commit hoàn tất merge."
   }
 ]

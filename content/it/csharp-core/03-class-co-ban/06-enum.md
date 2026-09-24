@@ -5,11 +5,12 @@ minutes: 4
 
 Đơn hàng chỉ có vài trạng thái: mới, đã thanh toán, đang giao, đã huỷ. Nếu
 lưu trạng thái bằng chuỗi, gõ nhầm `"paid"` thành `"piad"` thì compiler cũng
-không phát hiện. enum giới hạn giá trị vào đúng danh sách cho phép.
+không phát hiện. Với enum, bạn chọn giá trị theo tên trong một danh sách cố
+định, và gõ nhầm tên là lỗi compile.
 
 ## Khái niệm
 
-🎚️ **enum**: kiểu gồm một danh sách giá trị có tên cố định, biến kiểu enum chỉ nhận được một trong các giá trị đó.
+🎚️ **enum**: kiểu gồm một danh sách giá trị có tên cố định, mỗi tên ứng với một số nguyên.
 
 ## Ví dụ
 
@@ -129,33 +130,33 @@ enum OrderStatus { New, Paid }
     "options": [
       "Large",
       "3",
-      "2",
-      "1"
+      "1",
+      "2"
     ],
-    "answer": 3,
+    "answer": 4,
     "explain": "Số đánh từ 0: Small 0, Medium 1, Large 2."
   },
   {
     "prompt": "Trường nào nên dùng enum?",
     "options": [
-      "Phương thức thanh toán: tiền mặt, thẻ, ví điện tử",
-      "Tên sản phẩm",
-      "Ghi chú của khách",
-      "Số điện thoại"
+      "Phương thức thanh toán",
+      "Tên sản phẩm trong kho",
+      "Ghi chú của khách hàng",
+      "Số điện thoại của khách"
     ],
     "answer": 1,
-    "explain": "Phương thức thanh toán chỉ có vài giá trị cố định. Ba trường còn lại có thể là bất kỳ chuỗi nào."
+    "explain": "Phương thức thanh toán chỉ có vài giá trị cố định: tiền mặt, thẻ, ví điện tử. Ba trường còn lại có thể là bất kỳ chuỗi nào."
   },
   {
     "prompt": "Vì sao enum an toàn hơn chuỗi khi lưu trạng thái đơn hàng?",
     "options": [
       "enum chạy nhanh hơn string",
+      "Gõ sai tên enum là lỗi compile",
       "enum tốn ít bộ nhớ hơn",
-      "enum in ra đẹp hơn",
-      "Gõ sai tên giá trị enum là lỗi compile, gõ sai chuỗi thì không"
+      "enum in ra đẹp hơn"
     ],
-    "answer": 4,
-    "explain": "Compiler chỉ cho dùng các giá trị đã khai báo trong enum, nên lỗi gõ nhầm bị phát hiện ngay lúc build."
+    "answer": 2,
+    "explain": "Compiler chỉ cho dùng các tên đã khai báo trong enum, nên lỗi gõ nhầm bị phát hiện ngay lúc build. Gõ sai chuỗi thì compiler không biết."
   }
 ]
 ```

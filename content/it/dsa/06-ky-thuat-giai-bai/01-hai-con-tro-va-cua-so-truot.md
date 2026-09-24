@@ -4,14 +4,14 @@ minutes: 6
 ---
 
 Nhiều bài toán trên array có lời giải dễ nghĩ ra là hai vòng lặp lồng nhau,
-O(n²). Hai kỹ thuật trong bài này đưa chúng về một lượt duyệt O(n), mà không
-cần thêm `HashSet` hay `Dictionary`.
+O(n²). Hai kỹ thuật trong bài này đưa chúng về một lượt duyệt, không cần thêm
+`HashSet` hay `Dictionary`. Riêng hai con trỏ là O(n) sau khi dãy đã sắp xếp.
 
 ## Khái niệm
 
 👉 **Hai con trỏ (two pointers)**: dùng hai chỉ số cùng duyệt một array, thường một từ đầu và một từ cuối, mỗi bước dời một chỉ số dựa theo kết quả so sánh.
 
-🎞️ **Cửa sổ trượt (sliding window)**: xét một đoạn liền nhau có độ dài cố định, mỗi bước trượt đoạn sang phải một ô bằng cách cộng phần tử mới vào và trừ phần tử vừa rời đi.
+🎞️ **Cửa sổ trượt (sliding window)**: đoạn liền nhau độ dài cố định, trượt sang phải từng ô bằng cách cộng phần tử mới và trừ phần tử cũ.
 
 ## Ví dụ
 
@@ -58,8 +58,10 @@ flowchart TD
 ## Cửa sổ trượt
 
 Doanh thu 7 ngày (triệu đồng). Tìm 3 ngày liên tiếp có tổng doanh thu cao
-nhất. Cộng lại từ đầu cho mỗi đoạn 3 ngày thì tốn khoảng n × 3 bước. Cửa
-sổ trượt mỗi bước chỉ cộng một số và trừ một số.
+nhất.
+
+Cộng lại từ đầu cho mỗi đoạn 3 ngày thì tốn khoảng n × 3 bước. Cửa sổ trượt
+mỗi bước chỉ cộng một số và trừ một số.
 
 ```csharp
 int[] revenue = { 5, 8, 2, 9, 7, 1, 6 };
@@ -127,7 +129,8 @@ Array.Sort(prices);
 - Hai con trỏ: một từ đầu, một từ cuối, dời theo kết quả so sánh. Cần dãy đã
   sắp xếp.
 - Cửa sổ trượt: đoạn liền nhau, mỗi bước cộng phần tử vào, trừ phần tử ra.
-- Cả hai chỉ duyệt một lượt, O(n), không tốn thêm bộ nhớ.
+- Cả hai chỉ duyệt một lượt, không tốn thêm bộ nhớ. Cửa sổ trượt là O(n),
+  hai con trỏ là O(n) sau khi dãy đã sắp xếp.
 - Gặp bài "cặp có tổng", "đoạn liên tiếp" thì nghĩ tới hai kỹ thuật này.
 
 ```quiz
@@ -137,7 +140,7 @@ Array.Sort(prices);
     "options": [
       "Tăng left",
       "Dừng lại, không có cặp nào",
-      "Giảm right để lấy món rẻ hơn",
+      "Giảm right",
       "Tăng cả left và right"
     ],
     "answer": 3,
@@ -147,22 +150,22 @@ Array.Sort(prices);
     "prompt": "Cửa sổ 7 ngày trượt trên dữ liệu 30 ngày. Có bao nhiêu cửa sổ?",
     "options": [
       "30",
-      "24",
       "7",
-      "23"
+      "23",
+      "24"
     ],
-    "answer": 2,
+    "answer": 4,
     "explain": "Số cửa sổ là n - k + 1 = 30 - 7 + 1 = 24."
   },
   {
     "prompt": "Khi cửa sổ trượt sang phải một ô, tổng mới tính thế nào?",
     "options": [
+      "Cộng phần tử mới, trừ phần tử cũ",
       "Cộng lại toàn bộ k phần tử",
-      "Nhân đôi tổng cũ",
-      "Chỉ cộng phần tử mới",
-      "Tổng cũ cộng phần tử mới vào, trừ phần tử vừa rời đi"
+      "Chỉ trừ phần tử vừa rời đi",
+      "Chỉ cộng phần tử mới"
     ],
-    "answer": 4,
+    "answer": 1,
     "explain": "Chỉ hai phần tử thay đổi, nên chỉ cần một phép cộng và một phép trừ, O(1) mỗi bước."
   }
 ]

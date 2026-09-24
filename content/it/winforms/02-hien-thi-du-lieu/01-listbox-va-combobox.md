@@ -11,7 +11,7 @@ control để nó tự hiện tên từng sản phẩm.
 
 📋 **ListBox**: control hiện một danh sách để người dùng chọn.
 
-🔽 **ComboBox**: control giống `ListBox` nhưng thu gọn thành một ô, bấm vào mới xổ danh sách xuống.
+🔽 **ComboBox**: control thu gọn thành một ô, bấm vào mới xổ danh sách xuống để chọn.
 
 🔗 **DataSource**: property nhận cả một danh sách object để control hiện mỗi object thành một dòng.
 
@@ -85,9 +85,9 @@ public class Product
 - `DataSource = _products` đưa cả danh sách vào. `DisplayMember = "Name"`
   cho mỗi dòng hiện tên sản phẩm.
 - `SelectedItem` có kiểu `object`, vì `ListBox` chứa được mọi loại object.
-  `(Product)item` ép nó về `Product`. Khác `(int)` ở bài Toán tử và ép kiểu
-  của khoá C# Core, ép kiểu ở đây không đổi object, chỉ báo compiler object
-  thật là `Product`. Sai kiểu thì báo `InvalidCastException`.
+  `(Product)item` ép nó về `Product`. Khác `(int)` ở bài Toán tử và ép kiểu,
+  phép ép này không đổi object mà chỉ cho compiler biết object thật là
+  `Product`. Sai kiểu thì báo `InvalidCastException`.
 - `SelectedIndexChanged` chỉ chạy khi lựa chọn thay đổi. Lúc mở form, dòng
   đầu được chọn sẵn nhưng event chưa chạy, nên nhãn giá còn trống cho tới
   khi bạn chọn dòng khác.
@@ -155,9 +155,9 @@ productBox.DataSource =
   {
     "prompt": "ListBox có DataSource là List<Customer>. Muốn mỗi dòng hiện email của khách, đặt gì?",
     "options": [
-      "Text = \"Email\"",
+      "ValueMember = \"Email\"",
       "DataSource = \"Email\"",
-      "SelectedItem = \"Email\"",
+      "SelectedValue = \"Email\"",
       "DisplayMember = \"Email\""
     ],
     "answer": 4,
@@ -166,24 +166,24 @@ productBox.DataSource =
   {
     "prompt": "Vì sao phải viết (Product)item trước khi đọc .Price?",
     "options": [
-      "SelectedItem có kiểu object, compiler không biết nó có Price",
+      "SelectedItem có kiểu object",
       "Để đổi giá sang số nguyên",
-      "Vì Product là struct",
+      "Vì Product là struct, không phải class",
       "Không cần, item.Price chạy được luôn"
     ],
     "answer": 1,
-    "explain": "ListBox chứa mọi loại object nên SelectedItem khai báo là object. Ép về Product mới dùng được property của Product."
+    "explain": "ListBox chứa mọi loại object nên SelectedItem khai báo là object, compiler không biết nó có Price. Ép về Product mới dùng được property của Product."
   },
   {
     "prompt": "ComboBox chọn đơn vị tính chỉ cho chọn trong danh sách, không cho gõ chữ khác. Đặt property nào?",
     "options": [
       "ReadOnly = true",
-      "Enabled = false",
       "DropDownStyle = ComboBoxStyle.DropDownList",
-      "DisplayMember = \"Unit\""
+      "Enabled = false",
+      "DropDownStyle = ComboBoxStyle.Simple"
     ],
-    "answer": 3,
-    "explain": "DropDownList biến ô thành chỉ chọn. Enabled = false thì không chọn được gì."
+    "answer": 2,
+    "explain": "DropDownList biến ô thành chỉ chọn. Simple vẫn cho gõ, còn Enabled = false thì không chọn được gì."
   }
 ]
 ```

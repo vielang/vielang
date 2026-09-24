@@ -46,9 +46,10 @@ public class PriceCalculator
 }
 ```
 
-Tạo project test và chạy:
+Tạo project test cạnh thư mục `ShopApi` rồi chạy:
 
 ```bash
+cd ..
 dotnet new xunit -o ShopApi.Tests
 dotnet add ShopApi.Tests reference ShopApi
 dotnet test ShopApi.Tests
@@ -82,15 +83,19 @@ public class PriceCalculatorTests
 }
 ```
 
+- `cd ..` ra khỏi thư mục `ShopApi`, để hai project nằm cạnh nhau.
 - `dotnet add ... reference` cho project test dùng được class của `ShopApi`.
 - Mỗi test là một method `[Fact]`, tên nói rõ tình huống và kết quả mong
   đợi.
 - `Assert.Equal(mong đợi, thực tế)`: hai giá trị khác nhau thì test đỏ.
 - `Assert.Throws` kiểm tra method có ném đúng loại exception không.
+  `() => ...` là lambda không tham số, bọc lời gọi để `Assert.Throws` tự
+  chạy và bắt exception.
 
 ## Thử ngay
 
-Thêm class test này vào project `ShopApi.Tests` rồi chạy `dotnet test`:
+Thêm class test này vào project `ShopApi.Tests` rồi chạy lại
+`dotnet test ShopApi.Tests`:
 
 ```csharp
 using Xunit;
@@ -122,10 +127,12 @@ Actual:   450000
 Failed!  - Failed: 1, Passed: 3, Total: 4
 ```
 
-Đỏ. Passed là 3 vì project mới tạo có sẵn một test mẫu trong `UnitTest1.cs`.
-Tổng đúng bằng 500000 thì điều kiện `>= 500000` vẫn giảm 10%, còn
-450000. Test ở mốc ranh giới như thế này bắt được những hiểu nhầm mà thử bằng
-tay dễ bỏ qua.
+Đỏ. Tổng đúng bằng 500000 thì điều kiện `>= 500000` vẫn giảm 10%, còn
+450000. Passed là 3 vì project mới tạo có sẵn một test mẫu trong
+`UnitTest1.cs`.
+
+Test ở mốc ranh giới như thế này bắt được những hiểu nhầm mà thử bằng tay dễ
+bỏ qua.
 
 </details>
 
@@ -147,6 +154,22 @@ public class ReportTests
         string text =
             File.ReadAllText("C:/data/report.txt");
         Assert.NotEmpty(text);
+    }
+}
+```
+
+```csharp
+// ĐÚNG — bản giả trả dữ liệu định sẵn, không đọc file
+public interface IReportSource
+{
+    string Read();
+}
+
+public class FakeReportSource : IReportSource
+{
+    public string Read()
+    {
+        return "Doanh thu: 500000";
     }
 }
 ```
@@ -175,26 +198,26 @@ test nên kiểm tra một tình huống.
     "explain": "Act là bước gọi method cần test. Arrange chuẩn bị, Assert kiểm tra kết quả."
   },
   {
-    "prompt": "Phí ship miễn phí khi đơn từ 300000đ. Nên có test cho giá trị nào để bắt lỗi ranh giới?",
+    "prompt": "Vừa tạo ShopApi.Tests bằng dotnet new xunit, test gọi new ShippingCalculator() của ShopApi thì build báo không tìm thấy tên này. Thiếu bước nào?",
     "options": [
-      "Đúng 300000, và ngay dưới là 299999",
-      "Chỉ 1000000",
-      "Chỉ 0",
-      "Không cần, thử bằng tay là đủ"
-    ],
-    "answer": 1,
-    "explain": "Lỗi hay nằm ở mốc ranh giới như >= và >. Test ngay tại mốc và ngay dưới mốc sẽ bắt được."
-  },
-  {
-    "prompt": "OrderService nhận IPaymentGateway qua constructor. Muốn test OrderService mà không gọi ngân hàng thật thì làm gì?",
-    "options": [
-      "Gọi ngân hàng thật với số tiền nhỏ",
-      "Không test được",
-      "Sửa OrderService để bỏ qua thanh toán khi test",
-      "Truyền vào một class giả implement IPaymentGateway"
+      "Gắn [Fact] lên ShippingCalculator",
+      "Thêm using Xunit vào ShopApi",
+      "Đổi ShippingCalculator thành static",
+      "Thêm reference tới ShopApi"
     ],
     "answer": 4,
-    "explain": "Nhờ nhận interface qua constructor, lúc test chỉ cần truyền bản giả trả kết quả định sẵn."
+    "explain": "Project test chỉ thấy class của ShopApi sau lệnh dotnet add ShopApi.Tests reference ShopApi."
+  },
+  {
+    "prompt": "Test viết Assert.Equal(total, 200000m), trong đó total là kết quả thực tế. Khi test đỏ, thông báo lỗi sẽ thế nào?",
+    "options": [
+      "Expected và Actual bị đảo chỗ",
+      "Test luôn qua dù kết quả sai",
+      "Test không biên dịch được",
+      "Thông báo in ra y như viết đúng"
+    ],
+    "answer": 1,
+    "explain": "Assert.Equal nhận giá trị mong đợi trước, thực tế sau. Viết ngược thì test vẫn qua hay đỏ đúng như cũ, nhưng dòng Expected lại in kết quả thực tế nên dễ đọc nhầm."
   }
 ]
 ```

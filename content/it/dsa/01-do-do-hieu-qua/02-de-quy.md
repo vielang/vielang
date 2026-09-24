@@ -157,10 +157,10 @@ decimal Sum(List<decimal> items, int index)
     "options": [
       "A",
       "B",
-      "Cả ba cùng lúc",
-      "C"
+      "C",
+      "Cả ba cùng lúc"
     ],
-    "answer": 4,
+    "answer": 3,
     "explain": "Call stack vào sau ra trước: C nằm trên cùng nên xong trước, rồi mới tới B, rồi A."
   },
   {
@@ -168,10 +168,10 @@ decimal Sum(List<decimal> items, int index)
     "options": [
       "List quá nhiều phần tử",
       "Thiếu try/catch",
-      "Đệ quy không bao giờ tới điểm dừng",
-      "Dùng vòng lặp for lồng nhau"
+      "Dùng vòng lặp for lồng nhau",
+      "Đệ quy không bao giờ tới điểm dừng"
     ],
-    "answer": 3,
+    "answer": 4,
     "explain": "Mỗi lời gọi chiếm một tầng trên call stack. Không dừng thì stack đầy và chương trình sập."
   }
 ]

@@ -3,12 +3,10 @@ title: Đóng gói
 minutes: 5
 ---
 
-Ở khoá C# Core bạn đã viết class có property và constructor. Khoá này học
-cách tổ chức nhiều class cho dễ sửa.
-
-Tồn kho của một sản phẩm bỗng thành số âm. Tìm trong code thì thấy năm chỗ
-khác nhau cùng gán thẳng `product.Stock = ...`, và một chỗ quên kiểm tra. Đóng
-gói giải quyết việc này bằng cách chỉ cho sửa dữ liệu qua đúng một cửa.
+Khoá này học cách tổ chức nhiều class cho dễ sửa, bắt đầu từ đóng gói. Tồn
+kho của một sản phẩm bỗng thành số âm vì năm chỗ cùng gán thẳng
+`product.Stock = ...` và một chỗ quên kiểm tra. Đóng gói chặn việc này bằng
+cách chỉ cho sửa dữ liệu qua đúng một cửa.
 
 ## Khái niệm
 
@@ -43,11 +41,21 @@ class Product
 
     public void Restock(int quantity)
     {
+        if (quantity <= 0)
+        {
+            throw new ArgumentException(
+                "Số lượng phải lớn hơn 0");
+        }
         Stock = Stock + quantity;
     }
 
     public void Sell(int quantity)
     {
+        if (quantity <= 0)
+        {
+            throw new ArgumentException(
+                "Số lượng phải lớn hơn 0");
+        }
         if (quantity > Stock)
         {
             throw new InvalidOperationException(
@@ -62,8 +70,8 @@ class Product
   `Product` mới gán được. Khác `{ get; }` ở bài Property và constructor
   (chỉ gán trong constructor), `private set` cho method của class gán lại
   bao nhiêu lần cũng được.
-- Muốn đổi tồn kho thì phải gọi `Restock` hoặc `Sell`. Quy tắc "không bán quá
-  số đang có" nằm đúng một chỗ, trong `Sell`.
+- Muốn đổi tồn kho thì phải gọi `Restock` hoặc `Sell`. Quy tắc "số lượng
+  phải dương, không bán quá số đang có" chỉ nằm trong hai method này.
 - Không nơi nào khác trong chương trình làm `Stock` âm được nữa.
 
 ## Thử ngay
@@ -154,32 +162,32 @@ class Cup
     "options": [
       "Chạy được, Balance thành 1000",
       "Lỗi khi chạy",
-      "Lỗi compile vì set là private",
-      "Chạy được nhưng Balance không đổi"
+      "Chạy được nhưng Balance không đổi",
+      "Lỗi compile"
     ],
-    "answer": 3,
+    "answer": 4,
     "explain": "private set nghĩa là chỉ code bên trong Account mới gán được Balance. Bên ngoài chỉ đọc."
   },
   {
     "prompt": "Quy tắc \"giảm giá không quá 50%\" nên đặt ở đâu?",
     "options": [
-      "Trong method ApplyDiscount của class Product",
-      "Ở mọi nơi gọi, trước khi gán Price",
-      "Trong file ghi chú cho team",
-      "Không cần kiểm tra"
+      "Trong method ApplyDiscount của Product",
+      "Ở từng nơi gọi, trước khi gán Price",
+      "Chỉ trong constructor của Product",
+      "Trong một method static ở Program.cs"
     ],
     "answer": 1,
-    "explain": "Đặt quy tắc trong method của class thì chỉ có một chỗ phải viết và không nơi nào bỏ qua được."
+    "explain": "Đặt quy tắc trong method của class thì chỉ có một chỗ phải viết và không nơi nào bỏ qua được. Constructor chỉ chạy một lần nên không chặn được lần giảm giá sau."
   },
   {
     "prompt": "Một field khai báo int _count; mà không ghi access modifier. Nó là gì?",
     "options": [
       "public",
+      "private",
       "Tuỳ project",
-      "Không hợp lệ, bắt buộc phải ghi",
-      "private"
+      "Không hợp lệ, bắt buộc phải ghi"
     ],
-    "answer": 4,
+    "answer": 2,
     "explain": "Thành viên trong class không ghi access modifier thì mặc định là private."
   }
 ]

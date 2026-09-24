@@ -146,9 +146,9 @@ công ty, không phải để giải thích code làm **gì**.
   {
     "prompt": "Biến bool cho biết đơn hàng đã thanh toán nên đặt tên thế nào?",
     "options": [
-      "paid2",
+      "paidOrder",
       "isPaid",
-      "flag",
+      "orderFlag",
       "p"
     ],
     "answer": 2,
@@ -157,24 +157,24 @@ công ty, không phải để giải thích code làm **gì**.
   {
     "prompt": "Guard clause giúp gì cho method có nhiều if lồng nhau?",
     "options": [
-      "Chạy nhanh hơn",
-      "Bớt được tham số",
-      "Xử lý trường hợp đặc biệt rồi return ngay, phần còn lại không phải lồng trong if",
-      "Không cần kiểm điều kiện nữa"
+      "Method chạy nhanh hơn hẳn",
+      "Bớt được tham số của method",
+      "Bớt tầng if lồng nhau",
+      "Không phải kiểm điều kiện nữa"
     ],
     "answer": 3,
-    "explain": "Mỗi trường hợp đặc biệt thoát sớm, nên code chính nằm thẳng hàng, dễ đọc."
+    "explain": "Guard clause xử lý trường hợp đặc biệt rồi return ngay, nên phần còn lại không phải lồng trong if."
   },
   {
     "prompt": "Comment nào đáng giữ lại?",
     "options": [
-      "// cộng 1 vào i",
-      "// biến x là tổng tiền",
-      "// lặp qua danh sách",
-      "// Theo quy định thuế, hoá đơn dưới 200.000 không cần in VAT"
+      "// cộng 1 vào biến đếm i",
+      "// biến x là tổng tiền của đơn hàng",
+      "// lặp qua danh sách sản phẩm",
+      "// hoá đơn dưới 200.000 miễn VAT"
     ],
     "answer": 4,
-    "explain": "Comment tốt giải thích lý do mà code không tự nói được, như một quy định nghiệp vụ."
+    "explain": "Comment tốt giải thích lý do mà code không tự nói được, như một quy định thuế. Ba comment kia chỉ nhắc lại code, hoặc chữa cho tên dở."
   }
 ]
 ```

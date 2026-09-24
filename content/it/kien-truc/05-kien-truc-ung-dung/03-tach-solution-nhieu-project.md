@@ -24,14 +24,18 @@ Trong thư mục chứa `ShopApi` và `ShopDesk`:
 
 ```bash
 dotnet new sln -n Shop
-dotnet new classlib -o Shop.Core
-dotnet new classlib -o Shop.Infrastructure
-dotnet sln add Shop.Core Shop.Infrastructure ShopApi ShopDesk ShopApi.Tests
+dotnet new classlib -f net9.0 -o Shop.Core
+dotnet new classlib -f net9.0 -o Shop.Infrastructure
+dotnet sln add Shop.Core Shop.Infrastructure
+dotnet sln add ShopApi ShopDesk ShopApi.Tests
 dotnet add Shop.Infrastructure reference Shop.Core
 dotnet add ShopApi reference Shop.Core Shop.Infrastructure
 dotnet add ShopDesk reference Shop.Core Shop.Infrastructure
 dotnet build
 ```
+
+`-f net9.0` cho class library cùng framework với `ShopApi`. Thiếu nó, SDK
+.NET 10 tạo project `net10.0`, và project `net9.0` không tham chiếu được.
 
 Sau đó chuyển code:
 
@@ -61,8 +65,8 @@ public class Product
 }
 ```
 
-- `namespace Shop.Core;` như bài Ứng dụng WinForms đầu tiên. Project khác
-  dùng bằng `using Shop.Core;`.
+- `namespace Shop.Core;` như bài Ứng dụng WinForms đầu tiên. File nào trong
+  `ShopApi`, `ShopDesk` dùng `Product` thì thêm `using Shop.Core;` ở đầu.
 - `ShopApi` là `net9.0`, `ShopDesk` là `net9.0-windows`, cùng tham chiếu một
   `Shop.Core` `net9.0` được.
 - Sửa `Product` một lần, `dotnet build` là cả API lẫn app kho cùng nhận.
@@ -102,8 +106,9 @@ an assembly reference?)
 ```
 
 Lỗi. `Shop.Core` không có package EF Core, nên không thể lỡ tay dùng database
-trong lõi. Quy tắc "lõi không biết database" giờ được compiler kiểm hộ. Xoá
-`Bad.cs` đi.
+trong lõi.
+
+Quy tắc "lõi không biết database" giờ được compiler kiểm hộ. Xoá `Bad.cs` đi.
 
 </details>
 
@@ -147,35 +152,35 @@ Tham chiếu vòng cũng bị chặn: `Shop.Core` tham chiếu ngược lại
   {
     "prompt": "ShopDesk cần dùng OrderService nằm trong Shop.Core. Lệnh nào đúng?",
     "options": [
-      "dotnet add Shop.Core reference ShopDesk",
       "dotnet add ShopDesk reference Shop.Core",
+      "dotnet add Shop.Core reference ShopDesk",
       "dotnet sln add OrderService",
       "Chép OrderService sang ShopDesk"
     ],
-    "answer": 2,
+    "answer": 1,
     "explain": "Project cần dùng thì tham chiếu tới project chứa class: ShopDesk tham chiếu Shop.Core."
   },
   {
     "prompt": "ShopApi báo CS0122 'Product' is inaccessible due to its protection level. Nguyên nhân?",
     "options": [
-      "Thiếu dotnet build",
-      "Sai namespace",
-      "Chưa cài EF Core",
-      "Class Product trong Shop.Core thiếu public"
+      "Chưa chạy lại dotnet build",
+      "Product thiếu public",
+      "Thiếu using Shop.Core",
+      "Chưa thêm reference"
     ],
-    "answer": 4,
-    "explain": "Class không ghi access modifier là internal, project khác không thấy được."
+    "answer": 2,
+    "explain": "Class không ghi access modifier là internal, project khác không thấy được. Thiếu using hay reference thì báo CS0246, không phải CS0122."
   },
   {
     "prompt": "Lợi ích lớn nhất của việc tách Shop.Core thành project riêng là gì?",
     "options": [
-      "Build nhanh hơn",
-      "Không cần test nữa",
-      "API và WinForms dùng chung một bản code nghiệp vụ, và lõi không dùng nhầm database được",
-      "Không cần namespace"
+      "Build cả solution nhanh hơn",
+      "Không phải viết test cho Core",
+      "Một bản code nghiệp vụ chung",
+      "Không cần namespace nữa"
     ],
     "answer": 3,
-    "explain": "Code chung chỉ có một bản, và compiler giữ đúng chiều phụ thuộc của Clean Architecture."
+    "explain": "API và WinForms dùng chung một bản code nghiệp vụ. Thêm vào đó, compiler giữ đúng chiều phụ thuộc: lõi không dùng nhầm database được."
   }
 ]
 ```

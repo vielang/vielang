@@ -115,7 +115,7 @@ public class ProductRequest
 - `id` của sản phẩm cần sửa lấy từ URL, không lấy từ body.
 - `Find` gom phần tìm kiếm vào một chỗ cho cả ba action dùng.
 - Để gọn, ví dụ trả thẳng `Product`. Dự án thật nên trả qua DTO response như
-  bài trước.
+  bài DTO.
 
 ## Thử ngay
 
@@ -164,6 +164,14 @@ public class UpdateRequest
 
 Chỉ lấy `id` từ URL (`[HttpPut("{id}")]`). DTO dùng để sửa không có `Id`.
 
+```csharp
+// ĐÚNG — id chỉ nằm ở URL
+public class UpdateRequest
+{
+    public string Name { get; set; } = "";
+}
+```
+
 **Sửa hay xoá mà không kiểm tra tồn tại.** Không tìm thấy vẫn trả 204, client
 tưởng đã thành công.
 
@@ -180,31 +188,31 @@ tưởng đã thành công.
     "prompt": "PUT /api/products/5 với body hợp lệ, nhưng không có sản phẩm số 5. Nên trả gì?",
     "options": [
       "204 No Content",
-      "201 Created",
       "404 Not Found",
+      "201 Created",
       "200 OK"
     ],
-    "answer": 3,
+    "answer": 2,
     "explain": "Không có gì để sửa nên trả 404. Trả 204 làm client tưởng đã sửa thành công."
   },
   {
     "prompt": "Action Delete chỉ cần báo thành công, không trả dữ liệu. Kiểu trả về nào hợp lý?",
     "options": [
-      "IActionResult",
       "ActionResult<Product>",
       "List<Product>",
+      "IActionResult",
       "string"
     ],
-    "answer": 1,
+    "answer": 3,
     "explain": "IActionResult dùng khi chỉ trả status code như NoContent() hay NotFound(), không có dữ liệu kèm theo."
   },
   {
     "prompt": "Tạo 3 sản phẩm rồi tắt server và chạy lại. Với cách lưu trong bài, GET /api/products/1 trả gì?",
     "options": [
       "200 và sản phẩm số 1",
-      "201 Created",
-      "500 Internal Server Error",
-      "404 vì dữ liệu trong bộ nhớ đã mất"
+      "201 vì sản phẩm được tạo lại",
+      "500 vì list bị null",
+      "404 vì dữ liệu đã mất"
     ],
     "answer": 4,
     "explain": "List static chỉ sống trong bộ nhớ của tiến trình. Tắt server là mất, nên cần database."

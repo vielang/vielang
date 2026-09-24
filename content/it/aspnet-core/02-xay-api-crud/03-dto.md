@@ -143,6 +143,18 @@ public class ItemsController : ControllerBase
 }
 ```
 
+```csharp
+// ĐÚNG — trả qua DTO, không có CostPrice
+using Microsoft.AspNetCore.Mvc;
+
+public class ItemsController : ControllerBase
+{
+    [HttpGet("{id}")]
+    public ProductResponse GetById(int id) =>
+        new ProductResponse { Id = id, Name = "Pen" };
+}
+```
+
 **Nhận thẳng class bên trong từ body.** Client gửi thêm `id` hay `costPrice`
 là gán được luôn. Luôn nhận qua DTO chỉ chứa những gì client được phép gửi,
 như `CreateProductRequest` ở trên.
@@ -160,21 +172,21 @@ như `CreateProductRequest` ở trên.
   {
     "prompt": "Class User có PasswordHash. Action GET /api/users/1 nên trả về kiểu gì?",
     "options": [
-      "User",
-      "string chứa toàn bộ User",
-      "UserResponse không có PasswordHash",
-      "object"
+      "User, vì đó là dữ liệu gốc",
+      "string chứa JSON của User",
+      "object để linh hoạt kiểu",
+      "UserResponse bỏ PasswordHash"
     ],
-    "answer": 3,
+    "answer": 4,
     "explain": "Trả qua DTO chỉ có những trường client được xem. Trả thẳng User là lộ PasswordHash."
   },
   {
     "prompt": "CreateOrderRequest không có property Status. Client gửi JSON kèm \"status\": \"Paid\". Chuyện gì xảy ra?",
     "options": [
       "Trường status bị bỏ qua",
-      "Đơn hàng được tạo với trạng thái Paid",
-      "Lỗi 500",
-      "Lỗi compile"
+      "Đơn được tạo với trạng thái Paid",
+      "Trả 400 vì JSON có trường lạ",
+      "Trả 500 khi đọc JSON"
     ],
     "answer": 1,
     "explain": "Model binding chỉ gán các property có trong DTO. Trường thừa trong JSON bị bỏ qua."
@@ -182,13 +194,13 @@ như `CreateProductRequest` ở trên.
   {
     "prompt": "Vì sao DTO request để tạo sản phẩm không nên có Id?",
     "options": [
-      "Vì Id làm JSON dài hơn",
-      "Vì C# không cho đặt tên Id",
-      "Vì Id không phải kiểu int",
-      "Vì Id do server cấp, client không được tự đặt"
+      "Vì [ApiController] trả 400 khi có Id",
+      "Vì Id phải do server cấp",
+      "Vì model binding không gán được Id",
+      "Vì Id chỉ được lấy từ route"
     ],
-    "answer": 4,
-    "explain": "Client tự đặt Id có thể ghi đè hoặc trùng dữ liệu khác. Id phải do server quyết định."
+    "answer": 2,
+    "explain": "Client tự đặt Id có thể ghi đè hoặc trùng dữ liệu khác, nên Id phải do server quyết định. Model binding vẫn gán được Id nếu DTO có property này."
   }
 ]
 ```

@@ -3,8 +3,8 @@ title: null và nullable
 minutes: 5
 ---
 
-Bạn tìm khách hàng theo số điện thoại, nhưng chưa có khách nào dùng số đó. Kết
-quả là không có khách nào. C# dùng `null` để diễn tả "không có gì", và `null`
+Bạn tìm khách hàng theo số điện thoại, nhưng chưa có khách nào dùng số đó nên
+kết quả là không có ai. C# dùng `null` để diễn tả "không có gì", và `null`
 cũng là nguồn gây lỗi phổ biến nhất khi chương trình chạy.
 
 ## Khái niệm
@@ -13,7 +13,8 @@ cũng là nguồn gây lỗi phổ biến nhất khi chương trình chạy.
 
 ❓ **Nullable**: kiểu có dấu `?` phía sau, như `int?` hay `Customer?`, cho biết biến được phép mang giá trị `null`.
 
-Reference type mặc định là `null` khi chưa trỏ tới object nào. Value type như
+Field hoặc phần tử array kiểu reference type chưa gán thì mặc định là `null`,
+còn biến khai báo trong method thì phải gán trước khi dùng. Value type như
 `int` thì không nhận `null`, trừ khi viết thành `int?`.
 
 ## Ví dụ
@@ -135,23 +136,23 @@ int? stock = null;
     "prompt": "int? points = null; int total = points ?? 10; Giá trị của total là gì?",
     "options": [
       "null",
-      "0",
       "10",
+      "0",
       "Lỗi compile"
     ],
-    "answer": 3,
+    "answer": 2,
     "explain": "points là null nên ?? lấy vế phải là 10."
   },
   {
     "prompt": "Chương trình dừng với NullReferenceException ở dòng customer.Name.ToUpper(). Nguyên nhân nhiều khả năng nhất là gì?",
     "options": [
-      "customer hoặc customer.Name đang là null",
-      "Name là string nên không gọi ToUpper được",
+      "string không có method ToUpper",
       "Thiếu dấu ; ở cuối dòng",
-      "ToUpper chỉ dùng được với chữ tiếng Anh"
+      "customer hoặc Name đang là null",
+      "Name đang là chuỗi rỗng \"\""
     ],
-    "answer": 1,
-    "explain": "NullReferenceException xảy ra khi gọi thành viên trên một giá trị null. Cần kiểm tra null hoặc dùng ?."
+    "answer": 3,
+    "explain": "NullReferenceException xảy ra khi gọi thành viên trên một giá trị null. Chuỗi rỗng vẫn là một object nên gọi ToUpper được."
   },
   {
     "prompt": "Khai báo nào hợp lệ?",

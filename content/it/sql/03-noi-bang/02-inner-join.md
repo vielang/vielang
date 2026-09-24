@@ -94,6 +94,13 @@ FROM orders o, customers c;
 
 Luôn viết `JOIN ... ON` để điều kiện nối nằm ngay cạnh bảng được nối.
 
+```sql
+-- ĐÚNG — 4 dòng, mỗi đơn đi với đúng khách của nó
+SELECT o.order_id, c.name
+FROM orders o
+JOIN customers c ON c.customer_id = o.customer_id;
+```
+
 ## Tóm tắt
 
 - `JOIN bảng ON điều_kiện` ghép dòng của hai bảng, chỉ giữ cặp khớp nhau.
@@ -106,35 +113,35 @@ Luôn viết `JOIN ... ON` để điều kiện nối nằm ngay cạnh bảng �
   {
     "prompt": "Muốn lấy tên sản phẩm cho mỗi dòng hàng. Điều kiện ON nào đúng?",
     "options": [
+      "ON p.product_id = l.product_id",
       "ON l.line_id = p.product_id",
       "ON l.order_id = p.product_id",
-      "ON p.product_id = l.product_id",
       "ON p.name = l.quantity"
     ],
-    "answer": 3,
+    "answer": 1,
     "explain": "order_lines.product_id là khoá ngoại trỏ tới products.product_id. Nối hai cột này với nhau."
   },
   {
-    "prompt": "Bảng orders có 4 dòng, customers có 4 dòng. SELECT * FROM orders, customers; trả về bao nhiêu dòng?",
+    "prompt": "Đơn 1 có 2 dòng hàng. Chạy SELECT o.order_id, l.product_id FROM orders o JOIN order_lines l ON l.order_id = o.order_id; thì đơn 1 xuất hiện mấy lần?",
     "options": [
-      "16",
-      "4",
-      "8",
+      "1",
+      "2",
+      "0",
       "Báo lỗi"
     ],
-    "answer": 1,
-    "explain": "Không có điều kiện nối thì mỗi dòng bảng này ghép với mọi dòng bảng kia: 4 × 4 = 16."
+    "answer": 2,
+    "explain": "JOIN tạo một dòng cho mỗi cặp khớp nhau. Đơn 1 khớp với 2 dòng hàng nên hiện 2 lần, mỗi lần kèm một product_id."
   },
   {
     "prompt": "SELECT customer_id FROM orders o JOIN customers c ON c.customer_id = o.customer_id; báo lỗi ORA-00918. Vì sao?",
     "options": [
-      "Thiếu ORDER BY",
+      "Thiếu ORDER BY cuối câu",
       "JOIN phải viết là INNER JOIN",
-      "Bí danh phải có AS",
-      "Cả hai bảng đều có customer_id, phải ghi o.customer_id hoặc c.customer_id"
+      "customer_id có ở cả hai bảng",
+      "Bí danh bảng phải có AS"
     ],
-    "answer": 4,
-    "explain": "Cột trùng tên ở hai bảng thì Oracle không biết lấy của bảng nào. Ghi rõ bí danh trước tên cột."
+    "answer": 3,
+    "explain": "Cột trùng tên ở hai bảng thì Oracle không biết lấy của bảng nào. Ghi rõ bí danh trước tên cột: o.customer_id hoặc c.customer_id."
   }
 ]
 ```

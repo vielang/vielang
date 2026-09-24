@@ -14,9 +14,10 @@ database.
 ⚠️ **ErrorProvider**: component hiện biểu tượng lỗi cạnh một control, rê chuột vào biểu tượng thì thấy lời nhắn.
 
 Dữ liệu sản phẩm được kiểm ở ba nơi. Form báo sớm cho người nhập. API có
-`[Required]`, `[Range]` như bài Validation của khoá ASP.NET Core. Database có
-ràng buộc như `NOT NULL`, `CHECK` ở bài CREATE TABLE và ràng buộc của khoá
-SQL, làm chốt chặn cuối cùng cho những gì bảng đã khai báo.
+`[Required]`, `[Range]` như bài Validation của khoá ASP.NET Core.
+
+Database có ràng buộc như `NOT NULL`, `CHECK` ở bài CREATE TABLE và ràng
+buộc của khoá SQL, là chốt chặn cuối cùng.
 
 ```mermaid Đường ghi nào cũng phải qua ràng buộc của database
 flowchart LR
@@ -144,35 +145,35 @@ báo sớm, còn ràng buộc trong database vẫn phải giữ.
   {
     "prompt": "Ô số lượng là NumericUpDown chưa đặt Maximum. Nhân viên gõ 250 rồi bấm sang ô khác. Value là bao nhiêu?",
     "options": [
+      "100",
       "250",
       "0",
-      "100",
       "Báo lỗi và giữ nguyên chữ 250"
     ],
-    "answer": 3,
+    "answer": 1,
     "explain": "Maximum mặc định là 100, giá trị vượt quá bị kéo về đúng Maximum."
   },
   {
     "prompt": "Form đã kiểm giá > 0. Bảng products có cần thêm CHECK (price > 0) nữa không?",
     "options": [
-      "Có, vì API hay câu SQL gõ tay không đi qua form",
       "Không, kiểm hai lần là thừa",
+      "Có, vẫn nên thêm",
       "Không, CHECK làm chậm database",
       "Không, NumericUpDown đã chặn số âm"
     ],
-    "answer": 1,
-    "explain": "Form chỉ chặn được dữ liệu đi qua chính nó. Ràng buộc trong database chặn mọi đường ghi."
+    "answer": 2,
+    "explain": "Form chỉ chặn được dữ liệu đi qua chính nó. API hay câu SQL gõ tay không đi qua form, còn ràng buộc trong database chặn mọi đường ghi."
   },
   {
     "prompt": "Handler gọi SetError cho ô tên ở lần bấm trước. Lần này tên đã đúng. Muốn biểu tượng lỗi cũ biến mất, cần gì?",
     "options": [
       "Không cần gì, nó tự biến mất",
-      "Tạo ErrorProvider mới",
-      "Đóng form rồi mở lại",
-      "Gọi Clear() hoặc SetError(ô tên, \"\") đầu handler"
+      "Tạo một ErrorProvider mới",
+      "Gọi Clear() đầu handler",
+      "Gọi Refresh() của form"
     ],
-    "answer": 4,
-    "explain": "ErrorProvider giữ lỗi tới khi bị xoá. Clear() xoá tất cả, SetError với chuỗi rỗng xoá lỗi của một control."
+    "answer": 3,
+    "explain": "ErrorProvider giữ lỗi tới khi bị xoá. Clear() xoá tất cả, SetError với chuỗi rỗng xoá lỗi của một control. Tạo ErrorProvider mới thì cái cũ vẫn giữ biểu tượng."
   }
 ]
 ```

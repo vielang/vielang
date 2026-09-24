@@ -87,14 +87,14 @@ năng làm dở vào `main`.
 
 ```bash
 # SAI — không kiểm tra nhánh trước khi commit
-git commit -am "Phí ship làm dở"
+git commit -am "Phí giao hàng làm dở"
 ```
 
 ```bash
 # ĐÚNG — xem nhánh hiện tại, tạo nhánh riêng nếu cần
 git branch --show-current
 git switch -c phi-ship
-git commit -am "Phí ship làm dở"
+git commit -am "Phí giao hàng làm dở"
 ```
 
 `git status` cũng in tên nhánh ở dòng đầu: `On branch main`.
@@ -113,32 +113,32 @@ git commit -am "Phí ship làm dở"
     "options": [
       "Commit của main gộp vào phi-ship",
       "Hai nhánh đổi chỗ cho nhau",
-      "Commit của phi-ship gộp vào main",
-      "Tạo nhánh thứ ba"
+      "Tạo nhánh thứ ba",
+      "Commit của phi-ship gộp vào main"
     ],
-    "answer": 3,
+    "answer": 4,
     "explain": "merge luôn gộp nhánh được nêu tên vào nhánh đang đứng."
   },
   {
     "prompt": "Merge báo \"Fast-forward\". Điều đó nghĩa là gì?",
     "options": [
-      "Nhánh đích không có commit mới từ lúc tách, Git chỉ kéo nó tới commit cuối của nhánh kia",
-      "Merge bị bỏ qua",
-      "Có conflict cần sửa",
-      "Git xoá nhánh kia"
+      "Nhánh đích chỉ cần dời lên phía trước",
+      "Hai nhánh đã có nội dung giống hệt",
+      "Git tạo thêm một merge commit mới",
+      "Git gộp mà bỏ qua các conflict"
     ],
     "answer": 1,
-    "explain": "Không có gì phải trộn, nên Git chỉ dời nhánh đích lên phía trước."
+    "explain": "Nhánh đích không có commit mới từ lúc tách, nên không có gì phải trộn. Git chỉ dời nhánh đích tới commit cuối của nhánh kia."
   },
   {
     "prompt": "Lệnh nào tạo nhánh fix-gia và chuyển sang nó ngay?",
     "options": [
       "git merge fix-gia",
+      "git switch -c fix-gia",
       "git branch --show-current",
-      "git commit -am fix-gia",
-      "git switch -c fix-gia"
+      "git commit -am fix-gia"
     ],
-    "answer": 4,
+    "answer": 2,
     "explain": "switch -c tạo nhánh mới từ chỗ đang đứng rồi chuyển sang nhánh đó."
   }
 ]

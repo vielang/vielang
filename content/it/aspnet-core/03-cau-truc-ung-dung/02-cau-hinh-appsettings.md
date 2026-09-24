@@ -11,7 +11,7 @@ phải build lại. ASP.NET Core đọc chúng từ file cấu hình.
 
 ⚙️ **appsettings.json**: file JSON chứa cấu hình của ứng dụng, được đọc tự động khi khởi động.
 
-🌍 **Môi trường (environment)**: tên chế độ đang chạy như `Development` hay `Production`. File `appsettings.{Môi trường}.json` được đọc sau và ghi đè giá trị của `appsettings.json`.
+🌍 **Môi trường (environment)**: tên chế độ đang chạy như `Development` hay `Production`, quyết định file `appsettings.{Môi trường}.json` nào được đọc sau để ghi đè `appsettings.json`.
 
 ```mermaid File của môi trường được đọc sau nên ghi đè key trùng
 flowchart TD
@@ -98,7 +98,7 @@ có sẵn trong project, thêm:
 }
 ```
 
-Chạy lại server rồi gọi `curl http://localhost:5000/api/shop`.
+Chạy lại server rồi gọi `curl -i http://localhost:5000/api/shop`.
 
 **Đoán trước khi chạy:** `dotnet run` chạy ở môi trường `Development`. Số
 món tối đa in ra là 20 hay 5?
@@ -106,7 +106,9 @@ món tối đa in ra là 20 hay 5?
 <details>
 <summary>Xem kết quả</summary>
 
-```text
+```http
+HTTP/1.1 200 OK
+
 Shop An: tối đa 5 món
 ```
 
@@ -124,6 +126,11 @@ Là 5. File của môi trường `Development` được đọc sau và ghi đè
 // SAI — thiếu chữ s, max luôn bằng 0
 int max = _config.GetValue<int>(
     "Shop:MaxItemPerOrder");
+```
+
+```csharp
+// ĐÚNG — gõ sai tên property thì compiler báo
+int max = options.Value.MaxItemsPerOrder;
 ```
 
 Đọc qua class `ShopOptions` như ở trên thì tên key chỉ khai báo một lần,
@@ -147,10 +154,10 @@ server, lưu bằng biến môi trường.
     "options": [
       "Email.Smtp.Port",
       "Port",
-      "Email:Smtp:Port",
-      "Email/Smtp/Port"
+      "Email/Smtp/Port",
+      "Email:Smtp:Port"
     ],
-    "answer": 3,
+    "answer": 4,
     "explain": "Dấu : nối tên các cấp trong JSON."
   },
   {
@@ -168,11 +175,11 @@ server, lưu bằng biến môi trường.
     "prompt": "Chuỗi kết nối database có mật khẩu thật. Nên lưu ở đâu khi chạy trên server?",
     "options": [
       "appsettings.json",
+      "Biến môi trường trên server",
       "Viết cứng trong Program.cs",
-      "appsettings.Development.json",
-      "Biến môi trường trên server"
+      "appsettings.Development.json"
     ],
-    "answer": 4,
+    "answer": 2,
     "explain": "Các file appsettings được commit lên git. Bí mật trên server nên để trong biến môi trường hoặc kho bí mật."
   }
 ]

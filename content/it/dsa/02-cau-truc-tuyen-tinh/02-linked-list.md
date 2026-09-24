@@ -46,16 +46,11 @@ class Node
 - `Node?` cho phép biến chứa `null`, như `string?` ở bài null và nullable
   của khoá C# Core.
 
-```mermaid Mỗi node chỉ tới node kế tiếp
-flowchart LR
-    A["DH1"] --> B["DH2"] --> C["DH3"] --> N["null"]
-```
-
 | Thao tác | `List<T>` | Linked list |
 |---|---|---|
 | Lấy phần tử thứ `i` | O(1) | O(n), đi từ đầu |
 | Thêm vào đầu | O(n), dời cả list | O(1), đổi một tham chiếu |
-| Thêm vào cuối | O(1) | O(1) nếu giữ node cuối |
+| Thêm vào cuối | O(1) trung bình | O(1) nếu giữ node cuối |
 
 .NET có sẵn `LinkedList<T>` với `AddFirst`, `AddLast`, `RemoveFirst`,
 `RemoveLast`, đều O(1).
@@ -123,18 +118,18 @@ Console.WriteLine(orders[1]);
   {
     "prompt": "Danh sách chờ giao hàng liên tục có đơn gấp chen lên đầu, và hiếm khi cần lấy đơn thứ i. Cấu trúc nào hợp hơn?",
     "options": [
-      "List<T>, vì luôn nhanh hơn",
-      "Array cố định",
-      "Linked list, vì thêm vào đầu là O(1)",
-      "Không cấu trúc nào làm được"
+      "List<T>, thêm bằng Insert(0, x)",
+      "Array, chép sang array mới mỗi lần",
+      "List<T>, Add rồi sắp xếp lại",
+      "Linked list, thêm bằng AddFirst"
     ],
-    "answer": 3,
-    "explain": "Thêm vào đầu linked list chỉ đổi tham chiếu, còn List phải dời mọi phần tử."
+    "answer": 4,
+    "explain": "AddFirst chỉ đổi một tham chiếu, là O(1). Insert(0, x), chép array hay sắp xếp lại đều phải đụng tới mọi phần tử."
   },
   {
     "prompt": "Linked list có 1.000 node. Lấy node thứ 1.000 tốn khoảng bao nhiêu bước?",
     "options": [
-      "1.000 bước, vì phải đi từ đầu theo Next",
+      "1.000 bước",
       "1 bước",
       "10 bước",
       "Không lấy được"
@@ -146,11 +141,11 @@ Console.WriteLine(orders[1]);
     "prompt": "Node cuối của linked list có Next bằng gì?",
     "options": [
       "Chính nó",
+      "null",
       "Node đầu",
-      "Số 0",
-      "null"
+      "Số 0"
     ],
-    "answer": 4,
+    "answer": 2,
     "explain": "Next bằng null báo hiệu không còn node nào phía sau. Vòng duyệt dừng khi gặp null."
   }
 ]

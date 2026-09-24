@@ -126,11 +126,11 @@ var priceLabel = new Label
     "prompt": "Tạo var noteBox = new TextBox(); trong constructor nhưng chạy lên không thấy ô nhập đâu. Thiếu gì?",
     "options": [
       "Thiếu AutoSize = true",
-      "Thiếu Controls.Add(noteBox) hoặc panel.Controls.Add(noteBox)",
       "Thiếu [STAThread]",
+      "Thiếu Controls.Add(noteBox) hoặc panel.Controls.Add(noteBox)",
       "TextBox phải khai báo là field"
     ],
-    "answer": 2,
+    "answer": 3,
     "explain": "Control chỉ hiện khi nằm trong danh sách Controls của form hoặc của một panel đang ở trên form."
   },
   {
@@ -138,21 +138,21 @@ var priceLabel = new Label
     "options": [
       "Nhãn",
       "Ô nhập",
-      "Nút Lưu",
-      "Tuỳ kích thước từng control"
+      "Tuỳ kích thước từng control",
+      "Nút Lưu"
     ],
-    "answer": 3,
+    "answer": 4,
     "explain": "FlowLayoutPanel xếp theo thứ tự Add. Nút Lưu được Add đầu tiên nên nằm trên cùng."
   },
   {
     "prompt": "Kéo cửa sổ to ra, panel vẫn giữ nguyên kích thước nhỏ ở góc. Nên sửa thế nào?",
     "options": [
+      "Đặt Dock = DockStyle.Fill cho panel",
       "Tăng Padding của panel",
       "Đổi FlowDirection",
-      "Thêm AutoSize cho form",
-      "Đặt Dock = DockStyle.Fill cho panel"
+      "Thêm AutoSize cho form"
     ],
-    "answer": 4,
+    "answer": 1,
     "explain": "Dock = DockStyle.Fill làm panel phủ kín form và giãn theo khi cửa sổ đổi kích thước."
   }
 ]

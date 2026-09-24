@@ -46,8 +46,7 @@ foreach (var item in counts)
 
 - Duyệt list đúng một lần, mỗi lần tra và cập nhật dictionary là O(1). Tổng
   cộng O(n).
-- Câu `GROUP BY` kèm `COUNT(*)` ở bài GROUP BY và HAVING của khoá SQL làm
-  đúng việc này.
+- Nếu đã học khoá SQL: câu `GROUP BY` kèm `COUNT(*)` làm đúng việc này.
 
 ## Tìm hai món vừa đủ ngân sách
 
@@ -139,34 +138,34 @@ Console.WriteLine(customers.Contains("An"));
   {
     "prompt": "Cần biết có bao nhiêu mã giảm giá khác nhau trong 10.000 đơn hàng. Cách nào hợp nhất?",
     "options": [
-      "Thêm từng mã vào HashSet rồi đọc Count",
       "Hai vòng for so từng cặp mã",
       "Thêm vào List rồi đọc Count",
-      "Thêm vào Stack rồi Pop hết"
+      "Thêm vào Stack rồi Pop hết",
+      "Thêm từng mã vào HashSet rồi đọc Count"
     ],
-    "answer": 1,
+    "answer": 4,
     "explain": "HashSet bỏ qua mã trùng, Count chính là số mã khác nhau. Tổng cộng O(n)."
   },
   {
     "prompt": "set đã có \"PEN\". Gọi set.Add(\"PEN\") trả về gì?",
     "options": [
+      "False, và set không đổi",
       "True",
       "Ném exception",
-      "False, và set không đổi",
       "True, và set có hai \"PEN\""
     ],
-    "answer": 3,
+    "answer": 1,
     "explain": "HashSet không giữ phần tử trùng. Add báo false để bạn biết phần tử đã có."
   },
   {
     "prompt": "Đếm số lần mỗi từ khoá được tìm kiếm trong một list. Cấu trúc nào hợp nhất?",
     "options": [
       "Queue<string>",
+      "Dictionary<string, int>",
       "HashSet<string>",
-      "List<int>",
-      "Dictionary<string, int>"
+      "List<int>"
     ],
-    "answer": 4,
+    "answer": 2,
     "explain": "Cần gắn mỗi từ khoá với một số đếm, nên dùng Dictionary từ từ khoá sang số lần."
   }
 ]

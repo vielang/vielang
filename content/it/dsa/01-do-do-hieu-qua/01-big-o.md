@@ -17,7 +17,7 @@ bốn, hay gần như không đổi.
 
 | Big-O | Đọc là | Ví dụ | 1.000 phần tử |
 |---|---|---|---|
-| O(1) | hằng số | `list[2]`, `dict[key]` | 1 bước |
+| O(1) | hằng số | `list[2]`, `dict[key]` (trung bình) | 1 bước |
 | O(log n) | logarit | tìm nhị phân trên dãy đã sắp xếp | ~10 bước |
 | O(n) | tuyến tính | duyệt list tìm một tên | 1.000 bước |
 | O(n log n) | n log n | sắp xếp tốt | ~10.000 bước |
@@ -152,11 +152,11 @@ Vì sao `ContainsKey` chỉ tốn một bước là chuyện của chương Bả
     "prompt": "Method duyệt list đơn hàng một lần để tính tổng tiền. Đơn hàng tăng từ 1.000 lên 2.000 thì số bước thế nào?",
     "options": [
       "Không đổi",
-      "Gấp đôi, vì đây là O(n)",
       "Gấp bốn",
+      "Gấp đôi",
       "Tăng thêm đúng 1 bước"
     ],
-    "answer": 2,
+    "answer": 3,
     "explain": "Duyệt một lần là O(n): số bước tăng cùng tỉ lệ với số phần tử."
   },
   {
@@ -173,12 +173,12 @@ Vì sao `ContainsKey` chỉ tốn một bước là chuyện của chương Bả
   {
     "prompt": "Vì sao Big-O đếm số bước thay vì đo bằng giây?",
     "options": [
-      "Vì đo giây quá khó",
-      "Vì C# không đo được thời gian",
-      "Vì số giây phụ thuộc từng máy, còn dáng tăng của số bước thì không",
-      "Vì số bước luôn bằng số giây"
+      "Vì số giây đổi theo máy, dáng tăng số bước thì không",
+      "Vì đo giây cần viết code riêng cho từng thuật toán",
+      "Vì số bước cho biết chính xác chạy mất mấy giây",
+      "Vì hằng số trong số bước quyết định tốc độ"
     ],
-    "answer": 3,
+    "answer": 1,
     "explain": "Cùng một code chạy trên máy nhanh và máy chậm cho số giây khác nhau, nhưng số bước tăng theo n thì như nhau."
   }
 ]

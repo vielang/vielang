@@ -147,32 +147,32 @@ tiên là số âm: `pq.Enqueue(order, -total)`.
   {
     "prompt": "PriorityQueue<string, int> có (A, 5), (B, 1), (C, 3). Dequeue trả về gì?",
     "options": [
-      "A, vì thêm đầu tiên",
+      "A",
+      "B",
       "C",
-      "B, vì mức ưu tiên nhỏ nhất",
-      "A, vì mức lớn nhất"
+      "Không đoán trước được"
     ],
-    "answer": 3,
-    "explain": "PriorityQueue của .NET là min-heap: Dequeue lấy phần tử có mức ưu tiên nhỏ nhất."
+    "answer": 2,
+    "explain": "PriorityQueue của .NET là min-heap: Dequeue lấy phần tử có mức ưu tiên nhỏ nhất, không theo thứ tự thêm."
   },
   {
     "prompt": "Trong min-heap lưu bằng array, phần tử nhỏ nhất nằm ở đâu?",
     "options": [
-      "Ô 0, tức gốc",
       "Ô cuối cùng",
       "Ô giữa",
+      "Ô 0, tức gốc",
       "Không biết trước được"
     ],
-    "answer": 1,
+    "answer": 3,
     "explain": "Cha luôn nhỏ hơn hoặc bằng con, nên gốc ở ô 0 là nhỏ nhất."
   },
   {
     "prompt": "Vì sao Enqueue vào heap là O(log n)?",
     "options": [
       "Vì phải sắp xếp lại cả array",
-      "Vì heap dùng hash table",
-      "Vì heap là linked list",
-      "Vì phần tử mới chỉ đổi chỗ đi lên qua tối đa log n tầng"
+      "Vì phải tìm nhị phân chỗ chèn",
+      "Vì heap chia đôi array mỗi lần",
+      "Vì phần tử mới chỉ đi lên log n tầng"
     ],
     "answer": 4,
     "explain": "Heap là cây nhị phân gần đầy, cao khoảng log n. Phần tử mới đi từ đáy lên, mỗi bước một tầng."

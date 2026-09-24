@@ -11,9 +11,9 @@ sẵn nào chứa hết được. Bài này hướng dẫn bạn tự tạo ki�
 
 📐 **Class**: kiểu dữ liệu do bạn tự định nghĩa, gom dữ liệu và hành vi liên quan vào một chỗ.
 
-📦 **Object**: một giá trị cụ thể được tạo ra từ class bằng từ khoá `new`.
+🧊 **Object**: một giá trị cụ thể được tạo ra từ class bằng từ khoá `new`.
 
-🏷️ **Field**: biến khai báo bên trong class, mỗi object giữ một bản riêng.
+📎 **Field**: biến khai báo bên trong class, mỗi object giữ một bản riêng.
 
 Class chỉ là phần mô tả. Muốn dùng thì phải tạo object từ nó, và từ một
 class tạo bao nhiêu object cũng được.
@@ -111,34 +111,34 @@ pen.Price = 5000;
   {
     "prompt": "Class Customer có field public string Name = \"\". Chạy: var a = new Customer(); var b = new Customer(); a.Name = \"An\"; Console.WriteLine(b.Name); In ra gì?",
     "options": [
-      "An",
       "Chuỗi rỗng",
+      "An",
       "null",
       "Lỗi compile"
     ],
-    "answer": 2,
+    "answer": 1,
     "explain": "a và b là hai object riêng. Gán Name cho a không đụng tới b, nên b.Name vẫn là giá trị khởi tạo \"\"."
   },
   {
     "prompt": "Trong dòng var cart = new Cart(); thì Cart và cart lần lượt là gì?",
     "options": [
       "Cả hai đều là class",
+      "Cart là class, cart giữ object",
       "Cart là object, cart là class",
-      "Cart là class, cart là biến giữ object vừa tạo",
       "Cả hai đều là object"
     ],
-    "answer": 3,
+    "answer": 2,
     "explain": "Cart là tên class. new Cart() tạo một object, và biến cart giữ object đó."
   },
   {
     "prompt": "Field khác biến khai báo bên trong method ở điểm nào?",
     "options": [
-      "Field thuộc về object, mỗi object giữ một bản riêng",
-      "Field chỉ chứa được số",
+      "Field chỉ chứa được kiểu số",
       "Field không cần khai báo kiểu",
-      "Field dùng chung cho mọi object của class"
+      "Mỗi object giữ một bản field riêng",
+      "Field dùng chung cho mọi object"
     ],
-    "answer": 1,
+    "answer": 3,
     "explain": "Field nằm trong object và tồn tại cùng object. Biến trong method chỉ sống trong lúc method chạy."
   }
 ]

@@ -154,34 +154,34 @@ public class OrdersController : ControllerBase
   {
     "prompt": "Action xoá sản phẩm thành công và không cần trả dữ liệu gì. Nên trả gì?",
     "options": [
+      "NoContent()",
       "Ok(null)",
       "NotFound()",
-      "NoContent()",
       "BadRequest()"
     ],
-    "answer": 3,
+    "answer": 1,
     "explain": "NoContent() trả 204: thành công và không có body. Đây là cách phổ biến cho DELETE."
   },
   {
     "prompt": "Action trả ActionResult<Order>. Không tìm thấy đơn hàng thì viết gì?",
     "options": [
-      "return NotFound();",
       "return null;",
+      "return NotFound();",
       "return Ok();",
       "throw new Exception(\"Không có\");"
     ],
-    "answer": 1,
+    "answer": 2,
     "explain": "NotFound() trả 404 rõ ràng. Trả null thành 204, còn ném exception thành 500."
   },
   {
     "prompt": "Sau khi tạo khách hàng mới, response có header Location. Header này dùng để làm gì?",
     "options": [
       "Cho biết server đặt ở đâu",
-      "Chứa mật khẩu của khách hàng",
-      "Cho biết định dạng của body",
-      "Chỉ tới URL để lấy khách hàng vừa tạo"
+      "Bắt client chuyển sang trang khác",
+      "Chỉ tới URL để lấy khách hàng vừa tạo",
+      "Cho biết định dạng của body"
     ],
-    "answer": 4,
+    "answer": 3,
     "explain": "CreatedAtAction đặt Location là URL của tài nguyên mới, client gọi GET vào đó để lấy lại."
   }
 ]

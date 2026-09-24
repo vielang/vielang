@@ -27,6 +27,9 @@ dotnet tool install --global dotnet-ef
 dotnet add package Microsoft.EntityFrameworkCore.Design
 ```
 
+Project dùng .NET 9 thì thêm `--version 9.*` vào cả hai lệnh, như bài EF
+Core và DbContext.
+
 Tạo migration đầu tiên và áp dụng:
 
 ```bash
@@ -64,6 +67,11 @@ public partial class InitialCreate : Migration
   Đây là bản C# của `CREATE TABLE` ở khoá SQL: `nullable: false` là
   `NOT NULL`, `Oracle:Identity` là `GENERATED AS IDENTITY`.
 - `Down` chạy khi huỷ migration: xoá bảng đó.
+- Đây là code do công cụ sinh, chỉ cần đọc hiểu. `partial` cho phép class
+  nằm ở nhiều file, `protected override` ghi đè method của lớp cha
+  `Migration`.
+- `nullable: false` là tham số có tên (named argument): ghi tên tham số
+  trước giá trị cho dễ đọc.
 - Migration là code, được commit lên git cùng project. Cả team và server dùng
   chung một lịch sử thay đổi database.
 
@@ -126,8 +134,17 @@ database chưa có cột mới.
 ORA-00904: "p"."STOCK": invalid identifier
 ```
 
-Mỗi lần thêm, bớt hay đổi property của entity, chạy lại hai lệnh
-`migrations add` và `database update`.
+```bash
+# SAI — thêm property Stock rồi chạy luôn
+dotnet run --urls http://localhost:5000
+```
+
+```bash
+# ĐÚNG — sinh và áp dụng migration trước khi chạy
+dotnet ef migrations add AddStock
+dotnet ef database update
+dotnet run --urls http://localhost:5000
+```
 
 **Sửa file migration đã chạy trên server.** Server không chạy lại migration
 đã chạy, nên phần vừa sửa không bao giờ được áp dụng. Muốn đổi thêm thì tạo
@@ -145,20 +162,20 @@ migration mới.
   {
     "prompt": "Bạn thêm property Email vào class Customer. Cần làm gì để database có cột Email?",
     "options": [
-      "Không cần làm gì, EF Core tự thêm",
-      "Xoá file database rồi chạy lại",
-      "dotnet ef migrations add AddEmail, rồi dotnet ef database update",
-      "Chỉ cần build lại project"
+      "Không cần, EF Core tự thêm cột",
+      "Chỉ chạy dotnet ef database update",
+      "Chỉ cần build lại project",
+      "migrations add rồi database update"
     ],
-    "answer": 3,
-    "explain": "Sinh migration từ phần thay đổi, rồi áp dụng nó vào database."
+    "answer": 4,
+    "explain": "dotnet ef migrations add AddEmail sinh migration từ phần thay đổi, rồi dotnet ef database update áp dụng nó. Chỉ chạy database update thì chưa có migration mới nào để áp dụng."
   },
   {
     "prompt": "Method Down trong một migration dùng để làm gì?",
     "options": [
       "Huỷ đúng thay đổi mà Up đã làm",
-      "Tải database về máy",
-      "Chạy trước Up",
+      "Chạy khi Up bị lỗi giữa chừng",
+      "Chạy trước Up để dọn bảng cũ",
       "Xoá toàn bộ database"
     ],
     "answer": 1,
@@ -168,11 +185,11 @@ migration mới.
     "prompt": "Thư mục Migrations có nên commit lên git không?",
     "options": [
       "Không, mỗi người tự sinh",
+      "Có, để mọi nơi chung lịch sử",
       "Chỉ commit migration mới nhất",
-      "Không, vì chứa mật khẩu",
-      "Có, để cả team và server dùng chung lịch sử thay đổi"
+      "Không, vì chứa mật khẩu"
     ],
-    "answer": 4,
+    "answer": 2,
     "explain": "Migration là một phần của code. Mọi môi trường chạy cùng một chuỗi migration nên database giống nhau."
   }
 ]

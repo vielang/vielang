@@ -9,9 +9,9 @@ Oracle phải đọc từng dòng để so `customer_id`. Index giúp Oracle đi
 
 ## Khái niệm
 
-🔍 **Full table scan**: cách Oracle đọc lần lượt mọi dòng của bảng để tìm dòng thoả điều kiện.
+🐢 **Full table scan**: cách Oracle đọc lần lượt mọi dòng của bảng để tìm dòng thoả điều kiện.
 
-📇 **Index**: cấu trúc dữ liệu phụ lưu sẵn giá trị của một hay nhiều cột theo thứ tự, kèm vị trí dòng, để tìm theo cột đó mà không phải đọc cả bảng.
+📇 **Index**: bản sắp xếp sẵn giá trị của cột kèm vị trí dòng, giúp tìm theo cột đó mà không đọc cả bảng.
 
 ```mermaid Hai cách Oracle tìm đơn của khách có customer_id = 1
 flowchart TD
@@ -113,24 +113,24 @@ trong `WHERE` và `JOIN`.
   {
     "prompt": "Có index trên cột name. Câu nào KHÔNG dùng được index đó?",
     "options": [
-      "WHERE UPPER(name) = 'AN'",
       "WHERE name = 'An'",
       "WHERE name IN ('An', 'Bình')",
-      "WHERE name LIKE 'An%'"
+      "WHERE name LIKE 'An%'",
+      "WHERE UPPER(name) = 'AN'"
     ],
-    "answer": 1,
+    "answer": 4,
     "explain": "UPPER(name) là giá trị đã qua hàm, không có sẵn trong index. Ba câu còn lại so sánh trực tiếp trên name."
   },
   {
     "prompt": "Vì sao không nên tạo index cho mọi cột?",
     "options": [
-      "Vì Oracle giới hạn mỗi bảng một index",
-      "Vì index làm SELECT chậm đi",
-      "Vì index chỉ dùng được với số",
-      "Vì mỗi lần ghi dữ liệu phải cập nhật mọi index, làm ghi chậm và tốn dung lượng"
+      "Mỗi lần ghi phải cập nhật index",
+      "Mỗi bảng chỉ được một index",
+      "Index làm SELECT chậm đi",
+      "Index chỉ dùng được với số"
     ],
-    "answer": 4,
-    "explain": "Index tăng tốc đọc nhưng có giá khi ghi. Chỉ tạo cho cột hay dùng trong WHERE và JOIN."
+    "answer": 1,
+    "explain": "Index tăng tốc đọc nhưng có giá: mỗi lần ghi Oracle phải cập nhật mọi index, nên ghi chậm và tốn dung lượng. Chỉ tạo cho cột hay dùng trong WHERE và JOIN."
   }
 ]
 ```

@@ -3,8 +3,8 @@ title: Composition
 minutes: 5
 ---
 
-Đơn hàng có hai kiểu giao: thường và nhanh. Đơn hàng còn có hai kiểu gói:
-thường và gói quà. Dùng kế thừa thì phải có `FastOrder`, `GiftOrder`, `FastGiftOrder`… Mỗi
+Đơn hàng có hai kiểu giao (thường, nhanh) và hai kiểu gói (thường, gói quà).
+Dùng kế thừa thì phải có `FastOrder`, `GiftOrder`, `FastGiftOrder`… Mỗi
 lựa chọn thêm vào lại làm số class tăng nhanh. Composition giải quyết việc này bằng cách
 ghép các phần lại với nhau.
 
@@ -139,23 +139,23 @@ thêm một class implement `IShipping`.
   {
     "prompt": "Class Car cần dùng code của class Engine. Cách nào đúng?",
     "options": [
-      "class Car : Engine",
-      "class Engine : Car",
-      "class Car { public Engine Engine { get; set; } }",
+      "Car kế thừa Engine",
+      "Car có property kiểu Engine",
+      "Engine kế thừa Car",
       "Chép code Engine vào Car"
     ],
-    "answer": 3,
+    "answer": 2,
     "explain": "Xe không phải là một động cơ, mà xe có một động cơ. Đó là quan hệ \"có một\", nên dùng composition."
   },
   {
     "prompt": "Order có property IDiscount Discount. Muốn áp dụng mã giảm giá khác cho một đơn đã tạo, cần làm gì?",
     "options": [
       "Tạo lại đơn hàng từ một class con khác",
-      "Gán order.Discount = new NewDiscount();",
       "Sửa class Order",
+      "Gán order.Discount = new NewDiscount();",
       "Không làm được"
     ],
-    "answer": 2,
+    "answer": 3,
     "explain": "Với composition, chỉ cần gán object khác cho property. Object Order vẫn giữ nguyên."
   },
   {

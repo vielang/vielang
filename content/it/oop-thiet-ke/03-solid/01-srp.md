@@ -3,9 +3,9 @@ title: SRP — Một class, một trách nhiệm
 minutes: 5
 ---
 
-Class `OrderService` vừa tính tiền, vừa lưu file, vừa gửi email. Kế toán đổi
-thuế thì sửa nó, đổi nơi lưu cũng sửa nó, đổi mẫu email lại sửa nó. Sửa
-chỗ này dễ làm hỏng chỗ kia. SRP là nguyên tắc đầu tiên của SOLID, giúp tránh
+Class `OrderService` vừa tính tiền, vừa lưu file, vừa gửi email, nên đổi
+thuế, đổi nơi lưu hay đổi mẫu email đều phải sửa nó. Sửa chỗ này dễ làm hỏng
+chỗ kia. SRP là nguyên tắc đầu tiên của SOLID, giúp tránh
 đúng chuyện này.
 
 ## Khái niệm
@@ -48,8 +48,8 @@ class OrderNotifier
 Chép ví dụ trên vào `Program.cs` rồi chạy `dotnet run`. Sau đó đổi thuế từ
 10% sang 8% trong `OrderCalculator` và chạy lại.
 
-**Đoán trước khi chạy:** lần chạy đầu in ra gì, và muốn đổi thuế thì phải mở
-mấy class?
+**Đoán trước khi chạy:** lần chạy đầu và lần chạy sau khi đổi thuế in ra số
+tiền bao nhiêu?
 
 <details>
 <summary>Xem kết quả</summary>
@@ -58,8 +58,8 @@ mấy class?
 Gửi an@shop.vn: 220000đ
 ```
 
-Chỉ phải mở một class là `OrderCalculator`. `OrderNotifier` không biết gì về
-thuế nên không bị ảnh hưởng. Sau khi đổi sang 8%, dòng in ra là `216000đ`.
+Lần đầu in `220000đ`, sau khi đổi sang 8% in `216000đ`. Việc đổi thuế chỉ
+chạm vào `OrderCalculator`, còn `OrderNotifier` giữ nguyên.
 
 </details>
 
@@ -82,8 +82,26 @@ class OrderService
 }
 ```
 
-Cách sửa: tách thành `OrderCalculator`, `OrderFileStore`, `OrderNotifier`,
-mỗi class một việc như ở ví dụ trên.
+```csharp
+// ĐÚNG — mỗi class một lý do để thay đổi
+class OrderCalculator
+{
+    public decimal Total(decimal subtotal) =>
+        subtotal + subtotal * 10 / 100;
+}
+
+class OrderFileStore
+{
+    public void Save(decimal total) =>
+        Console.WriteLine($"Lưu file: {total}");
+}
+
+class OrderNotifier
+{
+    public void Send(string email) =>
+        Console.WriteLine($"Gửi {email}");
+}
+```
 
 **Tách quá vụn.** Mỗi class chỉ có một method một dòng, phải đọc qua năm
 class mới hiểu một luồng, thì code còn khó đọc hơn. SRP chia theo **lý do
@@ -101,23 +119,23 @@ thay đổi**, không phải theo số method.
   {
     "prompt": "Class Invoice có các method: Calculate(), PrintPdf(), SaveToDatabase(). Class này có mấy lý do để thay đổi?",
     "options": [
+      "3",
       "1",
       "2",
-      "3",
       "0"
     ],
-    "answer": 3,
+    "answer": 1,
     "explain": "Đổi cách tính, đổi mẫu PDF, đổi nơi lưu là ba lý do khác nhau, thường do ba nhóm người khác nhau yêu cầu."
   },
   {
     "prompt": "Cách tách nào hợp lý nhất cho class Invoice ở câu trên?",
     "options": [
-      "InvoiceCalculator, InvoicePdfPrinter, InvoiceRepository",
-      "Mỗi method một project riêng",
+      "Tách mỗi method ra một project",
+      "Tách ba class: tính, in PDF, lưu",
       "Giữ nguyên, thêm comment phân chia",
-      "Chuyển hết thành static method"
+      "Đổi mọi method thành static"
     ],
-    "answer": 1,
+    "answer": 2,
     "explain": "Mỗi class ứng với đúng một lý do thay đổi. Sửa cách in PDF không đụng tới cách tính hay cách lưu."
   },
   {
@@ -125,10 +143,10 @@ thay đổi**, không phải theo số method.
     "options": [
       "Mỗi class chỉ được có một method",
       "Mỗi method chỉ được có một dòng",
-      "Mỗi project chỉ có một class",
-      "Mỗi class chỉ nên có một lý do để thay đổi"
+      "Mỗi class chỉ có một lý do thay đổi",
+      "Mỗi class chỉ được gọi từ một nơi"
     ],
-    "answer": 4,
+    "answer": 3,
     "explain": "SRP nói về lý do thay đổi, không phải số method. Một class có nhiều method vẫn đúng SRP nếu chúng phục vụ cùng một trách nhiệm."
   }
 ]

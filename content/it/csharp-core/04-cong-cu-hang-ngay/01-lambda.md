@@ -44,8 +44,8 @@ foreach (decimal p in expensive)
 
 ## Method viết gọn bằng =>
 
-Method chỉ có một câu lệnh, dù là `return` hay lời gọi trong method `void`,
-cũng viết được bằng `=>`:
+Method chỉ có một biểu thức, dù là giá trị trả về hay lời gọi trong method
+`void`, cũng viết được bằng `=>`:
 
 ```csharp
 decimal Total(decimal price, int quantity) =>
@@ -125,11 +125,11 @@ Func<int, int> discount = x => { return x - 1000; };
     "prompt": "Func<string, int> f = s => s.Length; Console.WriteLine(f(\"shop\")); In ra gì?",
     "options": [
       "shop",
-      "4",
       "Lỗi compile",
+      "4",
       "0"
     ],
-    "answer": 2,
+    "answer": 3,
     "explain": "f nhận chuỗi và trả về độ dài. \"shop\" có 4 ký tự."
   },
   {

@@ -114,7 +114,11 @@ class MainForm : Form
 - `_source.Current` là dòng đang chọn trên lưới, kiểu `object`, ép về
   `Product` như bài ListBox.
 - Bấm "Hết hàng" thì tồn kho về 0, danh sách tải lại, dòng đó biến mất.
+  Cho gọn, ví dụ không tắt nút trong lúc chờ như bài Async giữ giao diện
+  mượt; app thật nên tắt.
 - API và app kho dùng cùng một đoạn code `DbProductStore`, chép nguyên.
+  Nhưng `DbContext` ở đây sống suốt vòng đời của form, nên `InStockAsync`
+  (không có `AsNoTracking()`) không thấy thay đổi do nơi khác ghi vào.
 
 ```mermaid Main chọn store nào, MainForm chỉ nhận IProductStore
 flowchart LR
@@ -235,33 +239,33 @@ class MainForm : Form
     "prompt": "App WinForms có thêm màn hình đơn hàng cần IOrderStore. Nên tạo DbOrderStore ở đâu?",
     "options": [
       "Trong constructor của form đơn hàng",
-      "Trong DbProductStore",
-      "Trong Main, rồi truyền vào constructor của form",
-      "Trong interface IOrderStore"
+      "Trong DbProductStore có sẵn",
+      "Trong handler Load của form",
+      "Trong Main"
     ],
-    "answer": 3,
-    "explain": "Main là composition root: mọi object được tạo và ghép ở đó, form chỉ nhận interface qua constructor."
+    "answer": 4,
+    "explain": "Main là composition root: mọi object được tạo và ghép ở đó, rồi truyền vào constructor của form. Form chỉ nhận interface."
   },
   {
     "prompt": "Muốn chạy thử màn hình kho trên máy chưa cài Oracle, cần sửa ở đâu?",
     "options": [
-      "Sửa MainForm",
+      "Chỉ sửa Main",
+      "Sửa MainForm cho đọc bộ nhớ",
       "Sửa IProductStore",
-      "Sửa DbProductStore",
-      "Chỉ sửa Main, truyền FakeProductStore vào form"
+      "Sửa DbProductStore"
     ],
-    "answer": 4,
-    "explain": "Form chỉ biết IProductStore, nên chỉ cần đổi object được tạo ở composition root."
+    "answer": 1,
+    "explain": "Form chỉ biết IProductStore, nên chỉ cần đổi object được tạo ở composition root: Main truyền FakeProductStore vào form."
   },
   {
     "prompt": "_source.Current trả về gì?",
     "options": [
-      "Object của dòng đang chọn, kiểu object",
       "Số thứ tự dòng đang chọn",
-      "Cả danh sách",
-      "Luôn là Product, không cần ép kiểu"
+      "Dòng đang chọn, kiểu object",
+      "Cả danh sách đang gắn vào",
+      "Dòng đang chọn, kiểu Product"
     ],
-    "answer": 1,
+    "answer": 2,
     "explain": "Current là object đang chọn trong BindingSource, khai báo kiểu object nên phải ép về Product."
   }
 ]

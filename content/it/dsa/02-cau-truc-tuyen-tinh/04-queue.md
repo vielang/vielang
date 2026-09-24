@@ -13,7 +13,7 @@ lại: ai đến trước được phục vụ trước.
 
 | Thao tác | Việc làm | Big-O |
 |---|---|---|
-| `Enqueue(x)` | thêm `x` vào cuối hàng | O(1) |
+| `Enqueue(x)` | thêm `x` vào cuối hàng | O(1) trung bình |
 | `Dequeue()` | lấy và bỏ phần tử ở đầu hàng | O(1) |
 | `Peek()` | xem phần tử ở đầu hàng, không bỏ | O(1) |
 
@@ -32,12 +32,6 @@ Console.WriteLine(orders.Count);       // 2
 
 - `Enqueue` xếp đơn vào cuối hàng, `Dequeue` lấy đơn ở đầu hàng.
 - `DH1` vào trước nên ra trước. `Peek` thấy `DH2` đang đứng đầu.
-
-```mermaid Vào ở cuối, ra ở đầu
-flowchart LR
-    E["Enqueue"] --> T["cuối DH3 | DH2 | DH1 đầu"]
-    T --> D["Dequeue trả DH1"]
-```
 
 ## Bên trong Queue
 
@@ -129,24 +123,24 @@ Giống `Stack<T>`, gọi `Dequeue` khi hàng rỗng sẽ ném
   {
     "prompt": "Tổng đài xử lý cuộc gọi theo thứ tự gọi đến. Nên dùng cấu trúc nào?",
     "options": [
-      "Queue",
       "Stack",
       "Linked list không giữ node cuối",
+      "Queue",
       "Array cố định"
     ],
-    "answer": 1,
+    "answer": 3,
     "explain": "Ai gọi trước được nghe trước, đúng kiểu vào trước ra trước của queue."
   },
   {
     "prompt": "Vì sao Dequeue của Queue<T> là O(1) còn List.RemoveAt(0) là O(n)?",
     "options": [
-      "Queue<T> không lưu phần tử",
+      "Queue<T> lưu phần tử trong Dictionary",
       "Queue<T> dùng linked list bên trong",
-      "RemoveAt(0) bị lỗi",
-      "Queue<T> chỉ tăng chỉ số đầu, không dời các phần tử còn lại"
+      "RemoveAt(0) phải tìm phần tử trước",
+      "Queue<T> chỉ tăng chỉ số đầu"
     ],
     "answer": 4,
-    "explain": "Array vòng tròn giữ chỉ số đầu và cuối. Lấy ra chỉ đổi chỉ số, không phải dời chỗ."
+    "explain": "Array vòng tròn giữ chỉ số đầu và cuối. Lấy ra chỉ đổi chỉ số, không dời các phần tử còn lại như RemoveAt(0)."
   }
 ]
 ```

@@ -13,7 +13,7 @@ bạn đã gặp nó ở call stack của bài Đệ quy.
 
 | Thao tác | Việc làm | Big-O |
 |---|---|---|
-| `Push(x)` | đặt `x` lên đỉnh | O(1) |
+| `Push(x)` | đặt `x` lên đỉnh | O(1) trung bình |
 | `Pop()` | lấy và bỏ phần tử ở đỉnh | O(1) |
 | `Peek()` | xem phần tử ở đỉnh, không bỏ | O(1) |
 
@@ -131,34 +131,34 @@ if (undo.Count > 0)
   {
     "prompt": "Push lần lượt A, B, C vào stack rồi Pop hai lần. Phần tử còn lại là gì?",
     "options": [
-      "A",
       "B",
       "C",
+      "A",
       "Stack rỗng"
     ],
-    "answer": 1,
+    "answer": 3,
     "explain": "Pop lấy C rồi B, vì vào sau ra trước. Còn lại A."
   },
   {
     "prompt": "Tự viết stack bằng List<T>. Nên chọn đỉnh ở đầu hay cuối list?",
     "options": [
-      "Đầu list, cho dễ nhìn",
+      "Đầu list, dùng Insert(0, x)",
       "Chỗ nào cũng như nhau",
       "Giữa list",
-      "Cuối list, vì Add và RemoveAt ở cuối là O(1)"
+      "Cuối list, dùng Add và RemoveAt"
     ],
     "answer": 4,
-    "explain": "Xoá ở đầu List phải dời mọi phần tử, thành O(n). Ở cuối thì không phải dời gì."
+    "explain": "Thêm, xoá ở đầu List phải dời mọi phần tử, thành O(n). Add và RemoveAt ở cuối không phải dời gì, là O(1)."
   },
   {
     "prompt": "Peek khác Pop ở điểm nào?",
     "options": [
+      "Peek chỉ xem đỉnh, không bỏ ra",
       "Peek nhanh hơn Pop",
       "Peek lấy phần tử ở đáy",
-      "Peek chỉ xem phần tử ở đỉnh, không bỏ nó ra",
       "Không khác gì"
     ],
-    "answer": 3,
+    "answer": 1,
     "explain": "Pop lấy và bỏ phần tử ở đỉnh. Peek chỉ đọc, Count giữ nguyên."
   }
 ]

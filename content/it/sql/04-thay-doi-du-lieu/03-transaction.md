@@ -23,7 +23,7 @@ INSERT INTO orders (customer_id, order_date, status)
 
 INSERT INTO order_lines
   (order_id, product_id, quantity, unit_price)
-  VALUES (5, 3, 1, 350000);
+  VALUES ((SELECT MAX(order_id) FROM orders), 3, 1, 350000);
 
 UPDATE products SET stock = stock - 1
 WHERE product_id = 3;
@@ -31,12 +31,16 @@ WHERE product_id = 3;
 COMMIT;
 ```
 
+- `(SELECT MAX(order_id) FROM orders)` lấy mã của đơn vừa thêm.
 - Trong Oracle, câu `INSERT`, `UPDATE` hoặc `DELETE` đầu tiên tự mở một
   transaction.
 - Các thay đổi chỉ được lưu hẳn khi chạy `COMMIT`.
 - Có lỗi giữa chừng thì gọi `ROLLBACK` để huỷ cả ba bước.
 - Trước khi `COMMIT`, chỉ phiên (một kết nối đang mở tới Oracle) đã thực hiện
   thay đổi mới thấy chúng. Người khác vẫn thấy dữ liệu cũ.
+
+Khối trên lưu hẳn dữ liệu, kể cả thay đổi còn dở từ trước. Thử xong, chạy khối
+làm mới ở bài đầu khoá trước khi học bài sau.
 
 ```mermaid Một transaction kết thúc bằng COMMIT hoặc ROLLBACK
 stateDiagram-v2
@@ -95,6 +99,17 @@ SELECT stock FROM products WHERE product_id = 1;
 Câu `SELECT` cuối trả về 0 chứ không phải 120. Tạo bảng trước, rồi mới bắt
 đầu thay đổi dữ liệu.
 
+```sql
+-- ĐÚNG — tạo bảng xong mới UPDATE, ROLLBACK trả lại 120
+CREATE TABLE order_log (note VARCHAR2(100));
+UPDATE products SET stock = 0 WHERE product_id = 1;
+ROLLBACK;
+SELECT stock FROM products WHERE product_id = 1;
+```
+
+Khối SAI đã lưu hẳn tồn kho 0 cho bút bi. Chạy khối làm mới ở bài đầu khoá
+trước khi học bài sau.
+
 ## Tóm tắt
 
 - Transaction gom nhiều câu lệnh thành một khối: cùng thành công hoặc cùng
@@ -110,32 +125,32 @@ Câu `SELECT` cuối trả về 0 chứ không phải 120. Tạo bảng trước
     "options": [
       "COMMIT để giữ câu thứ nhất",
       "Chạy lại câu thứ hai rồi thôi",
-      "ROLLBACK để huỷ cả câu thứ nhất",
-      "Không cần làm gì"
+      "Không cần làm gì",
+      "ROLLBACK để huỷ cả câu thứ nhất"
     ],
-    "answer": 3,
+    "answer": 4,
     "explain": "Hai câu phải cùng thành công. Câu hai lỗi thì ROLLBACK, nếu không A bị trừ tiền mà B không được cộng."
   },
   {
-    "prompt": "Bạn UPDATE giá sản phẩm nhưng chưa COMMIT. Đồng nghiệp SELECT cùng sản phẩm đó ở máy khác. Họ thấy giá nào?",
+    "prompt": "Bạn INSERT một đơn hàng, rồi INSERT dòng hàng của đơn đó, rồi ROLLBACK. Còn lại gì?",
     "options": [
-      "Giá cũ",
-      "Giá mới",
-      "Báo lỗi",
-      "NULL"
+      "Không còn gì, cả hai bị huỷ",
+      "Còn đơn, chỉ dòng hàng bị huỷ",
+      "Còn cả hai, INSERT tự lưu ngay",
+      "Báo lỗi, ROLLBACK chỉ huỷ một câu"
     ],
     "answer": 1,
-    "explain": "Thay đổi chưa COMMIT chỉ phiên của bạn thấy. Người khác vẫn đọc dữ liệu đã được COMMIT trước đó."
+    "explain": "ROLLBACK không giống Ctrl+Z huỷ câu cuối. Nó huỷ mọi thay đổi từ lần COMMIT gần nhất, ở đây là cả hai câu INSERT."
   },
   {
     "prompt": "UPDATE ...; CREATE TABLE ...; ROLLBACK; Câu UPDATE có bị huỷ không?",
     "options": [
       "Có, ROLLBACK huỷ mọi thứ",
+      "Không, UPDATE đã được lưu",
       "Chỉ huỷ nếu CREATE TABLE lỗi",
-      "Báo lỗi vì không được CREATE TABLE sau UPDATE",
-      "Không, vì CREATE TABLE đã tự COMMIT câu UPDATE"
+      "Báo lỗi ở câu CREATE TABLE"
     ],
-    "answer": 4,
+    "answer": 2,
     "explain": "Trong Oracle, lệnh DDL như CREATE TABLE tự COMMIT những thay đổi đang dở trước khi chạy."
   }
 ]

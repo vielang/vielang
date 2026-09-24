@@ -130,10 +130,10 @@ Console.WriteLine("Xin chào");
   {
     "prompt": "Dòng Console.Writeline(\"Hi\"); báo lỗi compile. Vì sao?",
     "options": [
-      "Thiếu dấu ; ở cuối",
+      "Thiếu dấu ; ở cuối dòng",
       "Chuỗi phải dùng nháy đơn",
       "Console phải viết thường",
-      "Tên đúng là WriteLine, chữ L viết hoa"
+      "Sai hoa thường ở WriteLine"
     ],
     "answer": 4,
     "explain": "C# phân biệt hoa thường. Writeline và WriteLine là hai tên khác nhau, và chỉ WriteLine tồn tại."

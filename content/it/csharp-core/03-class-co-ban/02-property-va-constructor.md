@@ -9,7 +9,7 @@ dữ liệu lúc tạo, và property để quyết định phần nào được 
 
 ## Khái niệm
 
-🏷️ **Property**: thành viên của class dùng như field, nhưng quy định được ai đọc và ai ghi qua `get` và `set`.
+🔐 **Property**: thành viên của class dùng như field, nhưng quy định được ai đọc và ai ghi qua `get` và `set`.
 
 🏗️ **Constructor**: method đặc biệt trùng tên class, tự chạy khi gọi `new`, dùng để gán giá trị ban đầu.
 
@@ -88,6 +88,11 @@ var pen = new Product("Bút bi", 5000m);
 pen.Price = 4000m;
 ```
 
+```csharp
+// ĐÚNG — truyền giá đúng ngay lúc tạo
+var pen = new Product("Bút bi", 4000m);
+```
+
 Muốn cho sửa giá thì phải khai báo `{ get; set; }`. Để `{ get; }` nghĩa là
 giá đã chốt từ lúc tạo.
 
@@ -137,7 +142,7 @@ class Item
       "Chạy được, Email được đổi",
       "Lỗi khi chạy",
       "Chạy được nhưng Email không đổi",
-      "Lỗi compile vì Email chỉ đọc"
+      "Lỗi compile"
     ],
     "answer": 4,
     "explain": "Property chỉ có get thì bên ngoài không gán được. Chỉ constructor mới gán được giá trị cho nó."
@@ -145,7 +150,7 @@ class Item
   {
     "prompt": "Class Order chỉ có constructor Order(int id). Dòng var o = new Order(); thì sao?",
     "options": [
-      "Lỗi compile vì phải truyền id",
+      "Lỗi compile",
       "Chạy được, id bằng 0",
       "Chạy được, id bằng null",
       "Lỗi khi chạy"
@@ -156,10 +161,10 @@ class Item
   {
     "prompt": "Property nào nên để { get; set; } thay vì { get; }?",
     "options": [
-      "Mã đơn hàng, cấp một lần lúc tạo",
-      "Số lượng tồn kho, thay đổi mỗi lần bán",
+      "Mã đơn hàng",
+      "Số lượng tồn kho",
       "Ngày tạo tài khoản",
-      "Mã số thuế của công ty"
+      "Mã số thuế công ty"
     ],
     "answer": 2,
     "explain": "Tồn kho đổi liên tục nên cần set. Ba giá trị còn lại chốt từ lúc tạo, để get là đủ và an toàn hơn."

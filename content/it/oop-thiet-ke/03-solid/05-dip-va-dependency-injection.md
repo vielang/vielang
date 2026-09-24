@@ -76,8 +76,7 @@ class FakeOrderRepository : IOrderRepository
 }
 ```
 
-**Đoán trước khi chạy:** để chuyển sang repository giả, bạn đã phải sửa
-mấy dòng trong `OrderService`?
+**Đoán trước khi chạy:** chương trình in ra dòng nào?
 
 <details>
 <summary>Xem kết quả</summary>
@@ -86,8 +85,9 @@ mấy dòng trong `OrderService`?
 Giả lập: lưu Bút bi
 ```
 
-Không dòng nào, chỉ đổi object truyền vào constructor. Viết test không cần
-database thật cũng theo cách này: truyền vào một repository giả.
+`OrderService` gọi `Save` của object được truyền vào, nên in dòng của
+`FakeOrderRepository`. Viết test không cần database thật cũng theo cách này:
+truyền vào một repository giả.
 
 </details>
 
@@ -101,6 +101,21 @@ class OrderService
 {
     private readonly SqlOrderRepository _repo =
         new SqlOrderRepository();
+
+    public void Place(string item) => _repo.Save(item);
+}
+```
+
+```csharp
+// ĐÚNG — nhận interface qua constructor
+class OrderService
+{
+    private readonly IOrderRepository _repo;
+
+    public OrderService(IOrderRepository repo)
+    {
+        _repo = repo;
+    }
 
     public void Place(string item) => _repo.Save(item);
 }
@@ -122,8 +137,18 @@ class OrderService
 }
 ```
 
-Cách sửa cho cả hai: nhận `IOrderRepository` qua constructor, như ở ví dụ
-trên.
+```csharp
+// ĐÚNG — kiểu tham số là interface
+class OrderService
+{
+    private readonly IOrderRepository _repo;
+
+    public OrderService(IOrderRepository repo)
+    {
+        _repo = repo;
+    }
+}
+```
 
 ## Tóm tắt
 
@@ -138,35 +163,35 @@ trên.
   {
     "prompt": "class ReportService { private readonly PdfExporter _pdf = new PdfExporter(); } Vấn đề chính là gì?",
     "options": [
-      "Tốn bộ nhớ",
-      "Sai quy ước đặt tên",
-      "Khoá cứng vào PdfExporter, không đổi được và khó test",
-      "Không có vấn đề gì"
+      "Khoá cứng vào PdfExporter",
+      "Tốn thêm bộ nhớ khi chạy",
+      "Sai quy ước đặt tên field",
+      "Không có vấn đề gì cả"
     ],
-    "answer": 3,
-    "explain": "Tự new là khoá cứng vào một class cụ thể. Nhận IExporter qua constructor thì đổi cách xuất hay dùng bản giả khi test đều dễ."
+    "answer": 1,
+    "explain": "Tự new là khoá cứng vào một class cụ thể, không đổi được và khó test. Nhận IExporter qua constructor thì đổi cách xuất hay dùng bản giả khi test đều dễ."
   },
   {
     "prompt": "Constructor nào đúng tinh thần DIP?",
     "options": [
-      "public PaymentService(IPaymentGateway gateway)",
       "public PaymentService(VnPayGateway gateway)",
+      "public PaymentService(IPaymentGateway gateway)",
       "public PaymentService() { _gateway = new VnPayGateway(); }",
       "public PaymentService(string gatewayName)"
     ],
-    "answer": 1,
+    "answer": 2,
     "explain": "Nhận interface thì PaymentService không phụ thuộc vào cổng thanh toán cụ thể nào. Đổi cổng chỉ cần truyền class khác."
   },
   {
     "prompt": "Lợi ích lớn nhất của DI khi viết test là gì?",
     "options": [
-      "Test chạy trên nhiều máy",
+      "Test chạy được trên nhiều máy",
       "Không cần viết test nữa",
-      "Code ngắn hơn",
-      "Truyền được bản giả thay cho database, email, API thật"
+      "Truyền được bản giả vào class",
+      "Code ngắn hơn, dễ đọc hơn"
     ],
-    "answer": 4,
-    "explain": "Class nhận phụ thuộc từ bên ngoài, nên khi test chỉ cần truyền bản giả vào, không cần hệ thống thật."
+    "answer": 3,
+    "explain": "Class nhận phụ thuộc từ bên ngoài, nên khi test chỉ cần truyền bản giả thay cho database, email hay API thật."
   }
 ]
 ```

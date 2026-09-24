@@ -118,33 +118,33 @@ Console.WriteLine(string.Equals(
     "prompt": "string email = \" an@shop.vn \"; email.Trim(); Console.WriteLine(email.Length); In ra gì?",
     "options": [
       "10",
-      "12",
       "0",
-      "Lỗi compile"
+      "Lỗi compile",
+      "12"
     ],
-    "answer": 2,
+    "answer": 4,
     "explain": "Trim() trả về chuỗi mới nhưng không được gán lại, nên email vẫn còn hai khoảng trắng và dài 12 ký tự."
   },
   {
     "prompt": "int qty = 3; Dòng nào in ra đúng \"Còn 3 cái\"?",
     "options": [
+      "Console.WriteLine($\"Còn {qty} cái\");",
       "Console.WriteLine(\"Còn {qty} cái\");",
       "Console.WriteLine(\"Còn qty cái\");",
-      "Console.WriteLine($\"Còn {qty} cái\");",
       "Console.WriteLine($\"Còn qty cái\");"
     ],
-    "answer": 3,
+    "answer": 1,
     "explain": "Cần cả dấu $ ở đầu chuỗi lẫn tên biến trong { } thì giá trị mới được chèn vào."
   },
   {
     "prompt": "Bạn cần kiểm tra tên sản phẩm có chứa chữ \"sale\" hay không. Dùng thao tác nào?",
     "options": [
-      "name.Contains(\"sale\")",
       "name.Replace(\"sale\", \"\")",
+      "name.Contains(\"sale\")",
       "name.Length",
       "name.Substring(0, 4)"
     ],
-    "answer": 1,
+    "answer": 2,
     "explain": "Contains trả về true hoặc false tuỳ chuỗi có chứa chuỗi con hay không."
   }
 ]

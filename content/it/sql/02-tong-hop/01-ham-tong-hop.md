@@ -20,7 +20,8 @@ thành một con số, và hàm tổng hợp làm việc đó.
 | `MIN(cột)`, `MAX(cột)` | nhỏ nhất, lớn nhất |
 
 Mọi hàm trong bảng, trừ `COUNT(*)`, đều bỏ qua giá trị NULL. Chúng giống
-`Count`, `Sum`, `Min`, `Max` của LINQ, khác ở chỗ bỏ qua NULL.
+`Count`, `Sum`, `Min`, `Max` của LINQ. Riêng `COUNT(cột)` khác `Count()` của
+LINQ ở chỗ không đếm dòng NULL.
 
 ## Ví dụ
 
@@ -94,10 +95,10 @@ sau).
     "options": [
       "10",
       "4",
-      "6",
-      "0"
+      "0",
+      "6"
     ],
-    "answer": 3,
+    "answer": 4,
     "explain": "COUNT(cột) chỉ đếm những dòng mà cột đó không NULL: 10 - 4 = 6."
   },
   {
@@ -115,11 +116,11 @@ sau).
     "prompt": "SELECT city, COUNT(*) FROM customers; báo ORA-00937. Vì sao?",
     "options": [
       "Bảng customers không có cột city",
+      "Lấy city mà không có GROUP BY",
       "COUNT(*) phải viết COUNT(city)",
-      "Thiếu dấu chấm phẩy",
-      "Có cột thường (city) cùng với hàm tổng hợp mà không có GROUP BY"
+      "Thiếu dấu chấm phẩy cuối câu"
     ],
-    "answer": 4,
+    "answer": 2,
     "explain": "Không có GROUP BY thì cả bảng thành một dòng, Oracle không biết hiện city nào. Thêm GROUP BY city để đếm theo từng thành phố."
   }
 ]

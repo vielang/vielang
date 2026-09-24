@@ -10,7 +10,7 @@ từ đầu. Validation chặn dữ liệu sai ngay ở cửa, trước khi acti
 
 ✅ **Validation**: bước kiểm tra dữ liệu client gửi lên có hợp lệ không trước khi xử lý.
 
-🏷️ **Data annotation**: attribute gắn lên property của DTO để khai báo quy tắc, ví dụ `[Required]`, `[Range]`.
+🔖 **Data annotation**: attribute gắn lên property của DTO để khai báo quy tắc, ví dụ `[Required]`, `[Range]`.
 
 | Attribute | Quy tắc |
 |---|---|
@@ -97,6 +97,8 @@ Content-Type: application/problem+json
 }
 ```
 
+Body trên đã rút gọn, bản thật có thêm `type` và `traceId`.
+
 Action không chạy. `[ApiController]` chặn từ trước và trả 400 kèm hai lỗi,
 mỗi lỗi gắn với tên property. Chữ có dấu bị mã hoá dạng `\u00EA` khi xem
 bằng `curl`, còn client đọc JSON sẽ hiện lại đúng "Tên không được trống".
@@ -115,19 +117,43 @@ using Microsoft.AspNetCore.Mvc;
 public class ItemsController : ControllerBase
 {
     [HttpPost]
-    public IActionResult Create(string name)
+    public ActionResult<string> Create(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
             return BadRequest("Tên không được trống");
         }
-        return Ok();
+        return Ok(name);
     }
 }
 ```
 
 Đặt quy tắc thành attribute trên DTO thì mọi action dùng DTO đó đều được kiểm
 tra.
+
+```csharp
+// ĐÚNG — quy tắc nằm trên DTO
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc;
+
+[ApiController]
+[Route("api/items")]
+public class ItemsController : ControllerBase
+{
+    [HttpPost]
+    public ActionResult<string> Create(
+        CreateItemRequest request)
+    {
+        return Ok(request.Name);
+    }
+}
+
+public class CreateItemRequest
+{
+    [Required(ErrorMessage = "Tên không được trống")]
+    public string Name { get; set; } = "";
+}
+```
 
 **Quên `[ApiController]`.** Không có nó thì dữ liệu sai vẫn lọt vào action,
 vì không còn bước nào tự trả 400.
@@ -148,7 +174,7 @@ vì không còn bước nào tự trả 400.
       "Action chạy với Quantity = 0",
       "Action chạy với Quantity = 1",
       "Trả 400, action không chạy",
-      "Trả 500"
+      "Trả 500 vì giá trị sai"
     ],
     "answer": 3,
     "explain": "0 nằm ngoài khoảng 1 đến 10. [ApiController] trả 400 trước khi action kịp chạy."
@@ -156,23 +182,23 @@ vì không còn bước nào tự trả 400.
   {
     "prompt": "Muốn email của khách hàng vừa bắt buộc vừa đúng định dạng. Gắn attribute nào?",
     "options": [
-      "[Required] và [EmailAddress]",
       "Chỉ [Required]",
       "[Range] và [EmailAddress]",
-      "[StringLength(1)]"
+      "[StringLength(1)]",
+      "[Required] và [EmailAddress]"
     ],
-    "answer": 1,
+    "answer": 4,
     "explain": "[Required] bắt buộc có giá trị, [EmailAddress] kiểm tra định dạng. Hai quy tắc dùng cùng nhau được."
   },
   {
     "prompt": "Quy tắc validation nên đặt ở đâu?",
     "options": [
+      "Trên DTO request, bằng attribute",
       "Trong từng action, bằng if",
       "Trong Program.cs",
-      "Ở phía client là đủ",
-      "Trên property của DTO request, bằng attribute"
+      "Ở phía client là đủ"
     ],
-    "answer": 4,
+    "answer": 1,
     "explain": "Đặt trên DTO thì mọi nơi dùng DTO đều được kiểm tra, không phải chép quy tắc. Chỉ kiểm tra ở client thì ai gọi thẳng API vẫn qua được."
   }
 ]

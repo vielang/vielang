@@ -13,8 +13,8 @@ nhanh bằng một câu hỏi.
 
 | | Interface | Abstract class |
 |---|---|---|
-| Chứa code dùng chung | không | có |
-| Có field, constructor | không | có |
+| Chứa code dùng chung | thường không | có |
+| Có field thường, constructor | không | có |
 | Một class dùng được mấy cái | nhiều | chỉ một |
 | Diễn tả quan hệ | "làm được" | "là một" |
 
@@ -132,10 +132,13 @@ thêm class thứ hai được.
 
 ```csharp
 // SAI — lỗi compile: chỉ được một class cha
-class GiftPayment : Payment, Refundable
+class BankPayment : Payment, Refundable
 {
-    public override string Pay() => "Quà tặng";
-    public override void Refund() { }
+    public override string Pay() => "Chuyển khoản";
+
+    public override void Refund() =>
+        Console.WriteLine(
+            $"Hoàn {Amount}đ về tài khoản");
 }
 
 abstract class Refundable
@@ -146,10 +149,13 @@ abstract class Refundable
 
 ```csharp
 // ĐÚNG — khả năng thì dùng interface
-class GiftPayment : Payment, IRefundable
+class BankPayment : Payment, IRefundable
 {
-    public override string Pay() => "Quà tặng";
-    public void Refund() { }
+    public override string Pay() => "Chuyển khoản";
+
+    public void Refund() =>
+        Console.WriteLine(
+            $"Hoàn {Amount}đ về tài khoản");
 }
 ```
 
@@ -170,8 +176,22 @@ class CashBill : IBill
 }
 ```
 
-Phần chung như `Amount` và `Receipt()` nên đặt trong abstract class như
-`Payment` ở ví dụ trên.
+```csharp
+// ĐÚNG — phần chung viết một lần ở class cha
+abstract class Bill
+{
+    public decimal Amount { get; set; }
+
+    public abstract string Kind();
+
+    public string Receipt() => $"{Kind()} - {Amount}đ";
+}
+
+class CashBill : Bill
+{
+    public override string Kind() => "Tiền mặt";
+}
+```
 
 ## Tóm tắt
 
@@ -188,7 +208,7 @@ Phần chung như `Amount` và `Receipt()` nên đặt trong abstract class như
       "Abstract class GpsTrackable",
       "Kế thừa Truck từ Phone",
       "Interface IGpsTrackable",
-      "Chép method GPS vào từng class, không cần gì chung"
+      "Chép method GPS vào từng class"
     ],
     "answer": 3,
     "explain": "Truck đã có class cha nên không kế thừa thêm được. Truck và Phone cũng không cùng loại, chỉ chung một khả năng, nên interface là hợp lý."
@@ -196,23 +216,23 @@ Phần chung như `Amount` và `Receipt()` nên đặt trong abstract class như
   {
     "prompt": "Các loại báo cáo đều có chung phần header, footer và cách in. Chỉ phần thân là khác nhau. Nên dùng gì?",
     "options": [
-      "Abstract class Report với abstract method BuildBody()",
-      "Interface IReport với 3 method",
-      "Mỗi báo cáo tự viết đầy đủ header và footer",
-      "enum ReportType"
+      "Interface IReport với ba method",
+      "Mỗi báo cáo tự viết header, footer",
+      "Một enum ReportType kèm switch",
+      "Abstract class Report có BuildBody()"
     ],
-    "answer": 1,
+    "answer": 4,
     "explain": "Có nhiều code chung cần viết một lần, chỉ phần thân khác nhau. Đó đúng là việc của abstract class."
   },
   {
     "prompt": "Khai báo nào hợp lệ, biết Animal là class còn ISwim và IFly là interface?",
     "options": [
+      "class Duck : Animal, ISwim, IFly",
       "class Duck : ISwim, Animal, IFly",
       "class Duck : Animal, Animal",
-      "class Duck : ISwim : IFly",
-      "class Duck : Animal, ISwim, IFly"
+      "class Duck : ISwim : IFly"
     ],
-    "answer": 4,
+    "answer": 1,
     "explain": "Class cha đứng đầu tiên, sau đó là các interface, cách nhau bằng dấu phẩy."
   }
 ]

@@ -70,9 +70,9 @@ var cs = "User Id=shopapi;Password=shopapi_pw;"
 ```
 
 Mật khẩu viết trong code sẽ nằm luôn trong file `.exe`, ai có file cũng đọc
-được, và đổi máy chủ là phải publish lại. App thật đọc chuỗi kết nối từ file
-cấu hình như bài Cấu hình của khoá ASP.NET Core, cấp cho mỗi nhân viên một
-tài khoản Oracle riêng, hoặc cho app gọi API thay vì nối thẳng vào database.
+được, và đổi máy chủ là phải publish lại. App thật không để mật khẩu dùng
+chung trong file đi kèm `.exe`: mỗi nhân viên một tài khoản Oracle riêng,
+hoặc app gọi API thay vì nối thẳng vào database.
 
 ## Tóm tắt
 
@@ -87,34 +87,34 @@ tài khoản Oracle riêng, hoặc cho app gọi API thay vì nối thẳng vào
     "prompt": "Cửa hàng có 20 máy, chưa máy nào cài .NET, cũng không có người cài giúp. Nên publish thế nào?",
     "options": [
       "--self-contained false để file nhỏ",
+      "--self-contained để mang theo .NET",
       "Dùng dotnet run trên từng máy",
-      "Chép thư mục bin/Debug sang",
-      "--self-contained để mang theo .NET"
+      "Chép thư mục bin/Debug sang"
     ],
-    "answer": 4,
+    "answer": 2,
     "explain": "Máy không có .NET thì bản self-contained mới chạy được mà không phải cài gì."
   },
   {
     "prompt": "App publish xong chạy tốt trên máy lập trình, sang máy nhân viên thì báo không kết nối được database. Nghi ngờ đầu tiên?",
     "options": [
       "Thiếu PublishSingleFile",
-      "Chuỗi kết nối vẫn trỏ localhost",
       "Sai -r win-x64",
-      "Máy nhân viên thiếu Visual Studio"
+      "Chuỗi kết nối vẫn trỏ localhost",
+      "Máy nhân viên chưa cài Oracle client"
     ],
-    "answer": 2,
-    "explain": "localhost trên máy nhân viên là chính máy đó, không có Oracle. Phải trỏ tới địa chỉ máy chủ."
+    "answer": 3,
+    "explain": "localhost trên máy nhân viên là chính máy đó, không có Oracle. Phải trỏ tới địa chỉ máy chủ. Oracle.EntityFrameworkCore không cần cài Oracle client."
   },
   {
     "prompt": "PublishSingleFile=true làm gì?",
     "options": [
-      "Nén mã nguồn thành một file",
+      "Nén mã nguồn thành một file zip",
       "Chỉ publish file Program.cs",
-      "Gom app và thư viện vào một file .exe duy nhất",
-      "Bỏ .NET ra khỏi bản publish"
+      "Bỏ .NET ra khỏi bản publish",
+      "Gom app vào một file .exe"
     ],
-    "answer": 3,
-    "explain": "Thay vì thư mục đầy file .dll, bản publish chỉ còn một file .exe để chép đi."
+    "answer": 4,
+    "explain": "App và thư viện được gom lại: thay vì thư mục đầy file .dll, bản publish chỉ còn một file .exe để chép đi."
   }
 ]
 ```

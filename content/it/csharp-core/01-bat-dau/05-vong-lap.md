@@ -13,7 +13,7 @@ dùng vòng lặp.
 
 🔢 **for**: vòng lặp dùng khi biết trước số lần lặp, có sẵn biến đếm.
 
-⏳ **while**: vòng lặp dùng khi chỉ biết điều kiện dừng, không biết trước số lần lặp.
+🔂 **while**: vòng lặp dùng khi chỉ biết điều kiện dừng, không biết trước số lần lặp.
 
 ## Ví dụ
 
@@ -153,22 +153,22 @@ for (int i = 1; i <= 5; i++)
     "prompt": "for (int i = 0; i < 3; i++) Console.WriteLine(i); In ra những số nào?",
     "options": [
       "1 2 3",
-      "0 1 2 3",
       "0 1 2",
+      "0 1 2 3",
       "0 1"
     ],
-    "answer": 3,
+    "answer": 2,
     "explain": "i bắt đầu từ 0 và dừng khi i < 3 thành sai, tức là lúc i bằng 3. Nên in 0, 1, 2."
   },
   {
     "prompt": "Chương trình cần hỏi mật khẩu cho tới khi người dùng nhập đúng. Vòng lặp nào phù hợp?",
     "options": [
-      "while, vì không biết trước người dùng nhập sai mấy lần",
-      "for, vì luôn biết số lần lặp",
-      "switch",
-      "Không cần vòng lặp"
+      "Vòng for",
+      "Câu switch",
+      "Vòng while",
+      "Câu if/else"
     ],
-    "answer": 1,
+    "answer": 3,
     "explain": "Số lần nhập không biết trước, chỉ biết điều kiện dừng là nhập đúng. Đó là việc của while."
   },
   {

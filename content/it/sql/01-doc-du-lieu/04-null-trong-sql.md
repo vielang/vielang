@@ -17,8 +17,8 @@ Mọi phép so sánh với `NULL` bằng `=` hay `<>` đều cho kết quả kh�
 cũng không sai, nên `WHERE` loại dòng đó. Muốn kiểm tra NULL phải dùng
 `IS NULL` hoặc `IS NOT NULL`.
 
-Khác `null` của C#: `= NULL` không bao giờ đúng, và `''` cũng là NULL. `NVL`
-thì giống toán tử `??`.
+Hai điểm khác `null` của C#: so sánh `= NULL` không bao giờ đúng, và chuỗi
+rỗng `''` cũng là NULL. `NVL` làm việc giống toán tử `??`.
 
 ## Ví dụ
 
@@ -83,6 +83,11 @@ này cũng không trả về dòng nào.
 SELECT name FROM customers WHERE email = '';
 ```
 
+```sql
+-- ĐÚNG — ô trống trong Oracle là NULL
+SELECT name FROM customers WHERE email IS NULL;
+```
+
 ## Tóm tắt
 
 - `NULL` là không có dữ liệu, khác 0 và khác chuỗi rỗng.
@@ -96,34 +101,34 @@ SELECT name FROM customers WHERE email = '';
   {
     "prompt": "Bảng products có cột discount, một số dòng là NULL. Câu nào tìm các sản phẩm chưa có giảm giá?",
     "options": [
+      "WHERE discount IS NULL",
       "WHERE discount = NULL",
       "WHERE discount = 0",
-      "WHERE discount IS NULL",
       "WHERE discount = ''"
     ],
-    "answer": 3,
+    "answer": 1,
     "explain": "Chỉ IS NULL mới tìm được NULL. Dấu = với NULL không bao giờ đúng, còn 0 là một giá trị khác hẳn."
   },
   {
     "prompt": "Muốn hiện 0 thay cho NULL ở cột discount khi hiển thị. Viết thế nào?",
     "options": [
-      "NVL(discount, 0)",
       "discount IS NULL",
+      "NVL(discount, 0)",
       "NULL(discount, 0)",
       "discount = 0"
     ],
-    "answer": 1,
+    "answer": 2,
     "explain": "NVL trả về giá trị thứ hai khi giá trị thứ nhất là NULL."
   },
   {
     "prompt": "Trong Oracle, INSERT một dòng với email = '' rồi tìm bằng WHERE email IS NULL. Dòng đó có được tìm thấy không?",
     "options": [
-      "Không, vì '' khác NULL",
-      "Báo lỗi khi INSERT",
-      "Chỉ tìm thấy bằng WHERE email = ''",
-      "Có, vì Oracle lưu '' thành NULL"
+      "Không, '' khác NULL",
+      "Không, INSERT báo lỗi",
+      "Có, tìm thấy",
+      "Không, phải tìm bằng = ''"
     ],
-    "answer": 4,
+    "answer": 3,
     "explain": "Oracle coi chuỗi rỗng là NULL, nên dòng đó có email là NULL và được IS NULL tìm thấy."
   }
 ]

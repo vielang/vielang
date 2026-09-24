@@ -81,8 +81,11 @@ warn: ProductsController[0]
       Không tìm thấy sản phẩm 999
 ```
 
-Chỉ một dòng `warn`. `LogDebug` thấp hơn mức `Information` mặc định nên bị
-bỏ qua. Muốn thấy log Debug khi dev, đặt `"Default": "Debug"` trong mục
+Chỉ một dòng `warn` của action. `LogDebug` thấp hơn mức `Information` mặc
+định nên bị bỏ qua. Lần gọi đầu có thể kèm một dòng `warn` của
+`HttpsRedirection` báo không tìm thấy cổng https, bỏ qua được.
+
+Muốn thấy log Debug khi dev, đặt `"Default": "Debug"` trong mục
 `Logging:LogLevel` của `appsettings.Development.json`.
 
 </details>
@@ -129,23 +132,23 @@ log, vì nhiều người và nhiều hệ thống đọc được log.
   {
     "prompt": "Mức log thấp nhất đặt là Warning. Dòng nào sẽ được ghi?",
     "options": [
-      "_logger.LogError(...)",
       "_logger.LogInformation(...)",
       "_logger.LogDebug(...)",
-      "_logger.LogTrace(...)"
+      "_logger.LogTrace(...)",
+      "_logger.LogError(...)"
     ],
-    "answer": 1,
+    "answer": 4,
     "explain": "Chỉ log từ Warning trở lên được ghi. Error cao hơn Warning, ba level còn lại thấp hơn nên bị bỏ."
   },
   {
     "prompt": "Cách viết log nào tốt nhất?",
     "options": [
+      "_logger.LogInformation(\"Đơn {OrderId} đã tạo\", orderId);",
       "_logger.LogInformation(\"Đơn \" + orderId + \" đã tạo\");",
       "_logger.LogInformation($\"Đơn {orderId} đã tạo\");",
-      "Console.WriteLine(\"Đơn đã tạo\");",
-      "_logger.LogInformation(\"Đơn {OrderId} đã tạo\", orderId);"
+      "Console.WriteLine(\"Đơn đã tạo\");"
     ],
-    "answer": 4,
+    "answer": 1,
     "explain": "Chỗ giữ {OrderId} lưu orderId thành một giá trị riêng, nên công cụ xem log lọc được theo từng đơn hàng."
   }
 ]

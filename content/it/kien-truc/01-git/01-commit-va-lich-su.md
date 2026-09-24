@@ -18,12 +18,6 @@ của project để bạn xem lại hay quay về lúc nào cũng được.
 Một thay đổi đi qua ba chỗ: sửa trong thư mục làm việc, `git add` vào
 staging area, rồi `git commit` để thành một mốc trong lịch sử.
 
-```mermaid Thay đổi đi từ thư mục làm việc vào lịch sử
-flowchart LR
-    W["Thư mục làm việc"] -- "git add" --> S["Staging area"]
-    S -- "git commit" --> H["Lịch sử commit"]
-```
-
 ## Ví dụ
 
 Cài Git xong, khai báo tên và email một lần. Git gắn chúng vào mỗi commit:
@@ -39,6 +33,7 @@ cả ba vào một kho Git:
 ```bash
 git init -b main
 dotnet new gitignore
+# mở .gitignore, thêm dòng appsettings.Development.json
 git add .
 git commit -m "Commit đầu tiên"
 git log --oneline
@@ -48,14 +43,17 @@ git log --oneline
   chính tên `main`.
 - `dotnet new gitignore` tạo sẵn `.gitignore` cho project .NET, bỏ qua các
   thư mục do build sinh ra như `bin/`, `obj/`.
+- `appsettings.Development.json` đang chứa mật khẩu Oracle từ bài EF Core
+  và DbContext. Mật khẩu không được commit, nên thêm file này vào
+  `.gitignore` trước khi `git add`.
 - `git add .` đưa mọi file vào staging area, `git commit -m` tạo commit kèm
   lời mô tả.
 - `git log --oneline` in mỗi commit một dòng: mã commit và lời mô tả.
 
 ## Thử ngay
 
-Thêm một dòng comment vào cuối `Program.cs`, tạo file mới `Notes.txt`, rồi
-chạy:
+Thêm một dòng comment vào cuối `ShopApi/Program.cs`, tạo file mới
+`Notes.txt` ở thư mục gốc, rồi chạy:
 
 ```bash
 git status
@@ -71,7 +69,7 @@ On branch main
 Changes not staged for commit:
   (use "git add <file>..." to update what will be committed)
   (use "git restore <file>..." to discard changes in working directory)
-	modified:   Program.cs
+	modified:   ShopApi/Program.cs
 
 Untracked files:
   (use "git add <file>..." to include in what will be committed)
@@ -80,8 +78,10 @@ Untracked files:
 no changes added to commit (use "git add" and/or "git commit -a")
 ```
 
-`Program.cs` đã có trong commit trước nên là "modified", đã sửa nhưng chưa
-`git add`. `Notes.txt` là file mới, Git chưa theo dõi nên là "untracked".
+`ShopApi/Program.cs` đã có trong commit trước nên là "modified", đã sửa
+nhưng chưa `git add`. Git ghi đường dẫn tính từ thư mục gốc của kho.
+
+`Notes.txt` là file mới, Git chưa theo dõi nên là "untracked".
 Muốn đưa cả hai vào commit tiếp theo thì `git add` chúng.
 
 </details>
@@ -104,10 +104,8 @@ dotnet new gitignore
 git add .
 ```
 
-`appsettings.Development.json` đang chứa mật khẩu Oracle từ bài EF Core và
-DbContext. Bài Cấu hình với appsettings đã dặn không commit mật khẩu, nên
-thêm dòng `appsettings.Development.json` vào cuối `.gitignore` trước khi
-`git add`.
+Tốt hơn nữa là không để mật khẩu trong file của project: bài Cấu hình với
+appsettings khuyên dùng user-secrets.
 
 ## Tóm tắt
 
@@ -122,23 +120,23 @@ thêm dòng `appsettings.Development.json` vào cuối `.gitignore` trước khi
   {
     "prompt": "Sửa Product.cs rồi chạy git commit -m \"Sửa giá\" mà chưa git add. Commit mới có thay đổi đó không?",
     "options": [
+      "Không, chỉ phần đã git add mới vào",
       "Có, commit tự lấy mọi thay đổi",
-      "Không, chỉ những gì đã git add vào staging area mới vào commit",
-      "Có, nhưng chỉ dòng đầu",
-      "Git báo lỗi và xoá thay đổi"
+      "Có, nếu file đã lưu trong editor",
+      "Git báo lỗi và bỏ thay đổi đó"
     ],
-    "answer": 2,
+    "answer": 1,
     "explain": "Commit lấy nội dung trong staging area. Thay đổi chưa add vẫn nằm ở thư mục làm việc."
   },
   {
     "prompt": "git status báo một file là \"Untracked\". Nghĩa là gì?",
     "options": [
       "File đã bị xoá",
-      "File đã commit nhưng bị sửa",
       "File mới, Git chưa từng theo dõi",
+      "File đã commit nhưng bị sửa",
       "File nằm trong .gitignore"
     ],
-    "answer": 3,
+    "answer": 2,
     "explain": "Untracked là file chưa từng được add. File trong .gitignore thì git status không hiện ra."
   },
   {
@@ -146,10 +144,10 @@ thêm dòng `appsettings.Development.json` vào cuối `.gitignore` trước khi
     "options": [
       "Controllers",
       "Migrations",
-      "Properties",
-      "bin và obj"
+      "bin và obj",
+      "Properties"
     ],
-    "answer": 4,
+    "answer": 3,
     "explain": "bin và obj do build sinh ra, ai build cũng tạo lại được. Migrations là code nên phải commit."
   }
 ]

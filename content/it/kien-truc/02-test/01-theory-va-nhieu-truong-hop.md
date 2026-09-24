@@ -18,7 +18,8 @@ liệu.
 ## Ví dụ
 
 Dùng lại `PriceCalculator` của bài Viết test cho API: tổng từ 500.000 trở lên
-thì giảm 10%.
+thì giảm 10%. Thêm method `Total_ReturnsExpected` vào class
+`PriceCalculatorTests` có sẵn của bài đó:
 
 ```csharp
 using Xunit;
@@ -53,32 +54,8 @@ trường hợp sai như số lượng 0 (kiểm bằng `Assert.Throws` ở mộ
 
 ## Thử ngay
 
-Thêm dòng `[InlineData(100000, 5, 500000)]` vào `Total_ReturnsExpected`:
-
-```csharp
-using Xunit;
-
-public class PriceCalculatorTests
-{
-    [Theory]
-    [InlineData(100000, 2, 200000)]
-    [InlineData(250000, 2, 450000)]
-    [InlineData(300000, 2, 540000)]
-    [InlineData(100000, 5, 500000)]
-    public void Total_ReturnsExpected(
-        decimal price, int quantity, decimal expected)
-    {
-        var calculator = new PriceCalculator();
-
-        decimal total =
-            calculator.Total(price, quantity);
-
-        Assert.Equal(expected, total);
-    }
-}
-```
-
-Chạy `dotnet test`.
+Thêm dòng `[InlineData(100000, 5, 500000)]` ngay dưới ba dòng `[InlineData]`
+của `Total_ReturnsExpected`, rồi chạy `dotnet test`.
 
 **Đoán trước khi chạy:** `Total_ReturnsExpected` giờ là mấy test, và dòng
 dữ liệu nào đỏ?
@@ -152,35 +129,35 @@ public class DiscountTests
   {
     "prompt": "Một [Theory] có 5 dòng [InlineData]. dotnet test đếm bao nhiêu test?",
     "options": [
-      "1",
       "5",
+      "1",
       "6",
       "Tuỳ số lần gọi Assert"
     ],
-    "answer": 2,
+    "answer": 1,
     "explain": "Mỗi dòng InlineData là một test riêng."
   },
   {
-    "prompt": "Giảm giá khi tổng từ 500.000 trở lên. Bộ dữ liệu nào quan trọng nhất phải có?",
+    "prompt": "Một [Theory] có 4 dòng [InlineData], dòng thứ hai đỏ. Hai dòng sau nó thì sao?",
     "options": [
-      "Tổng 100",
-      "Tổng 10 triệu",
-      "Tổng đúng 500.000 và ngay dưới 500.000",
-      "Chỉ cần một bộ bất kỳ"
+      "Không chạy, vì test dừng ở dòng đỏ",
+      "Vẫn chạy và qua hay đỏ tuỳ dữ liệu",
+      "Cũng bị tính là đỏ theo dòng thứ hai",
+      "Chỉ chạy khi sửa xong dòng thứ hai"
     ],
-    "answer": 3,
-    "explain": "Lỗi hay nằm ở mốc ranh giới, như nhầm giữa lớn hơn và lớn hơn hoặc bằng."
+    "answer": 2,
+    "explain": "Mỗi dòng InlineData là một test độc lập. Dòng này đỏ không làm các dòng khác dừng hay đỏ theo."
   },
   {
     "prompt": "[InlineData(5000m)] báo lỗi compile. Sửa thế nào?",
     "options": [
       "Đổi [Theory] thành [Fact]",
-      "Thêm using System.Decimal",
-      "Bỏ tham số của method",
-      "Viết [InlineData(5000)], xUnit tự đổi sang decimal"
+      "Viết [InlineData((decimal)5000)]",
+      "Viết [InlineData(5000)]",
+      "Viết [InlineData(\"5000m\")]"
     ],
-    "answer": 4,
-    "explain": "Attribute không nhận hằng decimal. Viết số nguyên và để tham số của method là decimal."
+    "answer": 3,
+    "explain": "Attribute không nhận hằng decimal, kể cả khi ép kiểu. Viết số nguyên, xUnit tự đổi sang decimal cho tham số của method."
   }
 ]
 ```

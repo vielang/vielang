@@ -159,24 +159,24 @@ return result;
   {
     "prompt": "Trộn hai dãy đã có thứ tự { 2, 8 } và { 3, 5 }. Kết quả là gì?",
     "options": [
-      "{ 2, 8, 3, 5 }",
       "{ 2, 3, 5, 8 }",
+      "{ 2, 8, 3, 5 }",
       "{ 3, 5, 2, 8 }",
       "{ 8, 5, 3, 2 }"
     ],
-    "answer": 2,
+    "answer": 1,
     "explain": "Lấy 2 (2 < 3), rồi 3 (3 < 8), rồi 5 (5 < 8), bên phải hết thì chép nốt 8."
   },
   {
     "prompt": "Vì sao merge sort vẫn O(n log n) khi dãy vào xếp ngược, còn sắp xếp chèn thành O(n²)?",
     "options": [
-      "Vì merge sort không so sánh",
-      "Vì merge sort dùng HashSet",
-      "Vì merge sort bỏ qua dãy ngược",
-      "Vì merge sort luôn chia đôi, số tầng và công việc mỗi tầng không phụ thuộc thứ tự ban đầu"
+      "Vì merge sort đảo dãy lại trước khi chia",
+      "Vì cách chia đôi không phụ thuộc thứ tự",
+      "Vì merge sort dừng sớm khi gặp dãy ngược",
+      "Vì merge sort chỉ so các phần tử kề nhau"
     ],
-    "answer": 4,
-    "explain": "Luôn có khoảng log n tầng chia, mỗi tầng trộn n phần tử, dù dãy vào ra sao."
+    "answer": 2,
+    "explain": "Merge sort luôn chia đôi nên có khoảng log n tầng, mỗi tầng trộn n phần tử, dù dãy vào ra sao. Sắp xếp chèn thì phải dời mỗi phần tử qua mọi phần tử đứng trước."
   },
   {
     "prompt": "Điểm dừng của MergeSort là gì?",

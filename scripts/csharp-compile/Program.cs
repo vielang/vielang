@@ -81,7 +81,10 @@ var webRefs = refs
         .Where(p => Path.GetFileName(p) is var f
             && (f.StartsWith("Microsoft.EntityFrameworkCore")
                 || f.StartsWith("Microsoft.Data.Sqlite")
-                || f.StartsWith("xunit")))
+                || f.StartsWith("xunit")
+                || f.StartsWith("Microsoft.AspNetCore.Authentication.JwtBearer")
+                || f.StartsWith("Microsoft.IdentityModel")
+                || f.StartsWith("System.IdentityModel")))
         .Select(p => MetadataReference.CreateFromFile(p)))
     .ToImmutableArray();
 

@@ -82,14 +82,15 @@ Content-Type: application/problem+json
   "title": "One or more validation errors occurred.",
   "status": 400,
   "errors": {
-    "Name": ["Tên không được trống"],
-    "Price": ["Giá phải từ 1 đến 100 triệu"]
+    "Name": ["T\u00EAn kh\u00F4ng \u0111\u01B0\u1EE3c tr\u1ED1ng"],
+    "Price": ["Gi\u00E1 ph\u1EA3i t\u1EEB 1 \u0111\u1EBFn 100 tri\u1EC7u"]
   }
 }
 ```
 
 Action không chạy. `[ApiController]` chặn từ trước và trả 400 kèm hai lỗi,
-mỗi lỗi gắn với tên property. Client dùng danh sách này để báo cho người dùng.
+mỗi lỗi gắn với tên property. Chữ có dấu bị mã hoá dạng `\u00EA` khi xem
+bằng `curl`, còn client đọc JSON sẽ hiện lại đúng "Tên không được trống".
 
 </details>
 

@@ -214,7 +214,21 @@ async function soatDinhNghia(files: string[]): Promise<string[]> {
 
 async function main() {
   const loc = process.argv[2];
-  const tatCa = await lietKe(ROOT);
+  // Soát định nghĩa phải đi theo THỨ TỰ HỌC (trường `order` trong course.md),
+  // không theo tên thư mục: `aspnet-core` đứng trước `csharp-core` theo chữ
+  // cái nhưng học sau, nên "exception" bị báo là dùng trước khi định nghĩa.
+  const thuTuKhoa = new Map<string, number>();
+  for (const khoa of await readdir(ROOT)) {
+    try {
+      const md = await readFile(path.join(ROOT, khoa, "course.md"), "utf8");
+      thuTuKhoa.set(khoa, Number(md.match(/^order:\s*(\d+)/m)?.[1] ?? 99));
+    } catch {
+      // không phải thư mục khoá
+    }
+  }
+  const khoaCua = (f: string) => path.relative(ROOT, f).split(path.sep)[0];
+  const tatCa = (await lietKe(ROOT)).sort(
+    (a, b) => (thuTuKhoa.get(khoaCua(a)) ?? 99) - (thuTuKhoa.get(khoaCua(b)) ?? 99) || a.localeCompare(b));
   const files = tatCa.filter((f) => !loc || f.includes(loc));
   const ketQua: KetQua[] = [];
 

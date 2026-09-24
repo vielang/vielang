@@ -161,6 +161,10 @@ var khoiSai = new List<string>();
 // trong Stubs.cs và báo lỗi oan.
 var kieuTrongBai = new Dictionary<string, string>(StringComparer.Ordinal);
 
+// Using của các khối trước, mang theo cùng kiểu: `ShopDbContext : DbContext`
+// cần `using Microsoft.EntityFrameworkCore` của khối đã khai báo nó.
+var usingTrongBai = new SortedSet<string>(StringComparer.Ordinal);
+
 // Đã thử mang theo cả BIẾN của khối trước, và bỏ: các bài dùng lại tên `a`,
 // `x`, `success` ở nhiều khối với nghĩa khác nhau, nên ghép vào là CS0128
 // hàng loạt. Kiểu thì khác — một bài chỉ định nghĩa `Order` đúng một lần.
@@ -181,7 +185,9 @@ List<Diagnostic> BienDich(string code, out SyntaxTree tree)
         : new List<SyntaxTree> { t, stubTree, usingTree };
     var boSung = kieuTrongBai.Where(p => !daKhaiBao.Contains(p.Key)).Select(p => p.Value).ToList();
     if (boSung.Count > 0)
-        cay.Add(CSharpSyntaxTree.ParseText(string.Join("\n\n", boSung), parseOptions, path: "TrongBai.cs"));
+        cay.Add(CSharpSyntaxTree.ParseText(
+            string.Join("\n", usingTrongBai) + "\n\n" + string.Join("\n\n", boSung),
+            parseOptions, path: "TrongBai.cs"));
 
     var comp = CSharpCompilation.Create(
         "Snippet",
@@ -205,6 +211,9 @@ void Kiem(string nhan, string code, int dongTrongFile, bool nghiemNgat = true)
     foreach (var kieu in tree.GetRoot().DescendantNodes()
                  .OfType<Microsoft.CodeAnalysis.CSharp.Syntax.BaseTypeDeclarationSyntax>())
         kieuTrongBai.TryAdd(kieu.Identifier.Text, kieu.ToFullString());
+    foreach (var u in tree.GetRoot().DescendantNodes()
+                 .OfType<Microsoft.CodeAnalysis.CSharp.Syntax.UsingDirectiveSyntax>())
+        usingTrongBai.Add(u.ToString());
 
 
     // Nhiều khối là THÂN CLASS trình bày rời: `public Task<Order> GetAsync(…)`
@@ -279,6 +288,7 @@ foreach (var file in Directory.GetFiles(root, "*.md", SearchOption.AllDirectorie
     var text = File.ReadAllText(file);
     var ten = Path.GetFileName(file);
     kieuTrongBai.Clear();   // mỗi bài một thế giới riêng
+    usingTrongBai.Clear();
     cheDoWeb = file.Replace('\\', '/').Contains("/aspnet-core/");
 
     foreach (Match m in fence.Matches(text))

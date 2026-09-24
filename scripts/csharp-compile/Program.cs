@@ -68,11 +68,60 @@ var refs = Directory.GetFiles(frameworkDir, "System*.dll")
     .Select(p => MetadataReference.CreateFromFile(p))
     .ToImmutableArray();
 
+// Khoá ASP.NET Core là project web thật: nạp thêm shared framework của ASP.NET
+// Core (FrameworkReference trong csproj), EF Core và xUnit (PackageReference,
+// dll nằm cạnh file thực thi). Không nạp Stubs.cs — bối cảnh giả ấy viết cho
+// khoá console, và các tên như ILogger của nó sẽ đụng với kiểu thật.
+var aspNetDir = Path.GetDirectoryName(
+    typeof(Microsoft.AspNetCore.Mvc.ControllerBase).Assembly.Location)!;
+var webRefs = refs
+    .Concat(Directory.GetFiles(aspNetDir, "Microsoft.*.dll")
+        .Select(p => MetadataReference.CreateFromFile(p)))
+    .Concat(Directory.GetFiles(AppContext.BaseDirectory, "*.dll")
+        .Where(p => Path.GetFileName(p) is var f
+            && (f.StartsWith("Microsoft.EntityFrameworkCore")
+                || f.StartsWith("Microsoft.Data.Sqlite")
+                || f.StartsWith("xunit")))
+        .Select(p => MetadataReference.CreateFromFile(p)))
+    .ToImmutableArray();
+
+// Global usings đúng như project `dotnet new webapi` (Web SDK).
+var webUsingTree = CSharpSyntaxTree.ParseText("""
+    global using System;
+    global using System.Collections.Generic;
+    global using System.IO;
+    global using System.Linq;
+    global using System.Net.Http;
+    global using System.Net.Http.Json;
+    global using System.Threading;
+    global using System.Threading.Tasks;
+    global using Microsoft.AspNetCore.Builder;
+    global using Microsoft.AspNetCore.Hosting;
+    global using Microsoft.AspNetCore.Http;
+    global using Microsoft.AspNetCore.Routing;
+    global using Microsoft.Extensions.Configuration;
+    global using Microsoft.Extensions.DependencyInjection;
+    global using Microsoft.Extensions.Hosting;
+    global using Microsoft.Extensions.Logging;
+    """, parseOptions, path: "GlobalUsings.cs");
+
+// Đổi theo từng file: bài thuộc khoá aspnet-core thì biên dịch như project web.
+var cheDoWeb = false;
+
 // Kiểu BCL hay bị quên `using` trong khoá này. Dùng để phân biệt "thiếu
 // using" (phải báo) với "tên do bài lược bỏ bối cảnh" (bỏ qua).
 var bclTypeNames = new HashSet<string>(StringComparer.Ordinal)
 {
     "Stopwatch", "Encoding", "Regex", "CultureInfo", "JsonSerializer",
+    // Khoá ASP.NET Core: quên `using Microsoft.AspNetCore.Mvc` hay
+    // `using Microsoft.EntityFrameworkCore` là lỗi người học gặp thật.
+    "ControllerBase", "ApiController", "ApiControllerAttribute",
+    "RouteAttribute", "HttpGetAttribute", "HttpPostAttribute",
+    "HttpPutAttribute", "HttpDeleteAttribute", "FromBodyAttribute",
+    "FromQueryAttribute", "ActionResult", "IActionResult",
+    "DbContext", "DbSet<>", "DbContextOptions<>", "ModelBuilder",
+    "RequiredAttribute", "RangeAttribute", "StringLengthAttribute",
+    "FactAttribute", "Assert",
 };
 
 var fence = new Regex("```csharp[^\n]*\r?\n(.*?)```", RegexOptions.Singleline);
@@ -127,7 +176,9 @@ List<Diagnostic> BienDich(string code, out SyntaxTree tree)
             .Select(n => n.Identifier.Text),
         StringComparer.Ordinal);
 
-    var cay = new List<SyntaxTree> { t, stubTree, usingTree };
+    var cay = cheDoWeb
+        ? new List<SyntaxTree> { t, webUsingTree }
+        : new List<SyntaxTree> { t, stubTree, usingTree };
     var boSung = kieuTrongBai.Where(p => !daKhaiBao.Contains(p.Key)).Select(p => p.Value).ToList();
     if (boSung.Count > 0)
         cay.Add(CSharpSyntaxTree.ParseText(string.Join("\n\n", boSung), parseOptions, path: "TrongBai.cs"));
@@ -135,7 +186,7 @@ List<Diagnostic> BienDich(string code, out SyntaxTree tree)
     var comp = CSharpCompilation.Create(
         "Snippet",
         cay,
-        refs,
+        cheDoWeb ? webRefs : refs,
         new CSharpCompilationOptions(
             OutputKind.ConsoleApplication,
             allowUnsafe: false,
@@ -228,6 +279,7 @@ foreach (var file in Directory.GetFiles(root, "*.md", SearchOption.AllDirectorie
     var text = File.ReadAllText(file);
     var ten = Path.GetFileName(file);
     kieuTrongBai.Clear();   // mỗi bài một thế giới riêng
+    cheDoWeb = file.Replace('\\', '/').Contains("/aspnet-core/");
 
     foreach (Match m in fence.Matches(text))
     {

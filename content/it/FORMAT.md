@@ -121,6 +121,29 @@ trước nó.
 | `02-interface-va-composition` | `01-interface` · `02-interface-hay-abstract-class` · `03-composition` |
 | `03-solid` | `01-srp` · `02-ocp` · `03-lsp` · `04-isp` · `05-dip-va-dependency-injection` |
 
+### ASP.NET Core Web API (`aspnet-core`)
+
+Dùng controller, không dùng minimal API. Database là SQLite qua EF Core.
+
+| Chương | Bài |
+|---|---|
+| `01-nen-tang-web` | `01-http-va-rest` · `02-tao-web-api-dau-tien` · `03-controller-va-routing` |
+| `02-xay-api-crud` | `01-nhan-du-lieu-tu-request` · `02-tra-ve-ket-qua` · `03-dto` · `04-validation` · `05-crud-hoan-chinh` |
+| `03-cau-truc-ung-dung` | `01-dependency-injection-trong-aspnet` · `02-cau-hinh-appsettings` · `03-logging` · `04-middleware-va-pipeline` |
+| `04-du-lieu-voi-ef-core` | `01-ef-core-va-dbcontext` · `02-migration` · `03-truy-van-voi-ef-core` · `04-quan-he-mot-nhieu` |
+| `05-hoan-thien-api` | `01-xu-ly-loi-tap-trung` · `02-xac-thuc-jwt` · `03-test-api` |
+
+Riêng bài web:
+
+- Project tạo bằng `dotnet new webapi --use-controllers -o ShopApi`, chạy
+  bằng `dotnet run --urls http://localhost:5000` để mọi bài cùng một địa chỉ.
+- "Thử ngay" là chạy server rồi gọi API bằng `curl -i`. Câu đoán hỏi về
+  status code hoặc JSON trả về. Kết quả trong `<details>` là response.
+- Request, response mẫu viết trong khối ```` ```http ````.
+- Code C# ghi rõ `using Microsoft.AspNetCore.Mvc;`,
+  `using Microsoft.EntityFrameworkCore;` vì template không tự thêm.
+  `check-code` biên dịch bài khoá này như một project web thật.
+
 ### Cú pháp chưa dạy thì chưa dùng
 
 - Method viết đầy đủ `{ return ...; }`. Dạng gọn `=> ...` chỉ dùng sau bài

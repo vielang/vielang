@@ -583,7 +583,7 @@ const CODE_THEMES = { light: "github-light", dark: "github-dark" } as const;
  * Ngôn ngữ nạp sẵn cho Shiki. Chỉ nạp những thứ khoá học thật sự dùng: mỗi
  * grammar là một file khá nặng, nạp cả bundle thì build chậm vô ích.
  */
-const CODE_LANGS = ["csharp", "bash", "sql", "json", "xml", "csv", "diff"];
+const CODE_LANGS = ["csharp", "bash", "sql", "json", "xml", "csv", "diff", "http"];
 
 /** Tên ngôn ngữ hay viết tắt trong file .md -> tên Shiki hiểu. */
 const LANG_ALIASES: Record<string, string> = {

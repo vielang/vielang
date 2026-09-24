@@ -4,8 +4,8 @@ minutes: 5
 ---
 
 Hai bài trước tự viết thuật toán sắp xếp để hiểu bên trong. Khi đi làm, bạn
-gần như luôn dùng hàm có sẵn của .NET: nhanh, đã kiểm kỹ, và gọn. Điều cần
-biết là chọn hàm nào, và hàm nào đổi list tại chỗ.
+gần như luôn dùng hàm có sẵn của .NET vì nhanh, đã được kiểm kỹ và gọn. Điều
+cần biết là nên chọn hàm nào, và hàm nào đổi luôn list gốc.
 
 ## Khái niệm
 
@@ -16,8 +16,8 @@ biết là chọn hàm nào, và hàm nào đổi list tại chỗ.
 | `list.Sort(...)`, `Array.Sort(...)` | có, sắp xếp tại chỗ | không |
 | `OrderBy`, `ThenBy` của LINQ | không, trả về dãy mới | có |
 
-Cả hai đều O(n log n). `OrderBy` đã gặp ở bài LINQ cơ bản của khoá C# Core,
-và giống `ORDER BY` ở bài Sắp xếp và phân trang của khoá SQL.
+Cả hai đều O(n log n). `OrderBy` đã gặp ở bài LINQ cơ bản của khoá C# Core.
+Nó giống `ORDER BY` ở bài Sắp xếp và phân trang của khoá SQL.
 
 ## Ví dụ
 
@@ -50,7 +50,7 @@ class Product
 
 - `Sort` nhận lambda so hai phần tử `a`, `b`. Kết quả âm nghĩa là `a` đứng
   trước, dương là `b` đứng trước, 0 là bằng nhau.
-- `a.Price.CompareTo(b.Price)` trả về đúng con số âm, 0 hoặc dương đó.
+- `a.Price.CompareTo(b.Price)` trả về đúng số âm, 0 hoặc dương như vậy.
 - Muốn giảm dần thì đổi chỗ: `b.Price.CompareTo(a.Price)`.
 - `Sort` đổi thứ tự ngay trong `products`, in ra `Bút bi`, `Thước`, `Vở`.
 
@@ -86,8 +86,8 @@ Thước: 7000
 Vở: 12000
 ```
 
-`OrderBy` ổn định: hai món cùng giá giữ thứ tự trong list gốc, "Bút chì"
-đứng trước "Bút bi". Muốn cùng giá thì xếp theo tên, thêm
+`OrderBy` ổn định: hai món cùng giá giữ thứ tự trong list gốc, nên "Bút chì"
+đứng trước "Bút bi". Muốn các món cùng giá xếp theo tên thì thêm
 `.ThenBy(p => p.Name)`, giống `ORDER BY price, name` trong SQL.
 
 </details>
@@ -95,7 +95,7 @@ Vở: 12000
 ## Lỗi hay gặp
 
 **Gọi `OrderBy` rồi tưởng list đã đổi.** `OrderBy` trả về dãy mới, list gốc
-giữ nguyên. Không dùng kết quả thì coi như chưa sắp xếp.
+giữ nguyên. Không dùng dãy trả về thì coi như chưa sắp xếp.
 
 ```csharp
 // SAI — items vẫn giữ thứ tự cũ

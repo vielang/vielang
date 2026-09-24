@@ -4,15 +4,15 @@ minutes: 6
 ---
 
 Tìm một giá trong list một triệu phần tử bằng cách duyệt từ đầu, xấu nhất phải
-so một triệu lần. Nếu list đã sắp xếp, có một cách chỉ cần khoảng 20 lần so.
-Đó cũng là lý do index ở khoá SQL tìm nhanh đến vậy.
+so một triệu lần. Nếu list đã sắp xếp, chỉ cần khoảng 20 lần so. Index ở bài
+Index của khoá SQL tìm nhanh cũng nhờ dữ liệu đã sắp xếp như vậy.
 
 ## Khái niệm
 
 🌓 **Tìm kiếm nhị phân (binary search)**: trên dãy đã sắp xếp, so với phần tử ở giữa rồi bỏ đi nửa không thể chứa giá trị cần tìm, lặp lại tới khi thấy hoặc hết dãy.
 
-Mỗi bước bỏ một nửa, nên 1.000.000 phần tử chỉ cần khoảng 20 bước, vì 2
-nhân với chính nó 20 lần là hơn một triệu. Đó là O(log n).
+Mỗi bước bỏ một nửa, nên 1.000.000 phần tử chỉ cần khoảng 20 bước, vì 2 mũ
+20 là 1.048.576. Đó là O(log n): gấp đôi dữ liệu chỉ thêm một bước.
 
 ## Ví dụ
 
@@ -52,7 +52,7 @@ int Find(int[] items, int target)
 - `mid` là vị trí giữa. `/` giữa hai số nguyên bỏ phần lẻ, như bài Toán tử
   và ép kiểu của khoá C# Core.
 - Giá ở giữa nhỏ hơn giá cần tìm thì bỏ nửa trái, lớn hơn thì bỏ nửa phải.
-- Đoạn còn lại rỗng (`low > high`) mà chưa thấy thì trả `-1`.
+- Đoạn còn lại rỗng (`low > high`) mà vẫn chưa thấy thì trả `-1`.
 
 ```mermaid Tìm 25000 trong 7 giá: ba bước
 flowchart TD
@@ -65,7 +65,8 @@ thấy thì chúng trả về một số âm.
 
 ## Thử ngay
 
-Viết lại `Find` thành `CountSteps` có đếm số bước, rồi tìm trong một triệu số:
+Chép `Find` thành `CountSteps`, thêm biến đếm số bước, rồi tìm trong một triệu
+số:
 
 ```csharp
 int[] big = new int[1000000];
@@ -83,7 +84,7 @@ int CountSteps(int[] items, int target)
     int high = items.Length - 1;
     while (low <= high)
     {
-        steps = steps + 1;
+        steps++;
         int mid = (low + high) / 2;
         if (items[mid] == target)
         {
@@ -112,15 +113,16 @@ int CountSteps(int[] items, int target)
 20
 ```
 
-500000 nằm đúng giữa nên thấy ngay bước đầu. 1000000 nằm cuối, trường hợp gần
-xấu nhất, cũng chỉ mất 20 bước. Duyệt từ đầu thì phải mất một triệu bước.
+500000 nằm đúng giữa nên thấy ngay ở bước đầu. 1000000 nằm cuối, gần như
+trường hợp xấu nhất, cũng chỉ mất 20 bước. Duyệt từ đầu thì mất một triệu
+bước.
 
 </details>
 
 ## Lỗi hay gặp
 
-**Tìm nhị phân trên dãy chưa sắp xếp.** Không báo lỗi gì, chỉ trả về kết quả
-sai, vì bỏ nửa dãy chỉ đúng khi dãy có thứ tự.
+**Tìm nhị phân trên dãy chưa sắp xếp.** Chương trình không báo lỗi, chỉ trả
+về kết quả sai, vì bỏ nửa dãy chỉ đúng khi dãy có thứ tự.
 
 ```csharp
 // SAI — 3000 có trong dãy nhưng trả về -1

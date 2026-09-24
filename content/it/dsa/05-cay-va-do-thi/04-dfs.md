@@ -62,8 +62,8 @@ Thăm D
 5
 ```
 
-Không giống. Từ A, DFS đi thẳng sang C rồi sang B, trước khi quay lui. BFS
-thì thăm A và B (cùng cách kho 1 bước) trước C. DFS vẫn tới đủ 5 điểm, nhưng
+Không giống. Từ A, DFS đi thẳng sang C rồi sang B, hết đường mới quay lui
+về C để sang D. BFS thì thăm A và B (cùng cách kho 1 bước) trước C. DFS vẫn tới đủ 5 điểm, nhưng
 thứ tự thăm không cho biết số bước ít nhất.
 
 </details>
@@ -97,8 +97,8 @@ while (stack.Count > 0)
 }
 ```
 
-`seen.Add` trả `false` nếu điểm đã thăm, như bài HashSet, nên điểm đó bị bỏ
-qua.
+`seen.Add` trả `false` nếu điểm đã thăm (bài HashSet và bài toán đếm), nên
+điểm đó bị bỏ qua.
 
 ## Tóm tắt
 

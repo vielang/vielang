@@ -3,9 +3,9 @@ title: Merge sort
 minutes: 6
 ---
 
-Sắp xếp chèn chậm hẳn khi dữ liệu lớn. Merge sort dùng ý tưởng chia để trị:
-chia dãy làm đôi, sắp xếp từng nửa bằng chính nó, rồi trộn hai nửa đã có thứ
-tự lại. Đây là chỗ đệ quy ở chương 1 phát huy tác dụng.
+Sắp xếp chèn chậm hẳn khi dữ liệu lớn. Merge sort chia dãy làm đôi, sắp xếp
+từng nửa bằng cách gọi lại chính nó, rồi trộn hai nửa đã có thứ tự. Đây là
+đệ quy của bài Đệ quy ở chương 1.
 
 ## Khái niệm
 
@@ -73,11 +73,11 @@ List<int> Merge(List<int> left, List<int> right)
 
 - Điểm dừng: dãy 0 hoặc 1 phần tử đã có thứ tự, như bài Đệ quy.
 - `GetRange(start, count)` lấy một đoạn của list thành list mới.
-- `Merge` so hai phần tử ở đầu, lấy cái nhỏ hơn. Một bên hết thì chép nốt
-  bên kia.
+- `Merge` so hai phần tử ở đầu hai list, lấy cái nhỏ hơn. Một bên hết thì
+  chép nốt bên kia.
 - Merge sort tạo list mới khi chia và trộn, nên tốn thêm bộ nhớ cỡ n.
 
-```mermaid Chia đôi tới khi còn một phần tử, rồi trộn ngược lên
+```mermaid Sắp xếp 4 giá: chia đôi, sắp xếp từng nửa, rồi trộn
 flowchart TD
     A["12000, 3000, 7000, 5000"] --> B["12000, 3000"]
     A --> C["7000, 5000"]
@@ -112,9 +112,9 @@ Trộn [3000, 7000, 12000] + [5000, 25000, 450000]
 3000, 5000, 7000, 12000, 25000, 450000
 ```
 
-Lần trộn đầu là ở tầng sâu nhất: nửa trái `12000, 3000, 7000` chia tiếp thành
-`12000` và `3000, 7000`, nửa sau này chia thành hai phần tử lẻ. Lần trộn cuối
-ghép hai nửa lớn đã có thứ tự.
+Nửa trái `12000, 3000, 7000` chia thành `12000` và `3000, 7000`, rồi
+`3000, 7000` chia tiếp thành hai phần tử đơn. Hai phần tử này được trộn đầu
+tiên. Lần trộn cuối ghép hai nửa lớn đã có thứ tự.
 
 </details>
 

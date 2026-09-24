@@ -35,16 +35,16 @@ Console.WriteLine(orders.Count);       // 2
 
 ```mermaid Vào ở cuối, ra ở đầu
 flowchart LR
-    E["Enqueue"] --> T["Cuối: DH3 | DH2 | DH1 :Đầu"]
+    E["Enqueue"] --> T["cuối DH3 | DH2 | DH1 đầu"]
     T --> D["Dequeue trả DH1"]
 ```
 
 ## Bên trong Queue
 
 Tự viết queue bằng `List<T>` với `Add` ở cuối và `RemoveAt(0)` ở đầu thì
-`Dequeue` thành O(n), như bài Array và List bên trong. `Queue<T>` tránh việc
-dời chỗ bằng cách dùng array vòng tròn: giữ hai chỉ số đầu và cuối, lấy ra chỉ
-là tăng chỉ số đầu. Hết ô ở cuối array thì quay lại dùng các ô trống ở đầu.
+`Dequeue` thành O(n), như bài Array và List bên trong. `Queue<T>` không dời
+chỗ mà dùng array vòng tròn: giữ hai chỉ số đầu và cuối, lấy ra chỉ là tăng
+chỉ số đầu. Hết ô ở cuối array thì quay lại dùng các ô trống ở đầu.
 
 ## Thử ngay
 
@@ -104,13 +104,13 @@ string next = orders.Dequeue();
 ```
 
 Giống `Stack<T>`, gọi `Dequeue` khi hàng rỗng sẽ ném
-`InvalidOperationException` (`Queue empty.`), nên kiểm `Count` trước.
+`InvalidOperationException` (`Queue empty.`), nên kiểm tra `Count` trước.
 
 ## Tóm tắt
 
 - Queue thêm ở cuối, lấy ở đầu: vào trước ra trước (FIFO).
 - `Enqueue`, `Dequeue`, `Peek` đều O(1) nhờ array vòng tròn.
-- Dùng cho đơn hàng chờ xử lý, và cho tìm kiếm theo chiều rộng ở chương 5.
+- Dùng cho đơn hàng chờ xử lý, và cho tìm kiếm theo chiều rộng (BFS) ở chương 5.
 - Đừng dùng `List<T>` với `RemoveAt(0)` làm hàng đợi.
 
 ```quiz

@@ -15,7 +15,7 @@ cần thêm `HashSet` hay `Dictionary`.
 
 ## Ví dụ
 
-Tìm hai món vừa đúng 19.000đ trên list giá **đã sắp xếp**:
+Tìm hai món có tổng đúng 19.000đ trong dãy giá **đã sắp xếp**:
 
 ```csharp
 int[] prices = { 3000, 5000, 7000, 12000, 25000 };
@@ -48,11 +48,18 @@ while (left < right)
 - So với cách dùng `HashSet` ở chương 3, cách này không tốn thêm bộ nhớ,
   nhưng cần dãy đã sắp xếp như tìm nhị phân.
 
+```mermaid Hai con trỏ tìm tổng 19000
+flowchart TD
+    A["3000 + 25000: lớn quá, right lùi"] --> B["3000 + 12000: nhỏ quá, left tiến"]
+    B --> C["5000 + 12000: nhỏ quá, left tiến"]
+    C --> D["7000 + 12000 = 19000: tìm thấy"]
+```
+
 ## Cửa sổ trượt
 
 Doanh thu 7 ngày (triệu đồng). Tìm 3 ngày liên tiếp có tổng doanh thu cao
-nhất. Cộng lại từ đầu cho mỗi đoạn 3 ngày thì tốn n × 3 bước. Cửa sổ trượt chỉ
-cộng một số và trừ một số mỗi bước.
+nhất. Cộng lại từ đầu cho mỗi đoạn 3 ngày thì tốn khoảng n × 3 bước. Cửa
+sổ trượt mỗi bước chỉ cộng một số và trừ một số.
 
 ```csharp
 int[] revenue = { 5, 8, 2, 9, 7, 1, 6 };
@@ -100,8 +107,9 @@ dòng in `best`. Cửa sổ thứ hai, ngày 2 tới ngày 4, có doanh thu cao 
 
 ## Lỗi hay gặp
 
-**Dùng hai con trỏ trên dãy chưa sắp xếp.** Dời con trỏ dựa trên giả định
-"bên phải lớn hơn", dãy không có thứ tự thì bỏ nhầm cặp đúng.
+**Dùng hai con trỏ trên dãy chưa sắp xếp.** Cách dời con trỏ dựa vào việc số
+bên phải luôn lớn hơn. Dãy chưa sắp xếp thì con trỏ có thể bỏ qua đúng cặp
+cần tìm.
 
 ```csharp
 // SAI — 7000 + 12000 có trong dãy nhưng không tìm ra
@@ -119,7 +127,7 @@ Array.Sort(prices);
 - Hai con trỏ: một từ đầu, một từ cuối, dời theo kết quả so sánh. Cần dãy đã
   sắp xếp.
 - Cửa sổ trượt: đoạn liền nhau, mỗi bước cộng phần tử vào, trừ phần tử ra.
-- Cả hai biến O(n²) thành O(n) mà không tốn thêm bộ nhớ.
+- Cả hai chỉ duyệt một lượt, O(n), không tốn thêm bộ nhớ.
 - Gặp bài "cặp có tổng", "đoạn liên tiếp" thì nghĩ tới hai kỹ thuật này.
 
 ```quiz

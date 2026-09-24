@@ -5,8 +5,8 @@ minutes: 6
 
 Tìm nhị phân nhanh nhưng cần array đã sắp xếp, mà chèn vào array thì phải dời
 chỗ, tốn O(n). Cây nhị phân tìm kiếm giữ dữ liệu luôn có thứ tự, vừa tìm vừa
-thêm đều nhanh. Index B-tree của Oracle ở khoá SQL cũng là một loại cây như
-vậy.
+thêm đều nhanh. Index của Oracle ở khoá SQL cũng dựa trên một loại cây tìm
+kiếm tên là B-tree.
 
 ## Khái niệm
 
@@ -14,7 +14,9 @@ vậy.
 
 ⛰️ **Chiều cao cây**: số node trên đường dài nhất từ gốc xuống lá, cũng là số bước tìm hoặc thêm trong trường hợp xấu nhất.
 
-Cây cân đối có chiều cao khoảng log n, nên tìm và thêm là O(log n). Node ở
+Node trên cùng gọi là gốc, node không có con gọi là lá.
+
+Cây cân đối cao khoảng log n, nên tìm và thêm là O(log n). Node ở
 đây giống node của linked list, chỉ khác là có hai tham chiếu `Left`,
 `Right` thay vì một `Next`.
 
@@ -139,8 +141,8 @@ thành một đường thẳng như linked list, tìm mất O(n). Thêm xen kẽ
 
 ## Lỗi hay gặp
 
-**Tự viết BST rồi nạp dữ liệu đã sắp xếp.** Dữ liệu lấy từ database thường
-đã `ORDER BY` sẵn, cây lệch hẳn về một bên và mất hết ưu điểm.
+**Tự viết BST rồi nạp dữ liệu đã sắp xếp.** Dữ liệu đọc ra thường đã sắp
+xếp sẵn, nên cây lệch hẳn về một bên và mất hết ưu điểm.
 
 ```csharp
 // SAI — nạp giá đã sắp xếp: cây lệch thành O(n)

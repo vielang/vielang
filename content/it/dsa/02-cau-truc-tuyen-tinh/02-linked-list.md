@@ -11,8 +11,8 @@ bước. Đổi lại, muốn tới phần tử thứ 1000 thì phải đi qua 9
 
 ⛓️ **Linked list**: danh sách mà mỗi phần tử (gọi là node) giữ giá trị và tham chiếu tới node kế tiếp, node cuối trỏ tới `null`.
 
-`Next` là tham chiếu như bài Value type và reference type của khoá C# Core:
-nó không chứa node kế tiếp, chỉ chỉ tới chỗ node đó nằm.
+`Next` là một tham chiếu (bài Value type và reference type của khoá C# Core):
+nó không chứa node kế tiếp, mà chỉ trỏ tới node đó.
 
 ## Ví dụ
 
@@ -43,7 +43,8 @@ class Node
 - Mỗi `Node` giữ `Value` và `Next`. `Next` của `DH3` là `null`, đánh dấu hết
   danh sách.
 - Duyệt bằng cách đi theo `Next` từ node đầu, tới khi gặp `null`.
-- `Node?` là kiểu có thể `null`, như bài null và nullable của khoá C# Core.
+- `Node?` cho phép biến chứa `null`, như `string?` ở bài null và nullable
+  của khoá C# Core.
 
 ```mermaid Mỗi node chỉ tới node kế tiếp
 flowchart LR

@@ -4,16 +4,16 @@ minutes: 6
 ---
 
 Cửa hàng có 5 sản phẩm thì cách tìm nào cũng nhanh. Lên 5 triệu sản phẩm, có
-cách vẫn trả lời ngay, có cách chạy mãi không xong. Big-O giúp bạn biết trước
-một cách giải sẽ chậm đi thế nào khi dữ liệu lớn lên, trước khi nó chậm thật.
+cách vẫn trả lời ngay, có cách chạy mãi không xong. Big-O cho bạn biết trước
+một cách giải chậm đi thế nào khi dữ liệu lớn lên.
 
 ## Khái niệm
 
 📈 **Big-O**: cách mô tả số bước của một thuật toán tăng thế nào khi số phần tử `n` tăng, bỏ qua các hằng số.
 
 Big-O không đo giây, vì mỗi máy chạy nhanh chậm khác nhau. Nó đếm số bước và
-chỉ quan tâm dáng tăng: gấp đôi dữ liệu thì gấp đôi, gấp bốn, hay gần như
-không đổi.
+chỉ xem số bước tăng theo kiểu nào: dữ liệu gấp đôi thì số bước gấp đôi, gấp
+bốn, hay gần như không đổi.
 
 | Big-O | Đọc là | Ví dụ | 1.000 phần tử |
 |---|---|---|---|
@@ -38,7 +38,7 @@ Console.WriteLine(names[2]);   // Balo
 int steps = 0;
 foreach (string name in names)
 {
-    steps = steps + 1;
+    steps++;
     if (name == "Máy tính")
     {
         break;
@@ -50,16 +50,17 @@ Console.WriteLine(steps);   // 5
 - `names[2]` nhảy thẳng tới ô thứ ba, không cần nhìn các ô khác.
 - Tìm "Máy tính" phải so từng tên từ đầu. List 5 triệu tên thì xấu nhất là 5
   triệu lần so.
-- Big-O tính theo trường hợp xấu nhất: tên cần tìm nằm cuối, hoặc không có.
+- Big-O thường tính theo trường hợp xấu nhất: tên cần tìm nằm cuối, hoặc
+  không có. Chỗ nào ghi "trung bình" là nói trường hợp thường gặp.
 
-Đây cũng là chuyện của bài Index ở khoá SQL. Không có index, Oracle quét cả
-bảng, tức O(n). Có index, Oracle tra trên dữ liệu đã sắp xếp, nhanh cỡ
-O(log n).
+Nếu đã học bài Index của khoá SQL, bạn đã gặp chuyện này. Không có index,
+Oracle quét cả bảng, tức O(n). Có index, Oracle tra trên dữ liệu đã sắp xếp,
+chỉ cỡ O(log n).
 
 ## Vòng lặp lồng nhau
 
-Vòng lặp trong nằm trong vòng lặp ngoài, mỗi vòng chạy `n` lần, nên tổng cộng
-là `n × n` bước: O(n²).
+Vòng ngoài chạy `n` lần. Mỗi lần đó, vòng trong lại chạy `n` lần, nên tổng
+cộng là `n × n` bước: O(n²).
 
 ```csharp
 Console.WriteLine(CountSteps(10));   // 100
@@ -71,7 +72,7 @@ int CountSteps(int n)
     {
         for (int j = 0; j < n; j++)
         {
-            steps = steps + 1;
+            steps++;
         }
     }
     return steps;
@@ -87,8 +88,8 @@ Console.WriteLine(CountSteps(100));
 Console.WriteLine(CountSteps(1000));
 ```
 
-**Đoán trước khi chạy:** `n` tăng 10 lần, từ 10 lên 100 rồi lên 1000. Số
-bước tăng bao nhiêu lần mỗi lượt?
+**Đoán trước khi chạy:** mỗi lượt `n` tăng 10 lần, từ 10 lên 100 rồi 1000.
+Số bước tăng bao nhiêu lần?
 
 <details>
 <summary>Xem kết quả</summary>
@@ -106,8 +107,8 @@ O(n²), dữ liệu lớn gấp 10 là chờ lâu gấp 100.
 
 ## Lỗi hay gặp
 
-**Gọi `Contains` của `List` trong vòng lặp.** Nhìn chỉ thấy một vòng lặp,
-nhưng `Contains` tự duyệt cả list bên trong, nên tổng cộng là O(n²).
+**Gọi `Contains` của `List` trong vòng lặp.** Code chỉ có một vòng lặp,
+nhưng mỗi lần gọi, `Contains` lại duyệt cả list, nên tổng cộng là O(n²).
 
 ```csharp
 // SAI — O(n²): Contains duyệt lại list mỗi vòng
@@ -142,8 +143,8 @@ Vì sao `ContainsKey` chỉ tốn một bước là chuyện của chương Bả
 
 - Big-O mô tả số bước tăng thế nào khi dữ liệu tăng, không đo giây.
 - Lấy theo vị trí là O(1), duyệt tìm là O(n), hai vòng lồng nhau là O(n²).
-- Tính theo trường hợp xấu nhất và bỏ qua hằng số.
-- Coi chừng method có vòng lặp ẩn bên trong như `List.Contains`.
+- Thường tính theo trường hợp xấu nhất và bỏ qua hằng số.
+- Cẩn thận với method có vòng lặp ẩn bên trong, như `List.Contains`.
 
 ```quiz
 [

@@ -3,17 +3,17 @@ title: HashSet và bài toán đếm
 minutes: 6
 ---
 
-Rất nhiều bài toán hằng ngày chỉ là đếm và kiểm tra trùng: mỗi sản phẩm bán
-được bao nhiêu cái, có bao nhiêu khách khác nhau, có hai món nào vừa đúng ngân
-sách không. Làm bằng hai vòng lặp lồng nhau là O(n²). Hash table đưa chúng về
+Nhiều bài toán hằng ngày chỉ là đếm và kiểm tra trùng: mỗi sản phẩm bán được
+bao nhiêu cái, có bao nhiêu khách khác nhau, có hai món nào vừa đúng ngân sách
+không. Làm bằng hai vòng lặp lồng nhau là O(n²). Dùng hash table thì chỉ còn
 O(n).
 
 ## Khái niệm
 
-🎯 **HashSet**: tập hợp các phần tử không trùng nhau, bên trong là hash table nên `Add`, `Contains`, `Remove` trung bình là O(1).
+🫧 **HashSet**: tập hợp các phần tử không trùng nhau, bên trong là hash table nên `Add`, `Contains`, `Remove` trung bình là O(1).
 
-`HashSet<T>` giống `Dictionary` chỉ có key mà không có value. `Add` trả về
-`false` nếu phần tử đã có sẵn, nên kiểm trùng và thêm vào làm cùng một lúc.
+`HashSet<T>` giống một `Dictionary` chỉ có key, không có value. `Add` trả về
+`false` nếu phần tử đã có, nên vừa kiểm trùng vừa thêm chỉ bằng một lời gọi.
 
 ## Ví dụ
 
@@ -46,14 +46,14 @@ foreach (var item in counts)
 
 - Duyệt list đúng một lần, mỗi lần tra và cập nhật dictionary là O(1). Tổng
   cộng O(n).
-- Đây là việc câu `GROUP BY name` kèm `COUNT(*)` làm ở bài GROUP BY và
-  HAVING của khoá SQL.
+- Câu `GROUP BY` kèm `COUNT(*)` ở bài GROUP BY và HAVING của khoá SQL làm
+  đúng việc này.
 
 ## Tìm hai món vừa đủ ngân sách
 
-Khách có 19.000đ, muốn mua đúng hai món tiêu hết số tiền đó. Với mỗi giá,
-món còn thiếu phải có giá `budget - price`. Hỏi `HashSet` xem đã gặp giá đó
-chưa, thay vì so với mọi giá khác.
+Khách có 19.000đ, muốn mua đúng hai món cho hết số tiền đó. Với mỗi giá
+`price`, món còn lại phải có giá `budget - price`. Hỏi `HashSet` xem đã gặp
+giá đó chưa, thay vì so với mọi giá khác.
 
 ```csharp
 List<decimal> prices = new List<decimal>
@@ -76,8 +76,8 @@ foreach (decimal price in prices)
 
 - Gặp 7000, cần thêm 12000, mà 12000 đã có trong `seen`. In ra
   `12000 + 7000`.
-- Một vòng lặp, mỗi bước O(1), nên O(n). Hai vòng lồng nhau so từng cặp sẽ là
-  O(n²).
+- Một vòng lặp, mỗi bước O(1), nên tổng là O(n). Hai vòng lồng nhau so từng
+  cặp thì là O(n²).
 
 ## Thử ngay
 
@@ -103,15 +103,15 @@ False
 2
 ```
 
-"An" và "Bình" là lần đầu nên `Add` trả `True`. "An" lần hai đã có sẵn, `Add`
-trả `False` và không thêm. Tập chỉ có 2 khách.
+"An" và "Bình" được thêm lần đầu nên `Add` trả `True`. "An" lần hai đã có,
+`Add` trả `False` và không thêm. Tập chỉ có 2 khách.
 
 </details>
 
 ## Lỗi hay gặp
 
-**Lấy phần tử của `HashSet` theo vị trí.** Hash table xếp phần tử theo ô của
-hàm băm, không theo thứ tự thêm vào, nên không có `[i]`.
+**Lấy phần tử của `HashSet` theo vị trí.** `HashSet` chỉ trả lời "có hay
+không", không đánh số vị trí cho phần tử, nên không có `[i]`.
 
 ```csharp
 // SAI — lỗi compile: HashSet không có [i]

@@ -11,11 +11,11 @@ hỏi "ít bước nhất" được giải bằng BFS, dùng đúng `Queue` củ
 
 🕸️ **Đồ thị (graph)**: tập các đỉnh nối với nhau bằng cạnh, ví dụ các điểm giao hàng nối bằng đường.
 
-🌊 **BFS (breadth-first search, tìm theo chiều rộng)**: đi từ điểm xuất phát, thăm hết các điểm cách 1 bước, rồi các điểm cách 2 bước, cứ thế loang ra như vết nước.
+🌊 **BFS (breadth-first search, tìm theo chiều rộng)**: đi từ điểm xuất phát, thăm hết các điểm cách 1 bước, rồi tới các điểm cách 2 bước, cứ thế ra xa dần.
 
 Đồ thị thường lưu bằng danh sách kề: mỗi đỉnh giữ list các đỉnh nối trực tiếp
 với nó. Trong C#, đó là `Dictionary<string, List<string>>`. Cây ở hai bài
-trước là một đồ thị đặc biệt, không có vòng.
+trước là một loại đồ thị không có vòng.
 
 ## Ví dụ
 
@@ -73,9 +73,9 @@ Dictionary<string, int> Bfs(string start)
 - `distance` vừa ghi số bước, vừa đánh dấu điểm đã thăm để không thăm lại.
 - Queue bảo đảm điểm gần được xử lý hết trước điểm xa, nên số bước ghi lần
   đầu cho mỗi điểm là ít nhất.
-- Mỗi điểm và mỗi con đường được xét một lần: O(số điểm + số đường).
+- Mỗi điểm và mỗi con đường được xét một lần: O(số đỉnh + số cạnh).
 
-```mermaid Các điểm giao hàng, có một vòng A - C - B
+```mermaid Các điểm giao hàng, có vòng Kho - A - C - B - Kho
 flowchart LR
     K[Kho] --- A
     K --- B
@@ -115,8 +115,9 @@ rồi mới tới điểm cách 2 bước (C).
 
 ## Lỗi hay gặp
 
-**Không đánh dấu điểm đã thăm.** Đồ thị có vòng: A nối C, C nối B, B nối lại
-kho. Không đánh dấu thì BFS đi vòng mãi, queue không bao giờ rỗng.
+**Không đánh dấu điểm đã thăm.** Đường đi hai chiều và có vòng, nên từ một
+điểm luôn quay lại được điểm cũ. Không đánh dấu thì BFS đi vòng mãi, queue
+không bao giờ rỗng.
 
 ```csharp
 // SAI — không kiểm đã thăm, chạy mãi không dừng
@@ -161,7 +162,7 @@ foreach (string next in roads[current])
   {
     "prompt": "Đồ thị có 1.000 điểm và 3.000 con đường. BFS tốn cỡ bao nhiêu bước?",
     "options": [
-      "Khoảng 4.000, tức O(số điểm + số đường)",
+      "Cỡ vài nghìn, tức O(số đỉnh + số cạnh)",
       "1.000.000",
       "3.000.000",
       "10"

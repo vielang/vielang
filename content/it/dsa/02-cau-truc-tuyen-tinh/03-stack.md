@@ -53,8 +53,8 @@ class PriceHistory
 }
 ```
 
-- Đỉnh là cuối list, vì bài trước đã cho thấy thêm và xoá ở cuối `List<T>`
-  là O(1).
+- Đỉnh là cuối list, vì thêm và xoá ở cuối `List<T>` là O(1), không phải dời
+  phần tử nào (bài Array và List bên trong).
 - `Pop` trả về 6000 là giá thêm sau cùng. `Peek` sau đó thấy 5500.
 - Chọn đỉnh là đầu list thì mỗi lần `Pop` phải dời cả list, thành O(n).
 
@@ -111,7 +111,7 @@ Console.WriteLine(undo.Pop());
 ```
 
 ```csharp
-// ĐÚNG — kiểm Count trước khi Pop
+// ĐÚNG — kiểm tra Count trước khi Pop
 var undo = new Stack<string>();
 if (undo.Count > 0)
 {
@@ -124,7 +124,7 @@ if (undo.Count > 0)
 - Stack thêm và lấy ở cùng một đầu: vào sau ra trước (LIFO).
 - `Push`, `Pop`, `Peek` đều O(1).
 - Dùng cho hoàn tác, call stack, và kiểm tra dấu ngoặc đóng mở.
-- Kiểm `Count` trước khi `Pop` hoặc `Peek`.
+- Kiểm tra `Count` trước khi `Pop` hoặc `Peek`.
 
 ```quiz
 [

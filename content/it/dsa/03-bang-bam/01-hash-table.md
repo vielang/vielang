@@ -3,19 +3,19 @@ title: Hash table
 minutes: 6
 ---
 
-Bài Big-O hứa rằng `Dictionary.ContainsKey` chỉ tốn một bước, dù dictionary
-có một triệu key. Tìm trong `List<T>` phải so từng phần tử, vậy `Dictionary`
-làm cách nào? Bên trong nó là một hash table.
+Bài Big-O nói `Dictionary.ContainsKey` chỉ tốn một bước, dù dictionary có
+một triệu key. Tìm trong `List<T>` thì phải so từng phần tử. `Dictionary`
+nhanh hơn vì bên trong nó là một hash table.
 
 ## Khái niệm
 
+🗳️ **Hash table (bảng băm)**: một array các ô (bucket), mỗi key được xếp vào đúng một ô để khi tìm chỉ cần xem ô đó.
+
 🎲 **Hàm băm (hash function)**: hàm biến một key thành một con số, dùng con số đó để chọn ô chứa key.
 
-💥 **Va chạm (collision)**: hai key khác nhau được hàm băm đưa vào cùng một ô.
+🚧 **Va chạm (collision)**: hai key khác nhau được hàm băm đưa vào cùng một ô.
 
-Hash table là một array các ô (gọi là bucket). Muốn tìm key nào, tính hàm băm
-để biết ngay ô cần xem, thay vì dò cả bảng. `Dictionary<TKey, TValue>` và
-`HashSet<T>` của .NET đều là hash table.
+`Dictionary<TKey, TValue>` và `HashSet<T>` của .NET đều là hash table.
 
 ## Ví dụ
 
@@ -90,13 +90,20 @@ class MiniDictionary
 - `new List<Entry>[4]` là array 4 ô, mỗi ô là một list các cặp key-value.
   Constructor tạo sẵn list rỗng cho từng ô.
 - `BucketOf` là hàm băm: "Vở" dài 2 ký tự, `2 % 4` bằng 2, nên nằm ở ô 2.
-- `Set` và `Get` chỉ duyệt đúng một ô. Ô chỉ có vài phần tử nên gần như là
-  O(1).
+- `Set` và `Get` chỉ duyệt đúng một ô. Mỗi ô chỉ có vài phần tử nên gần như
+  là O(1).
 - Không có key thì ném `KeyNotFoundException`, giống lỗi ở bài Dictionary của
   khoá C# Core.
 
-Hàm băm thật của .NET trộn mọi ký tự của key, nên các key rải đều ra các ô.
-Khi số phần tử nhiều quá so với số ô, `Dictionary` tự tăng số ô và xếp lại,
+```mermaid Sau ba lần Set: Bút bi và Vở cùng rơi vào ô 2
+flowchart LR
+    A["Bút bi: 6 % 4 = 2"] --> C["Ô 2: Bút bi, Vở"]
+    B["Vở: 2 % 4 = 2"] --> C
+    D["Balo: 4 % 4 = 0"] --> E["Ô 0: Balo"]
+```
+
+Hàm băm thật của .NET dùng mọi ký tự của key, nên các key rải đều ra các ô.
+Khi số phần tử quá nhiều so với số ô, `Dictionary` tự tăng số ô và xếp lại,
 giống `List<T>` gấp đôi array.
 
 ## Thử ngay
@@ -112,7 +119,8 @@ Console.WriteLine(table.BucketOf("Thước"));
 Console.WriteLine(table.BucketOf("Máy tính"));
 ```
 
-**Đoán trước khi chạy:** những sản phẩm nào rơi vào cùng một ô?
+**Đoán trước khi chạy:** ngoài "Bút bi" và "Vở", còn cặp nào rơi vào cùng
+một ô?
 
 <details>
 <summary>Xem kết quả</summary>
@@ -126,16 +134,16 @@ Console.WriteLine(table.BucketOf("Máy tính"));
 ```
 
 "Bút bi" (6 ký tự) và "Vở" (2 ký tự) cùng ở ô 2. "Balo" (4) và "Máy tính"
-(8) cùng ở ô 0. Đó là va chạm: ô chứa nhiều key nên phải so từng key trong
-list của ô. Nếu mọi key rơi vào một ô, hash table chậm như duyệt list, O(n).
+(8) cùng ở ô 0. Đó là va chạm: tìm trong ô này phải so từng key trong list
+của ô. Nếu mọi key rơi vào một ô, hash table chậm như duyệt list, O(n).
 
 </details>
 
 ## Lỗi hay gặp
 
-**Dùng object class làm key.** Như bài Value type và reference type của khoá
-C# Core, hai object class khác nhau thì không bằng nhau dù dữ liệu giống hệt.
-Hàm băm và phép so key mặc định đều dựa trên tham chiếu.
+**Dùng object của class làm key.** Bài Value type và reference type của khoá
+C# Core đã cho thấy hai object khác nhau thì không bằng nhau, dù dữ liệu giống
+hệt. Mặc định, `Dictionary` cũng băm và so key theo tham chiếu.
 
 ```csharp
 // SAI — tạo object mới thì không tìm lại được
@@ -165,7 +173,7 @@ Muốn dùng class làm key thì class đó phải `override` hai method `Equals
 - Hash table là array các ô. Hàm băm chọn ô cho từng key.
 - Tra, thêm, xoá theo key trung bình là O(1).
 - Va chạm là chuyện bình thường. Mọi key cùng một ô thì chậm thành O(n).
-- Key là object class thì so theo tham chiếu, trừ khi class override
+- Key là object của class thì so theo tham chiếu, trừ khi class override
   `Equals` và `GetHashCode`.
 
 ```quiz

@@ -4,13 +4,14 @@ minutes: 6
 ---
 
 Ở khoá C# Core, array có số ô cố định, còn `List<T>` thêm bao nhiêu cũng được.
-Thật ra bên trong `List<T>` vẫn là một array. Hiểu nó nới rộng thế nào sẽ giúp
-bạn biết thao tác nào nhanh, thao tác nào chậm.
+Thật ra bên trong `List<T>` vẫn là một array. Hiểu cách nó nới rộng, bạn sẽ
+biết thao tác nào nhanh, thao tác nào chậm.
 
 ## Khái niệm
 
-Array ở bài Array và List của khoá C# Core là dãy ô nằm liền nhau trong bộ
-nhớ. Nhờ vậy lấy theo vị trí chỉ mất O(1), nhưng số ô cố định lúc tạo.
+Array (bài Array và List của khoá C# Core) xếp các phần tử vào những ô nằm
+liền nhau trong bộ nhớ. Nhờ vậy lấy theo vị trí chỉ mất O(1), nhưng số ô cố
+định từ lúc tạo.
 
 📏 **Capacity**: số ô của array bên trong `List<T>`, luôn lớn hơn hoặc bằng `Count` là số phần tử đang dùng.
 
@@ -49,7 +50,7 @@ class MiniList
             _items = bigger;
         }
         _items[Count] = item;
-        Count = Count + 1;
+        Count++;
     }
 }
 ```
@@ -58,12 +59,21 @@ class MiniList
 - `Capacity => _items.Length` là property chỉ đọc, viết gọn bằng `=>`.
 - Thêm "Thước" khi 2 ô đã đầy: tạo array 4 ô, chép 2 phần tử cũ sang, rồi mới
   thêm.
-- Chép là O(n), nhưng vì mỗi lần gấp đôi nên hiếm khi xảy ra. Tính trung bình,
-  `Add` vẫn là O(1).
+- Chép là O(n), nhưng mỗi lần nới đều gấp đôi nên việc chép hiếm khi xảy ra.
+  Tính trung bình, `Add` vẫn là O(1).
+
+```mermaid Array đầy thì tạo array gấp đôi, chép sang rồi mới thêm
+flowchart LR
+    A["2 ô: Bút bi, Vở"] -->|chép sang| B["4 ô: Bút bi, Vở, trống, trống"]
+    B -->|thêm| C["4 ô: Bút bi, Vở, Thước, trống"]
+```
+
+`Insert(i, x)` chèn `x` vào vị trí `i`, `RemoveAt(i)` xoá phần tử ở vị trí
+`i`, `IndexOf(x)` trả về vị trí của `x`.
 
 | Thao tác trên `List<T>` | Big-O | Vì sao |
 |---|---|---|
-| `list[i]`, `Add` | O(1) | nhảy thẳng tới ô, thêm vào cuối |
+| `list[i]`, `Add`, `RemoveAt` ở cuối | O(1) | nhảy thẳng tới ô, thêm bớt ở cuối |
 | `Insert(0, x)`, `RemoveAt(0)` | O(n) | dời mọi phần tử phía sau một ô |
 | `Contains`, `IndexOf` | O(n) | so từng phần tử |
 
@@ -99,8 +109,8 @@ array đầy nên gấp đôi thành 8 rồi 16.
 
 ## Lỗi hay gặp
 
-**Lấy dần phần tử đầu bằng `RemoveAt(0)`.** Mỗi lần xoá đầu, cả list dời lên
-một ô. Làm vậy cho cả list là O(n²).
+**Lấy dần phần tử đầu bằng `RemoveAt(0)`.** Mỗi lần xoá phần tử đầu, cả list
+dời lên một ô. Lấy hết list theo cách này là O(n²).
 
 ```csharp
 // SAI — mỗi RemoveAt(0) dời hết phần còn lại
@@ -127,7 +137,7 @@ foreach (string order in orders)
 }
 ```
 
-Cần vừa lấy ra ở đầu vừa thêm vào ở cuối thì dùng `Queue<T>`, ở bài Queue.
+Cần vừa lấy ra ở đầu vừa thêm vào ở cuối thì dùng `Queue<T>` của bài Queue.
 
 ## Tóm tắt
 

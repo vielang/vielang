@@ -4,25 +4,25 @@ minutes: 6
 ---
 
 Danh mục sản phẩm có danh mục con, danh mục con lại có danh mục con nữa. Viết
-vòng lặp cho cấu trúc lồng không biết sâu bao nhiêu tầng thì rất rối. Đệ quy
-giải những bài như vậy bằng cách để method tự gọi lại chính nó. Sắp xếp trộn,
+vòng lặp cho dữ liệu lồng nhau không biết bao nhiêu tầng thì rất rối. Đệ quy
+giải những bài như vậy bằng cách cho method tự gọi lại chính nó. Merge sort,
 cây và đồ thị ở các chương sau đều dựa vào kỹ thuật này.
 
 ## Khái niệm
 
-🪆 **Đệ quy (recursion)**: method tự gọi lại chính nó, mỗi lần với một bài toán nhỏ hơn.
+🌀 **Đệ quy (recursion)**: method tự gọi lại chính nó, mỗi lần với một bài toán nhỏ hơn.
 
 🛑 **Điểm dừng (base case)**: trường hợp nhỏ nhất mà method trả lời thẳng, không gọi lại chính nó nữa.
 
 📚 **Call stack**: vùng nhớ ghi các lời gọi method đang chờ kết quả, gọi thì chồng thêm một tầng, `return` thì gỡ tầng trên cùng.
 
-Một hàm đệ quy luôn có hai phần: điểm dừng, và lời gọi lại với bài toán nhỏ
-hơn để tiến dần về điểm dừng.
+Method đệ quy luôn có hai phần: điểm dừng, và lời gọi lại với bài toán nhỏ
+hơn để tiến dần tới điểm dừng.
 
 ## Ví dụ
 
-Tính tổng giá: tổng từ vị trí `index` bằng giá ở `index` cộng tổng phần còn
-lại.
+Tính tổng giá: tổng tính từ vị trí `index` bằng giá ở `index` cộng tổng phần
+còn lại.
 
 ```csharp
 List<decimal> prices = new List<decimal>
@@ -41,10 +41,10 @@ decimal Sum(List<decimal> items, int index)
 }
 ```
 
-- Điểm dừng là khi `index` đi quá phần tử cuối: không còn gì để cộng.
-- Mỗi lần gọi lại, `index` tăng 1, nên list còn lại ngắn dần.
-- `Sum(prices, 0)` chờ `Sum(prices, 1)`, cái này lại chờ `Sum(prices, 2)`...
-  tới điểm dừng thì các kết quả cộng dồn ngược lên.
+- Điểm dừng là khi `index` đã qua phần tử cuối: không còn gì để cộng.
+- Mỗi lần gọi lại, `index` tăng 1, nên phần còn lại ngắn dần.
+- `Sum(prices, 0)` chờ `Sum(prices, 1)`, `Sum(prices, 1)` lại chờ
+  `Sum(prices, 2)`. Tới điểm dừng, các kết quả cộng dồn ngược lên.
 
 ```mermaid Các lời gọi chồng lên nhau rồi trả kết quả ngược lên
 sequenceDiagram
@@ -60,13 +60,13 @@ sequenceDiagram
     B-->>A: 19000
 ```
 
-Bài này viết bằng vòng lặp cũng được, và vòng lặp còn gọn hơn. Đệ quy thật sự
+Tính tổng thế này viết bằng vòng lặp cũng được, lại gọn hơn. Đệ quy thật sự
 có ích khi dữ liệu lồng nhau, như cây ở chương 5.
 
 ## Thử ngay
 
-Thay phần gọi `Sum` bằng method sau, in một dòng trước và một dòng sau lời gọi
-lại:
+Thay dòng in `Sum(prices, 0)` bằng đoạn dưới đây. Method `CountDown` in một
+dòng trước và một dòng sau lời gọi lại:
 
 ```csharp
 CountDown(3);
@@ -98,14 +98,14 @@ Ra 3
 ```
 
 Các dòng "Vào" in ra khi lời gọi chồng lên call stack. Dòng "Ra" chỉ chạy khi
-lời gọi bên trong đã xong, nên tầng vào sau cùng ra trước tiên.
+lời gọi bên trong đã xong, nên tầng vào sau cùng lại ra đầu tiên.
 
 </details>
 
 ## Lỗi hay gặp
 
-**Thiếu điểm dừng, hoặc gọi lại mà bài toán không nhỏ đi.** Lời gọi chồng mãi
-tới khi call stack đầy. Chương trình sập với dòng `Stack overflow.`, và
+**Thiếu điểm dừng, hoặc gọi lại mà bài toán không nhỏ đi.** Lời gọi chồng lên
+mãi tới khi call stack đầy. Chương trình sập với dòng `Stack overflow.`, và
 `try/catch` cũng không bắt được lỗi này.
 
 ```csharp

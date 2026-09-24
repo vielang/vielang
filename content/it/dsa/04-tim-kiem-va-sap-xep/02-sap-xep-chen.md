@@ -4,15 +4,14 @@ minutes: 5
 ---
 
 Tìm nhị phân cần dãy đã sắp xếp, vậy sắp xếp bằng cách nào? Sắp xếp chèn là
-cách dễ hiểu nhất, giống cách bạn xếp bài trên tay: rút từng lá và chèn vào
-đúng chỗ giữa các lá đã xếp. Nó cũng cho thấy rõ một thuật toán O(n²) trông
-như thế nào.
+cách dễ hiểu nhất: lấy từng phần tử và chèn vào đúng chỗ trong phần đã xếp.
+Nó cũng cho thấy rõ một thuật toán O(n²) trông như thế nào.
 
 ## Khái niệm
 
-🃏 **Sắp xếp chèn (insertion sort)**: đi lần lượt từng phần tử, dời các phần tử lớn hơn nó ở phần đã xếp sang phải một ô, rồi đặt nó vào chỗ trống.
+🃏 **Sắp xếp chèn (insertion sort)**: lấy lần lượt từng phần tử, dời các phần tử lớn hơn nó trong phần đã xếp sang phải một ô, rồi đặt nó vào ô trống.
 
-Phần đầu dãy luôn đã sắp xếp, và mỗi vòng nó dài thêm một phần tử. Xấu nhất
+Phần đầu dãy luôn có thứ tự, và mỗi vòng nó dài thêm một phần tử. Xấu nhất,
 mỗi phần tử phải so với mọi phần tử đứng trước, nên là O(n²).
 
 ## Ví dụ
@@ -32,7 +31,7 @@ void InsertionSort(int[] items)
         while (j >= 0 && items[j] > current)
         {
             items[j + 1] = items[j];
-            j = j - 1;
+            j--;
         }
         items[j + 1] = current;
     }
@@ -40,8 +39,10 @@ void InsertionSort(int[] items)
 ```
 
 - `i` bắt đầu từ 1, vì một phần tử đứng một mình đã là dãy có thứ tự.
-- `current` là lá bài đang cầm. Vòng `while` dời các giá lớn hơn nó sang phải.
-- Gặp giá nhỏ hơn hoặc hết dãy thì dừng, đặt `current` vào ô trống `j + 1`.
+- `current` là giá đang cần chèn. Vòng `while` dời các giá lớn hơn nó sang
+  phải.
+- Gặp giá không lớn hơn hoặc hết dãy thì dừng, đặt `current` vào ô trống
+  `j + 1`.
 - Sắp xếp ngay trong array, không tạo array mới.
 
 ```mermaid Chèn 7000 vào phần đã xếp 3000, 12000
@@ -52,8 +53,8 @@ flowchart LR
 
 ## Thử ngay
 
-Đếm số lần so sánh khi dãy vào đã có thứ tự, và khi dãy vào ngược hẳn. Thêm
-biến `comparisons` và trả nó về:
+Đếm số lần so sánh khi dãy vào đã có thứ tự và khi dãy vào xếp ngược. Chép
+`InsertionSort` thành `CountComparisons`, thêm biến `comparisons` và trả nó về:
 
 ```csharp
 int[] sorted = { 3000, 5000, 7000, 12000, 25000 };
@@ -70,13 +71,13 @@ int CountComparisons(int[] items)
         int j = i - 1;
         while (j >= 0)
         {
-            comparisons = comparisons + 1;
+            comparisons++;
             if (items[j] <= current)
             {
                 break;
             }
             items[j + 1] = items[j];
-            j = j - 1;
+            j--;
         }
         items[j + 1] = current;
     }
@@ -96,36 +97,42 @@ int CountComparisons(int[] items)
 
 Dãy đã có thứ tự: mỗi phần tử so một lần với phần tử liền trước là dừng, tổng
 4 lần, tức O(n). Dãy ngược: phần tử thứ hai so 1 lần, thứ ba 2 lần... tổng
-1 + 2 + 3 + 4 = 10, tăng theo n², tức O(n²).
+1 + 2 + 3 + 4 = 10 lần, tức O(n²).
 
 </details>
 
 ## Lỗi hay gặp
 
 **Dùng sắp xếp chèn cho dữ liệu lớn.** Một trăm nghìn đơn hàng xếp ngược thì
-tốn khoảng 5 tỉ lần so. Dữ liệu lớn hãy dùng thuật toán O(n log n) như merge
+tốn khoảng 5 tỉ lần so. Dữ liệu lớn nên dùng thuật toán O(n log n) như merge
 sort, hoặc hàm có sẵn của .NET.
 
 ```csharp
 // SAI — tự viết O(n²) cho dữ liệu lớn
 int[] prices = new int[100000];
+for (int i = 0; i < prices.Length; i++)
+{
+    prices[i] = prices.Length - i;   // xếp ngược
+}
 InsertionSort(prices);
 ```
 
 ```csharp
 // ĐÚNG — Array.Sort của .NET là O(n log n)
 int[] prices = new int[100000];
+for (int i = 0; i < prices.Length; i++)
+{
+    prices[i] = prices.Length - i;
+}
 Array.Sort(prices);
 ```
-
-Sắp xếp chèn vẫn có ích khi dãy nhỏ hoặc gần như đã có thứ tự. Chính
-`Array.Sort` của .NET cũng dùng nó cho những đoạn rất ngắn.
 
 ## Tóm tắt
 
 - Sắp xếp chèn lấy từng phần tử, dời phần tử lớn hơn sang phải, rồi chèn vào.
 - Xấu nhất O(n²), khi dãy vào xếp ngược.
-- Tốt nhất O(n), khi dãy vào đã có thứ tự.
+- Tốt nhất O(n), khi dãy vào đã có thứ tự, nên hợp với dãy nhỏ hoặc gần như
+  đã xếp.
 - Dữ liệu lớn dùng thuật toán O(n log n) như merge sort hoặc `Array.Sort`.
 
 ```quiz

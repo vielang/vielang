@@ -13,9 +13,16 @@ thêm vào vẫn nhanh. Đó là priority queue, bên trong là một heap.
 
 ⏫ **Priority queue (hàng đợi ưu tiên)**: hàng đợi mà `Dequeue` luôn lấy phần tử có mức ưu tiên nhỏ nhất, không theo thứ tự đến.
 
-Heap không cần xếp hết thứ tự như BST, chỉ cần cha nhỏ hơn con. Nhờ vậy nó
-lưu gọn trong một array: con của ô `i` nằm ở ô `2i + 1` và `2i + 2`, cha nằm
-ở ô `(i - 1) / 2`.
+Heap không cần xếp hết thứ tự như BST, chỉ cần cha không lớn hơn con. Cây
+được lấp đầy từng tầng, từ trái sang phải, nên lưu gọn trong một array: con
+của ô `i` nằm ở ô `2i + 1` và `2i + 2`, cha nằm ở ô `(i - 1) / 2`.
+
+```mermaid Min-heap lưu trong array 2, 5, 4, 8
+flowchart TD
+    A["ô 0: 2"] --> B["ô 1: 5"]
+    A --> C["ô 2: 4"]
+    B --> D["ô 3: 8"]
+```
 
 | Thao tác | Big-O |
 |---|---|
@@ -63,31 +70,42 @@ class MiniHeap
 
 - Mỗi lần đổi chỗ đi lên một tầng. Cây có khoảng log n tầng, nên `Add` là
   O(log n).
-- Lấy ra làm ngược lại: đưa phần tử cuối lên gốc rồi đổi chỗ xuống dưới.
+- Lấy ra làm ngược lại: đưa phần tử cuối lên gốc, rồi đổi chỗ với con nhỏ
+  hơn chừng nào còn lớn hơn con.
+- Ví dụ in ra `7`, `3, 7`, `3, 7, 9`, `1, 3, 9, 7`. Số 1 thêm sau cùng đổi
+  chỗ hai lần để lên gốc. Array không sắp xếp hẳn, nhưng gốc luôn nhỏ nhất.
 
 .NET có sẵn `PriorityQueue<TElement, TPriority>`: `Enqueue(phần tử, mức)`,
 `Dequeue()` trả phần tử có mức nhỏ nhất.
 
 ## Thử ngay
 
-Chạy ví dụ trên.
+Dùng `PriorityQueue` của .NET cho ba đơn, mức 1 là gấp nhất:
 
-**Đoán trước khi chạy:** bốn dòng in ra là gì? Số 1 thêm sau cùng sẽ nằm ở
-đâu?
+```csharp
+var orders = new PriorityQueue<string, int>();
+orders.Enqueue("DH1 thường", 3);
+orders.Enqueue("DH2 gấp", 1);
+orders.Enqueue("DH3 vừa", 2);
+while (orders.Count > 0)
+{
+    Console.WriteLine(orders.Dequeue());
+}
+```
+
+**Đoán trước khi chạy:** ba đơn ra theo thứ tự nào?
 
 <details>
 <summary>Xem kết quả</summary>
 
 ```text
-7
-3, 7
-3, 7, 9
-1, 3, 9, 7
+DH2 gấp
+DH3 vừa
+DH1 thường
 ```
 
-Thêm 3: nhỏ hơn cha 7 nên đổi lên gốc. Thêm 9: lớn hơn cha 3, đứng yên. Thêm
-1: đặt ở ô 3, nhỏ hơn cha 7 nên đổi lên ô 1, nhỏ hơn cha 3 nên đổi lên gốc.
-Array không sắp xếp hẳn, nhưng gốc luôn là số nhỏ nhất.
+`Dequeue` luôn lấy mức nhỏ nhất, không quan tâm đơn nào vào trước. DH1 vào
+đầu tiên nhưng ra cuối cùng.
 
 </details>
 
@@ -114,7 +132,7 @@ pq.Enqueue("DH3 thường", 2 * 1000 + 3);
 // Dequeue lần lượt: DH2 gấp, DH1 thường, DH3 thường
 ```
 
-Muốn lấy lớn nhất trước, ví dụ đơn có tổng tiền cao nhất, thì dùng mức ưu
+Muốn lấy lớn nhất trước, ví dụ đơn có tổng tiền cao nhất, thì đặt mức ưu
 tiên là số âm: `pq.Enqueue(order, -total)`.
 
 ## Tóm tắt

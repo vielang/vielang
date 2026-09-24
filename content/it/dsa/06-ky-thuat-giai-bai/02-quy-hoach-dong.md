@@ -4,9 +4,9 @@ minutes: 6
 ---
 
 Cửa hàng phát voucher mệnh giá 10, 30 và 40 nghìn. Khách được hoàn 60 nghìn,
-cần đưa ít voucher nhất. Cách tham lam, lấy voucher lớn nhất trước, cho
-40 + 10 + 10 là 3 tờ, trong khi 30 + 30 chỉ 2 tờ. Quy hoạch động tìm đúng đáp
-án tốt nhất.
+cần đưa ít voucher nhất. Cách tham lam (lấy voucher lớn nhất trước) cho
+40 + 10 + 10, tức 3 tờ, trong khi 30 + 30 chỉ cần 2 tờ. Quy hoạch động luôn
+tìm ra cách ít tờ nhất.
 
 ## Khái niệm
 

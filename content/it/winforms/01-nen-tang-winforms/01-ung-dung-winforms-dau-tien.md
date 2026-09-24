@@ -9,12 +9,13 @@ mềm đó bằng WinForms, dùng chung database Oracle với API.
 
 ## Khái niệm
 
-🪟 **WinForms (Windows Forms)**: thư viện của .NET để viết ứng dụng có cửa sổ, nút bấm, ô nhập chạy trên Windows.
+🪟 **WinForms (Windows Forms)**: thư viện của .NET để viết ứng dụng Windows có cửa sổ, nút bấm, ô nhập.
 
 🖼️ **Form**: class đại diện cho một cửa sổ. Mỗi cửa sổ trong app là một class kế thừa `Form`.
 
-`MainForm : Form` chính là kế thừa của khoá OOP: `MainForm` nhận sẵn mọi thứ
-một cửa sổ cần, như tiêu đề, kích thước, nút đóng, và chỉ thêm phần riêng.
+`MainForm : Form` là kế thừa như bài Kế thừa của khoá OOP: `MainForm` nhận
+sẵn mọi thứ một cửa sổ cần, như tiêu đề, kích thước, nút đóng, và chỉ thêm
+phần riêng.
 
 ## Ví dụ
 
@@ -56,13 +57,15 @@ class MainForm : Form
 Chạy bằng `dotnet run`, một cửa sổ trống hiện ra với tiêu đề "Quản lý cửa
 hàng".
 
-- `Main` là nơi chương trình bắt đầu. Ở khoá C# Core, compiler tự tạo `Main`
-  từ các câu lệnh top-level. Ở đây ta viết nó ra.
+- `Main` là nơi chương trình bắt đầu. Ở khoá C# Core, ta viết lệnh thẳng
+  trong `Program.cs` và compiler tự bọc chúng vào `Main`. Ở đây ta tự viết
+  `Main`, đặt trong `static class Program` chỉ chứa thành viên static.
 - `[STAThread]` là attribute, như `[HttpGet]` ở khoá ASP.NET Core. Nó bật chế
   độ chạy mà cửa sổ Windows cần.
-- `namespace ShopDesk;` đặt code vào tên chung của project. Template sinh
-  `ApplicationConfiguration` trong đó, nên phải giữ dòng này.
-- `Text`, `Width`, `Height` là property thừa kế từ `Form`, gán trong
+- `namespace ShopDesk;` đặt mọi class trong file vào namespace của project.
+  Template sinh `ApplicationConfiguration` trong namespace này, nên phải giữ
+  dòng này.
+- `Text`, `Width`, `Height` là property kế thừa từ `Form`, gán trong
   constructor.
 - `Application.Run` mở cửa sổ và chờ người dùng thao tác, giống `app.Run()`
   của Web API chờ request. Đóng cửa sổ thì `Run` kết thúc và chương trình
@@ -159,7 +162,7 @@ class MainForm : Form
   {
     "prompt": "Trong MainForm : Form, vì sao gán được Text = \"Kho\" dù MainForm không khai báo property Text?",
     "options": [
-      "Text là property MainForm thừa kế từ Form",
+      "Text là property MainForm kế thừa từ Form",
       "C# tự tạo property khi gán",
       "Text là biến toàn cục",
       "Phải có [STAThread] mới gán được"

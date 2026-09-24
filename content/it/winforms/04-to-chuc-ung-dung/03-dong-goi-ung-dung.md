@@ -11,7 +11,7 @@ viên cửa hàng không có những thứ đó. Bài này đóng gói app thàn
 
 📦 **Publish**: biên dịch app ở chế độ Release và gom mọi thứ nó cần vào một thư mục để đem đi cài.
 
-🧳 **Self-contained**: bản publish mang theo cả .NET bên trong, máy chạy nó không cần cài .NET.
+🧳 **Self-contained**: bản publish mang theo cả .NET, nên máy chạy nó không cần cài .NET.
 
 ## Ví dụ
 
@@ -26,13 +26,13 @@ dotnet publish -c Release -r win-x64 --self-contained -p:PublishSingleFile=true 
 - `PublishSingleFile=true` gom tất cả vào một file `ShopDesk.exe`.
 - `-o publish` đặt kết quả vào thư mục `publish`.
 
-Thư mục `publish` có `ShopDesk.exe` nặng khoảng 120 MB. Phần lớn là .NET,
+Thư mục `publish` có `ShopDesk.exe` nặng khoảng 120 MB. Phần lớn dung lượng là .NET,
 Windows Forms, EF Core và thư viện Oracle đi kèm.
 
 ## Thử ngay
 
-Chạy lại lệnh trên nhưng đổi `--self-contained` thành
-`--self-contained false`, rồi so kích thước file.
+Chạy lại lệnh trên, đổi `--self-contained` thành `--self-contained false`
+và `-o publish` thành `-o publish-nho`, rồi so kích thước hai file `.exe`.
 
 **Đoán trước khi chạy:** file `.exe` mới nhỏ hơn bao nhiêu? Chép nó sang một
 máy chưa cài .NET thì chạy được không?
@@ -46,8 +46,8 @@ máy chưa cài .NET thì chạy được không?
 ```
 
 Nhỏ hơn khoảng 10 lần, vì không mang theo .NET. Máy chưa cài .NET Desktop
-Runtime thì không chạy được: Windows hiện hộp thoại báo thiếu .NET và chỉ
-đường tải về.
+Runtime thì không chạy được: mở file lên chỉ thấy hộp thoại báo thiếu .NET,
+kèm đường dẫn tải về.
 
 </details>
 
@@ -70,8 +70,8 @@ var cs = "User Id=shopapi;Password=shopapi_pw;"
 ```
 
 Mật khẩu viết trong code sẽ nằm luôn trong file `.exe`, ai có file cũng đọc
-được. App thật cho mỗi nhân viên một tài khoản Oracle riêng, hoặc để app gọi
-API thay vì nối thẳng database.
+được. App thật thường cấp cho mỗi nhân viên một tài khoản Oracle riêng, hoặc cho
+app gọi API thay vì nối thẳng vào database.
 
 ## Tóm tắt
 

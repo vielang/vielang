@@ -9,14 +9,16 @@ chúng.
 
 ## Khái niệm
 
-🔘 **Control**: một thành phần trên cửa sổ như nhãn, ô nhập, nút bấm. Mỗi control là một object tạo từ class `Label`, `TextBox`, `Button`...
+🔘 **Control**: object hiển thị trên cửa sổ, như nhãn `Label`, ô nhập `TextBox`, nút bấm `Button`.
 
-📥 **Controls**: danh sách control con của một form hoặc một panel. Control chỉ hiện ra khi được thêm vào danh sách này.
+📥 **Controls**: property chứa danh sách control con của một form hoặc một panel.
+
+Control chỉ hiện ra khi đã được thêm vào danh sách này.
 
 🧱 **FlowLayoutPanel**: control chứa các control khác và tự xếp chúng nối tiếp nhau, không cần đặt toạ độ.
 
-Form chứa panel, panel chứa nhãn và nút. Đây là composition của khoá OOP:
-object lớn được ghép từ các object nhỏ.
+Form chứa panel, panel chứa nhãn và nút. Đây là composition như bài
+Composition của khoá OOP: object lớn được ghép từ các object nhỏ.
 
 ## Ví dụ
 
@@ -91,7 +93,7 @@ trong bộ nhớ không có nghĩa là nó nằm trên cửa sổ.
 ## Lỗi hay gặp
 
 **Chữ của `Label` bị cắt.** `Label` mặc định rộng cố định 100 điểm ảnh,
-phần chữ không vừa bị che mất.
+chữ dài hơn thế bị cắt mất.
 
 ```csharp
 // SAI — chỉ thấy một phần chữ

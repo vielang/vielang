@@ -4,22 +4,24 @@ minutes: 6
 ---
 
 `MainForm` đang gọi thẳng `ShopDbContext`. Muốn chạy thử màn hình khi chưa
-bật Oracle, hay đổi cách lưu dữ liệu, đều phải sửa form. Bài này đặt phần
+bật Oracle hay đổi cách lưu dữ liệu, bạn đều phải sửa form. Bài này đặt phần
 đọc ghi sau interface `IProductStore`, đúng như API đã làm ở khoá ASP.NET
 Core.
 
 ## Khái niệm
 
-🧩 **Composition root**: một chỗ duy nhất tạo các object và ghép chúng với nhau. Trong app WinForms, chỗ đó là `Main`.
+🧩 **Composition root**: nơi duy nhất trong app tạo các object và ghép chúng lại với nhau.
 
-Đây là bài DIP của khoá OOP lần thứ ba. Ở khoá OOP, `Main` tự `new`. Ở khoá
-ASP.NET Core, `AddScoped<IProductStore, DbProductStore>()` nhờ container làm
-hộ. Ở đây ta lại tự `new` trong `Main`, vì WinForms không có container sẵn.
+Trong app WinForms, chỗ đó là `Main`. Đây vẫn là DIP của khoá OOP: ở đó ta
+tự `new` rồi truyền vào constructor. Ở khoá ASP.NET Core, container làm hộ
+việc này qua `AddScoped<IProductStore, DbProductStore>()`.
+
+WinForms không có container sẵn, nên ta lại tự `new` trong `Main`.
 
 ## Ví dụ
 
-`IProductStore` và `DbProductStore` chép nguyên từ bài Truy vấn với EF Core
-của khoá ASP.NET Core, không sửa dòng nào:
+Chép nguyên `IProductStore` và `DbProductStore` từ bài Truy vấn với EF Core
+của khoá ASP.NET Core, không sửa dòng nào. Interface chỉ có hai method:
 
 ```csharp
 public interface IProductStore
@@ -116,9 +118,18 @@ class MainForm : Form
 - Bấm "Hết hàng" thì tồn kho về 0, danh sách tải lại, dòng đó biến mất.
 - Cùng một class `DbProductStore` giờ phục vụ cả API lẫn app kho.
 
+```mermaid Main chọn store nào, MainForm chỉ nhận IProductStore
+flowchart LR
+    M[Main] -->|"new"| D[DbProductStore]
+    M -.->|"hoặc new bản giả"| F[FakeProductStore]
+    D -->|"truyền vào constructor"| W[MainForm]
+    F -.-> W
+```
+
 ## Thử ngay
 
-Viết một bản giả, dữ liệu nằm trong bộ nhớ:
+Viết một bản giả giữ dữ liệu trong bộ nhớ, giống `InMemoryProductStore` ở
+bài Dependency injection trong ASP.NET Core:
 
 ```csharp
 class FakeProductStore : IProductStore
@@ -174,14 +185,14 @@ App mở bình thường, lưới có Bút bi và Vở.
 Chọn Vở, bấm "Hết hàng": dòng Vở biến mất.
 ```
 
-`MainForm` không đổi một chữ nào mà vẫn chạy trên dữ liệu giả. Nhớ
-`docker start oracle` và trả `Main` về `DbProductStore` sau khi thử.
+`MainForm` không đổi một chữ nào mà vẫn chạy trên dữ liệu giả. Thử xong,
+chạy `docker start oracle` và đổi `Main` về lại `DbProductStore`.
 
 </details>
 
 ## Lỗi hay gặp
 
-**Form tự `new` phần dữ liệu.** Form lại dính chặt vào Oracle, không thay
+**Form tự `new` phần dữ liệu.** Form lại gắn chặt với Oracle và không thay
 được bằng bản giả.
 
 ```csharp

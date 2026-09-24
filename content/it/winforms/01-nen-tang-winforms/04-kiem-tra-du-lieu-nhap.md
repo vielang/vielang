@@ -11,11 +11,19 @@ database.
 
 🔢 **NumericUpDown**: ô nhập chỉ nhận số, giá trị đọc qua property `Value` kiểu `decimal`, giới hạn bởi `Minimum` và `Maximum`.
 
-⚠️ **ErrorProvider**: component hiện biểu tượng lỗi cạnh một control, rê chuột vào thì thấy lời nhắn.
+⚠️ **ErrorProvider**: component hiện biểu tượng lỗi cạnh một control, rê chuột vào biểu tượng thì thấy lời nhắn.
 
 Dữ liệu sản phẩm được kiểm ở ba nơi. Form báo sớm cho người nhập. API có
-`[Required]`, `[Range]` như bài Validation. Database có `NOT NULL`, `CHECK`
-như bài Ràng buộc của khoá SQL, làm chốt chặn cuối cùng.
+`[Required]`, `[Range]` như bài Validation của khoá ASP.NET Core. Database có
+`NOT NULL`, `CHECK` như bài CREATE TABLE và ràng buộc của khoá SQL, làm chốt
+chặn cuối cùng.
+
+```mermaid Đường ghi nào cũng phải qua ràng buộc của database
+flowchart LR
+    F["Form WinForms"] --> D[("Database: NOT NULL, CHECK")]
+    A["API: Required, Range"] --> D
+    S["INSERT gõ tay"] --> D
+```
 
 ## Ví dụ
 
@@ -120,8 +128,8 @@ var priceBox = new NumericUpDown
 };
 ```
 
-**Chỉ kiểm ở form.** Code khác, như API hay một câu `INSERT` gõ tay, vẫn ghi
-được dữ liệu sai vào database. Kiểm ở form để báo sớm, còn ràng buộc trong
+**Chỉ kiểm ở form.** Đường ghi khác, như API hay một câu `INSERT` gõ tay,
+không đi qua form nên vẫn ghi được dữ liệu sai vào database. Kiểm ở form để báo sớm, còn ràng buộc trong
 database vẫn phải giữ.
 
 ## Tóm tắt

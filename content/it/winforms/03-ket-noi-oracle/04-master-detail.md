@@ -9,18 +9,18 @@ một-nhiều của EF Core với hai `BindingSource` để làm việc đó.
 
 ## Khái niệm
 
-🗂️ **Master-detail**: màn hình hai phần. Chọn một dòng ở bảng chính (master) thì bảng phụ (detail) hiện các dòng con của nó.
+🗂️ **Master-detail (chính-phụ)**: màn hình hai phần, chọn một dòng ở bảng chính (master) thì bảng phụ (detail) hiện các dòng con của nó.
 
-🧷 **DataMember**: tên property danh sách con. `BindingSource` phụ dùng nó để lấy danh sách con từ dòng đang chọn của `BindingSource` chính.
+🧷 **DataMember**: tên property danh sách con mà `BindingSource` phụ lấy ra từ dòng đang chọn của `BindingSource` chính.
 
-Đây vẫn là quan hệ một-nhiều giữa `ORDERS` và `ORDER_LINES` của khoá SQL,
-và `Order.Lines` của khoá ASP.NET Core. Chỉ khác là giờ hiện nó lên màn hình.
+Đây vẫn là quan hệ một-nhiều giữa `orders` và `order_lines` ở khoá SQL, đã
+khai báo thành `Order.Lines` ở khoá ASP.NET Core. Bài này đưa nó lên màn hình.
 
 ## Ví dụ
 
-Thêm `Order`, `OrderLine` và hai `DbSet` vào code, chép nguyên từ bài Quan hệ
-một-nhiều của khoá ASP.NET Core. Đơn mẫu đã tạo bằng
-`POST /api/orders/sample` ở bài đó, muốn thêm đơn thì gọi lại lệnh này.
+Chép class `Order`, `OrderLine` và hai `DbSet` `Orders`, `OrderLines` từ bài
+Quan hệ một-nhiều của khoá ASP.NET Core vào code. Đơn mẫu đã được tạo bằng
+`POST /api/orders/sample` ở bài đó. Muốn có thêm đơn thì gọi lại API này.
 
 ```csharp
 using Microsoft.EntityFrameworkCore;
@@ -97,9 +97,9 @@ Lưới trên vẫn đủ các đơn.
 Lưới dưới trống, dù chọn đơn nào.
 ```
 
-Không có `Include`, EF Core chỉ đọc bảng `ORDERS`. `Lines` của mỗi đơn giữ
-list rỗng lúc khởi tạo, giống hệt Thử ngay ở bài Quan hệ một-nhiều của khoá
-ASP.NET Core.
+Không có `Include`, EF Core chỉ đọc bảng `ORDERS`. `Lines` của mỗi đơn vẫn
+là list rỗng từ lúc khởi tạo, giống kết quả Thử ngay ở bài Quan hệ một-nhiều
+của khoá ASP.NET Core.
 
 </details>
 

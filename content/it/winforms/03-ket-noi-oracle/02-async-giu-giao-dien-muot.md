@@ -9,12 +9,15 @@ cửa sổ đứng im không kéo được, nhân viên sẽ tưởng app bị t
 
 ## Khái niệm
 
-🧵 **UI thread**: luồng duy nhất vừa chạy các handler vừa vẽ lại cửa sổ. Handler chạy lâu thì cửa sổ không được vẽ lại, trông như bị treo.
+🧵 **UI thread (luồng giao diện)**: luồng duy nhất vừa chạy các handler vừa vẽ lại cửa sổ.
 
-⏳ **Async event handler**: handler khai báo `async void` để dùng được `await` bên trong. Trong lúc `await`, UI thread rảnh tay vẽ cửa sổ và nhận thao tác.
+Handler chạy lâu thì cửa sổ không được vẽ lại, trông như bị treo.
 
-Handler phải trả về `void` vì event quy định như vậy. Đây là chỗ duy nhất
-dùng `async void`. Method async tự viết vẫn trả về `Task` như khoá C# Core.
+⏳ **Async event handler**: handler khai báo `async void` để dùng được `await` bên trong.
+
+Trong lúc `await`, UI thread rảnh để vẽ cửa sổ và nhận thao tác. Event quy
+định handler trả về `void`, nên đây là chỗ duy nhất dùng `async void`. Method
+async tự viết vẫn trả về `Task` như khoá C# Core.
 
 ## Ví dụ
 
@@ -77,6 +80,16 @@ class MainForm : Form
   được một truy vấn một lúc, bấm lần hai khi lần một chưa xong sẽ báo
   `InvalidOperationException`.
 - Lambda `async (sender, e) => ...` là handler `async void` viết gọn.
+
+```mermaid Trong lúc chờ Oracle, UI thread vẫn lo cửa sổ
+sequenceDiagram
+    participant U as UI thread
+    participant O as Oracle
+    U->>O: await ToListAsync()
+    U->>U: vẽ cửa sổ, nhận thao tác
+    O-->>U: danh sách sản phẩm
+    U->>U: gán DataSource, bật lại nút
+```
 
 ## Thử ngay
 

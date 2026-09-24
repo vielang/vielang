@@ -3,22 +3,24 @@ title: ListBox và ComboBox
 minutes: 5
 ---
 
-Nhân viên cần chọn một sản phẩm trong danh sách để xem giá. Gõ tay từng dòng
-vào control thì dài và dễ sai. Bài này đưa thẳng một `List<Product>` vào
-control và để nó tự hiện tên.
+Nhân viên cần chọn một sản phẩm trong danh sách để xem giá. Thêm tay từng
+dòng vào control thì dài và dễ sai. Bài này đưa cả một `List<Product>` vào
+control để nó tự hiện tên từng sản phẩm.
 
 ## Khái niệm
 
 📋 **ListBox**: control hiện một danh sách để người dùng chọn.
 
-🔽 **ComboBox**: như `ListBox` nhưng thu gọn thành một ô, bấm vào mới xổ danh sách xuống.
+🔽 **ComboBox**: control giống `ListBox` nhưng thu gọn thành một ô, bấm vào mới xổ danh sách xuống.
 
-🔗 **DataSource**: property nhận cả một danh sách object, control tự hiện mỗi object thành một dòng. `DisplayMember` là tên property được đem ra hiển thị.
+🔗 **DataSource**: property nhận cả một danh sách object để control hiện mỗi object thành một dòng.
+
+`DisplayMember` là tên property của object được đem ra hiện trên dòng đó.
 
 ## Ví dụ
 
 `Product` lấy từ chương EF Core của khoá ASP.NET Core, tạm bỏ `Stock` cho
-gọn. Chương sau sẽ đọc nó từ Oracle, còn bài này tạo sẵn trong bộ nhớ.
+gọn. Chương sau mới đọc sản phẩm từ Oracle, bài này tạo sẵn trong bộ nhớ.
 
 ```csharp
 class MainForm : Form
@@ -85,8 +87,8 @@ public class Product
 - `SelectedItem` có kiểu `object`, vì `ListBox` chứa được mọi loại object.
   `(Product)item` ép nó về `Product`, giống `(int)` ở bài Toán tử và ép kiểu.
 - `SelectedIndexChanged` chỉ chạy khi lựa chọn thay đổi. Lúc mở form, dòng
-  đầu đã được chọn sẵn nhưng nhãn giá còn trống cho tới khi bạn chọn dòng
-  khác.
+  đầu được chọn sẵn nhưng event chưa chạy, nên nhãn giá còn trống cho tới
+  khi bạn chọn dòng khác.
 
 ## ComboBox
 
@@ -123,8 +125,8 @@ Thiếu `DisplayMember`, control gọi `ToString()` của từng object. Mặc �
 
 ## Lỗi hay gặp
 
-**Hai control dùng chung một list.** Chúng dùng chung cả vị trí đang chọn:
-chọn "Vở" ở `ComboBox` thì `ListBox` cũng nhảy sang "Vở".
+**Gắn hai control vào cùng một list.** Hai control đó dùng chung cả vị trí
+đang chọn: chọn "Vở" ở `ComboBox` thì `ListBox` cũng nhảy sang "Vở".
 
 ```csharp
 // SAI — chọn ở ô này, ô kia nhảy theo

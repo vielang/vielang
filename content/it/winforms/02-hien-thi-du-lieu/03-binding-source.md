@@ -3,13 +3,14 @@ title: BindingSource
 minutes: 5
 ---
 
-Bài trước, thêm sản phẩm vào `List<Product>` mà lưới không hiện dòng mới.
-Màn hình kho còn cần ô nhập tên luôn hiện đúng sản phẩm đang chọn trên lưới.
+Ở bài trước, thêm sản phẩm vào `List<Product>` mà lưới không hiện dòng mới.
+Màn hình kho còn cần một ô nhập luôn hiện tên của sản phẩm đang chọn trên
+lưới.
 `BindingSource` giải quyết cả hai việc.
 
 ## Khái niệm
 
-🔄 **BindingSource**: object đứng giữa danh sách dữ liệu và các control. Nó báo cho control mỗi khi dữ liệu đổi, và giữ dòng đang chọn trong property `Current`.
+🔄 **BindingSource**: object đứng giữa danh sách dữ liệu và các control, báo cho control khi dữ liệu đổi và giữ dòng đang chọn trong property `Current`.
 
 🪢 **Data binding**: nối một property của control với một property của object, sửa bên này thì bên kia đổi theo.
 
@@ -90,8 +91,8 @@ public class Product
   thước" lần này thì dòng mới hiện ngay.
 - `DataBindings.Add("Text", _source, "Name")` nối `Text` của ô nhập với
   `Name` của sản phẩm đang chọn. Chọn dòng khác trên lưới, ô nhập đổi theo.
-- Control xếp bằng `Dock`: control thêm sau cùng nằm trên cùng, lưới lấp phần
-  còn lại.
+- Control xếp bằng `Dock`. Giữa các control `DockStyle.Top`, control thêm
+  sau cùng nằm trên cùng. Lưới `DockStyle.Fill` lấp phần còn lại.
 
 ## Thử ngay
 
@@ -110,7 +111,7 @@ Bấm sang lưới: dòng thứ hai đổi thành "Vở kẻ ngang".
 ```
 
 Binding ghi giá trị vào object khi ô nhập mất focus, không ghi theo từng phím.
-Object `Product` đổi, `BindingSource` báo cho lưới vẽ lại.
+Object `Product` đổi xong, `BindingSource` báo cho lưới vẽ lại.
 
 </details>
 
@@ -155,7 +156,7 @@ var grid = new DataGridView
       "orders = new List<Order>()"
     ],
     "answer": 2,
-    "explain": "Chỉ khi thêm qua BindingSource, nó mới biết để báo cho lưới vẽ lại."
+    "explain": "Thêm qua BindingSource thì nó mới biết mà báo cho lưới vẽ lại. Thêm thẳng vào orders thì lưới không hay biết."
   },
   {
     "prompt": "Dòng nào nối Text của emailBox với property Email của khách đang chọn trong _source?",
@@ -177,7 +178,7 @@ var grid = new DataGridView
       "Chỉ đổi khi tắt app"
     ],
     "answer": 3,
-    "explain": "Mặc định binding ghi giá trị vào object khi control được validate, tức lúc rời khỏi ô nhập."
+    "explain": "Mặc định binding chỉ ghi giá trị vào object khi ô nhập mất focus, tức lúc người dùng rời khỏi ô."
   }
 ]
 ```

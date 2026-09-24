@@ -3,16 +3,16 @@ title: DataGridView
 minutes: 5
 ---
 
-`ListBox` chỉ hiện được một thông tin mỗi dòng. Màn hình kho cần thấy cùng
-lúc mã, tên, giá của mọi sản phẩm, giống kết quả một câu `SELECT` ở khoá SQL.
-`DataGridView` hiện dữ liệu thành bảng như vậy.
+Mỗi dòng của `ListBox` chỉ hiện được một thông tin. Màn hình kho cần thấy
+cùng lúc mã, tên, giá của mọi sản phẩm, giống kết quả một câu `SELECT` ở khoá
+SQL. `DataGridView` hiện dữ liệu thành bảng như vậy.
 
 ## Khái niệm
 
 🧮 **DataGridView**: control hiện danh sách object thành bảng, mỗi object một dòng, mỗi property một cột.
 
-Nhận `DataSource` là `List<Product>`, lưới tự tạo cột `Id`, `Name`, `Price`
-từ các property public của `Product`. Không cần khai báo cột bằng tay.
+Khi `DataSource` là một `List<Product>`, lưới tự tạo cột `Id`, `Name`,
+`Price` từ các property public của `Product`. Không cần khai báo cột bằng tay.
 
 ## Ví dụ
 
@@ -67,10 +67,10 @@ public class Product
 
 - `ReadOnly = true` chỉ cho xem, không cho sửa ô. Bài CRUD sẽ mở phần sửa.
 - `AutoSizeColumnsMode.Fill` giãn các cột cho kín chiều ngang.
-- Cột được tạo sau khi gắn dữ liệu, nên đổi tiêu đề trong event
-  `DataBindingComplete`. Cột đánh số từ 0 như `List`, theo thứ tự property:
-  `Columns[2]` là cột `Price`.
-- `Format = "N0"` hiện số có dấu phân cách hàng nghìn, không lấy phần lẻ.
+- Cột chỉ có sau khi lưới gắn xong dữ liệu, nên đổi tiêu đề trong event
+  `DataBindingComplete`. Cột đánh số từ 0 như `List`, theo thứ tự khai báo
+  property: `Columns[2]` là cột `Price`.
+- `Format = "N0"` hiện số có dấu phân cách hàng nghìn, không có phần lẻ.
 
 ## Thử ngay
 
@@ -103,17 +103,17 @@ Controls.Add(addButton);
 Lưới vẫn chỉ có 2 dòng: Bút bi, Vở.
 ```
 
-`_products` đã có 3 phần tử, nhưng `List<T>` không báo cho ai biết khi nó
-thay đổi. Lưới không biết để vẽ lại. Bài BindingSource sẽ giải quyết chuyện
+`_products` đã có 3 phần tử, nhưng `List<T>` không báo cho ai khi nó thay
+đổi, nên lưới không biết mà vẽ lại. Bài BindingSource sẽ giải quyết chuyện
 này.
 
 </details>
 
 ## Lỗi hay gặp
 
-**Dùng field thay cho property.** Lưới chỉ tạo cột từ property. Class chỉ có
-field thì lưới không có cột nào, trống trơn. JSON của khoá ASP.NET Core cũng
-chỉ lấy property, cùng một lý do.
+**Dùng field thay cho property.** Lưới chỉ tạo cột từ property, nên class
+chỉ có field thì lưới trống trơn, không có cột nào. JSON ở khoá ASP.NET Core
+cũng vậy: mặc định chỉ lấy property, bỏ qua field.
 
 ```csharp
 // SAI — lưới không có cột nào

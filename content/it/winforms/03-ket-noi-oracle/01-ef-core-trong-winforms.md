@@ -3,17 +3,25 @@ title: EF Core trong WinForms
 minutes: 6
 ---
 
-Tới giờ sản phẩm vẫn nằm trong bộ nhớ, tắt app là mất. Bài này nối app với
-database `shopapi` mà API của khoá ASP.NET Core đang dùng. Hai app cùng đọc
-một bảng `PRODUCTS`, nên sản phẩm thêm qua API sẽ hiện luôn trên màn hình kho.
+Tới giờ danh sách sản phẩm chỉ nằm trong bộ nhớ, tắt app là mất. Bài này
+nối app với database `shopapi` mà API của khoá ASP.NET Core đang dùng. Hai app
+cùng đọc một bảng `PRODUCTS`, nên sản phẩm thêm qua API cũng hiện trên màn
+hình kho.
 
 ## Khái niệm
 
-🔌 **DbContextOptionsBuilder**: class dựng cấu hình cho `DbContext`: database nào, chuỗi kết nối nào, quy ước đặt tên nào.
+🔌 **DbContextOptionsBuilder**: class dựng cấu hình cho `DbContext`, gồm loại database, chuỗi kết nối và quy ước đặt tên.
 
 Ở khoá ASP.NET Core, `AddDbContext` dựng cấu hình này và container tạo
 `ShopDbContext` cho controller. WinForms không có container sẵn, nên ta tự
-dựng rồi tự `new`, đúng cách làm tay ở bài DIP của khoá OOP.
+dựng cấu hình rồi tự `new`, như cách truyền phụ thuộc bằng tay ở bài DIP và
+dependency injection của khoá OOP.
+
+```mermaid Hai app dùng chung một database
+flowchart LR
+    A[API] -- "migration, đọc ghi" --> D[(Oracle shopapi)]
+    W[App WinForms] -- "chỉ đọc ghi" --> D
+```
 
 ## Ví dụ
 
@@ -103,11 +111,12 @@ public class Product
 ```
 
 - `ShopDbContext` và `Product` chép nguyên từ khoá ASP.NET Core. Cùng class,
-  cùng quy ước tên, nên khớp đúng bảng `PRODUCTS` có sẵn.
-- `Main` là nơi ghép các phần: dựng `options`, tạo `db`, đưa vào
-  constructor của `MainForm`. Form không tự tạo database, nó nhận từ ngoài.
-- Chuỗi kết nối viết trong code chỉ để thử trên máy, như bài Cấu hình đã
-  nhắc.
+  cùng quy ước tên nên khớp đúng bảng `PRODUCTS` có sẵn.
+- `Main` là nơi ghép các phần: dựng `options`, tạo `db`, rồi đưa vào
+  constructor của `MainForm`. Form không tự tạo `ShopDbContext` mà nhận từ
+  bên ngoài.
+- Viết chuỗi kết nối thẳng trong code chỉ để thử trên máy, như bài Cấu hình
+  đã nhắc.
 - Event `Load` chạy ngay trước khi cửa sổ hiện lần đầu, hợp để đọc dữ liệu.
 
 ## Thử ngay
@@ -134,15 +143,15 @@ Chạy COMMIT trong VS Code, đóng app rồi mở lại: có "Thước".
 ```
 
 App mở một kết nối riêng tới Oracle. Như bài Transaction của khoá SQL, thay
-đổi chưa `COMMIT` chỉ phiên đã làm nó mới thấy.
+đổi chưa `COMMIT` chỉ phiên thực hiện nó mới thấy.
 
 </details>
 
 ## Lỗi hay gặp
 
 **Quên `UseUpperSnakeCaseNamingConvention()`.** EF Core tìm bảng
-`"Products"` thay vì `PRODUCTS`. Mở app là hiện hộp thoại lỗi báo `ORA-00942`,
-giống hệt lỗi ở bài EF Core và DbContext của khoá ASP.NET Core.
+`"Products"` thay vì `PRODUCTS`. Mở app là hiện hộp thoại lỗi `ORA-00942`,
+cùng lỗi đã gặp ở bài EF Core và DbContext của khoá ASP.NET Core.
 
 ```csharp
 // SAI — tìm bảng "Products", không có

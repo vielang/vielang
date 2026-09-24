@@ -4,8 +4,8 @@ minutes: 5
 ---
 
 Nút "Lưu" đã hiện nhưng bấm vào không có gì xảy ra. App console chạy từ trên
-xuống rồi dừng, còn app có cửa sổ thì ngồi chờ người dùng bấm, gõ, chọn. Bài
-này gắn code vào những lúc đó.
+xuống rồi dừng, còn app có cửa sổ thì chờ người dùng bấm, gõ, chọn. Bài này
+cho code chạy đúng vào những lúc đó.
 
 ## Khái niệm
 
@@ -56,7 +56,7 @@ class MainForm : Form
 ```
 
 - `addButton.Click += AddButton_Click;` gắn method vào event. Không có dấu
-  `()` sau tên method: ta đưa method cho nút giữ, không gọi nó ngay.
+  `()` sau tên method: ta giao method cho nút giữ để gọi sau, không gọi ngay.
 - Handler của `Click` luôn nhận hai tham số: `sender` là object phát ra
   event (ở đây là nút), `e` chứa thông tin thêm.
 - `_countLabel` là field, vì cả constructor lẫn handler đều cần dùng nó.
@@ -75,8 +75,8 @@ addButton.Click += (sender, e) =>
 };
 ```
 
-Lambda nhận đúng hai tham số như method handler. Handler dài hoặc cần đặt tên
-cho dễ đọc thì viết thành method riêng.
+Hai tham số `sender`, `e` đặt trong ngoặc `( )`, thân nhiều lệnh đặt trong
+`{ }`. Handler dài thì nên viết thành method riêng có tên cho dễ đọc.
 
 ## Thử ngay
 

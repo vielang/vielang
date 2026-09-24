@@ -5,15 +5,15 @@ minutes: 5
 
 Oracle tắt, mạng rớt, dữ liệu vi phạm ràng buộc: sớm muộn app cũng gặp lỗi.
 Không xử lý thì nhân viên thấy một hộp lỗi dài, khó hiểu của .NET. Bài
-này báo lỗi dễ hiểu và giữ app chạy tiếp.
+này giúp app báo lỗi dễ hiểu và vẫn chạy tiếp.
 
 ## Khái niệm
 
-🧯 **Application.ThreadException**: event nhận mọi exception chưa được bắt trong các handler của giao diện, kể cả handler `async void`.
+🚨 **Application.ThreadException**: event nhận mọi exception chưa được bắt trong các handler của giao diện, kể cả handler `async void`.
 
-Hai tầng giống khoá ASP.NET Core. Lỗi lường trước được thì bắt tại chỗ bằng
-`try/catch` như bài Exception của khoá C# Core. Lỗi còn lại đi về một chỗ
-chung, như bài Xử lý lỗi tập trung.
+App xử lý lỗi theo hai tầng, giống khoá ASP.NET Core. Lỗi lường trước được
+thì bắt tại chỗ bằng `try/catch`, như bài Exception của khoá C# Core. Lỗi
+còn lại đi về một chỗ chung, như bài Xử lý lỗi tập trung.
 
 ## Ví dụ
 
@@ -42,7 +42,7 @@ private async Task LoadAsync()
 }
 ```
 
-Chỗ chung cho mọi lỗi khác, đặt trong `Main` trước `Application.Run`:
+Chỗ chung cho các lỗi còn lại đặt trong `Main`, trước `Application.Run`:
 
 ```csharp
 Application.ThreadException += (sender, e) =>
@@ -58,37 +58,45 @@ Application.ThreadException += (sender, e) =>
 - `OracleException` nằm trong `Oracle.ManagedDataAccess.Client`, cùng thư
   viện với `OracleCommand` ở bài SQL injection. EF Core ném thẳng nó ra khi
   không kết nối được.
-- Chỉ bắt `OracleException` ở đây. Lỗi khác vẫn bay lên, rơi vào
-  `ThreadException`.
-- Handler của `ThreadException` hiện thông báo, rồi app chạy tiếp như chưa
-  có gì.
+- Ở đây chỉ bắt `OracleException`. Lỗi loại khác đi tiếp ra ngoài và rơi
+  vào `ThreadException`.
+- Handler của `ThreadException` hiện thông báo, sau đó app vẫn chạy tiếp.
 - `MessageBoxIcon.Error` thêm biểu tượng lỗi màu đỏ vào hộp thông báo.
+
+```mermaid Lỗi Oracle bắt tại chỗ, lỗi khác về ThreadException
+flowchart TD
+    A[Handler ném exception] --> B{"OracleException?"}
+    B -->|"có"| C["catch trong LoadAsync"]
+    B -->|"không"| D["Application.ThreadException"]
+    C --> E[MessageBox, app chạy tiếp]
+    D --> E
+```
 
 ## Thử ngay
 
 Tắt Oracle bằng `docker stop oracle`, rồi chạy app.
 
-**Đoán trước khi chạy:** app sập, treo, hay hiện gì?
+**Đoán trước khi chạy:** app sẽ sập, bị treo hay hiện gì?
 
 <details>
 <summary>Xem kết quả</summary>
 
 ```text
-Khoảng vài giây sau, hộp "Lỗi kết nối" hiện ra:
+Vài giây sau, hộp "Lỗi kết nối" hiện ra:
 "Không kết nối được database. Kiểm tra Oracle rồi thử lại."
 Bấm OK: cửa sổ kho vẫn mở, lưới trống.
 ```
 
-`InStockAsync` chờ Oracle trả lời rồi ném `OracleException` với mã
-`ORA-50201`. `catch` bắt được nên app không sập. Chạy `docker start oracle`
+`InStockAsync` thử kết nối vài giây, không được thì ném `OracleException`
+với mã `ORA-50201`. `catch` bắt được nên app không sập. Chạy `docker start oracle`
 rồi mở lại app là có dữ liệu.
 
 </details>
 
 ## Lỗi hay gặp
 
-**`catch (Exception)` rồi bỏ trống.** Mọi lỗi bị nuốt mất, kể cả lỗi code
-sai. Nhân viên thấy lưới trống mà không biết vì sao.
+**`catch (Exception)` rồi bỏ trống.** Mọi lỗi đều bị giấu đi, kể cả lỗi do
+code sai. Nhân viên thấy lưới trống mà không biết vì sao.
 
 ```csharp
 // SAI — lỗi gì cũng im lặng
@@ -152,7 +160,7 @@ catch (OracleException)
       "Vì compiler không cho",
       "Vì làm app chạy chậm",
       "Vì Exception không bắt được lỗi Oracle",
-      "Vì mọi lỗi bị nuốt, kể cả lỗi code sai, không ai biết để sửa"
+      "Vì mọi lỗi bị giấu đi, kể cả lỗi do code sai, không ai biết để sửa"
     ],
     "answer": 4,
     "explain": "Khối catch rỗng giấu mọi lỗi. App chạy sai mà không có dấu hiệu gì."

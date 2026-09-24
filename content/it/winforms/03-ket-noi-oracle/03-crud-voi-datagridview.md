@@ -9,12 +9,14 @@ EF Core làm được việc này với rất ít code.
 
 ## Khái niệm
 
-👀 **Change tracking**: `DbContext` ghi nhớ mọi object nó đã đọc hoặc được thêm vào, và biết object nào mới, bị sửa hay bị xoá.
+👀 **Change tracking (theo dõi thay đổi)**: `DbContext` ghi nhớ mọi object nó đã đọc ra hoặc được thêm vào, và biết object nào mới, bị sửa hay bị xoá.
 
-🔗 **Local.ToBindingList()**: danh sách các object mà `DbContext` đang theo dõi, gắn được vào `BindingSource`. Thêm, xoá trên lưới là `DbContext` biết ngay.
+🔗 **Local.ToBindingList()**: danh sách các object của một `DbSet` mà `DbContext` đang theo dõi, gắn được vào `BindingSource`.
 
-`SaveChangesAsync` đã gặp ở khoá ASP.NET Core. Nó đổi các thay đổi đang ghi
-nhớ thành câu `INSERT`, `UPDATE`, `DELETE`, và chạy chúng trong một
+Thêm hay xoá dòng trên lưới gắn với danh sách này thì `DbContext` biết ngay.
+
+`SaveChangesAsync` đã gặp ở khoá ASP.NET Core. Nó biến những thay đổi đang
+ghi nhớ thành câu `INSERT`, `UPDATE`, `DELETE`, rồi chạy chúng trong một
 transaction như bài Transaction của khoá SQL.
 
 ## Ví dụ
@@ -71,17 +73,24 @@ class MainForm : Form
 }
 ```
 
-- Lưới không còn `ReadOnly`, cũng không tắt dòng trống cuối: sửa ngay trong
-  ô, gõ vào dòng trống để thêm, chọn dòng rồi bấm phím Delete để xoá.
+- Lưới bỏ `ReadOnly` và giữ dòng trống cuối. Sửa ngay trong ô, gõ vào dòng
+  trống để thêm. Muốn xoá, bấm ô xám đầu dòng để chọn cả dòng rồi bấm
+  phím Delete.
 - `LoadAsync()` đọc bảng vào `DbContext`. `Local.ToBindingList()` đưa các
   object đó lên lưới.
 - Cột `Id` (cột 0) chỉ đọc, vì Oracle tự sinh khoá chính.
 - `SaveChangesAsync` trả về số dòng đã ghi.
 
+```mermaid Lưới nối với DbContext, chỉ SaveChangesAsync mới ghi xuống Oracle
+flowchart LR
+    G[Lưới] -- "sửa, thêm, xoá" --> D[DbContext ghi nhớ]
+    D -- SaveChangesAsync --> O[(Oracle)]
+```
+
 ## Thử ngay
 
 Chạy app. Sửa giá một sản phẩm, gõ thêm một sản phẩm mới ở dòng trống cuối,
-chọn một dòng khác rồi bấm Delete. Sau đó bấm "Lưu".
+chọn cả một dòng khác rồi bấm Delete. Sau đó bấm "Lưu".
 
 **Đoán trước khi chạy:** tiêu đề báo đã lưu mấy thay đổi, và đó là những
 thay đổi gì?
@@ -93,7 +102,7 @@ thay đổi gì?
 Kho hàng - đã lưu 3 thay đổi
 ```
 
-Ba thay đổi, thành một `UPDATE`, một `INSERT`, một `DELETE` trong Oracle.
+Ba thay đổi, thành một `UPDATE`, một `INSERT` và một `DELETE` trong Oracle.
 Trước khi bấm "Lưu", mọi thay đổi chỉ nằm trong bộ nhớ của `DbContext`. Đóng
 app lúc đó thì Oracle không nhận được gì, giống transaction chưa `COMMIT`.
 
@@ -101,9 +110,9 @@ app lúc đó thì Oracle không nhận được gì, giống transaction chưa 
 
 ## Lỗi hay gặp
 
-**Gắn lưới vào `ToListAsync()`.** Sửa ô vẫn được lưu, vì các object đó
-`DbContext` đang theo dõi. Nhưng dòng thêm và dòng xoá trên lưới chỉ đổi
-list thường, `DbContext` không biết, nên `SaveChangesAsync` bỏ qua.
+**Gắn lưới vào `ToListAsync()`.** Sửa ô vẫn được lưu, vì `DbContext`
+đang theo dõi các object đó. Còn thêm hay xoá dòng trên lưới chỉ làm đổi một
+list thường, `DbContext` không biết nên `SaveChangesAsync` bỏ qua.
 
 ```csharp
 // SAI — thêm, xoá trên lưới không được lưu

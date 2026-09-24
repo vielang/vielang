@@ -3,7 +3,7 @@ title: GROUP BY và HAVING
 minutes: 5
 ---
 
-Tổng doanh thu cả cửa hàng mới là một con số. Kế toán cần doanh thu của
+Tổng doanh thu của cả cửa hàng chỉ là một con số. Kế toán cần doanh thu của
 **từng** đơn, và chỉ quan tâm những đơn lớn. Bài này chia dữ liệu thành từng
 nhóm rồi tính riêng cho mỗi nhóm.
 
@@ -36,7 +36,7 @@ ORDER BY order_id;
 - Cột nào trong `SELECT` không nằm trong hàm tổng hợp thì phải có trong
   `GROUP BY`.
 
-Thứ tự Oracle xử lý một câu có đủ các phần:
+Oracle xử lý một câu có đủ các phần theo thứ tự sau:
 
 ```mermaid Thứ tự Oracle xử lý một câu SELECT có GROUP BY
 flowchart TD
@@ -93,8 +93,8 @@ GROUP BY order_id
 HAVING SUM(quantity * unit_price) > 100000;
 ```
 
-**Lấy cột không có trong `GROUP BY`.** Một đơn có nhiều sản phẩm, Oracle không
-biết hiện `product_id` nào cho mỗi đơn, nên báo lỗi `ORA-00979`.
+**Lấy cột không có trong `GROUP BY`.** Một đơn có nhiều sản phẩm nên Oracle không
+biết phải hiện `product_id` nào cho đơn đó và báo lỗi `ORA-00979`.
 
 ```sql
 -- SAI — lỗi: product_id không được gom
@@ -143,7 +143,7 @@ GROUP BY order_id;
       "WHERE product_id = 1"
     ],
     "answer": 4,
-    "explain": "Điều kiện trên từng dòng, không cần hàm tổng hợp, thì đặt ở WHERE để lọc trước khi gom."
+    "explain": "Điều kiện xét từng dòng và không dùng hàm tổng hợp thì đặt ở WHERE để lọc trước khi gom."
   }
 ]
 ```

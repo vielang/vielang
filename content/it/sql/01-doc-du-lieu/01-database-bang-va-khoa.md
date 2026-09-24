@@ -4,7 +4,7 @@ minutes: 6
 ---
 
 Dữ liệu của cửa hàng phải còn nguyên sau khi tắt server, và nhiều người phải
-đọc ghi cùng lúc mà không giẫm lên nhau. Việc đó do database đảm nhận. Khoá
+đọc và ghi cùng lúc mà không giẫm lên nhau. Việc đó do database đảm nhận. Khoá
 này dùng Oracle, loại database phổ biến ở ngân hàng và doanh nghiệp lớn.
 
 ## Khái niệm
@@ -149,7 +149,7 @@ Chạy câu lệnh sau trong SQL Worksheet:
 SELECT * FROM products ORDER BY product_id;
 ```
 
-`SELECT *` lấy mọi cột. `ORDER BY` sắp theo mã, bài Sắp xếp sẽ nói kỹ.
+`SELECT *` lấy mọi cột. `ORDER BY` sắp kết quả theo mã, bài Sắp xếp sẽ nói kỹ hơn.
 
 **Đoán trước khi chạy:** có bao nhiêu dòng, và sản phẩm số 2 là gì?
 
@@ -165,13 +165,13 @@ SELECT * FROM products ORDER BY product_id;
 | 5 | Máy tính | 450000 | 3 |
 
 Năm dòng, sản phẩm số 2 là Vở. Mã do Oracle tự cấp theo thứ tự thêm vào. Tên
-cột hiện chữ hoa vì Oracle lưu tên không đặt trong nháy kép ở dạng chữ hoa.
+cột hiện chữ hoa vì Oracle lưu những tên không đặt trong nháy kép ở dạng chữ hoa.
 
 </details>
 
 ## Lỗi hay gặp
 
-**Thêm dòng trùng khoá chính.** Khoá chính không được trùng, Oracle báo lỗi
+**Thêm dòng trùng khoá chính.** Khoá chính không được trùng, nên Oracle báo lỗi
 `ORA-00001`: vi phạm ràng buộc không trùng.
 
 ```sql

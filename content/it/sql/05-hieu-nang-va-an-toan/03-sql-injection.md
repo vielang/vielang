@@ -5,7 +5,7 @@ minutes: 5
 
 Trang tra cứu đơn hàng cho khách nhập email. Code ghép chuỗi email đó vào câu
 SQL rồi chạy. Một người gõ vào ô email một đoạn SQL thay vì email, và thế là
-đọc được thông tin của mọi khách. Đó là SQL injection, một lỗi bảo mật rất
+họ đọc được thông tin của mọi khách. Đó là SQL injection, một lỗi bảo mật rất
 phổ biến.
 
 ## Khái niệm
@@ -46,15 +46,24 @@ cmd.Parameters.Add(new OracleParameter("email", email));
 ```
 
 - `:email` là chỗ giữ, giá trị thật truyền qua `Parameters`.
-- Gõ gì vào ô email thì Oracle cũng chỉ so nó như một chuỗi.
-- Bind variable còn giúp Oracle dùng lại kế hoạch chạy cho cùng một câu SQL,
-  nên nhanh hơn.
-- EF Core viết bằng LINQ tự dùng tham số. Chỉ khi tự viết SQL thô bằng cách
-  ghép chuỗi thì mới dính lỗi.
+- Người dùng gõ gì vào ô email thì Oracle cũng chỉ coi đó là một chuỗi để
+  so sánh.
+- Bind variable còn giúp Oracle dùng lại kế hoạch thực thi khi cùng một câu
+  SQL chạy với giá trị khác nhau, nên nhanh hơn.
+- Truy vấn EF Core viết bằng LINQ tự dùng tham số. Lỗi chỉ xảy ra khi bạn tự
+  viết SQL thô bằng cách ghép chuỗi.
+
+```mermaid Cùng một đoạn nhập vào, hai cách đưa vào SQL
+flowchart TD
+    I["Người dùng nhập ' OR '1'='1"] --> A["Ghép chuỗi"]
+    I --> B["Bind variable"]
+    A --> A2["Đoạn nhập thành một phần code SQL, WHERE bị đổi nghĩa"]
+    B --> B2["Câu SQL giữ nguyên, đoạn nhập đi riêng và chỉ là chuỗi để so với email"]
+```
 
 ## Thử ngay
 
-Chạy đúng câu SQL mà kẻ tấn công tạo ra được:
+Chạy thử câu SQL mà kẻ tấn công tạo ra:
 
 ```sql
 SELECT name

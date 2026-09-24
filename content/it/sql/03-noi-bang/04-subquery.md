@@ -3,9 +3,9 @@ title: Subquery
 minutes: 5
 ---
 
-Muốn tìm sản phẩm đắt hơn giá trung bình, nhưng bài Hàm tổng hợp đã cho thấy
-`WHERE price > AVG(price)` báo lỗi. Cần tính giá trung bình trước, rồi dùng
-con số đó để lọc. Subquery làm được việc này trong một câu.
+Muốn tìm sản phẩm đắt hơn giá trung bình thì không viết được
+`WHERE price > AVG(price)`, vì bài Hàm tổng hợp đã cho thấy câu này báo lỗi.
+Phải tính giá trung bình trước, rồi dùng con số đó để lọc. Subquery làm được việc này trong một câu.
 
 ## Khái niệm
 
@@ -21,9 +21,15 @@ ORDER BY price;
 ```
 
 - Câu trong ngoặc chạy trước, trả về một con số: giá trung bình là 164800.
-- Câu bên ngoài dùng con số đó để lọc, được Balo và Máy tính.
+- Câu bên ngoài dùng con số đó để lọc, ra Balo và Máy tính.
 - Subquery trả về **một** giá trị thì so sánh bằng `=`, `>`, `<`.
 - Subquery trả về **nhiều** dòng thì dùng `IN`.
+
+```mermaid Subquery chạy trước, câu ngoài dùng kết quả của nó
+flowchart LR
+    sub["SELECT AVG(price) FROM products"] -->|"164800"| outer["WHERE price > 164800"]
+    outer --> res["Balo, Máy tính"]
+```
 
 ## Thử ngay
 
@@ -49,7 +55,7 @@ ORDER BY customer_id;
 | An |
 | Bình |
 
-Subquery trả về danh sách mã khách có đơn `PAID` là 1 và 2. An có ít nhất một
+Subquery trả về danh sách mã khách có đơn `PAID`: 1 và 2. An có ít nhất một
 đơn `PAID` nên được giữ. Chi không có đơn nào như vậy.
 
 </details>
@@ -78,7 +84,7 @@ WHERE customer_id IN (
 ```
 
 **`NOT IN` với danh sách có NULL.** Email của Chi là NULL. Chỉ cần danh sách
-có một NULL, `NOT IN` không trả về dòng nào.
+có một giá trị NULL là `NOT IN` không trả về dòng nào.
 
 ```sql
 -- SAI — không trả về dòng nào
@@ -137,7 +143,7 @@ WHERE email NOT IN (
       "Không dòng nào"
     ],
     "answer": 4,
-    "explain": "So với NULL không bao giờ ra đúng, nên điều kiện NOT IN không đúng với dòng nào. Phải loại NULL khỏi danh sách."
+    "explain": "So sánh với NULL không bao giờ cho kết quả đúng, nên điều kiện NOT IN không đúng với dòng nào. Phải loại NULL khỏi danh sách."
   }
 ]
 ```

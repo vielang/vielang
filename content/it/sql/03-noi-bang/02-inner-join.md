@@ -26,7 +26,19 @@ ORDER BY o.order_id;
 - `ON c.customer_id = o.customer_id`: ghép mỗi đơn với đúng khách của nó.
 - `o` và `c` là bí danh. Hai bảng có cột trùng tên thì bắt buộc ghi rõ cột
   của bảng nào.
-- Nối thêm bảng thứ ba thì viết thêm một `JOIN ... ON ...`.
+- Muốn nối thêm bảng thứ ba thì viết thêm một `JOIN ... ON ...`.
+
+Mỗi đơn được ghép với đúng một khách, còn Dũng không khớp đơn nào nên không
+có trong kết quả:
+
+```mermaid INNER JOIN chỉ giữ các cặp đơn và khách khớp nhau
+flowchart LR
+    o1["Đơn 1"] --> an["An (1)"]
+    o2["Đơn 2"] --> an
+    o3["Đơn 3"] --> binh["Bình (2)"]
+    o4["Đơn 4"] --> chi["Chi (3)"]
+    dung["Dũng (4)"]
+```
 
 ## Thử ngay
 
@@ -58,8 +70,8 @@ phẩm có cùng `product_id`.
 
 ## Lỗi hay gặp
 
-**Dùng `AS` cho bí danh bảng.** Oracle cho `AS` với bí danh **cột**, nhưng
-không cho với bí danh **bảng**. Oracle báo lỗi cú pháp.
+**Dùng `AS` cho bí danh bảng.** Oracle cho viết `AS` trước bí danh **cột**,
+nhưng không cho viết trước bí danh **bảng**, nên câu dưới báo lỗi cú pháp.
 
 ```sql
 -- SAI — lỗi: Oracle không nhận AS trước bí danh bảng
@@ -71,7 +83,7 @@ SELECT o.order_id FROM orders AS o;
 SELECT o.order_id FROM orders o;
 ```
 
-**Liệt kê hai bảng mà quên điều kiện nối.** Không báo lỗi, nhưng mỗi đơn bị
+**Liệt kê hai bảng mà quên điều kiện nối.** Câu lệnh không báo lỗi, nhưng mỗi đơn bị
 ghép với **mọi** khách: 4 đơn × 4 khách thành 16 dòng vô nghĩa.
 
 ```sql
@@ -86,7 +98,7 @@ Luôn viết `JOIN ... ON` để điều kiện nối nằm ngay cạnh bảng �
 
 - `JOIN bảng ON điều_kiện` ghép dòng của hai bảng, chỉ giữ cặp khớp nhau.
 - Điều kiện nối thường là khoá ngoại bằng khoá chính.
-- Đặt bí danh ngắn cho bảng, trong Oracle không có `AS`.
+- Đặt bí danh ngắn cho bảng. Oracle không cho viết `AS` trước bí danh bảng.
 - Thiếu điều kiện nối thì mọi dòng ghép với mọi dòng.
 
 ```quiz

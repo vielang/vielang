@@ -4,8 +4,8 @@ minutes: 5
 ---
 
 Cửa hàng cần thêm bảng mã giảm giá. Mã không được trùng, phần trăm giảm chỉ
-từ 1 đến 50. Nếu chỉ kiểm tra trong code thì một chỗ quên kiểm tra là dữ liệu
-sai lọt vào. Ràng buộc để database tự chặn.
+từ 1 đến 50. Nếu chỉ kiểm tra trong code thì chỉ cần quên kiểm tra ở một chỗ
+là dữ liệu sai lọt vào. Ràng buộc giúp database tự chặn dữ liệu sai.
 
 ## Khái niệm
 
@@ -21,8 +21,8 @@ sai lọt vào. Ràng buộc để database tự chặn.
 | `CHECK (điều kiện)` | giá trị phải thoả điều kiện |
 | `REFERENCES bảng (cột)` | khoá ngoại |
 
-`DEFAULT giá_trị` không phải ràng buộc, nhưng hay đi kèm: cột không được ghi
-khi `INSERT` thì nhận giá trị này.
+`DEFAULT giá_trị` không phải ràng buộc, nhưng hay đi kèm: câu `INSERT` không
+ghi cột này thì cột nhận giá trị đó.
 
 ## Ví dụ
 
@@ -37,7 +37,7 @@ CREATE TABLE coupons (
 );
 ```
 
-- `code` bắt buộc có và không trùng.
+- `code` bắt buộc có giá trị và không được trùng.
 - `CHECK (percent BETWEEN 1 AND 50)` chặn mọi giá trị ngoài khoảng.
 - `active` mặc định là 1. Oracle 19c chưa có kiểu `BOOLEAN` cho cột, nên
   thường dùng `NUMBER(1)` với 1 là có, 0 là không.
@@ -69,21 +69,17 @@ cột này có giá trị gì?
 |---|---|---|---|
 | 1 | SALE10 | 10 | 1 |
 
-`coupon_id` do identity cấp là 1. `active` lấy giá trị `DEFAULT` là 1.
+`coupon_id` được identity tự cấp, là 1. `active` lấy giá trị `DEFAULT` là 1.
 
 </details>
 
 ## Lỗi hay gặp
 
-**Thêm dữ liệu vi phạm `CHECK`.** Oracle báo lỗi `ORA-02290`: vi phạm ràng
-buộc kiểm tra.
+**Thêm dữ liệu vi phạm `CHECK`.** Với bảng `coupons` vừa tạo ở trên, Oracle
+báo lỗi `ORA-02290`: vi phạm ràng buộc kiểm tra.
 
 ```sql
 -- SAI — lỗi: 80% nằm ngoài khoảng 1 đến 50
-CREATE TABLE coupons (
-  code    VARCHAR2(20) NOT NULL,
-  percent NUMBER CHECK (percent BETWEEN 1 AND 50)
-);
 INSERT INTO coupons (code, percent) VALUES ('BIG', 80);
 ```
 
@@ -93,8 +89,8 @@ byte, nên Oracle báo lỗi `ORA-12899`: giá trị quá dài.
 
 ```sql
 -- SAI — lỗi: 'Dũng' cần 5 byte
-CREATE TABLE staff (name VARCHAR2(4));
-INSERT INTO staff (name) VALUES ('Dũng');
+CREATE TABLE staff_bytes (name VARCHAR2(4));
+INSERT INTO staff_bytes (name) VALUES ('Dũng');
 ```
 
 ```sql

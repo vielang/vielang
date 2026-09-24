@@ -17,8 +17,8 @@ Ba mức chuẩn hoá cơ bản, mỗi mức gồm cả mức trước:
 | Mức | Quy tắc | Ví dụ vi phạm |
 |---|---|---|
 | 1NF | mỗi ô chỉ chứa một giá trị | ô `products` ghi "Bút bi, Vở" |
-| 2NF | mọi cột phụ thuộc vào **toàn bộ** khoá chính | bảng khoá (đơn, sản phẩm) lại lưu ngày đặt đơn |
-| 3NF | cột không phụ thuộc vào cột khác không phải khoá | bảng đơn hàng lưu email của khách |
+| 2NF | mọi cột phụ thuộc vào **toàn bộ** khoá chính | bảng có khoá (đơn, sản phẩm) lại lưu ngày đặt đơn |
+| 3NF | cột không phụ thuộc vào một cột khác ngoài khoá | bảng đơn hàng lưu email của khách |
 
 ## Ví dụ
 
@@ -29,7 +29,7 @@ Bảng chưa chuẩn hoá:
 | 1 | An | an@shop.vn | Bút bi, Vở |
 | 2 | An | an@shop.vn | Balo |
 
-Chuẩn hoá thành bốn bảng của cửa hàng đang dùng:
+Sau khi chuẩn hoá, ta có bốn bảng mà cửa hàng mẫu đang dùng:
 
 - Thông tin khách nằm ở `customers`, mỗi khách một dòng.
 - `orders` chỉ lưu `customer_id` trỏ tới khách.
@@ -73,7 +73,7 @@ ORDER BY customer_email;
 | an@shop.vn |
 
 Hai email cho cùng một người. Sửa một đơn mà quên đơn kia là dữ liệu lệch.
-Với bảng `customers` riêng, email chỉ nằm đúng một chỗ nên không thể lệch.
+Khi có bảng `customers` riêng, email chỉ nằm đúng một chỗ nên không thể lệch.
 
 </details>
 
@@ -96,15 +96,15 @@ Tách thành bảng dòng hàng, mỗi sản phẩm một dòng, như `order_lin
 ## Tóm tắt
 
 - Chuẩn hoá chia dữ liệu để mỗi thông tin chỉ nằm ở một chỗ.
-- 1NF: mỗi ô một giá trị. 2NF và 3NF: không lưu thông tin phụ thuộc vào thứ
-  khác ngoài khoá.
+- 1NF: mỗi ô một giá trị. 2NF và 3NF: mọi cột phụ thuộc vào toàn bộ khoá
+  chính và chỉ vào khoá chính.
 - Dữ liệu lặp lại ở nhiều dòng sẽ lệch nhau khi sửa sót.
 - Nối các bảng đã tách bằng khoá ngoại và `JOIN`.
 
 ```quiz
 [
   {
-    "prompt": "Bảng order_lines lưu cả product_name và product_price bên cạnh product_id. Vấn đề là gì?",
+    "prompt": "Bảng order_lines lưu cả product_name bên cạnh product_id. Vấn đề là gì?",
     "options": [
       "Không có vấn đề gì",
       "Thiếu khoá chính",
@@ -115,7 +115,7 @@ Tách thành bảng dòng hàng, mỗi sản phẩm một dòng, như `order_lin
     "explain": "Tên sản phẩm phụ thuộc vào product_id, nên chỉ nên nằm ở bảng products. Lưu lặp thì dễ lệch khi sửa."
   },
   {
-    "prompt": "Cột phone_numbers lưu '0901..., 0912...' trong một ô vi phạm mức nào?",
+    "prompt": "Cột phone_numbers lưu '0901..., 0912...' trong cùng một ô. Bảng vi phạm mức nào?",
     "options": [
       "1NF",
       "2NF",

@@ -15,7 +15,8 @@ phải chặn những đơn hàng trỏ tới một khách không tồn tại.
 
 ## Ví dụ
 
-Trong script dữ liệu mẫu, bảng `orders` khai báo khoá ngoại như sau:
+Bảng `orders` trong script dữ liệu mẫu khai báo khoá ngoại như bản rút gọn
+dưới đây:
 
 ```sql
 CREATE TABLE order_samples (
@@ -83,8 +84,8 @@ INSERT INTO orders (customer_id, order_date, status)
   VALUES (4, DATE '2025-03-01', 'NEW');
 ```
 
-**Xoá khách đang có đơn hàng.** Xoá xong thì các đơn đó trỏ vào khoảng không,
-nên Oracle chặn lại với lỗi `ORA-02292`: vẫn còn dòng con.
+**Xoá khách đang có đơn hàng.** Nếu xoá được, các đơn đó sẽ trỏ tới một khách
+không còn tồn tại, nên Oracle chặn lại với lỗi `ORA-02292`: vẫn còn dòng con.
 
 ```sql
 -- SAI — lỗi: khách số 1 vẫn còn đơn hàng

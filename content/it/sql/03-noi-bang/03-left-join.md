@@ -4,7 +4,7 @@ minutes: 5
 ---
 
 Phòng marketing muốn gửi mã giảm giá cho những khách chưa từng mua hàng.
-`INNER JOIN` chỉ giữ khách có đơn, nên những khách cần tìm lại bị loại mất.
+`INNER JOIN` chỉ giữ khách có đơn, nên chính những khách cần tìm lại bị loại.
 `LEFT JOIN` giữ lại cả những khách không có đơn nào.
 
 ## Khái niệm
@@ -63,8 +63,9 @@ JOIN orders o ON o.customer_id = c.customer_id
 WHERE o.order_id IS NULL;
 ```
 
-**Lọc bảng bên phải ở `WHERE`.** Điều kiện `o.status = 'PAID'` loại luôn
-những dòng có `o.status` là NULL, nên `LEFT JOIN` hoạt động như `JOIN`.
+**Lọc bảng bên phải ở `WHERE`.** Điều kiện `o.status = 'PAID'` loại mọi dòng
+không phải `PAID`, kể cả dòng có `o.status` là NULL của khách không có đơn,
+nên `LEFT JOIN` hoạt động như `JOIN`.
 Điều kiện cho bảng bên phải đặt trong `ON`.
 
 ```sql
@@ -85,7 +86,8 @@ LEFT JOIN orders o ON o.customer_id = c.customer_id
 
 ## Tóm tắt
 
-- `LEFT JOIN` giữ mọi dòng bảng bên trái, bảng bên phải không khớp thì NULL.
+- `LEFT JOIN` giữ mọi dòng bảng bên trái, dòng không khớp thì cột bảng phải
+  là NULL.
 - Tìm dòng "không có": `LEFT JOIN` rồi `WHERE cột_bên_phải IS NULL`.
 - Điều kiện lọc bảng bên phải đặt trong `ON`, không đặt ở `WHERE`.
 - `INNER JOIN` chỉ giữ cặp khớp nhau, `LEFT JOIN` giữ đủ bảng trái.

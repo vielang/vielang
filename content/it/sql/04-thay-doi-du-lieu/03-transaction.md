@@ -4,14 +4,14 @@ minutes: 5
 ---
 
 Đặt một đơn hàng gồm ba bước: thêm đơn, thêm dòng hàng, trừ tồn kho. Nếu mất
-điện sau bước thứ hai, đơn đã tạo mà kho chưa trừ, dữ liệu lệch nhau. Ba bước
+điện sau bước thứ hai thì đơn đã tạo mà kho chưa trừ, dữ liệu bị lệch. Ba bước
 phải cùng thành công hoặc cùng bị huỷ. Transaction đảm bảo điều đó.
 
 ## Khái niệm
 
 🔄 **Transaction**: nhóm câu lệnh thay đổi dữ liệu được thực hiện trọn vẹn cùng nhau, hoặc tất cả có hiệu lực, hoặc không câu nào có hiệu lực.
 
-✅ **COMMIT**: xác nhận mọi thay đổi trong transaction, từ đây người khác mới thấy và thay đổi không mất nữa.
+✅ **COMMIT**: xác nhận mọi thay đổi trong transaction, từ lúc này người khác mới thấy chúng và chúng không còn bị mất.
 
 ↩️ **ROLLBACK**: huỷ mọi thay đổi chưa `COMMIT`, đưa dữ liệu về như lúc bắt đầu transaction.
 
@@ -31,12 +31,23 @@ WHERE product_id = 3;
 COMMIT;
 ```
 
-- Trong Oracle, câu `INSERT`, `UPDATE`, `DELETE` đầu tiên tự mở một
+- Trong Oracle, câu `INSERT`, `UPDATE` hoặc `DELETE` đầu tiên tự mở một
   transaction.
-- Các thay đổi chỉ được lưu hẳn khi gặp `COMMIT`.
+- Các thay đổi chỉ được lưu hẳn khi chạy `COMMIT`.
 - Có lỗi giữa chừng thì gọi `ROLLBACK` để huỷ cả ba bước.
-- Trước khi `COMMIT`, chỉ phiên đang làm việc thấy các thay đổi. Người khác
-  vẫn thấy dữ liệu cũ.
+- Trước khi `COMMIT`, chỉ phiên đã thực hiện thay đổi mới thấy chúng. Người
+  khác vẫn thấy dữ liệu cũ.
+
+```mermaid Một transaction kết thúc bằng COMMIT hoặc ROLLBACK
+stateDiagram-v2
+    state "Đang dở, chỉ phiên này thấy" as Do
+    state "Đã lưu hẳn, mọi phiên đều thấy" as Luu
+    state "Đã huỷ, dữ liệu như trước transaction" as Huy
+    [*] --> Do : INSERT, UPDATE, DELETE
+    Do --> Do : thêm câu lệnh
+    Do --> Luu : COMMIT
+    Do --> Huy : ROLLBACK
+```
 
 ## Thử ngay
 
@@ -66,8 +77,8 @@ Là 120. `ROLLBACK` huỷ câu `UPDATE` vì nó chưa được `COMMIT`.
 
 ## Lỗi hay gặp
 
-**Quên `COMMIT`.** Trong phiên của mình thì thấy dữ liệu đã đổi, nhưng người
-khác không thấy. Đóng kết nối mà chưa `COMMIT` thì thay đổi có thể mất.
+**Quên `COMMIT`.** Bạn thấy dữ liệu đã đổi trong phiên của mình, nhưng người
+khác thì không. Đóng kết nối mà chưa `COMMIT` thì thay đổi có thể mất.
 
 **Chạy `CREATE TABLE` giữa transaction.** Câu lệnh tạo bảng (DDL) trong Oracle
 tự `COMMIT` mọi thay đổi đang dở. `ROLLBACK` sau đó không huỷ được câu

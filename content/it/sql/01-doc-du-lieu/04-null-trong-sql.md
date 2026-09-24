@@ -13,8 +13,8 @@ xử như một giá trị bình thường.
 
 🩹 **NVL**: hàm của Oracle trả về giá trị thay thế khi gặp NULL, ví dụ `NVL(email, 'chưa có')`.
 
-Mọi phép so sánh với `NULL` bằng `=` hay `<>` đều không đúng mà cũng không
-sai, nên dòng đó bị loại khỏi `WHERE`. Muốn kiểm tra NULL phải dùng
+Mọi phép so sánh với `NULL` bằng `=` hay `<>` đều cho kết quả không đúng
+cũng không sai, nên `WHERE` loại dòng đó. Muốn kiểm tra NULL phải dùng
 `IS NULL` hoặc `IS NOT NULL`.
 
 ## Ví dụ
@@ -27,7 +27,7 @@ WHERE email IS NULL;
 
 - `IS NULL` tìm những dòng chưa có email. Kết quả là Chi.
 - `IS NOT NULL` thì ngược lại.
-- Oracle coi chuỗi rỗng `''` là `NULL`. Lưu `''` vào cột nào thì cột đó thành
+- Oracle coi chuỗi rỗng `''` là `NULL`. Lưu `''` vào cột nào thì ô đó thành
   `NULL`.
 
 ## Thử ngay

@@ -3,7 +3,7 @@ title: Index
 minutes: 5
 ---
 
-Bảng đơn hàng có vài triệu dòng. Câu tìm đơn của một khách mất 5 giây, vì
+Bảng đơn hàng có vài triệu dòng. Câu truy vấn tìm đơn của một khách mất 5 giây, vì
 Oracle phải đọc từng dòng để so `customer_id`. Index giúp Oracle đi thẳng tới
 đúng những dòng cần tìm.
 
@@ -12,6 +12,13 @@ Oracle phải đọc từng dòng để so `customer_id`. Index giúp Oracle đi
 🔍 **Full table scan**: cách Oracle đọc lần lượt mọi dòng của bảng để tìm dòng thoả điều kiện.
 
 📇 **Index**: cấu trúc dữ liệu phụ lưu sẵn giá trị của một hay nhiều cột theo thứ tự, kèm vị trí dòng, để tìm theo cột đó mà không phải đọc cả bảng.
+
+```mermaid Hai cách Oracle tìm đơn của khách có customer_id = 1
+flowchart TD
+    Q["WHERE customer_id = 1"] --> A["Không có index: đọc lần lượt mọi dòng của orders"]
+    Q --> B["Có index: tra giá trị 1 trong index đã sắp xếp"]
+    B --> C["Lấy vị trí dòng, đọc đúng các dòng đó"]
+```
 
 ## Ví dụ
 
@@ -41,7 +48,8 @@ WHERE table_name = 'ORDERS'
 ORDER BY column_name;
 ```
 
-`user_ind_columns` là bảng hệ thống của Oracle, liệt kê cột của mọi index.
+`user_ind_columns` là view hệ thống của Oracle, liệt kê cột của các index
+thuộc user đang đăng nhập.
 
 **Đoán trước khi chạy:** bạn chỉ tạo một index. Kết quả có mấy dòng?
 
@@ -77,8 +85,8 @@ WHERE order_date >= DATE '2025-01-05'
   AND order_date <  DATE '2025-01-06';
 ```
 
-**Tạo index cho mọi cột.** Đọc nhanh hơn một chút, nhưng mỗi lần ghi dữ liệu
-lại chậm đi vì phải cập nhật quá nhiều index. Chỉ tạo index cho cột hay dùng
+**Tạo index cho mọi cột.** Việc đọc có nhanh hơn một chút, nhưng mỗi lần ghi
+dữ liệu lại chậm đi vì Oracle phải cập nhật quá nhiều index. Chỉ tạo index cho cột hay dùng
 trong `WHERE` và `JOIN`.
 
 ## Tóm tắt

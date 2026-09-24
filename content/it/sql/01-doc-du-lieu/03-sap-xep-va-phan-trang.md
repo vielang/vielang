@@ -36,8 +36,15 @@ ORDER BY price DESC
 OFFSET 2 ROWS FETCH NEXT 2 ROWS ONLY;
 ```
 
+```mermaid Oracle sắp xếp trước, rồi mới bỏ qua và lấy dòng
+flowchart TD
+    A["ORDER BY: sắp xếp các dòng"] --> B["OFFSET 2 ROWS: bỏ dòng 1 và 2"]
+    B --> C["FETCH NEXT 2 ROWS ONLY: lấy dòng 3 và 4"]
+```
+
 `OFFSET 2 ROWS` bỏ qua 2 dòng của trang đầu, `FETCH NEXT 2 ROWS ONLY` lấy 2
-dòng tiếp theo. Trang thứ n thì bỏ qua `(n - 1) × số dòng mỗi trang`.
+dòng tiếp theo. Muốn lấy trang thứ n thì bỏ qua
+`(n - 1) × số dòng mỗi trang` dòng.
 
 ## Thử ngay
 
@@ -67,8 +74,8 @@ tiếp theo.
 
 ## Lỗi hay gặp
 
-**Phân trang mà không `ORDER BY`.** Không sắp xếp thì Oracle không hứa thứ tự
-nào cả, trang 2 có thể lặp lại món đã có ở trang 1.
+**Phân trang mà không `ORDER BY`.** Không có `ORDER BY` thì Oracle không đảm bảo
+thứ tự nào cả, trang 2 có thể lặp lại món đã có ở trang 1.
 
 ```sql
 -- SAI — thứ tự không xác định
@@ -116,7 +123,7 @@ FETCH FIRST 3 ROWS ONLY;
     "explain": "Trang 3 bỏ qua hai trang đầu, tức (3 - 1) × 10 = 20 dòng, rồi lấy 10 dòng."
   },
   {
-    "prompt": "Muốn xem khách mới nhất trước, sắp theo ngày tạo. Viết gì?",
+    "prompt": "Muốn xem khách mới nhất trước, sắp theo ngày tạo. Viết thế nào?",
     "options": [
       "ORDER BY created_at DESC",
       "ORDER BY created_at",

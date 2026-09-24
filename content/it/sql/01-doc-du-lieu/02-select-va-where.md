@@ -4,7 +4,7 @@ minutes: 5
 ---
 
 Cửa hàng có hàng nghìn sản phẩm, nhưng khách chỉ muốn xem món dưới 10.000đ.
-Đọc cả bảng rồi tự lọc bằng mắt thì không được. Bài này hướng dẫn chọn đúng
+Đọc cả bảng rồi tự lọc bằng mắt là không khả thi. Bài này hướng dẫn chọn đúng
 cột và lọc đúng dòng ngay trong câu SQL.
 
 ## Khái niệm
@@ -24,6 +24,13 @@ WHERE price < 10000;
 - `SELECT name, price`: chỉ lấy hai cột, thay vì `*` lấy tất cả.
 - `FROM products`: đọc từ bảng `products`.
 - `WHERE price < 10000`: chỉ giữ sản phẩm giá dưới 10.000đ.
+
+```mermaid WHERE xét từng dòng của products, chỉ giữ dòng thoả điều kiện
+flowchart TD
+    A["products: 5 dòng"] --> B{"price < 10000?"}
+    B -->|"Đúng: giữ"| C["Bút bi 5000, Thước 7000"]
+    B -->|"Sai: loại"| D["Vở, Balo, Máy tính"]
+```
 
 Các toán tử hay dùng trong `WHERE`:
 
@@ -110,7 +117,7 @@ WHERE (city = 'Hà Nội' OR city = 'Đà Nẵng')
       "WHERE name IN ('B')"
     ],
     "answer": 3,
-    "explain": "LIKE dùng để khớp mẫu, % thay cho mọi ký tự phía sau. Chuỗi phải đặt trong nháy đơn."
+    "explain": "LIKE dùng để khớp mẫu, % thay cho mọi chuỗi ký tự phía sau. Chuỗi phải đặt trong nháy đơn."
   },
   {
     "prompt": "WHERE stock > 0 AND price < 10000 OR price > 400000 được Oracle hiểu thế nào?",

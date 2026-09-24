@@ -29,11 +29,11 @@ DELETE FROM order_lines
 WHERE line_id = 6;
 ```
 
-- `INSERT` liệt kê tên cột rồi giá trị theo đúng thứ tự đó. Cột không ghi
-  thì nhận NULL hoặc giá trị mặc định.
+- `INSERT` liệt kê tên cột rồi giá trị theo đúng thứ tự đó. Cột không được
+  liệt kê thì nhận NULL hoặc giá trị mặc định.
 - `UPDATE ... SET cột = giá_trị` sửa được nhiều cột, cách nhau bằng dấu
   phẩy.
-- `SET` dùng được giá trị cũ: `SET stock = stock - 1`.
+- `SET` dùng được giá trị cũ của cột: `SET stock = stock - 1`.
 - `WHERE` của `UPDATE` và `DELETE` giống hệt `WHERE` của `SELECT`.
 
 ## Thử ngay
@@ -70,8 +70,8 @@ nguyên.
 
 ## Lỗi hay gặp
 
-**`UPDATE` quên `WHERE`.** Câu lệnh chạy không báo lỗi gì, và sửa **mọi**
-dòng trong bảng.
+**`UPDATE` quên `WHERE`.** Câu lệnh vẫn chạy, không báo lỗi gì, nhưng sửa
+**mọi** dòng trong bảng.
 
 ```sql
 -- SAI — mọi sản phẩm đều thành 5500đ
@@ -84,8 +84,8 @@ UPDATE products SET price = 5500
 WHERE product_id = 1;
 ```
 
-**`DELETE` quên `WHERE`.** Cũng vậy, cả bảng bị xoá sạch. Thói quen an toàn:
-viết `SELECT` với cùng điều kiện `WHERE` trước, xem đúng những dòng cần xoá
+**`DELETE` quên `WHERE`.** Tương tự, cả bảng bị xoá sạch. Thói quen an toàn:
+viết `SELECT` với cùng điều kiện `WHERE` trước, thấy đúng những dòng cần xoá
 rồi mới đổi thành `DELETE`.
 
 ```sql
@@ -134,7 +134,7 @@ DELETE FROM order_lines;
       "Chạy SELECT * FROM orders WHERE status = 'CANCELLED' để xem trước"
     ],
     "answer": 4,
-    "explain": "SELECT với cùng điều kiện cho thấy chính xác những dòng sắp bị xoá. Đúng rồi mới đổi SELECT * thành DELETE."
+    "explain": "SELECT với cùng điều kiện cho thấy chính xác những dòng sắp bị xoá. Thấy đúng rồi mới đổi SELECT * thành DELETE."
   }
 ]
 ```

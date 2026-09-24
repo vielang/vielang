@@ -51,6 +51,14 @@ class Product
 - `ToList()` gom kết quả thành `List`.
 - `string.Join(", ", names)` ghép các phần tử thành một chuỗi.
 
+```mermaid Dữ liệu đi qua từng bước của chuỗi LINQ
+flowchart TD
+    S["products: Bút bi, Vở, Balo"]
+    S -->|"Where: Stock > 0"| W["Bút bi, Balo"]
+    W -->|"OrderBy: Price"| O["Bút bi 5000, Balo 350000"]
+    O -->|"Select: Name"| N["names: Bút bi, Balo"]
+```
+
 Những method dùng nhiều nhất:
 
 | Method | Làm gì |

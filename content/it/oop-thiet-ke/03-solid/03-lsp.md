@@ -4,8 +4,8 @@ minutes: 5
 ---
 
 Vòng lặp hoàn tiền chạy ổn với mọi hình thức thanh toán, cho tới khi có thêm
-thẻ quà tặng. Class này kế thừa `Payment` nhưng `Refund()` lại ném lỗi, vì thẻ
-quà tặng không hoàn được. Chương trình sập ở chỗ không ai ngờ. LSP giúp tránh
+thẻ quà tặng. Class thẻ quà tặng kế thừa `Payment` nhưng `Refund()` lại ném
+lỗi, vì thẻ quà tặng không hoàn tiền được. Chương trình sập ở chỗ không ai ngờ. LSP giúp tránh
 loại lỗi này.
 
 ## Khái niệm
@@ -58,7 +58,7 @@ class GiftCardPayment : Payment
 
 ## Sửa bằng interface
 
-Chỉ class nào hoàn được mới nhận khả năng hoàn tiền, giống bài
+Chỉ class nào hoàn tiền được mới implement `IRefundable`, như ở bài
 **Interface hay abstract class**:
 
 ```csharp
@@ -160,7 +160,7 @@ loại của class cha. Hãy dùng interface nhỏ hơn hoặc composition.
     "prompt": "Cách sửa hợp lý cho ví dụ Bird và Penguin?",
     "options": [
       "Bắt mọi nơi gọi Fly() kiểm tra có phải Penguin không",
-      "Để Fly() của Penguin không làm gì mà không báo",
+      "Để Fly() của Penguin im lặng, không làm gì",
       "Xoá class Penguin",
       "Tách interface IFlyable, chỉ loài biết bay mới implement"
     ],

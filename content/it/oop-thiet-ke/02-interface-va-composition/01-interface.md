@@ -4,8 +4,8 @@ minutes: 5
 ---
 
 Đặt hàng xong, hệ thống gửi email cho khách. Tháng sau sếp muốn gửi thêm SMS.
-Nếu code đặt hàng gắn chặt với email thì phải sửa chính nó. Interface giúp code
-đặt hàng chỉ cần biết "có ai đó gửi được thông báo", còn gửi bằng gì thì tuỳ.
+Nếu code đặt hàng gắn chặt với email thì phải sửa chính code đó. Interface
+giúp code đặt hàng chỉ cần biết "có ai đó gửi được thông báo", còn gửi bằng gì thì tuỳ.
 
 ## Khái niệm
 
@@ -91,7 +91,7 @@ mới chỉ cần viết class mới, không sửa `PlaceOrder`.
 
 ## Lỗi hay gặp
 
-**Implement thiếu thành viên.** Class đã ký `: INotifier` thì phải viết đủ.
+**Implement thiếu thành viên.** Class đã ghi `: INotifier` thì phải viết đủ.
 
 ```csharp
 // SAI — lỗi compile: thiếu method Send
@@ -123,9 +123,10 @@ INotifier notifier = new EmailNotifier();
 
 ## Tóm tắt
 
-- Interface liệt kê method và property mà class phải có, không có cách làm.
+- Interface liệt kê method và property mà class phải có, không kèm cách làm.
 - Class `: TênInterface` phải implement đủ mọi thành viên, để `public`.
-- Code chỉ phụ thuộc vào interface thì đổi được cách làm mà không phải sửa.
+- Code chỉ phụ thuộc vào interface thì đổi được cách làm mà không phải
+  sửa code đó.
 - Không `new` được interface. Một class implement được nhiều interface.
 
 ```quiz

@@ -45,6 +45,14 @@ class Product
 - `string` là reference type nhưng không sửa được nội dung, nên dùng giống
   value type mà không gặp vấn đề này.
 
+```mermaid a và b giữ hai số riêng, p1 và p2 cùng trỏ một object
+flowchart LR
+    A["a: 5"]
+    B["b: 10"]
+    P1[p1] --> O["Product: Price = 9000"]
+    P2[p2] --> O
+```
+
 ## Thử ngay
 
 Chép class `Product` ở ví dụ trên, thay các dòng đầu bằng:

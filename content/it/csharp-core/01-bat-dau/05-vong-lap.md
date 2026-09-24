@@ -38,6 +38,15 @@ Dòng `for` có ba phần, cách nhau bằng dấu `;`:
 - `i <= 3`: điều kiện, còn đúng thì còn lặp.
 - `i++`: tăng `i` thêm 1 sau mỗi vòng (`i--` thì giảm 1).
 
+```mermaid Thứ tự chạy ba phần của vòng for
+flowchart TD
+    A["int i = 1"] --> B{"i <= 3?"}
+    B -- Đúng --> C["In dòng giá"]
+    C --> D["i++"]
+    D --> B
+    B -- Sai --> E[Thoát vòng lặp]
+```
+
 ## while và break
 
 `while` chỉ có điều kiện. Vòng lặp chạy chừng nào điều kiện còn đúng:

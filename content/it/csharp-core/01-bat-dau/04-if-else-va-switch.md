@@ -43,6 +43,15 @@ Console.WriteLine(shippingFee);   // 15000
 - `else if` thêm điều kiện tiếp theo, `else` là trường hợp còn lại.
 - Code bên trong mỗi nhánh đặt trong cặp ngoặc `{ }`.
 
+```mermaid Chuỗi if / else if / else chọn phí ship
+flowchart TD
+    A["total = 350000"] --> B{"total >= 500000?"}
+    B -- Đúng --> C["shippingFee = 0"]
+    B -- Sai --> D{"total >= 200000?"}
+    D -- Đúng --> E["shippingFee = 15000"]
+    D -- Sai --> F["shippingFee = 30000"]
+```
+
 ## switch
 
 Khi so một biến với nhiều giá trị cụ thể, `switch` gọn hơn một chuỗi

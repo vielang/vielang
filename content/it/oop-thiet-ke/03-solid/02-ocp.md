@@ -55,12 +55,13 @@ class Checkout
 
 - `Checkout` chỉ biết `IDiscount`, không biết có bao nhiêu loại giảm giá.
 - Thêm loại giảm giá mới là thêm class mới. `Checkout` không phải sửa.
-- Đây là đa hình và interface ở chương trước, dùng đúng chỗ.
+- Đây chính là đa hình và interface đã học ở các chương trước.
 
 ## Thử ngay
 
-Chép ví dụ trên vào `Program.cs`. Thêm class dưới đây vào cuối file, rồi thêm
-một dòng gọi `checkout.Pay(100000m, new VipDiscount())`:
+Chép ví dụ trên vào `Program.cs`. Thêm class dưới đây vào cuối file, rồi in
+thêm `checkout.Pay(100000m, new VipDiscount())` ngay sau hai lệnh in ở đầu
+file:
 
 ```csharp
 class VipDiscount : IDiscount
@@ -111,9 +112,9 @@ decimal Pay(decimal amount, string type)
 Cách sửa: mỗi nhánh `if` thành một class implement `IDiscount`, như ở ví dụ
 trên.
 
-**Làm trước cho mọi khả năng.** Chỉ có một cách tính mà đã tạo interface cho
-"sau này" thì chỉ thêm file. Hãy áp dụng OCP khi thấy phần đó **thật sự** hay
-thay đổi.
+**Làm trước cho mọi khả năng.** Mới có một cách tính đã tạo interface để dành
+cho "sau này" thì chỉ tốn thêm file. Hãy áp dụng OCP khi thấy phần đó **thật
+sự** hay thay đổi.
 
 ## Tóm tắt
 

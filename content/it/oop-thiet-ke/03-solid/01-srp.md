@@ -4,7 +4,7 @@ minutes: 5
 ---
 
 Class `OrderService` vừa tính tiền, vừa lưu file, vừa gửi email. Kế toán đổi
-thuế thì sửa nó, đổi nơi lưu cũng sửa nó, đổi mẫu email cũng lại sửa nó. Sửa
+thuế thì sửa nó, đổi nơi lưu cũng sửa nó, đổi mẫu email lại sửa nó. Sửa
 chỗ này dễ làm hỏng chỗ kia. SRP là nguyên tắc đầu tiên của SOLID, giúp tránh
 đúng chuyện này.
 
@@ -39,7 +39,8 @@ class OrderNotifier
 ```
 
 - `OrderCalculator` chỉ tính tiền. Đổi thuế thì chỉ sửa class này.
-- `OrderNotifier` chỉ gửi thông báo. Đổi nội dung thì chỉ sửa class này.
+- `OrderNotifier` chỉ gửi thông báo. Đổi nội dung thông báo thì chỉ sửa
+  class này.
 - Mỗi class nhỏ, đọc nhanh, và sửa một class không đụng tới class kia.
 
 ## Thử ngay
@@ -84,9 +85,9 @@ class OrderService
 Cách sửa: tách thành `OrderCalculator`, `OrderFileStore`, `OrderNotifier`,
 mỗi class một việc như ở ví dụ trên.
 
-**Tách quá vụn.** Một class chỉ có một method một dòng, lại phải đi qua năm
-class mới hiểu được một luồng, thì khó đọc hơn. SRP là chia theo **lý do thay
-đổi**, không phải theo số method.
+**Tách quá vụn.** Mỗi class chỉ có một method một dòng, phải đọc qua năm
+class mới hiểu một luồng, thì code còn khó đọc hơn. SRP chia theo **lý do
+thay đổi**, không phải theo số method.
 
 ## Tóm tắt
 

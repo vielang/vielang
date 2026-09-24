@@ -3,8 +3,8 @@ title: Interface hay abstract class
 minutes: 5
 ---
 
-Interface và abstract class đều không tạo object trực tiếp được, và đều bắt
-class khác viết method. Vậy khi nào dùng cái nào? Bài này đưa ra cách chọn
+Không thể tạo object trực tiếp từ interface hay abstract class, và cả hai đều
+bắt class khác viết method. Vậy khi nào dùng cái nào? Bài này đưa ra cách chọn
 nhanh bằng một câu hỏi.
 
 ## Khái niệm
@@ -61,7 +61,24 @@ class CardPayment : Payment, IRefundable
 - `IRefundable` là interface vì hoàn tiền chỉ là một khả năng. Thẻ làm được,
   tiền mặt thì không.
 - `CardPayment : Payment, IRefundable`: kế thừa một class cha, đồng thời
-  implement một interface. Class cha đứng đầu tiên.
+  implement một interface. Class cha phải đứng đầu tiên.
+
+```mermaid Payment là class cha, IRefundable là khả năng thêm
+classDiagram
+    class Payment {
+        <<abstract>>
+        Amount
+        Pay()
+        Receipt()
+    }
+    class IRefundable {
+        <<interface>>
+        Refund()
+    }
+    Payment <|-- CashPayment
+    Payment <|-- CardPayment
+    IRefundable <|.. CardPayment
+```
 
 ## Thử ngay
 
@@ -102,8 +119,8 @@ Hoàn 120000đ về thẻ
 Hoàn 80000đ về ví
 ```
 
-Không được, sẽ là lỗi compile. `CashPayment` không implement `IRefundable`,
-nên không nằm trong `List<IRefundable>` được. Compiler chặn luôn việc hoàn
+Không được, đó là lỗi compile. `CashPayment` không implement `IRefundable`,
+nên không thêm vào `List<IRefundable>` được. Compiler chặn luôn việc hoàn
 tiền mặt.
 
 </details>

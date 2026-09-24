@@ -10,7 +10,7 @@ nguyên tắc cuối của SOLID, còn dependency injection là cách làm phổ
 
 ## Khái niệm
 
-🔌 **DIP (Dependency Inversion Principle)**: code nghiệp vụ không phụ thuộc trực tiếp vào class cụ thể như database hay email, mà cả hai cùng phụ thuộc vào interface.
+🔌 **DIP (Dependency Inversion Principle)**: code nghiệp vụ không phụ thuộc trực tiếp vào class cụ thể lo database hay email, mà cả hai cùng phụ thuộc vào interface.
 
 💉 **Dependency injection (DI)**: class nhận những thứ nó cần qua constructor, thay vì tự `new` bên trong.
 
@@ -51,6 +51,17 @@ class OrderService
 - Trong ASP.NET Core, framework tự tạo và truyền các object này. Bạn chỉ khai
   báo interface nào ứng với class nào.
 
+```mermaid Trước: phụ thuộc thẳng vào SQL. Sau: cả hai hướng về interface
+flowchart TD
+    subgraph Trước
+        A[OrderService] --> B[SqlOrderRepository]
+    end
+    subgraph Sau
+        C[OrderService] --> I[IOrderRepository]
+        D[SqlOrderRepository] -->|implement| I
+    end
+```
+
 ## Thử ngay
 
 Chép ví dụ trên vào `Program.cs`. Thêm class dưới đây vào cuối file, rồi đổi
@@ -74,8 +85,8 @@ mấy dòng trong `OrderService`?
 Giả lập: lưu Bút bi
 ```
 
-Không dòng nào. Chỉ đổi thứ truyền vào constructor. Đây là cách viết test
-không cần database thật: truyền vào một repository giả.
+Không dòng nào, chỉ đổi object truyền vào constructor. Viết test không cần
+database thật cũng theo cách này: truyền vào một repository giả.
 
 </details>
 

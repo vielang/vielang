@@ -38,6 +38,15 @@ catch (FormatException)
 - Có thể thêm khối `finally` sau `catch`. Code trong `finally` luôn chạy, dù
   có lỗi hay không.
 
+```mermaid Đường chạy của try, catch và finally
+flowchart TD
+    T[Chạy code trong try] --> Q{Có exception?}
+    Q -->|Không| E[Chạy hết try]
+    Q -->|Có| C["Bỏ phần còn lại, nhảy vào catch"]
+    E --> F[finally]
+    C --> F
+```
+
 Tên exception hay gặp: `FormatException` (sai định dạng),
 `NullReferenceException` (dùng biến đang là `null`), `ArgumentException` (tham số không
 hợp lệ), `InvalidOperationException` (thao tác không hợp lệ lúc đó).

@@ -62,6 +62,24 @@ Quẹt thẻ - 120000đ
 - Vòng lặp chỉ biết `Payment`. Đó là trừu tượng: nơi dùng không cần biết là
   tiền mặt hay thẻ.
 
+```mermaid Payment chỉ khai báo Pay(), mỗi class con tự viết thân
+classDiagram
+    Payment <|-- CashPayment
+    Payment <|-- CardPayment
+    class Payment {
+        <<abstract>>
+        +decimal Amount
+        +abstract Pay() string
+        +Receipt() string
+    }
+    class CashPayment {
+        +override Pay() string
+    }
+    class CardPayment {
+        +override Pay() string
+    }
+```
+
 So với `virtual` ở bài trước:
 
 | | `virtual` | `abstract` |

@@ -65,6 +65,20 @@ class PhysicalProduct : Product
   `Product` để gán `Name` và `Price`, rồi class con gán tiếp `WeightGram`.
 - Một class chỉ kế thừa được **một** class cha.
 
+```mermaid PhysicalProduct nhận lại phần của Product, chỉ khai báo thêm phần riêng
+classDiagram
+    Product <|-- PhysicalProduct
+    class Product {
+        +string Name
+        +decimal Price
+        +Describe() string
+    }
+    class PhysicalProduct {
+        +int WeightGram
+        +ShippingFee() decimal
+    }
+```
+
 ## Thử ngay
 
 Chép ví dụ trên vào `Program.cs`. Thay ba dòng đầu bằng các lệnh gọi dưới

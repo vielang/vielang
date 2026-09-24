@@ -34,6 +34,18 @@ async Task<decimal> GetPriceAsync(string code)
 - `Task.Delay(1000)` chờ 1 giây mà không chặn chương trình, dùng để giả lập
   việc chậm.
 
+```mermaid Thứ tự chạy của ví dụ trên
+sequenceDiagram
+    participant M as Code gọi
+    participant G as GetPriceAsync
+    M->>G: GetPriceAsync(PEN-01)
+    G->>G: await Task.Delay(1000)
+    G-->>M: trả về Task<decimal> chưa xong
+    Note over M: await, chờ mà không chặn
+    G-->>M: sau 1 giây: 5000
+    M->>M: Console.WriteLine(price)
+```
+
 ## Thử ngay
 
 Dán vào `Program.cs` rồi chạy `dotnet run`:

@@ -3,9 +3,9 @@ title: Composition
 minutes: 5
 ---
 
-Đơn hàng có hai kiểu giao: thường và nhanh. Lại có hai kiểu gói: thường và gói
-quà. Dùng kế thừa thì phải có `FastOrder`, `GiftOrder`, `FastGiftOrder`… Mỗi
-lựa chọn mới lại nhân đôi số class. Composition giải quyết việc này bằng cách
+Đơn hàng có hai kiểu giao: thường và nhanh. Đơn hàng còn có hai kiểu gói:
+thường và gói quà. Dùng kế thừa thì phải có `FastOrder`, `GiftOrder`, `FastGiftOrder`… Mỗi
+lựa chọn thêm vào lại làm số class tăng nhanh. Composition giải quyết việc này bằng cách
 ghép các phần lại với nhau.
 
 ## Khái niệm
@@ -13,7 +13,7 @@ ghép các phần lại với nhau.
 🧱 **Composition**: class chứa object của class khác làm property và giao việc cho object đó, thay vì kế thừa.
 
 Kế thừa là quan hệ **"là một"**, composition là quan hệ **"có một"**. Đơn
-hàng không phải là một cách giao hàng, mà đơn hàng *có* một cách giao hàng.
+hàng không phải là một cách giao hàng, mà *có* một cách giao hàng.
 
 ## Ví dụ
 
@@ -56,6 +56,22 @@ class Order
   class con của `Order`.
 - Thêm kiểu giao mới chỉ cần thêm một class implement `IShipping`.
 
+```mermaid Order có một IShipping, gán object nào cũng được
+classDiagram
+    class Order {
+        Subtotal
+        Shipping
+        Total()
+    }
+    class IShipping {
+        <<interface>>
+        Fee()
+    }
+    Order o-- IShipping
+    IShipping <|.. StandardShipping
+    IShipping <|.. FastShipping
+```
+
 ## Thử ngay
 
 Chép ví dụ trên vào `Program.cs`, thay các dòng gọi ở đầu file bằng:
@@ -87,7 +103,7 @@ không thể đổi thành `StandardOrder`.
 
 ## Lỗi hay gặp
 
-**Dùng kế thừa cho mọi tổ hợp lựa chọn.** Số class tăng theo cấp số nhân.
+**Dùng kế thừa cho mọi tổ hợp lựa chọn.** Số class bằng tích số các lựa chọn.
 
 ```csharp
 // SAI — 2 kiểu giao × 2 kiểu gói = 4 class con
@@ -99,7 +115,7 @@ class FastGiftOrder : FastOrder { }
 ```
 
 ```csharp
-// ĐÚNG — một class Order, ghép các phần lại
+// ĐÚNG — một class, ghép các phần lại
 class GiftOrder
 {
     public IShipping Shipping { get; set; }
@@ -108,8 +124,8 @@ class GiftOrder
 }
 ```
 
-Thêm kiểu giao thứ ba thì cách kế thừa thành 6 class. Cách composition chỉ
-thêm một class `IShipping`.
+Thêm kiểu giao thứ ba thì cách kế thừa cần 6 class con. Cách composition chỉ
+thêm một class implement `IShipping`.
 
 ## Tóm tắt
 

@@ -39,6 +39,12 @@ foreach (var item in stock)
 - `ContainsKey` kiểm tra khoá có tồn tại không.
 - `foreach` lấy ra từng cặp, đọc bằng `.Key` và `.Value`.
 
+```mermaid Dictionary stock: mỗi khoá trỏ tới một giá trị
+flowchart LR
+    K1["PEN-01"] --> V1["120"]
+    K2["BOOK-02"] --> V2["35"]
+```
+
 ## Thử ngay
 
 Dán vào `Program.cs` rồi chạy `dotnet run`:

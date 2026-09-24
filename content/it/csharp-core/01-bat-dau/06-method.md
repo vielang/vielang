@@ -43,6 +43,15 @@ Một method gồm bốn phần, lấy `CalculateTotal` làm ví dụ:
 
 Method không trả về gì thì dùng `void`, như `PrintLine`.
 
+```mermaid Gọi CalculateTotal: truyền tham số vào, nhận giá trị trả về
+sequenceDiagram
+    participant P as Chương trình
+    participant M as CalculateTotal
+    P->>M: price = 5000, quantity = 3
+    M-->>P: return 15000
+    Note over P: total = 15000
+```
+
 ## Thử ngay
 
 Dán vào `Program.cs` rồi chạy `dotnet run`:

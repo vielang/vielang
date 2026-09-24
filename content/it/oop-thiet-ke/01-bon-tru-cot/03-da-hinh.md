@@ -61,6 +61,13 @@ Ebook C#: 0
 - C# chạy bản `override` của object thật, không phải bản của `Product`.
 - Thêm loại hàng mới chỉ cần viết class mới có `override`. Vòng lặp không đổi.
 
+```mermaid Cùng một lời gọi, C# chọn bản override theo object thật
+flowchart TD
+    A["item.ShippingFee()"] --> B{"Object thật là gì?"}
+    B -->|PhysicalProduct| C["Grams * 10m"]
+    B -->|DigitalProduct| D["0m"]
+```
+
 ## Thử ngay
 
 Chép ba class ở ví dụ trên, thay các dòng đầu bằng:

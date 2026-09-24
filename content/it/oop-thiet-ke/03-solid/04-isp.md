@@ -3,10 +3,10 @@ title: ISP — Interface nhỏ, đúng việc
 minutes: 5
 ---
 
-Interface `IOrderStore` có bốn method: đọc, lưu, xoá, xuất PDF. Trang báo cáo
-chỉ cần đọc, nhưng class của nó vẫn phải implement cả bốn, và ba method còn lại
-thành `throw new NotImplementedException()`. ISP tránh việc ép class nhận những
-thứ nó không dùng.
+Interface `IOrderStore` có ba method: đọc, lưu, xoá. Trang báo cáo chỉ cần
+đọc, nhưng class của nó vẫn phải implement đủ ba method, hai method thừa chỉ
+để `throw new NotImplementedException()`. ISP giúp tránh việc ép class
+nhận những thứ nó không dùng.
 
 ## Khái niệm
 
@@ -55,9 +55,24 @@ class ReportPage
 - `ReportPage` chỉ cần đọc nên chỉ nhận `IOrderReader`. Sửa phần ghi không
   ảnh hưởng tới nó.
 
+```mermaid Một class làm hai vai, ReportPage chỉ thấy vai đọc
+classDiagram
+    class IOrderReader {
+        <<interface>>
+        Get(id)
+    }
+    class IOrderWriter {
+        <<interface>>
+        Save(order)
+    }
+    IOrderReader <|.. OrderRepository
+    IOrderWriter <|.. OrderRepository
+    ReportPage --> IOrderReader
+```
+
 ## Thử ngay
 
-Chép ví dụ trên vào `Program.cs`, thêm dòng sau vào cuối phần gọi ở đầu file:
+Chép ví dụ trên vào `Program.cs`, thêm hai dòng sau ngay dưới `page.Show();`:
 
 ```csharp
 IOrderWriter writer = repo;
@@ -76,14 +91,14 @@ writer.Save("Đơn #2");
 Lưu Đơn #2
 ```
 
-Được. Một object implement nhiều interface thì dùng được ở vai nào cũng được.
-Mỗi nơi chỉ thấy đúng phần nó cần.
+Được. Object implement nhiều interface thì đóng được vai của từng interface
+đó. Mỗi nơi chỉ thấy đúng phần nó cần.
 
 </details>
 
 ## Lỗi hay gặp
 
-**Interface to, class buộc phải viết cho có.** `NotImplementedException` là
+**Interface quá to, class phải implement cho có.** `NotImplementedException` là
 dấu hiệu rõ nhất.
 
 ```csharp

@@ -31,6 +31,7 @@ import {
 } from "@/lib/recording-store";
 import { clampToViewport, useDraggable } from "@/lib/use-draggable";
 import { recorderAnchor } from "@/lib/widget-dock";
+import { pauseAutoplay } from "@/lib/autoplay-player";
 import { cn } from "@/lib/utils";
 import { useActivityStore } from "@/lib/activity-store";
 
@@ -133,6 +134,9 @@ export function RecorderWidget({ bookId, page }: { bookId: string; page: number 
     setError(null);
     setBusy(true);
     stopPlayback();
+    // Đang nghe tự động thì dừng lại: micro sẽ thu lẫn tiếng bài nghe, và hết
+    // bài là trang tự lật — bảng này dựng lại theo trang, bản đang ghi đứt.
+    pauseAutoplay();
     try {
       session.current = await startRecording();
       startedAt.current = Date.now();
@@ -192,6 +196,8 @@ export function RecorderWidget({ bookId, page }: { bookId: string; page: number 
       audio.onended = () => setPlayingId(null);
       audio.src = objectUrl.current;
       setPlayingId(rec.id);
+      // Nghe lại giọng mình mà bài nghe tự động vẫn chạy thì 2 tiếng chồng nhau.
+      pauseAutoplay();
       void audio.play();
     },
     [playingId, stopPlayback]

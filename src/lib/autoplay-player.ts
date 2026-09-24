@@ -201,6 +201,9 @@ function rememberPosition() {
   const { bookId, queue, index, status } = useAutoplayStore.getState();
   const item = queue[index];
   if (!bookId || !item || status === "idle" || !audio) return;
+  // Bài vừa đổi `src` còn đang chờ tua tới chỗ nghe dở: `currentTime` lúc
+  // này là 0 (trình duyệt vừa đặt lại), ghi xuống là xoá mất chỗ dở thật.
+  if (pendingSeek > 0) return;
   lastSavedTime = audio.currentTime;
   savePosition(bookId, { url: item.url, time: Math.floor(audio.currentTime) });
 }
@@ -226,6 +229,16 @@ function playIndex(i: number, startAt = 0) {
   updateMediaSession();
 }
 
+/** Nạp lại bài đang phát sau lỗi tải, giữ đúng chỗ đang nghe. */
+function reload(a: HTMLAudioElement) {
+  // Nạp lại là về giây 0 — tua lại chỗ cũ. Lấy số lớn hơn: lỗi xảy ra ngay
+  // lúc đang chờ tua tới chỗ nghe dở thì `currentTime` vẫn là 0, còn chỗ
+  // cần tới nằm ở `pendingSeek`.
+  pendingSeek = Math.max(pendingSeek, a.currentTime);
+  a.load();
+  play(a);
+}
+
 function onEnded() {
   const { index, status } = useAutoplayStore.getState();
   if (status === "idle") return;
@@ -249,12 +262,7 @@ function onError() {
   }
   if (retries < MAX_AUTO_RETRIES) {
     const a = audio;
-    retryTimer = setTimeout(() => {
-      // Nạp lại là về giây 0 — đang nghe dở thì tua lại đúng chỗ.
-      pendingSeek = a.currentTime;
-      a.load();
-      play(a);
-    }, retryDelay(retries));
+    retryTimer = setTimeout(() => reload(a), retryDelay(retries));
     retries++;
     return;
   }
@@ -268,7 +276,7 @@ export function startAutoplay(bookId: string, fromIndex = 0, startAt = 0) {
   const queue = state.bookId === bookId && state.queue.length > 0 ? state.queue : buildPlaylist(bookId);
   if (queue.length === 0) return;
   useAutoplayStore.setState({ bookId, queue });
-  setMediaSessionHandlers();
+  setMediaSessionHandlers(true);
   playIndex(Math.min(Math.max(fromIndex, 0), queue.length - 1), startAt);
 }
 
@@ -292,6 +300,10 @@ export function stopAutoplay() {
   useAutoplayStore.setState({ bookId: null, queue: [], index: 0, status: "idle" });
   if (typeof navigator !== "undefined" && "mediaSession" in navigator) {
     navigator.mediaSession.metadata = null;
+    // Trả phím phát/dừng của tai nghe, bàn phím về cho trình duyệt — để lại
+    // là chúng tiếp tục gọi vào đây và không điều khiển được widget audio
+    // thường nữa.
+    setMediaSessionHandlers(false);
   }
 }
 
@@ -311,6 +323,13 @@ export function resumeAutoplay() {
     return;
   }
   useAutoplayStore.setState({ status: "playing" });
+  // Dừng vì mất mạng (xem onError): thẻ đang kẹt ở trạng thái lỗi, `play()`
+  // suông sẽ bị từ chối — phải nạp lại, và cho đủ lượt thử lại từ đầu.
+  if (audio.error) {
+    retries = 0;
+    reload(audio);
+    return;
+  }
   play(audio);
 }
 
@@ -327,7 +346,11 @@ export function autoplayPrev() {
   const { index } = useAutoplayStore.getState();
   // Như mọi trình phát nhạc: đã nghe được một đoạn thì "lùi" là về đầu bài.
   if (audio && audio.currentTime > 3) {
+    // Bấm đúng lúc đang nghỉ giữa 2 bài thì bài vừa hết cũng tính là "đã
+    // nghe một đoạn": huỷ lượt sang bài kế, phát lại bài vừa rồi.
+    clearTimers();
     audio.currentTime = 0;
+    if (useAutoplayStore.getState().status === "playing") play(audio);
     return;
   }
   playIndex(Math.max(index - 1, 0));
@@ -345,7 +368,8 @@ function updateMediaSession() {
   });
 }
 
-function setMediaSessionHandlers() {
+/** Gắn (hoặc gỡ) các nút điều khiển ở màn hình khoá/tai nghe. */
+function setMediaSessionHandlers(enabled: boolean) {
   if (!("mediaSession" in navigator)) return;
   const handlers: [MediaSessionAction, () => void][] = [
     ["play", resumeAutoplay],
@@ -355,7 +379,7 @@ function setMediaSessionHandlers() {
   ];
   for (const [action, handler] of handlers) {
     try {
-      navigator.mediaSession.setActionHandler(action, handler);
+      navigator.mediaSession.setActionHandler(action, enabled ? handler : null);
     } catch {
       // Trình duyệt cũ không hỗ trợ action này — bỏ qua.
     }

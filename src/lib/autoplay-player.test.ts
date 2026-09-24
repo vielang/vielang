@@ -153,3 +153,59 @@ describe("nhớ chỗ nghe dở", () => {
     expect(useAutoplayResumeStore.getState().positions.step1).toBeUndefined();
   });
 });
+
+describe("các ca dễ hỏng", () => {
+  it("đang chờ tua tới chỗ dở thì không ghi đè chỗ dở bằng giây 0", () => {
+    useAutoplayResumeStore.setState({
+      positions: { step1: { url: queue[5].url, time: 42 } },
+    });
+    continueAutoplay("step1");
+    // Trình duyệt đặt lại về 0 khi đổi `src` và bắn timeupdate/pause.
+    el().dispatchEvent(new Event("timeupdate"));
+    stopAutoplay();
+    expect(useAutoplayResumeStore.getState().positions.step1).toEqual({
+      url: queue[5].url,
+      time: 42,
+    });
+  });
+
+  it("lỗi tải ngay lúc đang chờ tua thì thử lại vẫn tua tới đúng chỗ dở", () => {
+    useAutoplayResumeStore.setState({
+      positions: { step1: { url: queue[5].url, time: 42 } },
+    });
+    continueAutoplay("step1");
+    el().dispatchEvent(new Event("error"));
+    vi.advanceTimersByTime(retryDelay(0));
+    el().dispatchEvent(new Event("loadedmetadata"));
+    expect(el().currentTime).toBe(42);
+  });
+
+  it("mất mạng thì tạm dừng; có mạng lại bấm phát là nạp lại bài chứ không kẹt", () => {
+    startAutoplay("step1");
+    const online = vi.spyOn(navigator, "onLine", "get").mockReturnValue(false);
+    el().dispatchEvent(new Event("error"));
+    expect(useAutoplayStore.getState().status).toBe("paused");
+
+    online.mockReturnValue(true);
+    // jsdom không có `error` trên thẻ media — gắn tạm như trình duyệt thật.
+    Object.defineProperty(el(), "error", { configurable: true, value: { code: 2 } });
+    toggleAutoplayPause();
+    expect(load).toHaveBeenCalledTimes(1);
+    expect(useAutoplayStore.getState().status).toBe("playing");
+    online.mockRestore();
+    delete (el() as { error?: unknown }).error;
+  });
+
+  it("bấm lùi lúc đang nghỉ giữa 2 bài thì phát lại bài vừa rồi, không nhảy sang bài kế", () => {
+    startAutoplay("step1", 2);
+    Object.defineProperty(el(), "currentTime", { configurable: true, writable: true, value: 120 });
+    el().dispatchEvent(new Event("ended"));
+    autoplayPrev();
+    vi.advanceTimersByTime(GAP_MS * 2);
+    expect(useAutoplayStore.getState().index).toBe(2);
+    expect(el().currentTime).toBe(0);
+    expect(play).toHaveBeenCalledTimes(2);
+    // Thẻ audio dùng chung cho mọi test — gỡ giá trị giả ra.
+    delete (el() as { currentTime?: number }).currentTime;
+  });
+});

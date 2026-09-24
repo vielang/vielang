@@ -1,0 +1,257 @@
+---
+title: Tách giao diện và dữ liệu
+minutes: 6
+---
+
+`MainForm` đang gọi thẳng `ShopDbContext`. Muốn chạy thử màn hình khi chưa
+bật Oracle, hay đổi cách lưu dữ liệu, đều phải sửa form. Bài này đặt phần
+đọc ghi sau interface `IProductStore`, đúng như API đã làm ở khoá ASP.NET
+Core.
+
+## Khái niệm
+
+🧩 **Composition root**: một chỗ duy nhất tạo các object và ghép chúng với nhau. Trong app WinForms, chỗ đó là `Main`.
+
+Đây là bài DIP của khoá OOP lần thứ ba. Ở khoá OOP, `Main` tự `new`. Ở khoá
+ASP.NET Core, `AddScoped<IProductStore, DbProductStore>()` nhờ container làm
+hộ. Ở đây ta lại tự `new` trong `Main`, vì WinForms không có container sẵn.
+
+## Ví dụ
+
+`IProductStore` và `DbProductStore` chép nguyên từ bài Truy vấn với EF Core
+của khoá ASP.NET Core, không sửa dòng nào:
+
+```csharp
+public interface IProductStore
+{
+    Task<List<Product>> InStockAsync();
+    Task<bool> SetStockAsync(int id, int stock);
+}
+```
+
+`Main` ghép các phần, `MainForm` chỉ biết `IProductStore`:
+
+```csharp
+using Microsoft.EntityFrameworkCore;
+
+namespace ShopDesk;
+
+static class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        ApplicationConfiguration.Initialize();
+
+        var cs = "User Id=shopapi;Password=shopapi_pw;"
+            + "Data Source=localhost:1521/FREEPDB1";
+        var options =
+            new DbContextOptionsBuilder<ShopDbContext>()
+                .UseOracle(cs)
+                .UseUpperSnakeCaseNamingConvention()
+                .Options;
+        var db = new ShopDbContext(options);
+        IProductStore store = new DbProductStore(db);
+
+        Application.Run(new MainForm(store));
+    }
+}
+
+class MainForm : Form
+{
+    private readonly IProductStore _store;
+    private readonly BindingSource _source =
+        new BindingSource();
+
+    public MainForm(IProductStore store)
+    {
+        _store = store;
+        Text = "Hàng còn trong kho";
+        Width = 500;
+
+        var grid = new DataGridView
+        {
+            Dock = DockStyle.Fill,
+            DataSource = _source,
+            ReadOnly = true,
+            AllowUserToAddRows = false
+        };
+        var soldOutButton = new Button
+        {
+            Text = "Hết hàng",
+            Dock = DockStyle.Top
+        };
+        soldOutButton.Click += SoldOutButton_Click;
+        Controls.Add(grid);
+        Controls.Add(soldOutButton);
+
+        Load += async (sender, e) => await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        _source.DataSource =
+            await _store.InStockAsync();
+    }
+
+    private async void SoldOutButton_Click(
+        object? sender, EventArgs e)
+    {
+        object? item = _source.Current;
+        if (item == null)
+        {
+            return;
+        }
+        var product = (Product)item;
+        await _store.SetStockAsync(product.Id, 0);
+        await LoadAsync();
+    }
+}
+```
+
+- `MainForm` không có chữ `DbContext` nào. Nó chỉ gọi hai method của
+  interface.
+- `_source.Current` là dòng đang chọn trên lưới, kiểu `object`, ép về
+  `Product` như bài ListBox.
+- Bấm "Hết hàng" thì tồn kho về 0, danh sách tải lại, dòng đó biến mất.
+- Cùng một class `DbProductStore` giờ phục vụ cả API lẫn app kho.
+
+## Thử ngay
+
+Viết một bản giả, dữ liệu nằm trong bộ nhớ:
+
+```csharp
+class FakeProductStore : IProductStore
+{
+    private readonly List<Product> _products =
+        new List<Product>
+        {
+            new Product
+            {
+                Id = 1, Name = "Bút bi", Stock = 100
+            },
+            new Product
+            {
+                Id = 2, Name = "Vở", Stock = 5
+            }
+        };
+
+    public Task<List<Product>> InStockAsync()
+    {
+        var result = _products
+            .Where(p => p.Stock > 0)
+            .ToList();
+        return Task.FromResult(result);
+    }
+
+    public Task<bool> SetStockAsync(int id, int stock)
+    {
+        foreach (var p in _products)
+        {
+            if (p.Id == id)
+            {
+                p.Stock = stock;
+                return Task.FromResult(true);
+            }
+        }
+        return Task.FromResult(false);
+    }
+}
+```
+
+`Task.FromResult` bọc sẵn một kết quả thành `Task`, dùng khi không có gì
+phải chờ. Tắt Oracle bằng `docker stop oracle`, rồi trong `Main` đổi dòng
+tạo `store` thành `IProductStore store = new FakeProductStore();`.
+
+**Đoán trước khi chạy:** Oracle đã tắt. App có mở được, có bấm "Hết hàng"
+được không?
+
+<details>
+<summary>Xem kết quả</summary>
+
+```text
+App mở bình thường, lưới có Bút bi và Vở.
+Chọn Vở, bấm "Hết hàng": dòng Vở biến mất.
+```
+
+`MainForm` không đổi một chữ nào mà vẫn chạy trên dữ liệu giả. Nhớ
+`docker start oracle` và trả `Main` về `DbProductStore` sau khi thử.
+
+</details>
+
+## Lỗi hay gặp
+
+**Form tự `new` phần dữ liệu.** Form lại dính chặt vào Oracle, không thay
+được bằng bản giả.
+
+```csharp
+// SAI — form tự tạo DbProductStore
+class MainForm : Form
+{
+    private readonly IProductStore _store;
+
+    public MainForm(ShopDbContext db)
+    {
+        _store = new DbProductStore(db);
+    }
+}
+```
+
+```csharp
+// ĐÚNG — form nhận interface từ Main
+class MainForm : Form
+{
+    private readonly IProductStore _store;
+
+    public MainForm(IProductStore store)
+    {
+        _store = store;
+    }
+}
+```
+
+## Tóm tắt
+
+- Form chỉ phụ thuộc `IProductStore`, không biết `DbContext`.
+- `Main` là composition root: tạo `DbContext`, `DbProductStore`, form, rồi
+  ghép lại.
+- `DbProductStore` dùng chung được cho API và app WinForms.
+- Đổi sang `FakeProductStore` là chạy được giao diện khi không có Oracle.
+
+```quiz
+[
+  {
+    "prompt": "Trong ASP.NET Core, dòng AddScoped<IProductStore, DbProductStore>() làm việc gì mà app WinForms phải tự làm trong Main?",
+    "options": [
+      "Tạo bảng PRODUCTS",
+      "Tạo DbProductStore và đưa vào nơi cần IProductStore",
+      "Mở kết nối Oracle",
+      "Vẽ giao diện"
+    ],
+    "answer": 2,
+    "explain": "Container tạo DbProductStore và tiêm vào controller. WinForms không có container nên Main tự new rồi truyền vào form."
+  },
+  {
+    "prompt": "Muốn chạy thử màn hình kho trên máy chưa cài Oracle, cần sửa ở đâu?",
+    "options": [
+      "Sửa MainForm",
+      "Sửa IProductStore",
+      "Sửa DbProductStore",
+      "Chỉ sửa Main, truyền FakeProductStore vào form"
+    ],
+    "answer": 4,
+    "explain": "Form chỉ biết IProductStore, nên chỉ cần đổi object được tạo ở composition root."
+  },
+  {
+    "prompt": "_source.Current trả về gì?",
+    "options": [
+      "Object của dòng đang chọn, kiểu object",
+      "Số thứ tự dòng đang chọn",
+      "Cả danh sách",
+      "Luôn là Product, không cần ép kiểu"
+    ],
+    "answer": 1,
+    "explain": "Current là object đang chọn trong BindingSource, khai báo kiểu object nên phải ép về Product."
+  }
+]
+```

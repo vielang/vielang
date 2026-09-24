@@ -23,11 +23,12 @@ flowchart TD
 ## Ví dụ
 
 ```sql
-CREATE INDEX idx_orders_customer
-  ON orders (customer_id);
+CREATE INDEX idx_demo
+  ON order_lines (product_id);
 ```
 
-- Từ đây, câu `WHERE customer_id = 1` dùng được index thay vì đọc cả bảng.
+- Từ đây, câu `WHERE product_id = 1` trên `order_lines` dùng được index thay
+  vì đọc cả bảng.
 - Oracle tự tạo index cho khoá chính và cột `UNIQUE`.
 - Khoá ngoại **không** tự có index. Cột khoá ngoại hay dùng để `JOIN` nên
   thường cần tạo index.
@@ -69,7 +70,7 @@ cho khoá chính từ lúc tạo bảng.
 ## Lỗi hay gặp
 
 **Bọc hàm quanh cột trong `WHERE`.** Index lưu giá trị gốc của
-`order_date`, không lưu kết quả của `TRUNC(order_date)`, nên Oracle không
+`order_date`, không lưu kết quả của `TRUNC(order_date)` (cắt phần giờ), nên Oracle không
 dùng được index và phải đọc cả bảng.
 
 ```sql

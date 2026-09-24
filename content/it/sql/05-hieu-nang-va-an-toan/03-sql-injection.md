@@ -25,7 +25,8 @@ string sql =
     + email + "'";
 ```
 
-Người dùng nhập `' OR '1'='1`, câu SQL thành:
+Viết bằng `$"... '{email}'"` (string interpolation ở khoá C# Core) cũng là
+ghép chuỗi, nguy hiểm y hệt. Người dùng nhập `' OR '1'='1`, câu SQL thành:
 
 ```sql
 -- SAI — điều kiện luôn đúng
@@ -33,7 +34,7 @@ SELECT name FROM customers
 WHERE email = '' OR '1'='1';
 ```
 
-Dùng bind variable với thư viện `Oracle.ManagedDataAccess`:
+Dùng bind variable với thư viện `Oracle.ManagedDataAccess.Core`:
 
 ```csharp
 // ĐÚNG — email được gửi riêng, không ghép vào SQL
@@ -45,11 +46,13 @@ var cmd = new OracleCommand(
 cmd.Parameters.Add(new OracleParameter("email", email));
 ```
 
+`conn` là kết nối đã mở tới Oracle; khối chỉ minh hoạ cách truyền tham số.
+
 - `:email` là chỗ giữ, giá trị thật truyền qua `Parameters`.
 - Người dùng gõ gì vào ô email thì Oracle cũng chỉ coi đó là một chuỗi để
   so sánh.
-- Bind variable còn giúp Oracle dùng lại kế hoạch thực thi khi cùng một câu
-  SQL chạy với giá trị khác nhau, nên nhanh hơn.
+- Bind variable còn giúp Oracle dùng lại cách chạy đã tính cho câu SQL đó
+  khi chỉ có giá trị thay đổi, nên nhanh hơn.
 
 ```mermaid Cùng một đoạn nhập vào, hai cách đưa vào SQL
 flowchart TD

@@ -9,7 +9,7 @@ sửa chỗ kia. Kế thừa giải quyết đúng việc này.
 
 ## Khái niệm
 
-🧬 **Kế thừa (inheritance)**: class con nhận lại property và method của class cha, rồi thêm phần riêng của mình.
+🧬 **Kế thừa (inheritance)**: class con nhận lại field, property và method của class cha, rồi thêm phần riêng của mình.
 
 👪 **Class cha, class con (base class, derived class)**: class được kế thừa là class cha, class kế thừa nó là class con, khai báo bằng `class Con : Cha`.
 
@@ -123,7 +123,8 @@ chỉ viết một lần ở class cha.
 ## Lỗi hay gặp
 
 **Quên gọi `base(...)`.** Class cha không có constructor rỗng thì compiler
-không biết tạo phần cha bằng cách nào.
+không biết tạo phần cha bằng cách nào (như bài Property và constructor: có
+constructor nhận tham số thì không còn constructor rỗng).
 
 ```csharp
 // SAI — lỗi compile: thiếu base(name, price)

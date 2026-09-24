@@ -43,15 +43,18 @@ class CardPayment : Payment
 
 class GiftCardPayment : Payment
 {
-    public override void Refund() =>
+    public override void Refund()
+    {
         throw new NotSupportedException(
             "Thẻ quà tặng không hoàn được");
+    }
 }
 ```
 
 - Vòng lặp tin rằng mọi `Payment` đều hoàn tiền được, vì class cha đã hứa
   như vậy.
-- `GiftCardPayment` phá lời hứa đó, nên thay nó vào chỗ `Payment` là
+- `GiftCardPayment` phá lời hứa đó bằng `NotSupportedException` (exception
+  có sẵn báo thao tác không được hỗ trợ), nên thay nó vào chỗ `Payment` là
   chương trình sập.
 - Lỗi không nằm ở vòng lặp, mà ở chỗ `GiftCardPayment` không nên có
   `Refund()`.
@@ -127,8 +130,10 @@ abstract class Shipment
 
 class StorePickup : Shipment
 {
-    public override string Track() =>
+    public override string Track()
+    {
         throw new NotSupportedException();
+    }
 }
 ```
 

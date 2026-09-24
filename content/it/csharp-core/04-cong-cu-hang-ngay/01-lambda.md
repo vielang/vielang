@@ -44,7 +44,8 @@ foreach (decimal p in expensive)
 
 ## Method viết gọn bằng =>
 
-Method chỉ có một dòng `return` cũng viết được bằng `=>`:
+Method chỉ có một câu lệnh, dù là `return` hay lời gọi trong method `void`,
+cũng viết được bằng `=>`:
 
 ```csharp
 decimal Total(decimal price, int quantity) =>

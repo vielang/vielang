@@ -19,7 +19,8 @@ thành một con số, và hàm tổng hợp làm việc đó.
 | `AVG(cột)` | trung bình |
 | `MIN(cột)`, `MAX(cột)` | nhỏ nhất, lớn nhất |
 
-Mọi hàm trong bảng, trừ `COUNT(*)`, đều bỏ qua giá trị NULL.
+Mọi hàm trong bảng, trừ `COUNT(*)`, đều bỏ qua giá trị NULL. Chúng giống
+`Count`, `Sum`, `Min`, `Max` của LINQ, khác ở chỗ bỏ qua NULL.
 
 ## Ví dụ
 

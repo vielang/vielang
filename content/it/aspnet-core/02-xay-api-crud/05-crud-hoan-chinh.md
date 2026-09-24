@@ -39,7 +39,10 @@ public class ProductsController : ControllerBase
     public ActionResult<Product> GetById(int id)
     {
         var product = Find(id);
-        if (product == null) return NotFound();
+        if (product == null)
+        {
+            return NotFound();
+        }
         return Ok(product);
     }
 
@@ -65,7 +68,10 @@ public class ProductsController : ControllerBase
         int id, ProductRequest req)
     {
         var product = Find(id);
-        if (product == null) return NotFound();
+        if (product == null)
+        {
+            return NotFound();
+        }
         product.Name = req.Name;
         product.Price = req.Price;
         return NoContent();
@@ -75,7 +81,10 @@ public class ProductsController : ControllerBase
     public IActionResult Delete(int id)
     {
         var product = Find(id);
-        if (product == null) return NotFound();
+        if (product == null)
+        {
+            return NotFound();
+        }
         Products.Remove(product);
         return NoContent();
     }

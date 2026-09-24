@@ -69,6 +69,9 @@ app.MapControllers();
 app.Run();
 ```
 
+- `!` sau `["Jwt:Key"]` báo với compiler giá trị này chắc chắn không
+  `null`.
+
 Chặn action bằng `[Authorize]`:
 
 ```csharp
@@ -122,7 +125,7 @@ public class AuthController : ControllerBase
         var key = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(secret));
         var token = new JwtSecurityToken(
-            claims: new[]
+            claims: new List<Claim>
             {
                 new Claim(ClaimTypes.Name, userName),
             },
@@ -138,8 +141,6 @@ public class AuthController : ControllerBase
 - Token chứa tên người dùng (claim) và hết hạn sau 1 giờ.
 - Ví dụ bỏ qua bước kiểm tra mật khẩu để gọn. Dự án thật dùng ASP.NET Core
   Identity để lưu và kiểm tra mật khẩu.
-- `!` sau `["Jwt:Key"]` báo với compiler giá trị này chắc chắn không
-  `null`.
 
 ## Thử ngay
 

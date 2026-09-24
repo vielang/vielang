@@ -15,6 +15,8 @@ controller để chạy khi có request tới.
 
 🗺️ **Routing**: cơ chế ASP.NET Core dựa vào HTTP method và URL của request để chọn action sẽ chạy.
 
+🏷️ **Attribute**: nhãn đặt trong `[ ]` phía trên class, method hay property để framework đọc và xử lý theo, ví dụ `[HttpGet]`.
+
 ## Ví dụ
 
 Tạo file `Controllers/ProductsController.cs`:
@@ -29,8 +31,16 @@ public class ProductsController : ControllerBase
     private static readonly List<Product> Products =
         new List<Product>
         {
-            new Product(1, "Pen", 5000m),
-            new Product(2, "Notebook", 12000m),
+            new Product
+            {
+                Id = 1, Name = "Pen",
+                Price = 5000m
+            },
+            new Product
+            {
+                Id = 2, Name = "Notebook",
+                Price = 12000m
+            },
         };
 
     [HttpGet]
@@ -41,22 +51,24 @@ public class ProductsController : ControllerBase
         Products.FirstOrDefault(p => p.Id == id);
 }
 
-public class Product(int id, string name, decimal price)
+public class Product
 {
-    public int Id { get; } = id;
-    public string Name { get; } = name;
-    public decimal Price { get; } = price;
+    public int Id { get; set; }
+    public string Name { get; set; } = "";
+    public decimal Price { get; set; }
 }
 ```
 
+- `using Microsoft.AspNetCore.Mvc;` mở namespace chứa `ControllerBase` và
+  các attribute, thiếu thì compiler báo không tìm thấy tên.
 - `[Route("api/products")]` đặt đường dẫn chung cho cả controller.
 - `[HttpGet]` nối `GET /api/products` tới `GetAll`.
 - `[HttpGet("{id}")]` nối `GET /api/products/2` tới `GetById`. Phần `{id}`
   trong URL được gán vào tham số `id`.
 - `[ApiController]` bật các hành vi dành cho API, như tự trả lỗi 400 khi dữ
   liệu gửi lên sai.
-- `Product(int id, string name, decimal price)` là cách viết gọn: tham số
-  đặt ngay sau tên class, dùng để gán giá trị cho property.
+- Mỗi request tạo một object controller mới, nên list phải `static` (bài
+  static của C# Core) để mọi request dùng chung.
 - Danh sách sản phẩm để tạm trong bộ nhớ. Chương 4 sẽ chuyển sang database.
 
 Routing ghép route của controller với route của action để chọn action:

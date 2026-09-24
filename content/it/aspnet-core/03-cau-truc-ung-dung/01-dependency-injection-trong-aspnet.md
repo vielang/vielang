@@ -66,7 +66,8 @@ public class ProductsController : ControllerBase
 - `AddSingleton<IProductStore, InMemoryProductStore>()`: nơi nào cần
   `IProductStore` thì nhận `InMemoryProductStore`.
 - Controller chỉ khai báo tham số `IProductStore` trong constructor.
-  Container tự tạo object và truyền vào.
+  Container tự tạo object và truyền vào. Ở bài DIP khoá OOP bạn tự tạo
+  object rồi truyền vào constructor, ở đây container làm việc đó.
 - Dữ liệu trong bộ nhớ phải sống suốt ứng dụng, nên đăng ký `Singleton`.
 - Sang chương 4, muốn đổi sang database chỉ cần đổi dòng đăng ký,
   controller không phải sửa.

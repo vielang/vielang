@@ -25,6 +25,9 @@ WHERE price < 10000;
 - `FROM products`: đọc từ bảng `products`.
 - `WHERE price < 10000`: chỉ giữ sản phẩm giá dưới 10.000đ.
 
+`WHERE`, `ORDER BY` và việc chọn cột làm việc như `Where`, `OrderBy`, `Select`
+của LINQ, nhưng chạy ngay trong database.
+
 ```mermaid WHERE xét từng dòng của products, chỉ giữ dòng thoả điều kiện
 flowchart TD
     A["products: 5 dòng"] --> B{"price < 10000?"}
@@ -36,9 +39,9 @@ Các toán tử hay dùng trong `WHERE`:
 
 | Toán tử | Ý nghĩa | Ví dụ |
 |---|---|---|
-| `=` `<>` | bằng, khác | `city = 'Hà Nội'` |
+| `=` `<>` | bằng, khác (C#: `==`, `!=`) | `city = 'Hà Nội'` |
 | `>` `<` `>=` `<=` | so sánh | `stock > 0` |
-| `AND` `OR` `NOT` | kết hợp điều kiện | `stock > 0 AND price < 10000` |
+| `AND` `OR` `NOT` | kết hợp điều kiện (C#: `&&`, `\|\|`, `!`) | `stock > 0 AND price < 10000` |
 | `BETWEEN a AND b` | nằm trong khoảng, tính cả hai đầu | `price BETWEEN 5000 AND 12000` |
 | `IN (...)` | bằng một trong các giá trị | `city IN ('Hà Nội', 'TP.HCM')` |
 | `LIKE` | khớp mẫu: `%` là nhiều ký tự bất kỳ | `name LIKE 'B%'` |
@@ -69,7 +72,7 @@ Có. `BETWEEN` tính cả hai đầu khoảng, nên 5000 và 12000 đều đư�
 
 ## Lỗi hay gặp
 
-**Đặt chuỗi trong nháy kép.** Oracle hiểu `"Vở"` là tên cột, và báo
+**Đặt chuỗi trong nháy kép theo thói quen C#.** Oracle hiểu `"Vở"` là tên cột, và báo
 `ORA-00904: invalid identifier`.
 
 ```sql

@@ -71,6 +71,8 @@ public class Product
   vừa tạo, ví dụ `/api/products/1`.
 - `nameof(GetById)` chỉ ra action dùng để dựng URL đó. Viết bằng `nameof`
   thì khi đổi tên method, compiler báo lỗi ngay.
+- `new { id = product.Id }` tạo nhanh một object không cần khai báo class,
+  dùng để điền `{id}` vào URL.
 
 ## Thử ngay
 

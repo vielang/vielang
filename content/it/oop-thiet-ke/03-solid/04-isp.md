@@ -5,7 +5,8 @@ minutes: 5
 
 Interface `IOrderStore` có ba method: đọc, lưu, xoá. Trang báo cáo chỉ cần
 đọc, nhưng class của nó vẫn phải implement đủ ba method, hai method thừa chỉ
-để `throw new NotImplementedException()`. ISP giúp tránh việc ép class
+để `throw new NotImplementedException()` (exception có sẵn báo method chưa
+viết). ISP giúp tránh việc ép class
 nhận những thứ nó không dùng.
 
 ## Khái niệm
@@ -113,10 +114,14 @@ interface IOrderStore
 class ReportSource : IOrderStore
 {
     public string Get(int id) => $"Đơn #{id}";
-    public void Save(string order) =>
+    public void Save(string order)
+    {
         throw new NotImplementedException();
-    public void Delete(int id) =>
+    }
+    public void Delete(int id)
+    {
         throw new NotImplementedException();
+    }
 }
 ```
 

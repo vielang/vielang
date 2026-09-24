@@ -61,6 +61,8 @@ public partial class InitialCreate : Migration
 ```
 
 - `Up` chạy khi áp dụng migration: tạo bảng `PRODUCTS`, cột `ID` là khoá tự tăng.
+  Đây là bản C# của `CREATE TABLE` ở khoá SQL: `nullable: false` là
+  `NOT NULL`, `Oracle:Identity` là `GENERATED AS IDENTITY`.
 - `Down` chạy khi huỷ migration: xoá bảng đó.
 - Migration là code, được commit lên git cùng project. Cả team và server dùng
   chung một lịch sử thay đổi database.

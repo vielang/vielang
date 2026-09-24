@@ -18,7 +18,8 @@ mới lại phải sửa giỏ hàng. Với đa hình, mỗi loại tự biết 
 ```csharp
 var cart = new List<Product>
 {
-    new PhysicalProduct { Name = "Sách", Grams = 800 },
+    new PhysicalProduct
+        { Name = "Sách", WeightGram = 800 },
     new DigitalProduct { Name = "Ebook C#" },
 };
 
@@ -37,10 +38,10 @@ class Product
 
 class PhysicalProduct : Product
 {
-    public int Grams { get; set; }
+    public int WeightGram { get; set; }
 
     public override decimal ShippingFee() =>
-        Grams * 10m;
+        WeightGram * 10m;
 }
 
 class DigitalProduct : Product
@@ -54,6 +55,9 @@ Sách: 8000
 Ebook C#: 0
 ```
 
+- Bài này dùng `{ get; set; }` và object initializer `new ... { Name = ... }`
+  (đã gặp ở bài Value type và reference type) cho code ngắn, và
+  `ShippingFee()` giờ đưa lên `Product` với `virtual`.
 - `List<Product>` chứa được cả `PhysicalProduct` và `DigitalProduct`, vì
   cả hai đều là `Product`.
 - Vòng lặp chỉ gọi `item.ShippingFee()`, không cần biết món hàng thuộc loại
@@ -64,7 +68,7 @@ Ebook C#: 0
 ```mermaid Cùng một lời gọi, C# chọn bản override theo object thật
 flowchart TD
     A["item.ShippingFee()"] --> B{"Object thật là gì?"}
-    B -->|PhysicalProduct| C["Grams * 10m"]
+    B -->|PhysicalProduct| C["WeightGram * 10m"]
     B -->|DigitalProduct| D["0m"]
 ```
 

@@ -9,7 +9,8 @@ và lấy đơn hàng kèm các dòng hàng của nó.
 
 ## Khái niệm
 
-🔗 **Quan hệ một-nhiều (one-to-many)**: một dòng ở bảng này ứng với nhiều dòng ở bảng khác, ví dụ một đơn hàng có nhiều dòng hàng.
+Quan hệ một-nhiều và khoá ngoại đã học ở bài Khoá ngoại của khoá SQL. Bài này
+khai báo chúng bằng class.
 
 🧲 **Navigation property**: property trỏ tới object liên quan, như `Order.Lines`, để đi từ đơn hàng tới các dòng hàng.
 
@@ -22,7 +23,7 @@ using Microsoft.EntityFrameworkCore;
 public class Order
 {
     public int Id { get; set; }
-    public string CustomerName { get; set; } = "";
+    public int CustomerId { get; set; }
     public List<OrderLine> Lines { get; set; } =
         new List<OrderLine>();
 }
@@ -31,8 +32,9 @@ public class OrderLine
 {
     public int Id { get; set; }
     public int OrderId { get; set; }
-    public string ProductName { get; set; } = "";
+    public int ProductId { get; set; }
     public int Quantity { get; set; }
+    public decimal UnitPrice { get; set; }
 }
 
 public class ShopDbContext : DbContext
@@ -44,6 +46,8 @@ public class ShopDbContext : DbContext
     }
 
     public DbSet<Order> Orders => Set<Order>();
+    public DbSet<OrderLine> OrderLines =>
+        Set<OrderLine>();
 }
 
 [ApiController]
@@ -64,7 +68,10 @@ public class OrdersController : ControllerBase
         var order = await _db.Orders
             .Include(o => o.Lines)
             .FirstOrDefaultAsync(o => o.Id == id);
-        if (order == null) return NotFound();
+        if (order == null)
+        {
+            return NotFound();
+        }
         return Ok(order);
     }
 }
@@ -73,23 +80,28 @@ public class OrdersController : ControllerBase
 - `Order.Lines` là navigation property, cho biết một đơn có nhiều dòng.
 - `OrderLine.OrderId` là khoá ngoại. EF Core tự nhận ra nhờ tên theo mẫu
   `TênClass` + `Id`.
-- Migration tạo hai bảng `ORDERS` và `ORDER_LINE`, nối với nhau qua cột
-  `ORDER_ID`.
+- Hai class khớp với bảng `orders`, `order_lines` của khoá SQL. Đơn chỉ lưu
+  `CustomerId`, dòng hàng lưu `ProductId` và `UnitPrice` là giá lúc bán,
+  đúng như bài Chuẩn hoá.
+- Migration tạo hai bảng `ORDERS` và `ORDER_LINES`, nối với nhau qua cột
+  `ORDER_ID`, và tự tạo index cho cột này. Bài Index của khoá SQL đã nói
+  Oracle không tự tạo index cho khoá ngoại.
 - `Include(o => o.Lines)` bảo EF Core đọc luôn các dòng hàng cùng đơn hàng.
-  Câu SQL được sinh ra là một `LEFT JOIN` từ `ORDERS` sang `ORDER_LINE`.
+  Câu SQL được sinh ra là một `LEFT JOIN` từ `ORDERS` sang `ORDER_LINES`.
 
 ```mermaid Một Order có nhiều OrderLine, nối qua OrderId
 erDiagram
     Order ||--o{ OrderLine : "có"
     Order {
         int Id
-        string CustomerName
+        int CustomerId
     }
     OrderLine {
         int Id
         int OrderId
-        string ProductName
+        int ProductId
         int Quantity
+        decimal UnitPrice
     }
 ```
 
@@ -105,16 +117,14 @@ using Microsoft.AspNetCore.Mvc;
 [HttpPost("sample")]
 public async Task<IActionResult> CreateSample()
 {
-    var order = new Order { CustomerName = "An" };
+    var order = new Order { CustomerId = 1 };
     order.Lines.Add(new OrderLine
     {
-        ProductName = "Bút",
-        Quantity = 2
+        ProductId = 1, Quantity = 2, UnitPrice = 5000m
     });
     order.Lines.Add(new OrderLine
     {
-        ProductName = "Vở",
-        Quantity = 3
+        ProductId = 2, Quantity = 3, UnitPrice = 12000m
     });
 
     _db.Orders.Add(order);
@@ -139,8 +149,8 @@ mảng rỗng, hay vẫn đủ hai dòng?
 <summary>Xem kết quả</summary>
 
 ```text
-Có Include:   {"id":1,"customerName":"An","lines":[{...},{...}]}
-Bỏ Include:   {"id":1,"customerName":"An","lines":[]}
+Có Include:   {"id":1,"customerId":1,"lines":[{...},{...}]}
+Bỏ Include:   {"id":1,"customerId":1,"lines":[]}
 ```
 
 Mảng rỗng. Không có `Include`, EF Core chỉ đọc bảng `ORDERS`. `Lines` giữ giá

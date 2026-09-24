@@ -17,6 +17,9 @@ Mọi phép so sánh với `NULL` bằng `=` hay `<>` đều cho kết quả kh�
 cũng không sai, nên `WHERE` loại dòng đó. Muốn kiểm tra NULL phải dùng
 `IS NULL` hoặc `IS NOT NULL`.
 
+Khác `null` của C#: `= NULL` không bao giờ đúng, và `''` cũng là NULL. `NVL`
+thì giống toán tử `??`.
+
 ## Ví dụ
 
 ```sql

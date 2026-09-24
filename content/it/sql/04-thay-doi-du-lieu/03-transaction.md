@@ -35,8 +35,8 @@ COMMIT;
   transaction.
 - Các thay đổi chỉ được lưu hẳn khi chạy `COMMIT`.
 - Có lỗi giữa chừng thì gọi `ROLLBACK` để huỷ cả ba bước.
-- Trước khi `COMMIT`, chỉ phiên đã thực hiện thay đổi mới thấy chúng. Người
-  khác vẫn thấy dữ liệu cũ.
+- Trước khi `COMMIT`, chỉ phiên (một kết nối đang mở tới Oracle) đã thực hiện
+  thay đổi mới thấy chúng. Người khác vẫn thấy dữ liệu cũ.
 
 ```mermaid Một transaction kết thúc bằng COMMIT hoặc ROLLBACK
 stateDiagram-v2

@@ -34,7 +34,8 @@ GRANT CREATE SESSION, CREATE TABLE, CREATE SEQUENCE
   TO shopapi;
 ```
 
-User mới chưa có bảng nào. Bài sau dùng migration để EF Core tự tạo bảng.
+`GRANT` cấp cho user mới quyền đăng nhập và tạo bảng. User mới chưa có bảng
+nào, bài sau dùng migration để EF Core tự tạo bảng.
 
 ## Ví dụ
 
@@ -45,7 +46,8 @@ dotnet add package Oracle.EntityFrameworkCore
 dotnet add package EFCore.NamingConventions
 ```
 
-Thêm chuỗi kết nối vào `appsettings.json`:
+Thêm chuỗi kết nối vào `appsettings.Development.json`. Mật khẩu này chỉ để
+thử trên máy, như bài Cấu hình:
 
 ```json
 "ConnectionStrings": {
@@ -108,9 +110,12 @@ public class ProductsController : ControllerBase
 ```
 
 - `UseOracle(cs)` chọn Oracle, đọc chuỗi kết nối từ cấu hình.
+- Để gọn, controller nhận thẳng `ShopDbContext`. Bài Truy vấn sẽ đặt nó sau
+  một interface như bài Dependency injection.
 - `UseUpperSnakeCaseNamingConvention()` đổi tên sang chữ hoa nối gạch dưới:
-  `Products` thành `PRODUCTS`, `CustomerName` thành `CUSTOMER_NAME`. Tên
-  khớp với cách viết của khoá SQL.
+  `Products` thành `PRODUCTS`, `UnitPrice` thành `UNIT_PRICE`. Tên
+  khớp với cách viết của khoá SQL. Khoá chính theo quy ước EF Core tên là
+  `Id`, nên cột là `ID` chứ không phải `PRODUCT_ID`.
 - `AddDbContext` đăng ký `ShopDbContext` với vòng đời `Scoped`, mỗi request
   một phiên làm việc.
 - `ToListAsync()` đọc cả bảng. Dùng bản `Async` vì đọc database là việc chậm.

@@ -31,6 +31,8 @@ CREATE TABLE order_samples (
 - Một khách có thể có nhiều đơn, nên `customer_id` được lặp lại trong
   `orders`.
 - Bảng chứa khoá ngoại gọi là bảng con, bảng được trỏ tới gọi là bảng cha.
+- Khác C# nơi `Customer` có thể giữ `List<Order>`, bảng cha không lưu danh
+  sách: mỗi dòng con tự lưu khoá của cha.
 
 Bốn bảng của cửa hàng nối với nhau như sau:
 
@@ -69,7 +71,8 @@ tên khách thay vì mã, cần nối hai bảng bằng `JOIN` ở bài sau.
 
 ## Lỗi hay gặp
 
-**Thêm đơn cho khách không tồn tại.** Không có khách số 99, Oracle báo lỗi
+**Thêm đơn cho khách không tồn tại.** `INSERT` thêm dòng, `DELETE` xoá dòng
+(học kỹ ở chương Thay đổi dữ liệu). Không có khách số 99, Oracle báo lỗi
 `ORA-02291`: không tìm thấy dòng cha.
 
 ```sql

@@ -46,7 +46,8 @@ class OrderService
 ```
 
 - `OrderService` chỉ biết `IOrderRepository`, không biết có SQL. Đó là DIP.
-- `OrderService` nhận repository qua constructor. Đó là DI.
+- `OrderService` nhận repository qua constructor. Đó là DI. `PlaceOrder` ở
+  bài Interface đã làm đúng như vậy.
 - Nơi tạo `OrderService` quyết định dùng repository nào.
 - Trong ASP.NET Core, framework tự tạo và truyền các object này. Bạn chỉ khai
   báo interface nào ứng với class nào.

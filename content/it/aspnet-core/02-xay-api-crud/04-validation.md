@@ -53,6 +53,8 @@ public class CreateProductRequest
 - `[ApiController]` tự kiểm tra DTO trước khi gọi action. Sai quy tắc thì
   trả 400 kèm danh sách lỗi, action không chạy.
 - `ErrorMessage` đặt câu báo lỗi riêng thay cho câu mặc định bằng tiếng Anh.
+- Validation chặn ở API để trả 400 dễ hiểu. `NOT NULL`, `CHECK` ở bài
+  CREATE TABLE của khoá SQL vẫn là lớp chặn cuối trong database.
 
 ```mermaid Dữ liệu sai bị chặn trước khi vào action
 flowchart TD

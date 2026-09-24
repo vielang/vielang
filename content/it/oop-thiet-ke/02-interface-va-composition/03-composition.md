@@ -12,8 +12,8 @@ ghép các phần lại với nhau.
 
 🧱 **Composition**: class chứa object của class khác làm property và giao việc cho object đó, thay vì kế thừa.
 
-Kế thừa là quan hệ **"là một"**, composition là quan hệ **"có một"**. Đơn
-hàng không phải là một cách giao hàng, mà *có* một cách giao hàng.
+Đơn hàng không phải là một cách giao hàng, mà *có* một cách giao hàng, như
+`Customer` có `Address` ở bài Kế thừa.
 
 ## Ví dụ
 

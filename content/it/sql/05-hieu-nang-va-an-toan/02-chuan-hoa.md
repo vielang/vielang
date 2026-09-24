@@ -36,6 +36,8 @@ Sau khi chuẩn hoá, ta có bốn bảng mà cửa hàng mẫu đang dùng:
 - Mỗi sản phẩm trong đơn là một dòng ở `order_lines`, không gộp chung trong
   một ô.
 - Khách đổi email thì chỉ sửa một dòng ở `customers`.
+- `order_lines.unit_price` không phải dữ liệu lặp: đó là giá lúc bán, vì giá ở
+  `products` có thể đổi.
 
 ## Thử ngay
 

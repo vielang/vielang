@@ -5,7 +5,8 @@ minutes: 5
 
 App bán hàng trên điện thoại cần lấy danh sách sản phẩm từ server. Hai bên
 nói chuyện với nhau bằng HTTP. Trước khi viết API, bạn cần biết một request
-gồm những gì và server trả lời ra sao.
+gồm những gì và server trả lời ra sao. Khoá này ghép C#, OOP (interface, DI)
+và SQL (Oracle) đã học thành một API.
 
 ## Khái niệm
 
@@ -37,6 +38,8 @@ Content-Type: application/json
 
 - Dòng đầu của request gồm method (`GET`) và đường dẫn (`/api/products/1`).
 - Dòng đầu của response có status code (`200 OK`).
+- Các dòng `Tên: giá trị` sau dòng đầu là header, chở thông tin kèm theo như
+  kiểu dữ liệu của body.
 - Dữ liệu trả về ở dạng JSON, một định dạng chữ gồm các cặp tên và giá trị.
 
 Một API sản phẩm theo kiểu REST:

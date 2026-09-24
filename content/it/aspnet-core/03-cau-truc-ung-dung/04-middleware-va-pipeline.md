@@ -47,7 +47,8 @@ app.MapControllers();
 app.Run();
 ```
 
-- `app.Use(...)` thêm một middleware vào pipeline.
+- `app.Use(...)` thêm một middleware vào pipeline. Lambda cũng đánh dấu
+  `async` được như method.
 - `context` chứa request và response hiện tại.
 - Code trước `await next()` chạy khi request đi vào. Code sau nó chạy khi
   response đi ra.

@@ -9,6 +9,9 @@ client chỉ nhận 500 với body rỗng, không biết chuyện gì đã xảy
 `try/catch` vào từng action thì code lặp lại khắp nơi. Bài này bắt mọi lỗi ở
 một chỗ.
 
+Vẫn dùng `try/catch` như bài Exception khi xử lý được một lỗi cụ thể. Lỗi
+không lường trước thì để bộ xử lý tập trung bắt.
+
 ## Khái niệm
 
 🛡️ **Xử lý lỗi tập trung**: bắt mọi exception chưa được xử lý ở một chỗ duy nhất trong pipeline, rồi trả về response lỗi thống nhất.
@@ -65,12 +68,14 @@ public class AppExceptionHandler : IExceptionHandler
 ```
 
 - `IExceptionHandler` là interface để viết bộ xử lý lỗi. `TryHandleAsync`
-  được gọi khi có exception chưa ai bắt.
+  được gọi khi có exception chưa ai bắt. `ValueTask<bool>` dùng như
+  `Task<bool>`.
 - Bộ xử lý ghi log đầy đủ exception cho team, còn client chỉ nhận một câu
   chung chung.
 - Trả `true` nghĩa là lỗi đã được xử lý xong.
 - `AddExceptionHandler` đăng ký bộ xử lý, `UseExceptionHandler()` thêm nó
-  vào pipeline.
+  vào pipeline. `UseExceptionHandler()` là một middleware, đặt đầu pipeline
+  để bọc các bước sau.
 - `ct` dùng để huỷ việc ghi response khi client ngắt kết nối, ở đây chỉ cần
   truyền tiếp.
 

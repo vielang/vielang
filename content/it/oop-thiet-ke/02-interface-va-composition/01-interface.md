@@ -49,7 +49,9 @@ class PlaceOrder
   và để `public`.
 - `PlaceOrder` chỉ biết `INotifier`, không biết email. Nó nhận notifier qua
   constructor.
-- `readonly` nghĩa là field chỉ gán được trong constructor.
+- `readonly` nghĩa là field chỉ gán được lúc khai báo hoặc trong
+  constructor, sau đó không đổi (giống property `{ get; }` ở bài Property
+  và constructor). Field `private` theo quy ước .NET bắt đầu bằng `_`.
 - Không `new INotifier()` được, nhưng biến kiểu `INotifier` thì giữ được bất
   kỳ class nào implement nó.
 - Một class implement được nhiều interface:

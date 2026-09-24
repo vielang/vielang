@@ -41,6 +41,8 @@ class Product
 
 - `class Product` khai báo hai field (`Name`, `Price`) và một method
   (`TotalFor`).
+- `public` cho phép code bên ngoài class dùng field và method đó. Bài Đóng
+  gói của khoá OOP sẽ nói kỹ.
 - `new Product()` tạo một object, biến `pen` giữ object đó.
 - Dùng dấu chấm để truy cập field và method của object: `pen.Price`,
   `pen.TotalFor(2)`. Bên trong `TotalFor`, `Price` chính là giá của `pen`.

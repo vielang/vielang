@@ -25,7 +25,7 @@ khoảng 5 phút và làm được ngay một việc cụ thể.
 Mỗi khái niệm được định nghĩa đúng một lần, trên một dòng riêng:
 
 ```
-🧬 **Kế thừa (inheritance)**: class con nhận lại field và method của class cha.
+🧬 **Kế thừa (inheritance)**: class con nhận lại field, property và method của class cha, rồi thêm phần riêng của mình.
 ```
 
 - Mở đầu bằng **một** emoji gợi hình cho khái niệm.

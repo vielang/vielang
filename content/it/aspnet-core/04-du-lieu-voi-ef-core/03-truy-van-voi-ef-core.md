@@ -24,36 +24,70 @@ SQL và chạy trong database.
 
 ## Ví dụ
 
+Phần đọc ghi database nằm trong `DbProductStore`, sau interface `IProductStore`
+như bài Dependency injection. Controller không biết có EF Core:
+
 ```csharp
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+
+public interface IProductStore
+{
+    Task<List<Product>> InStockAsync();
+    Task<bool> SetStockAsync(int id, int stock);
+}
+
+public class DbProductStore : IProductStore
+{
+    private readonly ShopDbContext _db;
+
+    public DbProductStore(ShopDbContext db)
+    {
+        _db = db;
+    }
+
+    public async Task<List<Product>> InStockAsync() =>
+        await _db.Products
+            .Where(p => p.Stock > 0)
+            .ToListAsync();
+
+    public async Task<bool> SetStockAsync(
+        int id, int stock)
+    {
+        var product = await _db.Products.FindAsync(id);
+        if (product == null)
+        {
+            return false;
+        }
+        product.Stock = stock;
+        await _db.SaveChangesAsync();
+        return true;
+    }
+}
 
 [ApiController]
 [Route("api/products")]
 public class ProductsController : ControllerBase
 {
-    private readonly ShopDbContext _db;
+    private readonly IProductStore _store;
 
-    public ProductsController(ShopDbContext db)
+    public ProductsController(IProductStore store)
     {
-        _db = db;
+        _store = store;
     }
 
     [HttpGet("in-stock")]
     public async Task<List<Product>> InStock() =>
-        await _db.Products
-            .Where(p => p.Stock > 0)
-            .ToListAsync();
+        await _store.InStockAsync();
 
     [HttpPut("{id}/stock")]
     public async Task<IActionResult> SetStock(
         int id, int stock)
     {
-        var product = await _db.Products.FindAsync(id);
-        if (product == null) return NotFound();
-
-        product.Stock = stock;
-        await _db.SaveChangesAsync();
+        if (!await _store.SetStockAsync(id, stock))
+        {
+            return NotFound();
+        }
         return NoContent();
     }
 }
@@ -77,11 +111,18 @@ public class ShopDbContext : DbContext
 }
 ```
 
+- Đăng ký trong `Program.cs`:
+  `builder.Services.AddScoped<IProductStore, DbProductStore>();`. Phải là
+  `Scoped` vì `DbContext` là `Scoped`, đúng lỗi "Singleton phụ thuộc
+  Scoped" của bài Dependency injection.
 - `Where(...).ToListAsync()`: điều kiện lọc chạy trong database, chỉ các dòng
   khớp mới được gửi về.
 - `FindAsync(id)` tìm theo khoá chính, không có thì trả `null`.
 - Sửa: chỉ cần đổi property rồi gọi `SaveChangesAsync`. `DbContext` tự biết
   object nào đã đổi và sinh câu `UPDATE`.
+- `SaveChangesAsync` gói mọi câu `INSERT`, `UPDATE`, `DELETE` vào một
+  transaction như bài Transaction của khoá SQL: một câu lỗi thì không câu nào
+  được lưu.
 - Mọi method đọc ghi database đều có bản `Async`, dùng kèm `await`.
 - Giá trị lấy từ biến C# được EF Core gửi bằng bind variable, như bài SQL
   injection của khoá SQL, nên truy vấn LINQ không bị chèn SQL.

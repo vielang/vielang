@@ -75,7 +75,7 @@ class OrderService
         subtotal + subtotal * 10 / 100;
 
     public void SaveToFile(decimal total) =>
-        File.WriteAllText("order.txt", $"{total}");
+        Console.WriteLine($"Lưu file: {total}");
 
     public void SendEmail(string email) =>
         Console.WriteLine($"Gửi {email}");

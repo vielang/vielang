@@ -4,7 +4,8 @@ minutes: 5
 ---
 
 Muốn tìm sản phẩm đắt hơn giá trung bình thì không viết được
-`WHERE price > AVG(price)`, vì bài Hàm tổng hợp đã cho thấy câu này báo lỗi.
+`WHERE price > AVG(price)`, vì bài GROUP BY và HAVING đã cho thấy hàm tổng hợp
+trong `WHERE` báo lỗi.
 Phải tính giá trung bình trước, rồi dùng con số đó để lọc. Subquery làm được việc này trong một câu.
 
 ## Khái niệm

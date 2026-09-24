@@ -3,9 +3,11 @@ title: Xử lý lỗi tập trung
 minutes: 5
 ---
 
-Database mất kết nối, một chỗ trong code ném exception không ai bắt. Client
-nhận về một trang lỗi dài kèm stack trace, lộ cả tên class bên trong. Bọc
-`try/catch` vào từng action thì quá dài. Bài này bắt mọi lỗi ở một chỗ.
+Database mất kết nối, code ném ra một exception mà không ai bắt. Ở môi trường
+Development, client nhận về trang lỗi dài kèm stack trace. Trên server thật,
+client chỉ nhận 500 với body rỗng, không biết chuyện gì đã xảy ra. Bọc
+`try/catch` vào từng action thì code lặp lại khắp nơi. Bài này bắt mọi lỗi ở
+một chỗ.
 
 ## Khái niệm
 
@@ -71,6 +73,16 @@ public class AppExceptionHandler : IExceptionHandler
   vào pipeline.
 - `ct` dùng để huỷ việc ghi response khi client ngắt kết nối, ở đây chỉ cần
   truyền tiếp.
+
+Đường đi của một exception chưa ai bắt:
+
+```mermaid Exception đi tới bộ xử lý lỗi tập trung
+flowchart TD
+    A["Action ném exception"] --> B["UseExceptionHandler()"]
+    B --> C["AppExceptionHandler.TryHandleAsync"]
+    C --> D["Log của server: message + stack trace"]
+    C --> E["Client: 500 + ProblemDetails"]
+```
 
 ## Thử ngay
 

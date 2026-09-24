@@ -13,6 +13,12 @@ phải build lại. ASP.NET Core đọc chúng từ file cấu hình.
 
 🌍 **Môi trường (environment)**: tên chế độ đang chạy như `Development` hay `Production`. File `appsettings.{Môi trường}.json` được đọc sau và ghi đè giá trị của `appsettings.json`.
 
+```mermaid File của môi trường được đọc sau nên ghi đè key trùng
+flowchart TD
+    A["appsettings.json"] -->|"đọc trước"| C[IConfiguration]
+    B["appsettings.Development.json"] -->|"đọc sau, ghi đè key trùng"| C
+```
+
 ## Ví dụ
 
 Thêm vào `appsettings.json`:
@@ -54,8 +60,8 @@ public class ShopController : ControllerBase
 ```
 
 - `IConfiguration` có sẵn trong container, chỉ cần nhận qua constructor.
-- Dấu `:` đi vào từng cấp của JSON: `Shop:Name`.
-- `GetValue<int>` đọc và đổi sang số.
+- Dấu `:` nối tên các cấp trong JSON: `Shop:Name`.
+- `GetValue<int>` đọc giá trị rồi đổi sang kiểu `int`.
 
 ## Đọc cấu hình vào class
 
@@ -75,9 +81,9 @@ public class ShopOptions
 }
 ```
 
-Nơi cần dùng nhận `IOptions<ShopOptions>` qua constructor, rồi đọc
-`options.Value.MaxItemsPerOrder`. Cách này có kiểu rõ ràng, gõ sai tên thì
-compiler báo ngay.
+Class cần dùng nhận `IOptions<ShopOptions>` qua constructor, rồi đọc
+`options.Value.MaxItemsPerOrder`. Cách này có kiểu rõ ràng, gõ sai tên property thì
+compiler báo ngay. Tên property vẫn phải khớp với key trong JSON.
 
 ## Thử ngay
 
@@ -112,7 +118,7 @@ Là 5. File của môi trường `Development` được đọc sau và ghi đè
 
 ## Lỗi hay gặp
 
-**Gõ sai tên key.** Không có lỗi nào được báo, chỉ nhận về giá trị mặc định.
+**Gõ sai tên key.** Ứng dụng không báo lỗi, chỉ trả về giá trị mặc định.
 
 ```csharp
 // SAI — thiếu chữ s, max luôn bằng 0
@@ -120,7 +126,8 @@ int max = _config.GetValue<int>(
     "Shop:MaxItemPerOrder");
 ```
 
-Đọc qua class `ShopOptions` như ở trên để tránh gõ tên key bằng chuỗi.
+Đọc qua class `ShopOptions` như ở trên thì tên key chỉ khai báo một lần,
+không phải gõ lại chuỗi ở nhiều nơi.
 
 **Để mật khẩu trong `appsettings.json`.** File này được commit lên git, ai có
 code là thấy mật khẩu. Khi dev, lưu bí mật bằng `dotnet user-secrets`. Trên
@@ -144,7 +151,7 @@ server, lưu bằng biến môi trường.
       "Email/Smtp/Port"
     ],
     "answer": 3,
-    "explain": "Dấu : đi vào từng cấp của JSON."
+    "explain": "Dấu : nối tên các cấp trong JSON."
   },
   {
     "prompt": "appsettings.json đặt LogLevel là Warning, appsettings.Development.json đặt là Debug. Chạy ở Development thì dùng giá trị nào?",

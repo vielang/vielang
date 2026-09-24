@@ -4,8 +4,8 @@ minutes: 5
 ---
 
 Bài trước dừng ở lỗi "no such table". Class `Product` đã có, nhưng database
-chưa có bảng. Về sau thêm cột `Stock` cũng phải sửa database theo. Migration
-giữ cho cấu trúc database luôn khớp với class trong code.
+chưa có bảng. Về sau, thêm property `Stock` thì database cũng phải đổi theo.
+Migration giữ cho cấu trúc database luôn khớp với class trong code.
 
 ## Khái niệm
 
@@ -65,7 +65,7 @@ public partial class InitialCreate : Migration
 
 ## Thử ngay
 
-Sau khi đã `database update`, gọi lại `GET /api/products` và thấy `[]`.
+Sau khi chạy `database update`, gọi lại `GET /api/products` sẽ nhận `[]`.
 Giờ thêm property vào `Product`:
 
 ```csharp
@@ -115,7 +115,7 @@ sinh phần khác nhau. Các dòng đã có vẫn giữ nguyên, `Stock` nhận 
 
 ## Lỗi hay gặp
 
-**Sửa class mà quên tạo migration.** Code chạy, nhưng truy vấn báo lỗi vì
+**Sửa class mà quên tạo migration.** Code vẫn chạy, nhưng truy vấn báo lỗi vì
 database chưa có cột mới.
 
 ```text
@@ -125,16 +125,16 @@ SQLite Error 1: 'no such column: p.Stock'.
 Mỗi lần thêm, bớt hay đổi property của entity, chạy lại hai lệnh
 `migrations add` và `database update`.
 
-**Sửa file migration đã chạy trên server.** Database trên server không chạy
-lại migration cũ, nên thay đổi đó không bao giờ tới nơi. Muốn đổi thêm thì
-tạo migration mới.
+**Sửa file migration đã chạy trên server.** Server không chạy lại migration
+đã chạy, nên phần vừa sửa không bao giờ được áp dụng. Muốn đổi thêm thì tạo
+migration mới.
 
 ## Tóm tắt
 
 - Migration là file C# mô tả cách đổi cấu trúc database.
 - `migrations add` sinh migration từ phần class thay đổi.
 - `database update` áp dụng các migration chưa chạy.
-- Migration được commit lên git. Không sửa migration đã chạy, hãy tạo cái mới.
+- Migration được commit lên git. Không sửa migration đã chạy, hãy tạo migration mới.
 
 ```quiz
 [

@@ -3,9 +3,9 @@ title: Controller và routing
 minutes: 5
 ---
 
-Controller mẫu trả về thời tiết, còn cửa hàng cần API sản phẩm. Bài này tự
-viết controller đầu tiên, và xem ASP.NET Core chọn method nào để chạy khi có
-request tới.
+Controller mẫu trả về thời tiết, còn cửa hàng cần API sản phẩm. Bài này hướng
+dẫn tự viết controller đầu tiên và xem ASP.NET Core chọn method nào của
+controller để chạy khi có request tới.
 
 ## Khái niệm
 
@@ -56,8 +56,16 @@ public class Product(int id, string name, decimal price)
 - `[ApiController]` bật các hành vi dành cho API, như tự trả lỗi 400 khi dữ
   liệu gửi lên sai.
 - `Product(int id, string name, decimal price)` là cách viết gọn: tham số
-  đặt ngay sau tên class và dùng để gán cho property.
+  đặt ngay sau tên class, dùng để gán giá trị cho property.
 - Danh sách sản phẩm để tạm trong bộ nhớ. Chương 4 sẽ chuyển sang database.
+
+Routing ghép route của controller với route của action để chọn action:
+
+```mermaid Request được nối tới action nào
+flowchart LR
+  A["GET /api/products"] -->|"api/products"| C["GetAll()"]
+  B["GET /api/products/2"] -->|"api/products + {id}"| D["GetById(id = 2)"]
+```
 
 ## Thử ngay
 
@@ -85,7 +93,7 @@ HTTP/1.1 200 OK
 HTTP/1.1 204 No Content
 ```
 
-Không phải 404 mà là 204. Action trả về `null`, và ASP.NET Core hiểu là
+Không phải 404 mà là 204. Action trả về `null`, ASP.NET Core hiểu đó là
 "thành công nhưng không có dữ liệu". Bài **Trả về kết quả** sẽ hướng dẫn trả
 404 đúng cách.
 
@@ -93,11 +101,11 @@ Không phải 404 mà là 204. Action trả về `null`, và ASP.NET Core hiểu
 
 ## Lỗi hay gặp
 
-**Controller có `[ApiController]` nhưng thiếu `[Route]`.** Ứng dụng dừng
-ngay lúc khởi động, báo action phải có route.
+**Controller có `[ApiController]` nhưng thiếu `[Route]`.** Mọi request đều
+nhận lỗi 500, log báo action phải có route.
 
 ```csharp
-// SAI — thiếu [Route], ứng dụng không khởi động được
+// SAI — thiếu [Route], request nào cũng lỗi 500
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
@@ -122,7 +130,7 @@ public class OrdersController : ControllerBase
 ```
 
 **Hai action cùng method và cùng URL.** ASP.NET Core không biết chọn cái nào,
-request trả về lỗi 500.
+nên request nhận lỗi 500.
 
 ```csharp
 // SAI — hai action đều là GET /api/customers
@@ -180,10 +188,10 @@ Sửa bằng cách cho action thứ hai một URL riêng, ví dụ `[HttpGet("ac
       "Vì tên file nằm trong thư mục Controllers",
       "Vì có method tên GetAll",
       "Vì được đăng ký trong appsettings.json",
-      "Vì kế thừa ControllerBase và có [ApiController], [Route]"
+      "Vì kế thừa ControllerBase"
     ],
     "answer": 4,
-    "explain": "Kế thừa ControllerBase và đánh dấu attribute là thứ khiến ASP.NET Core nhận ra controller và nối route cho nó."
+    "explain": "ASP.NET Core nhận ra controller nhờ kế thừa ControllerBase. Còn [Route] và [HttpGet] cho biết URL nào gọi tới action nào."
   }
 ]
 ```

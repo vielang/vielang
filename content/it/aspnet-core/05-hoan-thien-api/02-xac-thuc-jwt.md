@@ -4,7 +4,7 @@ minutes: 6
 ---
 
 Ai cũng gọi được `POST /api/products` để thêm sản phẩm, kể cả người lạ. API
-cần biết người gọi là ai, và chỉ cho người có quyền làm những việc quan trọng.
+cần biết người gọi là ai, và chỉ cho phép người có quyền làm việc quan trọng.
 Bài này dùng JWT để làm việc đó.
 
 ## Khái niệm
@@ -143,8 +143,8 @@ public class AuthController : ControllerBase
 
 ## Thử ngay
 
-Thêm vào `appsettings.Development.json` một khoá đủ dài. Khoá này chỉ để thử
-trên máy, khoá thật để trong biến môi trường như bài Cấu hình:
+Thêm một khoá đủ dài vào `appsettings.Development.json`. Khoá này chỉ để thử
+trên máy, khoá thật đặt trong biến môi trường như bài Cấu hình.
 
 ```json
 "Jwt": { "Key": "day-la-khoa-bi-mat-dai-hon-32-ky-tu-nhe" }
@@ -189,7 +189,8 @@ app.UseAuthentication();
 ```
 
 **Nhầm 401 với 403.** 401 là chưa xác thực: không có token hoặc token sai.
-403 là đã biết là ai nhưng không đủ quyền, ví dụ action có
+403 là server đã biết người gọi là ai nhưng người đó không đủ quyền, ví dụ
+action có
 `[Authorize(Roles = "Admin")]` mà người gọi không phải Admin.
 
 ## Tóm tắt

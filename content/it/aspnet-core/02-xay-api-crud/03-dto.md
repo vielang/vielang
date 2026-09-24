@@ -87,6 +87,14 @@ public class ProductResponse
 - `Created(url, data)` cũng trả 201 như `CreatedAtAction`, dùng khi chưa có
   action đọc riêng để trỏ tới.
 
+```mermaid Dữ liệu đi qua ba class trong action Create
+flowchart TD
+    A["JSON client gửi"] --> B["CreateProductRequest: Name, Price"]
+    B --> C["Product: thêm Id, CostPrice"]
+    C -->|ToResponse| D["ProductResponse: Id, Name, Price"]
+    D --> E["JSON trả về client"]
+```
+
 ## Thử ngay
 
 Chạy server. Tạo file `product.json`:

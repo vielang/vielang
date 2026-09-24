@@ -15,7 +15,7 @@ gồm những gì và server trả lời ra sao.
 
 🔢 **Status code**: số ba chữ số trong response cho biết kết quả. 2xx là thành công, 4xx là lỗi phía client, 5xx là lỗi phía server.
 
-🧭 **REST**: cách thiết kế API mà mỗi URL chỉ một tài nguyên (danh từ), còn việc cần làm thể hiện bằng HTTP method.
+🧭 **REST**: cách thiết kế API mà mỗi URL trỏ tới một tài nguyên (danh từ), còn việc cần làm thể hiện bằng HTTP method.
 
 ## Ví dụ
 
@@ -37,7 +37,7 @@ Content-Type: application/json
 
 - Dòng đầu của request gồm method (`GET`) và đường dẫn (`/api/products/1`).
 - Dòng đầu của response có status code (`200 OK`).
-- Dữ liệu trả về dạng JSON, một định dạng chữ gồm các cặp tên và giá trị.
+- Dữ liệu trả về ở dạng JSON, một định dạng chữ gồm các cặp tên và giá trị.
 
 Một API sản phẩm theo kiểu REST:
 
@@ -84,7 +84,7 @@ Lần 2: status 404, body là {}
 ```
 
 Server trả 404 Not Found vì không có user 9999. Chỉ cần nhìn status code là
-client biết kết quả, không phải đọc body.
+client biết kết quả, không cần đọc body.
 
 </details>
 

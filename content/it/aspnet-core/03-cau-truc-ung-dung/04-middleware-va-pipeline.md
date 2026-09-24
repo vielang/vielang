@@ -3,7 +3,7 @@ title: Middleware và pipeline
 minutes: 5
 ---
 
-Muốn đo mỗi request mất bao lâu, bạn không muốn thêm code đo vào từng action.
+Để đo mỗi request mất bao lâu, bạn không muốn thêm code đo vào từng action.
 Việc chung cho mọi request như vậy nên làm ở một chỗ, trước khi request tới
 controller. Chỗ đó là pipeline.
 
@@ -11,7 +11,7 @@ controller. Chỗ đó là pipeline.
 
 🚰 **Pipeline**: chuỗi các bước mà mọi request đi qua trước khi tới controller, rồi response đi ngược lại qua đúng các bước đó.
 
-🧱 **Middleware**: một bước trong pipeline, được xử lý request, gọi bước tiếp theo, rồi xử lý response.
+🧱 **Middleware**: một bước trong pipeline, xử lý request, gọi bước tiếp theo, rồi xử lý response.
 
 ```mermaid Request đi xuôi qua từng middleware, response đi ngược lại
 flowchart TD
@@ -128,12 +128,12 @@ app.Use(async (context, next) =>
 });
 ```
 
-Muốn thêm header thì đặt trước `await next()`.
+Muốn thêm header thì đặt code đó trước `await next()`.
 
 ## Tóm tắt
 
 - Pipeline là chuỗi middleware mà mọi request đi qua.
-- Middleware làm việc trước `await next()` với request, sau đó với response.
+- Middleware xử lý request trước `await next()`, xử lý response sau đó.
 - Thứ tự thêm middleware trong `Program.cs` là thứ tự chạy.
 - Việc chung cho mọi request như đo thời gian, ghi log nên làm ở middleware.
 

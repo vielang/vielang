@@ -4,8 +4,8 @@ minutes: 5
 ---
 
 Ở chương trước, danh sách sản phẩm là một list `static` nằm ngay trong
-controller. Controller vừa xử lý request vừa giữ dữ liệu, và không thể đổi
-sang database mà không sửa nó. Bài này tách phần lưu trữ ra một service, rồi
+controller. Controller vừa xử lý request vừa giữ dữ liệu, nên muốn đổi sang
+database thì phải sửa controller. Bài này tách phần lưu trữ ra một service, rồi
 để ASP.NET Core tự đưa service đó vào controller.
 
 ## Khái niệm
@@ -63,17 +63,24 @@ public class ProductsController : ControllerBase
 }
 ```
 
-- `AddSingleton<IProductStore, InMemoryProductStore>()`: ai cần
+- `AddSingleton<IProductStore, InMemoryProductStore>()`: nơi nào cần
   `IProductStore` thì nhận `InMemoryProductStore`.
-- Controller chỉ khai báo cần `IProductStore` trong constructor. Container
-  tự tạo và truyền vào.
+- Controller chỉ khai báo tham số `IProductStore` trong constructor.
+  Container tự tạo object và truyền vào.
 - Dữ liệu trong bộ nhớ phải sống suốt ứng dụng, nên đăng ký `Singleton`.
-- Chương 4 đổi sang database chỉ bằng cách đổi dòng đăng ký, controller
-  không phải sửa.
+- Sang chương 4, muốn đổi sang database chỉ cần đổi dòng đăng ký,
+  controller không phải sửa.
+
+```mermaid Container tạo store rồi đưa vào constructor controller
+flowchart LR
+    R["GET /api/products"] --> C[DI container]
+    C -->|"tạo một lần, dùng lại"| S[InMemoryProductStore]
+    S -->|"truyền vào constructor"| P[ProductsController]
+```
 
 ## Thử ngay
 
-Thêm class đếm và một action vào project, rồi đăng ký bằng `AddScoped`:
+Thêm class đếm và một controller mới vào project, rồi đăng ký bằng `AddScoped`:
 
 ```csharp
 using Microsoft.AspNetCore.Mvc;
@@ -110,7 +117,7 @@ public class CountController : ControllerBase
 Gọi `curl http://localhost:5000/api/count` ba lần. Sau đó đổi `AddScoped`
 thành `AddSingleton`, chạy lại server và gọi thêm ba lần.
 
-**Đoán trước khi chạy:** với `AddScoped`, ba lần gọi in ra những số nào?
+**Đoán trước khi chạy:** với `AddScoped`, ba lần gọi trả về những số nào?
 
 <details>
 <summary>Xem kết quả</summary>
@@ -128,7 +135,7 @@ AddSingleton: 1, 2, 3
 
 ## Lỗi hay gặp
 
-**Quên đăng ký service.** Request tới controller trả lỗi 500, log báo không
+**Quên đăng ký service.** Request tới controller nhận lỗi 500, log báo không
 tạo được `IProductStore`.
 
 ```csharp
@@ -141,8 +148,8 @@ app.MapControllers();
 app.Run();
 ```
 
-**Singleton phụ thuộc vào Scoped.** Object sống suốt ứng dụng mà giữ một
-object chỉ nên sống trong một request. Ở môi trường Development, ứng dụng dừng
+**Singleton phụ thuộc vào Scoped.** Object sống suốt ứng dụng lại giữ một
+object vốn chỉ nên sống trong một request. Ở môi trường Development, ứng dụng dừng
 ngay lúc khởi động và báo lỗi này.
 
 ```csharp
@@ -150,6 +157,7 @@ ngay lúc khởi động và báo lỗi này.
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<Counter>();
 builder.Services.AddSingleton<Report>();
+var app = builder.Build();   // báo lỗi tại đây
 
 public class Report
 {

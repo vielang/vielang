@@ -57,8 +57,8 @@ public class ProductsController : ControllerBase
 
 - `ILogger<ProductsController>` có sẵn trong container. Tên class trong
   `< >` được ghi kèm mỗi dòng log để biết log đến từ đâu.
-- `{Id}` là chỗ giữ, giá trị `id` được điền vào. Công cụ xem log tìm được theo
-  từng giá trị này.
+- `{Id}` là chỗ giữ: giá trị của `id` được điền vào đúng vị trí đó. Công
+  cụ xem log lọc được theo giá trị này.
 - `appsettings.json` quy định level thấp nhất được ghi. Mặc định là
   `Information`, nên dòng `LogDebug` không hiện.
 
@@ -89,7 +89,7 @@ bỏ qua. Muốn thấy log Debug khi dev, đặt `"Default": "Debug"` trong m�
 
 ## Lỗi hay gặp
 
-**Ghép chuỗi vào log.** Dòng log vẫn đọc được, nhưng công cụ xem log không tìm
+**Ghép chuỗi vào log.** Dòng log vẫn đọc được, nhưng công cụ xem log không lọc
 được theo `Id` nữa.
 
 ```csharp
@@ -146,7 +146,7 @@ log, vì nhiều người và nhiều hệ thống đọc được log.
       "_logger.LogInformation(\"Đơn {OrderId} đã tạo\", orderId);"
     ],
     "answer": 4,
-    "explain": "Chỗ giữ {OrderId} giữ giá trị riêng, công cụ xem log tìm được theo từng đơn hàng."
+    "explain": "Chỗ giữ {OrderId} lưu orderId thành một giá trị riêng, nên công cụ xem log lọc được theo từng đơn hàng."
   }
 ]
 ```

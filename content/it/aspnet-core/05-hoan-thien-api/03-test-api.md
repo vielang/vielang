@@ -4,14 +4,14 @@ minutes: 5
 ---
 
 Bạn sửa công thức giảm giá, gọi thử bằng `curl` thấy đúng. Ba tuần sau, một
-người khác sửa chỗ khác làm hỏng công thức đó, không ai phát hiện. Test tự
-động chạy lại mọi lần kiểm tra chỉ bằng một lệnh.
+người khác sửa code chỗ khác và làm hỏng công thức đó, nhưng không ai phát
+hiện. Test tự động giúp chạy lại mọi phép kiểm tra chỉ bằng một lệnh.
 
 ## Khái niệm
 
 🧪 **Unit test**: code tự động kiểm tra một phần nhỏ như một method hay một class có chạy đúng không.
 
-✔️ **xUnit**: thư viện test phổ biến của .NET. Mỗi method test đánh dấu `[Fact]`, kiểm tra kết quả bằng `Assert`.
+✔️ **xUnit**: thư viện test phổ biến của .NET, mỗi method test đánh dấu `[Fact]` và kiểm tra kết quả bằng `Assert`.
 
 Mỗi test gồm ba bước:
 
@@ -85,7 +85,7 @@ public class PriceCalculatorTests
 - `dotnet add ... reference` cho project test dùng được class của `ShopApi`.
 - Mỗi test là một method `[Fact]`, tên nói rõ tình huống và kết quả mong
   đợi.
-- `Assert.Equal(mong đợi, thực tế)` sai là test đỏ.
+- `Assert.Equal(mong đợi, thực tế)`: hai giá trị khác nhau thì test đỏ.
 - `Assert.Throws` kiểm tra method có ném đúng loại exception không.
 
 ## Thử ngay
@@ -119,10 +119,11 @@ Assert.Equal() Failure: Values differ
 Expected: 500000
 Actual:   450000
 
-Failed!  - Failed: 1, Passed: 2, Total: 3
+Failed!  - Failed: 1, Passed: 3, Total: 4
 ```
 
-Đỏ. Tổng đúng bằng 500000 thì điều kiện `>= 500000` vẫn giảm 10%, còn
+Đỏ. Passed là 3 vì project mới tạo có sẵn một test mẫu trong `UnitTest1.cs`.
+Tổng đúng bằng 500000 thì điều kiện `>= 500000` vẫn giảm 10%, còn
 450000. Test ở mốc ranh giới như thế này bắt được những hiểu nhầm mà thử bằng
 tay dễ bỏ qua.
 

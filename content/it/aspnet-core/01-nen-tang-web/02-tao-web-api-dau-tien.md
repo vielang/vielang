@@ -3,7 +3,7 @@ title: Tạo Web API đầu tiên
 minutes: 5
 ---
 
-Đã biết HTTP, giờ tới lúc tự dựng một server trả lời request. Bài này tạo
+Bạn đã biết HTTP, giờ tới lúc tự dựng một server trả lời request. Bài này tạo
 project Web API bằng ASP.NET Core, chạy nó, và gọi thử API có sẵn trong
 template.
 
@@ -23,7 +23,7 @@ cd ShopApi
 dotnet run --urls http://localhost:5000
 ```
 
-- `--use-controllers` tạo project dùng controller, cách cả khoá này dùng.
+- `--use-controllers` tạo project dùng controller, cách làm của cả khoá này.
 - `--urls` cố định địa chỉ server, để mọi bài gọi cùng một địa chỉ.
 
 Phần cốt lõi của `Program.cs`:
@@ -48,8 +48,8 @@ chúng.
 
 ## Thử ngay
 
-Template có sẵn một controller mẫu tên `WeatherForecast`. Để server chạy, mở
-terminal thứ hai và gọi:
+Template có sẵn một controller mẫu tên `WeatherForecast`. Để nguyên server đang
+chạy, mở terminal thứ hai và gọi:
 
 ```bash
 curl -i http://localhost:5000/weatherforecast
@@ -69,7 +69,7 @@ Content-Type: application/json; charset=utf-8
 ```
 
 Status 200, body là một mảng JSON 5 phần tử. Số liệu là ngẫu nhiên nên mỗi
-lần gọi mỗi khác. Tên property trong JSON được viết thường chữ đầu
+lần gọi mỗi khác. Tên property trong JSON có chữ đầu viết thường
 (`temperatureC`), dù trong C# là `TemperatureC`.
 
 </details>
@@ -112,7 +112,7 @@ thấy service cần thiết và nhắc bạn gọi `AddControllers`. Hai dòng
 ```quiz
 [
   {
-    "prompt": "Server chạy bình thường nhưng gọi URL nào cũng nhận 404. Nguyên nhân khả dĩ nhất trong Program.cs?",
+    "prompt": "Server chạy bình thường nhưng gọi URL nào cũng nhận 404. Nguyên nhân nhiều khả năng nhất trong Program.cs là gì?",
     "options": [
       "Thiếu builder.Build()",
       "Thiếu app.Run()",

@@ -54,6 +54,13 @@ public class CreateProductRequest
   trả 400 kèm danh sách lỗi, action không chạy.
 - `ErrorMessage` đặt câu báo lỗi riêng thay cho câu mặc định bằng tiếng Anh.
 
+```mermaid Dữ liệu sai bị chặn trước khi vào action
+flowchart TD
+    A["POST /api/products"] --> B{"DTO đúng quy tắc?"}
+    B -->|Đúng| C["Action Create chạy, trả 200"]
+    B -->|Sai| D["Trả 400 kèm danh sách lỗi"]
+```
+
 ## Thử ngay
 
 Chạy server. Tạo file `product.json` với dữ liệu sai:
@@ -121,7 +128,7 @@ public class ItemsController : ControllerBase
 tra.
 
 **Quên `[ApiController]`.** Không có nó thì dữ liệu sai vẫn lọt vào action,
-vì không ai tự trả 400 nữa.
+vì không còn bước nào tự trả 400.
 
 ## Tóm tắt
 

@@ -94,10 +94,38 @@ erDiagram
 
 ## Thử ngay
 
-Tạo migration, cập nhật database, rồi thêm một đơn có hai dòng hàng (qua một
-action POST, hoặc thêm thẳng bằng code). Sau đó gọi:
+Tạo migration, cập nhật database, rồi thêm action sau vào `OrdersController`
+để tạo một đơn mẫu có hai dòng hàng:
+
+```csharp
+using Microsoft.AspNetCore.Mvc;
+
+// Thêm action này vào trong OrdersController
+[HttpPost("sample")]
+public async Task<IActionResult> CreateSample()
+{
+    var order = new Order { CustomerName = "An" };
+    order.Lines.Add(new OrderLine
+    {
+        ProductName = "Bút",
+        Quantity = 2
+    });
+    order.Lines.Add(new OrderLine
+    {
+        ProductName = "Vở",
+        Quantity = 3
+    });
+
+    _db.Orders.Add(order);
+    await _db.SaveChangesAsync();
+    return Ok(order.Id);
+}
+```
+
+Chạy server, tạo đơn mẫu rồi đọc lại:
 
 ```bash
+curl -X POST http://localhost:5000/api/orders/sample
 curl http://localhost:5000/api/orders/1
 ```
 

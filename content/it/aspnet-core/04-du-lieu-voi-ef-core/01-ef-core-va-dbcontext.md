@@ -115,8 +115,8 @@ bảng.
 
 ## Lỗi hay gặp
 
-**Quên đăng ký `DbContext`.** Controller cần `ShopDbContext` mà container
-không biết tạo, request trả 500.
+**Quên đăng ký `DbContext`.** Controller cần `ShopDbContext` nhưng container
+không biết cách tạo, nên request trả 500.
 
 ```csharp
 // SAI — thiếu AddDbContext
@@ -125,7 +125,8 @@ builder.Services.AddControllers();
 var app = builder.Build();
 ```
 
-**Viết cứng chuỗi kết nối trong code.** Mỗi môi trường một database khác nhau.
+**Viết cứng chuỗi kết nối trong code.** Mỗi môi trường thường dùng một
+database khác nhau.
 Đặt chuỗi kết nối vào `appsettings.json` như bài Cấu hình:
 
 ```csharp
@@ -144,7 +145,7 @@ builder.Services.AddDbContext<ShopDbContext>(options =>
 - EF Core là ORM: class thành bảng, object thành dòng.
 - `DbContext` là phiên làm việc với database, mỗi `DbSet<T>` là một bảng.
 - Đăng ký bằng `AddDbContext` trong `Program.cs`, nhận qua constructor.
-- Có class chưa đủ, phải tạo bảng trong database trước khi dùng.
+- Chỉ có class thì chưa đủ, phải tạo bảng trong database trước khi dùng.
 
 ```quiz
 [

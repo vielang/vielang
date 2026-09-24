@@ -3,7 +3,8 @@ title: CRUD hoàn chỉnh
 minutes: 6
 ---
 
-Bốn bài trước mỗi bài lo một phần: nhận dữ liệu, trả kết quả, DTO, validation.
+Mỗi bài trong bốn bài trước lo một phần: nhận dữ liệu, trả kết quả, DTO,
+validation.
 Bài này ghép tất cả lại thành API sản phẩm đủ bốn thao tác thêm, đọc, sửa,
 xoá. Dữ liệu vẫn để trong bộ nhớ, chương 4 sẽ chuyển sang database.
 
@@ -189,7 +190,7 @@ tưởng đã thành công.
     "explain": "IActionResult dùng khi chỉ trả status code như NoContent() hay NotFound(), không có dữ liệu kèm theo."
   },
   {
-    "prompt": "Tạo 3 sản phẩm rồi tắt server và chạy lại. GET /api/products/1 trả gì với cách lưu trong bài?",
+    "prompt": "Tạo 3 sản phẩm rồi tắt server và chạy lại. Với cách lưu trong bài, GET /api/products/1 trả gì?",
     "options": [
       "200 và sản phẩm số 1",
       "201 Created",

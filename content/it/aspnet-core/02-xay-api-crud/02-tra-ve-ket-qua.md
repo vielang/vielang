@@ -3,8 +3,8 @@ title: Trả về kết quả
 minutes: 5
 ---
 
-Ở bài Controller và routing, hỏi sản phẩm không tồn tại thì nhận về 204 thay
-vì 404. Client không phân biệt được "không có" với "thành công". Bài này chỉ
+Ở bài Controller và routing, gọi API lấy sản phẩm không tồn tại thì nhận về
+204 thay vì 404. Client không phân biệt được "không có" với "thành công". Bài này chỉ
 cách chọn đúng status code cho từng trường hợp.
 
 ## Khái niệm
@@ -69,8 +69,8 @@ public class Product
   `Ok(product)` ở nhánh kia.
 - `CreatedAtAction` trả 201, kèm header `Location` chỉ tới URL của sản phẩm
   vừa tạo, ví dụ `/api/products/1`.
-- `nameof(GetById)` là tên action dùng để dựng URL đó, viết bằng `nameof` để
-  đổi tên method thì compiler báo lỗi ngay.
+- `nameof(GetById)` chỉ ra action dùng để dựng URL đó. Viết bằng `nameof`
+  thì khi đổi tên method, compiler báo lỗi ngay.
 
 ## Thử ngay
 

@@ -84,6 +84,14 @@ public class ShopDbContext : DbContext
   object nào đã đổi và sinh câu `UPDATE`.
 - Mọi method đọc ghi database đều có bản `Async`, dùng kèm `await`.
 
+```mermaid Where được dịch sang SQL, database chỉ trả dòng khớp
+flowchart TD
+    A["Where(p => p.Stock > 0)"] --> B[EF Core dịch sang SQL]
+    B --> C["WHERE Stock > 0"]
+    C --> D[(Database)]
+    D --> E[Chỉ trả về các dòng còn hàng]
+```
+
 ## Thử ngay
 
 Để xem câu SQL mà EF Core sinh ra, thêm vào mục `Logging:LogLevel` của
@@ -116,7 +124,7 @@ Nằm trong câu SQL. EF Core dịch lambda `p => p.Stock > 0` thành
 ## Lỗi hay gặp
 
 **Gọi `ToListAsync()` trước khi lọc.** Cả bảng được đọc về bộ nhớ rồi mới lọc.
-Bảng có một triệu dòng là một triệu dòng đi qua mạng.
+Bảng có một triệu dòng thì cả một triệu dòng bị đọc vào bộ nhớ.
 
 ```csharp
 // SAI — đọc hết bảng rồi mới lọc trong C#
@@ -131,8 +139,8 @@ var inStock = await _db.Products
     .ToListAsync();
 ```
 
-**Quên `SaveChangesAsync()`.** `Add`, `Remove` hay đổi property chỉ thay đổi
-trong `DbContext`. Không gọi `SaveChangesAsync` thì không có gì được ghi xuống
+**Quên `SaveChangesAsync()`.** `Add`, `Remove` hay đổi property chỉ được ghi
+nhận trong `DbContext`. Không gọi `SaveChangesAsync` thì không có gì được ghi xuống
 database.
 
 ## Tóm tắt

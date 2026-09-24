@@ -6,6 +6,7 @@ import type { AudioTrack } from "@/lib/audio";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useAudioWidgetStore } from "@/lib/audio-widget-store";
+import { useAutoplayStore } from "@/lib/autoplay-player";
 import { useRetryingMedia } from "@/lib/use-retrying-media";
 import { useKeepInViewport } from "@/lib/use-draggable";
 import { AUDIO_WIDGET_SIZE, audioAnchor } from "@/lib/widget-dock";
@@ -168,6 +169,7 @@ export function AudioWidget({
   const setActiveType = useAudioWidgetStore((s) => s.setActiveType);
   const storedSide = useAudioWidgetStore((s) => s.side);
   const setSide = useAudioWidgetStore((s) => s.setSide);
+  const autoplayOn = useAutoplayStore((s) => s.status !== "idle");
 
   const drag = useRef<{
     pointerId: number;
@@ -264,7 +266,9 @@ export function AudioWidget({
     if (!d.moved && collapsed) expand();
   }
 
-  if (!hasLeft && !hasRight) return null;
+  // Đang nghe tự động thì nhường chỗ cho `AutoplayBar` — 2 trình phát cùng
+  // lúc là 2 tiếng chồng nhau.
+  if (autoplayOn || (!hasLeft && !hasRight)) return null;
 
   // z-[55]: trên tooltip (z-50) để panel canh giữa không bị tooltip che, nhưng
   // dưới panel bài giảng (z-[60]) khi cả hai cùng mở.

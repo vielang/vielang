@@ -5,7 +5,10 @@ import { useRouter } from "next/navigation";
 import type { Book } from "@/lib/books";
 import { useProgressStore } from "@/lib/progress-store";
 import { useEffectiveNote, useNoteStore } from "@/lib/note-store";
-import { getPageAudio } from "@/lib/audio";
+import { getAudioPages, getPageAudio } from "@/lib/audio";
+import { buildPlaylist, startIndexFor } from "@/lib/autoplay";
+import { startAutoplay, stopAutoplay, useAutoplayStore } from "@/lib/autoplay-player";
+import { AutoplayBar } from "@/components/reader/autoplay-bar";
 import {
   getAdjacentSpreadAnchor,
   getChapters,
@@ -274,6 +277,22 @@ export function ReaderView({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- so sánh theo pagesKey (chuỗi) để khỏi chạy lại mỗi lần render do `pages` là array mới mỗi lượt.
   }, [book.id, pagesKey, markPageRead]);
 
+  // Nghe tự động: báo trang đang hiện lên để bài kế tiếp biết có phải lật
+  // trang không (xem AutoplayFollower).
+  const hasBookAudio = getAudioPages(book.id).length > 0;
+  const autoplayActive = useAutoplayStore((s) => s.bookId === book.id);
+  const setAutoplayView = useAutoplayStore((s) => s.setView);
+  useEffect(() => {
+    setAutoplayView(pages, effectiveDouble);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- như trên, so theo pagesKey.
+  }, [pagesKey, effectiveDouble, setAutoplayView]);
+
+  // Gọi thẳng trong click, không qua effect — xem đầu lib/autoplay-player.ts.
+  const toggleAutoplay = useCallback(() => {
+    if (autoplayActive) stopAutoplay();
+    else startAutoplay(book.id, startIndexFor(buildPlaylist(book.id), page));
+  }, [autoplayActive, book.id, page]);
+
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       // Dialog nhảy trang / sheet bài giảng toàn màn hình đang mở (Slider/
@@ -383,6 +402,7 @@ export function ReaderView({
       />
 
       <AudioWidget pages={pages} tracksByPage={audioTracksByPage} />
+      <AutoplayBar bookId={book.id} />
 
       <NoteWidget bookId={book.id} pages={pages} noteContentByPage={noteContentByPage} />
       <NoteSheet bookId={book.id} pages={pages} noteContentByPage={noteContentByPage} />
@@ -420,6 +440,9 @@ export function ReaderView({
         recordOpen={recordOpen}
         recordHasContent={recordHasContent}
         onRecordToggle={() => setRecordOpen(!recordOpen)}
+        showAutoplay={hasBookAudio}
+        autoplayActive={autoplayActive}
+        onAutoplayToggle={toggleAutoplay}
         onPrev={turnPrev}
         onNext={turnNext}
         onJump={goTo}

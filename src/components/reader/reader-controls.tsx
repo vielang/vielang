@@ -9,6 +9,7 @@ import {
   ChevronRight,
   CircleQuestionMark,
   Columns2,
+  Headphones,
   Mic,
   MoreVertical,
   NotebookText,
@@ -106,6 +107,9 @@ export function ReaderControls({
   recordOpen,
   recordHasContent,
   onRecordToggle,
+  showAutoplay,
+  autoplayActive,
+  onAutoplayToggle,
   onPrev,
   onNext,
   onJump,
@@ -143,6 +147,11 @@ export function ReaderControls({
   /** Trang đang hiện đã có bản ghi — chấm báo trên nút micro. */
   recordHasContent: boolean;
   onRecordToggle: () => void;
+  /** Sách có bài nghe — không có thì khỏi hiện nút nghe tự động. */
+  showAutoplay: boolean;
+  /** Đang nghe tự động sách này. */
+  autoplayActive: boolean;
+  onAutoplayToggle: () => void;
   onPrev: () => void;
   onNext: () => void;
   onJump: (page: number) => void;
@@ -179,6 +188,16 @@ export function ReaderControls({
       active: recordOpen,
       dot: recordHasContent,
     },
+    ...(showAutoplay
+      ? [
+          {
+            icon: Headphones,
+            label: autoplayActive ? "Tắt nghe tự động" : "Nghe tự động từ trang này",
+            onSelect: onAutoplayToggle,
+            active: autoplayActive,
+          },
+        ]
+      : []),
     {
       icon: Bookmark,
       label: isBookmarked ? "Bỏ đánh dấu trang" : "Đánh dấu trang",

@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ServiceWorker } from "@/components/service-worker";
 import { InstallPromptCapture } from "@/components/install-prompt-capture";
+import { AutoplayFollower } from "@/components/autoplay-follower";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
@@ -66,6 +67,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <TooltipProvider delayDuration={200}>{children}</TooltipProvider>
           <ServiceWorker />
           <InstallPromptCapture />
+          {/* Nghe tự động cả sách phải sống qua các lần lật trang — xem
+              lib/autoplay-player.ts. */}
+          <AutoplayFollower />
           {/* Vercel Analytics — số lượt xem trang, không cookie, không
               theo dấu người dùng qua các trang web khác.
 

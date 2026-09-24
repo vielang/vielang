@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { RotateCcw } from "lucide-react";
+import { Headphones, RotateCcw } from "lucide-react";
+import { startAutoplay } from "@/lib/autoplay-player";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -29,10 +30,13 @@ import { AnswersToggle } from "@/components/library/answers-toggle";
 export function BookDetailHeader({
   book,
   hasAnswers = false,
+  hasAudio = false,
 }: {
   book: Book;
   /** Sách có chấm đáp án không (xem lib/page-answers.ts) — không có thì khỏi hiện công tắc. */
   hasAnswers?: boolean;
+  /** Sách có bài nghe không — không có thì khỏi hiện nút nghe tự động. */
+  hasAudio?: boolean;
 }) {
   const books = useProgressStore((s) => s.books);
   const hasHydrated = useProgressStore((s) => s.hasHydrated);
@@ -89,6 +93,16 @@ export function BookDetailHeader({
             </TooltipTrigger>
             <TooltipContent>Đọc lại từ trang 1</TooltipContent>
           </Tooltip>
+        )}
+
+        {hasAudio && (
+          // Phát ngay trong click rồi mới lật vào trình đọc — ra khỏi lượt
+          // xử lý lần chạm là trình duyệt không cho phát nữa (xem
+          // lib/autoplay-player.ts). Lật trang do AutoplayFollower lo.
+          <Button size="sm" variant="outline" onClick={() => startAutoplay(book.id)}>
+            <Headphones className="size-4" aria-hidden />
+            Nghe tự động
+          </Button>
         )}
 
         <OfflineDownload book={book} />

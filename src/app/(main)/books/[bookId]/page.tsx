@@ -40,7 +40,11 @@ export default async function BookDetailPage({
 
   return (
     <div className="flex flex-col gap-6">
-      <BookDetailHeader book={book} hasAnswers={getAnswerPages(book.id).length > 0} />
+      <BookDetailHeader
+        book={book}
+        hasAnswers={getAnswerPages(book.id).length > 0}
+        hasAudio={getAudioPages(book.id).length > 0}
+      />
       <PageGrid
         bookId={book.id}
         totalPages={book.totalPages}

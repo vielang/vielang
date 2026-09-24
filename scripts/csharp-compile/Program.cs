@@ -353,7 +353,8 @@ foreach (var file in Directory.GetFiles(root, "*.md", SearchOption.AllDirectorie
     // Khoá SQL cũng cần tham chiếu Oracle (Oracle.ManagedDataAccess) nên dùng
     // chung bộ tham chiếu với khoá ASP.NET Core.
     var duongDan = file.Replace('\\', '/');
-    cheDoWeb = duongDan.Contains("/aspnet-core/") || duongDan.Contains("/sql/");
+    cheDoWeb = duongDan.Contains("/aspnet-core/") || duongDan.Contains("/sql/")
+        || duongDan.Contains("/kien-truc/");
     cheDoWinForms = duongDan.Contains("/winforms/");
 
     foreach (Match m in fence.Matches(text))

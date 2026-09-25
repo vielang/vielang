@@ -17,10 +17,9 @@
  * Import TĨNH như `lib/notes.ts`, cùng lý do (Output File Tracing của Next
  * không lần được file đọc qua path dựng động lúc chạy).
  */
-import step1 from "../../content/quiz/step1.json";
-import step2 from "../../content/quiz/step2.json";
-import step3 from "../../content/quiz/step3.json";
-import step4 from "../../content/quiz/step4.json";
+// Một file gộp mọi sách, do build-content sinh (xem `buildIndex`) — thêm nội
+// dung cho sách mới là tự có mặt, không phải sửa danh sách import ở đây.
+import index from "../../content/quiz/index.json";
 
 interface BaseItem {
   id: string;
@@ -81,12 +80,7 @@ export interface QuizSection {
   items: QuizItem[];
 }
 
-const QUIZZES: Record<string, Record<string, QuizSection[]>> = {
-  step1,
-  step2,
-  step3,
-  step4,
-} as Record<string, Record<string, QuizSection[]>>;
+const QUIZZES = index as unknown as Record<string, Record<string, QuizSection[]>>;
 
 export function getPageQuiz(bookId: string, page: number): QuizSection[] {
   return QUIZZES[bookId]?.[String(page)] ?? [];

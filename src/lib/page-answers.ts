@@ -21,14 +21,9 @@
  * Import TĨNH như `lib/page-translation.ts`, cùng lý do (Output File Tracing
  * của Next không lần được file đọc qua path dựng động lúc chạy).
  */
-import step1 from "../../content/answers/step1.json";
-import step2 from "../../content/answers/step2.json";
-import step3 from "../../content/answers/step3.json";
-import step4 from "../../content/answers/step4.json";
-import wbStep1 from "../../content/answers/wb-step1.json";
-import wbStep2 from "../../content/answers/wb-step2.json";
-import wbStep3 from "../../content/answers/wb-step3.json";
-import wbStep4 from "../../content/answers/wb-step4.json";
+// Một file gộp mọi sách, do build-content sinh (xem `buildIndex`) — thêm nội
+// dung cho sách mới là tự có mặt, không phải sửa danh sách import ở đây.
+import index from "../../content/answers/index.json";
 import type { Rect } from "@/lib/page-translation";
 
 export interface AnswerLine {
@@ -61,16 +56,7 @@ export interface AnswerKey {
  * không khớp tuple `Rect`. Hình dạng thật đã được `scripts/build-content.ts`
  * kiểm lúc build.
  */
-const ANSWERS = {
-  step1,
-  step2,
-  step3,
-  step4,
-  "wb-step1": wbStep1,
-  "wb-step2": wbStep2,
-  "wb-step3": wbStep3,
-  "wb-step4": wbStep4,
-} as unknown as Record<string, Record<string, AnswerKey[]>>;
+const ANSWERS = index as unknown as Record<string, Record<string, AnswerKey[]>>;
 
 export function getPageAnswers(bookId: string, page: number): AnswerKey[] {
   return ANSWERS[bookId]?.[String(page)] ?? [];

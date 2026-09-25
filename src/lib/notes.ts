@@ -10,17 +10,11 @@
  * Tracing của Next không include được file đọc qua path dựng động lúc
  * request, gây lỗi khi deploy serverless dù chạy đúng ở `next dev`.
  */
-import step1 from "../../content/notes/step1.json";
-import step2 from "../../content/notes/step2.json";
-import step3 from "../../content/notes/step3.json";
-import step4 from "../../content/notes/step4.json";
+// Một file gộp mọi sách, do build-content sinh (xem `buildIndex`) — thêm nội
+// dung cho sách mới là tự có mặt, không phải sửa danh sách import ở đây.
+import index from "../../content/notes/index.json";
 
-const NOTES: Record<string, Record<string, string>> = {
-  step1,
-  step2,
-  step3,
-  step4,
-};
+const NOTES = index as Record<string, Record<string, string>>;
 
 export function getNoteContent(bookId: string, page: number): string | null {
   return NOTES[bookId]?.[String(page)] ?? null;

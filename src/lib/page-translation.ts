@@ -26,10 +26,9 @@
  * Import TĨNH như `lib/notes.ts` và `lib/quiz.ts`, cùng lý do (Output File
  * Tracing của Next không lần được file đọc qua path dựng động lúc chạy).
  */
-import step1 from "../../content/translate/step1.json";
-import step2 from "../../content/translate/step2.json";
-import step3 from "../../content/translate/step3.json";
-import step4 from "../../content/translate/step4.json";
+// Một file gộp mọi sách, do build-content sinh (xem `buildIndex`) — thêm nội
+// dung cho sách mới là tự có mặt, không phải sửa danh sách import ở đây.
+import index from "../../content/translate/index.json";
 
 /** [x, y, rộng, cao] — tất cả theo tỉ lệ 0–1 của ảnh trang. */
 export type Rect = [number, number, number, number];
@@ -61,12 +60,7 @@ export interface TranslationRegion {
  * không khớp tuple 4 phần tử `Rect` nên không ép thẳng được. Hình dạng thật
  * đã được `scripts/build-content.ts` kiểm lúc build (đủ 4 số, nằm trong ảnh).
  */
-const TRANSLATIONS = {
-  step1,
-  step2,
-  step3,
-  step4,
-} as unknown as Record<string, Record<string, TranslationRegion[]>>;
+const TRANSLATIONS = index as unknown as Record<string, Record<string, TranslationRegion[]>>;
 
 export function getPageTranslations(
   bookId: string,

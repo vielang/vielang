@@ -10,6 +10,9 @@
  *   content/it/<khoá>/<chương>/<bài>.md  -> content/it/courses.json
  *   content/cam-nang/<mục>/<bài>.md      -> content/cam-nang/guide.json
  *
+ * Rồi gộp JSON từng sách của mỗi loại (notes/quiz/translate/grammar/answers)
+ * thành `content/<loại>/index.json` — file duy nhất `src/lib` import.
+ *
  * Vì sao Markdown -> HTML ngay ở bước build: note hiển thị/sửa bằng Tiptap
  * (xem components/reader/note-editor.tsx), mà Tiptap đọc/ghi HTML. Convert
  * sẵn ở đây để toàn app chỉ làm việc với 1 định dạng duy nhất — bản gốc và
@@ -913,6 +916,26 @@ async function exists(p: string): Promise<boolean> {
   }
 }
 
+/**
+ * Gộp file JSON từng sách của một loại nội dung thành `content/<loại>/index.json`
+ * (khoá theo bookId, chỉ sách có nội dung) — thứ duy nhất `src/lib` import.
+ *
+ * Trước đây mỗi file lib tự liệt kê `import step1 …step4` bằng tay: thêm nội
+ * dung cho một sách khác (vd sách tiếng Anh) thì build vẫn qua nhưng app lặng
+ * lẽ không hiện gì, vì chẳng ai import file của sách đó. Import TĨNH một file
+ * gộp vẫn giữ được lý do ban đầu (Next lần ra file lúc deploy).
+ */
+async function buildIndex(root: string): Promise<void> {
+  const index: Record<string, unknown> = {};
+  for (const book of BOOKS) {
+    const file = path.join(root, `${book.id}.json`);
+    if (!(await exists(file))) continue;
+    const data = JSON.parse(await readFile(file, "utf8")) as Record<string, unknown>;
+    if (Object.keys(data).length > 0) index[book.id] = data;
+  }
+  await writeFile(path.join(root, "index.json"), JSON.stringify(index) + "\n", "utf8");
+}
+
 async function main() {
   for (const book of BOOKS) {
     const notes = await buildNotes(book.id);
@@ -924,6 +947,9 @@ async function main() {
       `  ${book.id}: ${notes} note, ${questions} câu hỏi, ` +
         `${regions} vùng dịch, ${grammar} điểm ngữ pháp, ${answers} mục đáp án`
     );
+  }
+  for (const root of [NOTES_ROOT, QUIZ_ROOT, TRANSLATE_ROOT, GRAMMAR_ROOT, ANSWERS_ROOT]) {
+    await buildIndex(root);
   }
   const lessons = await buildCourses();
   if (lessons) console.log(`  IT: ${lessons} bài học`);

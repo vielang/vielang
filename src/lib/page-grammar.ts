@@ -28,10 +28,9 @@
  * (Output File Tracing của Next không lần được file đọc qua path dựng động).
  */
 import { BOOKS } from "@/lib/books";
-import step1 from "../../content/grammar/step1.json";
-import step2 from "../../content/grammar/step2.json";
-import step3 from "../../content/grammar/step3.json";
-import step4 from "../../content/grammar/step4.json";
+// Một file gộp mọi sách, do build-content sinh (xem `buildIndex`) — thêm nội
+// dung cho sách mới là tự có mặt, không phải sửa danh sách import ở đây.
+import index from "../../content/grammar/index.json";
 
 /** [x, y, rộng, cao] — tất cả theo tỉ lệ 0–1 của ảnh trang. */
 export type Rect = [number, number, number, number];
@@ -101,12 +100,7 @@ export interface GrammarPoint {
   exVi: string;
 }
 
-const GRAMMAR = {
-  step1,
-  step2,
-  step3,
-  step4,
-} as unknown as Record<string, Record<string, GrammarPoint[]>>;
+const GRAMMAR = index as unknown as Record<string, Record<string, GrammarPoint[]>>;
 
 export function getPageGrammar(bookId: string, page: number): GrammarPoint[] {
   return GRAMMAR[bookId]?.[String(page)] ?? [];

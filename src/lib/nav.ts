@@ -1,4 +1,4 @@
-import { Bookmark, ChartNoAxesColumn, Compass, GraduationCap, Library, type LucideIcon } from "lucide-react";
+import { ChartNoAxesColumn, Compass, GraduationCap, Library, type LucideIcon } from "lucide-react";
 import { TRACKS } from "@/lib/tracks";
 
 /**
@@ -36,11 +36,12 @@ export const NAV_TABS: NavTab[] = [
       ),
   },
   { href: "/exam", label: "Luyện thi", icon: GraduationCap, match: (p) => startsWith(p, "/exam") },
-  // Không phải việc HỌC như bốn tab kia mà là thông tin để sống và làm việc ở
+  // Không phải việc HỌC như các tab kia mà là thông tin để sống và làm việc ở
   // Hàn (visa, trường, việc làm) — xem lib/guide.ts.
   { href: "/cam-nang/visa", label: "Cẩm nang", icon: Compass, match: (p) => startsWith(p, "/cam-nang") },
+  // Gồm cả trang đã đánh dấu (/my/danh-dau) — trước là một tab riêng, gộp vào
+  // đây vì cùng là dữ liệu học tập cá nhân, và để thanh tab còn 4 ô rộng hơn.
   { href: "/my", label: "Góc học tập", icon: ChartNoAxesColumn, match: (p) => startsWith(p, "/my") },
-  { href: "/bookmarks", label: "Đánh dấu", icon: Bookmark, match: (p) => startsWith(p, "/bookmarks") },
 ];
 
 export function activeTab(path: string): NavTab | undefined {

@@ -18,6 +18,7 @@ import { StudyHeatmap } from "@/components/my/study-heatmap";
 import { WeekStrip } from "@/components/my/week-strip";
 import { SuggestionList } from "@/components/my/suggestion-list";
 import { BookProgressCard, booksInProgress } from "@/components/my/book-progress";
+import { BookmarkStrip } from "@/components/my/bookmark-strip";
 import { summarizeQuiz, WrongList } from "@/components/my/quiz-review";
 import { RedoList, SkillBars, WeakGrammarList } from "@/components/my/ability-panel";
 import { BackupPanel } from "@/components/my/backup-panel";
@@ -192,6 +193,9 @@ export function MyPageView({ books }: { books: readonly Book[] }) {
           </div>
         </section>
       )}
+
+      {/* Trang đã đánh dấu — ngay sau sách đang học, vì cùng nói về việc đọc. */}
+      <BookmarkStrip books={books} progressByBook={progressByBook} />
 
       {/* Luyện thi TOPIK */}
       <section className="flex flex-col gap-3" aria-labelledby="exam-title">

@@ -66,7 +66,7 @@ describe("tài nguyên bất biến", () => {
   it("KHÔNG nhận tài liệu HTML", () => {
     // Đây là luật quan trọng nhất trong cả file: HTML mà rơi vào nhánh cache
     // trước thì người dùng kẹt ở bản cũ, deploy bao nhiêu lần cũng không thấy.
-    for (const p of ["/", "/read/step1/10", "/bookmarks", "/offline"]) {
+    for (const p of ["/", "/read/step1/10", "/my/danh-dau", "/offline"]) {
       expect(rules.isImmutableAsset(url(p))).toBe(false);
     }
   });

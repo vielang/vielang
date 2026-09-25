@@ -71,7 +71,12 @@ const nextConfig: NextConfig = {
   // Cẩm nang không có trang tổng: mở thẳng mục đầu tiên. Tạm thời (307) chứ
   // không vĩnh viễn — sau này có thể thêm trang tổng mà trình duyệt không
   // nhớ mãi đường chuyển cũ.
-  redirects: async () => [{ source: "/cam-nang", destination: "/cam-nang/visa", permanent: false }],
+  redirects: async () => [
+    { source: "/cam-nang", destination: "/cam-nang/visa", permanent: false },
+    // Trang đánh dấu đã chuyển vào Góc học tập. Vĩnh viễn (308): link cũ và lối
+    // tắt trên màn hình chính vẫn mở đúng chỗ.
+    { source: "/bookmarks", destination: "/my/danh-dau", permanent: true },
+  ],
   images: {
     // Còn lại cho ảnh từ xa nếu về sau cần; ảnh sách nay đi qua `imageRewrites`.
     remotePatterns: imageRemotePatterns(),

@@ -38,6 +38,7 @@ export default function LibraryPage() {
       bookTitles={Object.fromEntries(
         BOOKS.map((book) => [book.id, shortLabel(book)])
       )}
+      showVideoPromo
     />
   );
 }

@@ -59,6 +59,7 @@ export const NAV_TABS: NavTab[] = [
       p === "/" ||
       startsWith(p, "/books") ||
       startsWith(p, "/sach") ||
+      startsWith(p, "/video") ||
       TRACKS.some(
         (t) =>
           (t.slug && startsWith(p, `/${t.slug}`)) ||

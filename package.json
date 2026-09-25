@@ -12,6 +12,7 @@
     "test": "vitest run",
     "prepare-images": "tsx scripts/prepare-images.ts",
     "prepare-audio": "tsx scripts/prepare-audio.ts",
+    "prepare-video": "tsx scripts/prepare-video.ts",
     "build-content": "tsx scripts/build-content.ts",
     "check-csharp": "dotnet run --project scripts/csharp-check",
     "check-code": "dotnet run --project scripts/csharp-compile",

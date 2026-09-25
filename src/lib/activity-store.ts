@@ -48,7 +48,7 @@ export function gradeKey(bookId: string, page: number, answerKeyId: string): str
   return `${bookId}:${page}:${answerKeyId}`;
 }
 
-export const DEFAULT_WEEKLY_GOAL = 90;
+const DEFAULT_WEEKLY_GOAL = 90;
 
 /** Sửa đúng ngày `now`, tạo ngày mới nếu chưa có. */
 function bumpDay(

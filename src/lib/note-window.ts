@@ -45,11 +45,6 @@ export function focusNoteWindow(): void {
   noteWindow?.focus();
 }
 
-export function closeNoteWindow(): void {
-  noteWindow?.close();
-  noteWindow = null;
-}
-
 export function isNoteWindowClosed(): boolean {
   return noteWindow === null || noteWindow.closed;
 }

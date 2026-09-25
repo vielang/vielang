@@ -47,7 +47,7 @@ export function recordingKey(bookId: string, page: number): string {
   return `${bookId}:${page}`;
 }
 
-export const RECORDING_STORAGE_KEY = "kiip-recordings-v1";
+const RECORDING_STORAGE_KEY = "kiip-recordings-v1";
 
 /** So sánh trước khi `set` để không thành vòng lặp ghi/lỗi/ghi — xem `idb-storage`. */
 function markQuota(exceeded: boolean): void {

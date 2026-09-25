@@ -77,7 +77,7 @@ const TEXTBOOK_CHAPTERS: Record<string, number[]> = {
 };
 
 /** Danh sách trang bắt đầu của từng bài (bài 1..N), theo đúng thứ tự. */
-export function getChapterStartPages(bookId: string): number[] {
+function getChapterStartPages(bookId: string): number[] {
   const textbookLayout = AUDIO_LAYOUTS[bookId];
   if (textbookLayout) return textbookLayout.lessonStartPages;
 

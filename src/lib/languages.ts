@@ -42,10 +42,6 @@ export const LANGUAGES = [
 /** Union tự suy ra từ LANGUAGES — thêm ngôn ngữ mới ở trên là type này rộng ra theo, khỏi sửa 2 chỗ. */
 export type LanguageCode = (typeof LANGUAGES)[number]["code"];
 
-export function languageHref(slug: string): string {
-  return slug ? `/${slug}` : "/";
-}
-
 export function getLanguage(slug: string): LanguageConfig | undefined {
   return LANGUAGES.find((l) => l.slug === slug);
 }

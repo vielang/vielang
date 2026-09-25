@@ -10,7 +10,7 @@ const BLANKS = ["㉠", "㉡"];
  * Trang đề / đáp án mẫu phần viết — chỉ có bản in (ảnh), không có chữ. Chữ
  * trên điện thoại khá nhỏ nên kèm liên kết mở ảnh gốc để phóng to.
  */
-export function WritingImage({ exam, src, alt }: { exam: Exam; src: string; alt: string }) {
+function WritingImage({ exam, src, alt }: { exam: Exam; src: string; alt: string }) {
   const url = examAssetUrl(exam, src);
   return (
     <figure className="flex flex-col gap-1">
@@ -33,7 +33,7 @@ export function WritingImage({ exam, src, alt }: { exam: Exam; src: string; alt:
  * Ô viết của một câu: 51–52 hai dòng ㉠ ㉡, 53–54 một ô bài viết có đếm chữ
  * theo yêu cầu độ dài của đề.
  */
-export function WritingInput({
+function WritingInput({
   task,
   texts,
   onChange,
@@ -139,7 +139,7 @@ const RUBRIC: Record<WritingTask["kind"], string> = {
 };
 
 /** Tự chấm một câu viết sau khi đối chiếu đáp án mẫu. */
-export function SelfGrade({
+function SelfGrade({
   task,
   value,
   onChange,

@@ -14,7 +14,7 @@
  *   npm run prepare-audio -- --book step1 # chỉ 1 sách
  *   npm run prepare-audio -- --force      # upload lại kể cả đã có
  *
- * Cần các biến môi trường trong web/.env.local (giống prepare-images.ts):
+ * Cần các biến môi trường trong .env.local (giống prepare-images.ts):
  *   R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME
  */
 import { config as loadEnv } from "dotenv";
@@ -39,7 +39,7 @@ const CONCURRENCY = 6;
 function requireEnv(name: string): string {
   const v = process.env[name];
   if (!v) {
-    console.error(`✗ Thiếu biến môi trường ${name}. Xem web/.env.local.example.`);
+    console.error(`✗ Thiếu biến môi trường ${name}. Xem .env.local.example.`);
     process.exit(1);
   }
   return v;

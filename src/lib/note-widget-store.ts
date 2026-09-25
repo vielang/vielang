@@ -29,7 +29,7 @@ export type NoteSide = "left" | "right";
 
 interface NoteWidgetState {
   mode: NoteMode;
-  /** null = chưa từng kéo, dùng vị trí mặc định (mép phải, dưới thanh trên). */
+  /** null = chưa từng kéo, dùng vị trí mặc định (mép TRÁI, dưới thanh trên — xem `notePanelAnchor`). */
   position: Position | null;
   /** null = chưa từng đổi cỡ, dùng kích thước mặc định theo màn hình. */
   size: Size | null;

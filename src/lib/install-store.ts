@@ -70,7 +70,7 @@ export function useCaptureInstallPrompt(): void {
 }
 
 /** Đang mở dưới dạng app đã cài chứ không phải tab trình duyệt. */
-export function isStandalone(): boolean {
+function isStandalone(): boolean {
   if (typeof window === "undefined") return false;
   return (
     window.matchMedia("(display-mode: standalone)").matches ||

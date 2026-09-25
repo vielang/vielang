@@ -95,15 +95,6 @@ export function isGradable(item: QuizItem): item is ChoiceItem | FillItem {
   return item.kind !== "free";
 }
 
-/** Danh sách số trang có bài tập của 1 sách, sắp xếp tăng dần. */
-export function getQuizPages(bookId: string): number[] {
-  const book = QUIZZES[bookId];
-  if (!book) return [];
-  return Object.keys(book)
-    .map(Number)
-    .sort((a, b) => a - b);
-}
-
 /**
  * Dấu câu bị bỏ qua khi so đáp án — gồm cả dạng nửa chiều rộng lẫn toàn chiều
  * rộng (bàn phím tiếng Hàn/Nhật hay sinh ra dạng toàn chiều rộng).

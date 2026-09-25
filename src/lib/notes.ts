@@ -20,10 +20,6 @@ export function getNoteContent(bookId: string, page: number): string | null {
   return NOTES[bookId]?.[String(page)] ?? null;
 }
 
-export function hasNote(bookId: string, page: number): boolean {
-  return getNoteContent(bookId, page) !== null;
-}
-
 /** Danh sách số trang có note của 1 sách, đã sắp xếp tăng dần. */
 export function getNotePages(bookId: string): number[] {
   const book = NOTES[bookId];

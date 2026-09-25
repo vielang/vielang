@@ -13,7 +13,7 @@ function imageRemotePatterns(): NonNullable<
   if (!base) {
     console.warn(
       "⚠ NEXT_PUBLIC_IMAGE_BASE_URL chưa được cấu hình — ảnh sách sẽ không tải được. " +
-        "Xem web/.env.local.example."
+        "Xem .env.local.example."
     );
     return [];
   }

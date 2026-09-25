@@ -37,7 +37,7 @@ export const EMPTY_DAY: DayStats = {
  * Học ít nhất ngần này trong ngày mới tính là "một ngày học" (cho chuỗi ngày
  * và lịch). Mở app lướt 10 giây rồi tắt thì không nên giữ được chuỗi.
  */
-export const MIN_STUDY_DAY_MS = 60_000;
+const MIN_STUDY_DAY_MS = 60_000;
 
 /**
  * "YYYY-MM-DD" theo GIỜ ĐỊA PHƯƠNG của máy, không phải UTC.

@@ -22,7 +22,7 @@ const FILLED = ["❶", "❷", "❸", "❹"];
  * Khung `.exam-box` là ô viền quanh đoạn văn như trên đề in. Ảnh luôn có nền
  * trắng: tranh/biểu đồ của đề vẽ trên nền giấy, để nền tối là lộ mép.
  */
-export function ExamHtml({ html, className }: { html: string; className?: string }) {
+function ExamHtml({ html, className }: { html: string; className?: string }) {
   if (!html.trim()) return null;
   return (
     <div

@@ -208,9 +208,9 @@ export const BOOKS: readonly Book[] = [
  * `object-contain` nên không lấp đầy khung, phải tự tính khung ảnh thật thì
  * toạ độ vùng (lưu theo tỉ lệ 0–1 của ẢNH) mới khớp.
  */
-export const PAGE_IMAGE_WIDTH = 1200;
-export const PAGE_IMAGE_HEIGHT = 1562;
-export const PAGE_ASPECT_RATIO = PAGE_IMAGE_WIDTH / PAGE_IMAGE_HEIGHT;
+const PAGE_IMAGE_WIDTH = 1200;
+const PAGE_IMAGE_HEIGHT = 1562;
+const PAGE_ASPECT_RATIO = PAGE_IMAGE_WIDTH / PAGE_IMAGE_HEIGHT;
 
 /** Tỉ lệ rộng/cao ảnh trang của 1 sách cụ thể — dùng cái này thay vì PAGE_ASPECT_RATIO thẳng để khung ảnh chính xác cho từng khổ giấy. */
 export function getPageAspectRatio(book: Book): number {
@@ -282,7 +282,3 @@ export function mediaOriginBase(): string {
   return imageBaseUrl();
 }
 
-/** URL R2 tuyệt đối — chỉ dùng cho script phía máy chủ, không dùng ở trình duyệt. */
-export function getPageOriginUrl(bookId: string, page: number): string {
-  return `${imageBaseUrl()}/books/${bookId}/pages/${padPage(page)}.webp`;
-}

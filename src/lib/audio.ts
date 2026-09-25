@@ -75,10 +75,6 @@ export function getPageAudio(bookId: string, page: number): AudioTrack[] {
   }));
 }
 
-export function hasAudio(bookId: string, page: number): boolean {
-  return getPageAudio(bookId, page).length > 0;
-}
-
 /** Danh sách số trang có audio của 1 sách (textbook hoặc workbook). */
 export function getAudioPages(bookId: string): number[] {
   const textbookPages = getTextbookAudioPages(bookId);

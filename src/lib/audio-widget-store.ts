@@ -11,11 +11,11 @@ interface Position {
 // nổi còn lại — gom một chỗ để nhìn ra bố cục tổng thể.
 
 interface AudioWidgetState {
-  /** Vị trí panel lúc mở rộng. null = chưa mở lần nào (sẽ canh giữa). */
+  /** Vị trí panel lúc mở rộng. null = chưa mở lần nào (mở ra ngay tại chỗ nút tròn). */
   position: Position | null;
   /**
    * Vị trí nút tròn lúc thu nhỏ — tách riêng khỏi `position` để mỗi trạng
-   * thái giữ chỗ của nó: mở ra thì panel canh giữa cho dễ bấm, thu lại thì
+   * thái giữ chỗ của nó: mở ra thì panel bung từ chỗ nút tròn, thu lại thì
    * nút tròn về đúng góc người dùng đã đặt, không nằm chình ình giữa trang.
    * null = chưa từng kéo, dùng góc dưới phải.
    */

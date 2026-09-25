@@ -59,10 +59,10 @@ export const PEN_WIDTHS = [0.0022, 0.0038, 0.0065];
 /** Bút dạ quang dày hơn hẳn — đủ phủ kín một dòng chữ Hàn cỡ thường. */
 export const HIGHLIGHTER_WIDTHS = [0.014, 0.024, 0.04];
 /** Cỡ chữ chú thích, cũng theo phần chiều rộng trang. */
-export const TEXT_SIZES = [0.018, 0.026, 0.038];
+const TEXT_SIZES = [0.018, 0.026, 0.038];
 
 export const PEN_COLORS = ["#ef4444", "#2563eb", "#16a34a", "#111827"];
-export const HIGHLIGHTER_COLORS = ["#fde047", "#86efac", "#93c5fd", "#fda4af"];
+const HIGHLIGHTER_COLORS = ["#fde047", "#86efac", "#93c5fd", "#fda4af"];
 
 /** Bút dạ quang vẽ đè lên ảnh scan nên phải trong suốt, nếu không mất chữ. */
 export const HIGHLIGHTER_OPACITY = 0.38;
@@ -94,7 +94,8 @@ interface AnnotationState {
   lastPage: number | null;
   /**
    * Góc trên trái của thanh công cụ vẽ, theo px màn hình. `null` = chưa từng
-   * kéo, dùng vị trí mặc định (căn giữa, ngay trên thanh điều hướng trang).
+   * kéo, dùng vị trí mặc định: dựng dọc sát mép phải, ngay trên nút audio
+   * (xem `drawToolbarAnchor` trong widget-dock).
    *
    * Không lưu xuống kho, giống `note-widget-store`: vị trí này phụ thuộc cỡ
    * màn hình, nhớ lại từ phiên trước rồi mở ở máy khác là nó nằm ngoài màn.
@@ -125,7 +126,7 @@ export function annotationKey(bookId: string, page: number): string {
   return `${bookId}:${page}`;
 }
 
-export const ANNOTATION_STORAGE_KEY = "kiip-annotations-v1";
+const ANNOTATION_STORAGE_KEY = "kiip-annotations-v1";
 
 /** So sánh trước khi `set` để không thành vòng lặp ghi/lỗi/ghi — xem `idb-storage`. */
 function markQuota(exceeded: boolean): void {

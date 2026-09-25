@@ -6,8 +6,8 @@
  * Đầu vào : ../<sourceDir>_images/pages/page-0001.png (ưu tiên — lossless,
  *           tránh nén lossy 2 lần khi ra WebP) hoặc .jpg (fallback, sách cũ
  *           tải bằng download_ebook.py) — nằm ở thư mục gốc `kiip/`, một
- *           cấp trên thư mục `web/` — chạy script bằng `npm run
- *           prepare-images` để cwd luôn là `web/`). `sourceDir` lấy từ
+ *           cấp trên thư mục dự án — chạy script bằng `npm run
+ *           prepare-images` để cwd luôn là thư mục dự án). `sourceDir` lấy từ
  *           `src/lib/books.ts` (khác `id` với sách bài tập, vd `WB_step1`
  *           cho id `wb-step1`).
  * Đầu ra  : R2 bucket, key `books/<id>/pages/0001.webp` và
@@ -19,7 +19,7 @@
  *   npm run prepare-images -- --force      # upload lại kể cả đã có
  *   npm run prepare-images -- --skip-thumbs
  *
- * Cần các biến môi trường trong web/.env.local (xem .env.local.example):
+ * Cần các biến môi trường trong .env.local (xem .env.local.example):
  *   R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME
  */
 import { config as loadEnv } from "dotenv";
@@ -45,7 +45,7 @@ const CONCURRENCY = 6;
 function requireEnv(name: string): string {
   const v = process.env[name];
   if (!v) {
-    console.error(`✗ Thiếu biến môi trường ${name}. Xem web/.env.local.example.`);
+    console.error(`✗ Thiếu biến môi trường ${name}. Xem .env.local.example.`);
     process.exit(1);
   }
   return v;

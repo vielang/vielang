@@ -399,7 +399,7 @@ export function pauseAutoplay() {
   useAutoplayStore.setState({ status: "paused" });
 }
 
-export function resumeAutoplay() {
+function resumeAutoplay() {
   const { status, index } = useAutoplayStore.getState();
   if (status !== "paused" || !audio) return;
   // Bấm dừng đúng lúc đang nghỉ giữa 2 bài: bài cũ đã hết, phát tiếp là sang bài kế.

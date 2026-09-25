@@ -70,12 +70,12 @@ export function bookCacheName(bookId: string): string {
   return `${BOOK_CACHE_PREFIX}${bookId}`;
 }
 
-export function isBookCache(name: string): boolean {
+function isBookCache(name: string): boolean {
   return name.startsWith(BOOK_CACHE_PREFIX);
 }
 
 /** "kiip-book-step1" -> "step1" */
-export function bookIdFromCache(name: string): string {
+function bookIdFromCache(name: string): string {
   return name.slice(BOOK_CACHE_PREFIX.length);
 }
 
@@ -140,7 +140,7 @@ function pageDocUrl(bookId: string, page: number): string {
  *
  * PHẢI khớp với hàm cùng tên trong `public/sw.js`.
  */
-export function rscCacheKey(bookId: string, page: number): string {
+function rscCacheKey(bookId: string, page: number): string {
   return `${pageDocUrl(bookId, page)}?__offline_rsc=1`;
 }
 

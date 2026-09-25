@@ -79,7 +79,7 @@ export const useNoteStore = create<NoteState>()(
 syncAcrossTabs(useNoteStore);
 
 /** Tiptap trả về `<p></p>` cho document rỗng — coi như "không có nội dung". */
-export function isBlankHtml(html: string | null | undefined): boolean {
+function isBlankHtml(html: string | null | undefined): boolean {
   if (!html) return true;
   return html.replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ").trim() === "";
 }

@@ -115,7 +115,7 @@ function defaultCollapsedPosition(): Pos {
  * cũng mở ra ở góc dưới phải, không đè vào giữa trang sách.
  *
  * Neo theo mép phải-dưới chứ không giữ nguyên (x, y) là điểm mấu chốt: bề
- * rộng nhảy 48 -> 256, giữ nguyên x thì panel tràn hẳn khỏi mép phải, mang
+ * rộng nhảy 48 -> 300 (PANEL_WIDTH), giữ nguyên x thì panel tràn hẳn khỏi mép phải, mang
  * theo cả nút "Thu nhỏ" ra ngoài màn hình.
  */
 function panelPositionFrom(collapsedPos: Pos, panelHeight: number): Pos {
@@ -279,7 +279,7 @@ export function AudioWidget({
   // lúc là 2 tiếng chồng nhau.
   if (autoplayOn || (!hasLeft && !hasRight)) return null;
 
-  // z-[55]: trên tooltip (z-50) để panel canh giữa không bị tooltip che, nhưng
+  // z-[55]: trên tooltip (z-50) để panel không bị tooltip che, nhưng
   // dưới panel bài giảng (z-[60]) khi cả hai cùng mở.
   return (
     // KHÔNG đặt `touch-none` ở đây. Trình duyệt tính `touch-action` bằng

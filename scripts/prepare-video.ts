@@ -168,6 +168,14 @@ async function makePoster(mp4Path: string, duration: number | null, outPath: str
  * Chuyển hẳn sang H.264 + AAC (10.5.2020~ mọi iPhone đều phát được) trước
  * khi upload. File đã sẵn H.264 thì chỉ remux (đưa moov atom lên đầu cho
  * tua nhanh hơn) — không encode lại cho đỡ tốn thời gian.
+ *
+ * `-crf 24 -maxrate 3000k -bufsize 6000k`: bitrate "best effort" của yt-dlp
+ * (bám sát nguồn AV1 gốc) ra file ~4.4 Mbps trung bình — quá nặng để phát
+ * mượt trên mạng di động, hay bị đứng khựng giữa chừng. Đã so frame trực
+ * tiếp: crf 24 (thay vì 20) mắt thường không phân biệt được trên nội dung
+ * này, mà dung lượng giảm còn một nửa; `-maxrate`/`-bufsize` chặn luôn các
+ * đoạn cảnh phức tạp (rừng cây, mưa…) đột biến bitrate vượt băng thông máy
+ * xem, nguồn gây khựng thường gặp nhất.
  */
 async function needsTranscode(mp4Path: string): Promise<boolean> {
   try {
@@ -189,8 +197,9 @@ async function transcodeForCompat(mp4Path: string, tmpDir: string, id: string): 
   const args = transcode
     ? [
         "-y", "-loglevel", "error", "-nostats", "-i", mp4Path,
-        "-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-pix_fmt", "yuv420p",
-        "-c:a", "aac", "-b:a", "160k",
+        "-c:v", "libx264", "-preset", "fast", "-crf", "24",
+        "-maxrate", "3000k", "-bufsize", "6000k", "-pix_fmt", "yuv420p",
+        "-c:a", "aac", "-b:a", "128k",
         "-movflags", "+faststart",
         outPath,
       ]

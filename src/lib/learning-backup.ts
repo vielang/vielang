@@ -23,6 +23,7 @@ export const BACKUP_KEYS = [
   // localStorage, thiếu khoá nào là báo.
   "kiip-guide-v1",
   "kiip-autoplay-v1",
+  "kiip-video-progress-v1",
 ] as const;
 
 const APP_ID = "vietopik-learning-backup";

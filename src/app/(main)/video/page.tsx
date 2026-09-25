@@ -4,9 +4,11 @@ import { PageHeader } from "@/components/layout/page-header";
 import { EmptyState } from "@/components/layout/empty-state";
 import { SegmentedNav } from "@/components/layout/segmented-nav";
 import { VideoCard } from "@/components/video/video-card";
+import { ContinueWatching } from "@/components/video/continue-watching";
 import { getVideoLessons } from "@/lib/videos";
 import { getLanguage } from "@/lib/languages";
 import { libraryTabs } from "@/lib/series";
+import { mediaOriginBase } from "@/lib/books";
 
 const KOREAN = getLanguage("")!;
 
@@ -25,6 +27,10 @@ export default function VideoLibraryPage() {
 
   return (
     <div className="flex flex-col gap-6">
+      {/* Video nặng (~50-150MB/tập) nằm trên R2 — mở kết nối trước để lúc
+          bấm vào một tập không phải đợi bắt tay TLS từ đầu. */}
+      <link rel="preconnect" href={mediaOriginBase()} />
+
       <div className="flex flex-col gap-3">
         <PageHeader
           title="Học tiếng Hàn qua video"
@@ -32,6 +38,8 @@ export default function VideoLibraryPage() {
         />
         {tabs.length > 1 && <SegmentedNav label="Bộ sách" items={tabs} />}
       </div>
+
+      <ContinueWatching lessons={lessons} />
 
       {lessons.length === 0 ? (
         <EmptyState

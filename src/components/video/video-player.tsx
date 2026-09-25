@@ -1,9 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Languages, Maximize, Minimize, Pause, Play } from "lucide-react";
+import { Languages, Loader2, Maximize, Minimize, Pause, Play, RotateCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { activeCue, videoPosterUrl, videoUrl, type VideoCue, type VideoLesson } from "@/lib/videos";
+import { resumeTime, useVideoProgressStore } from "@/lib/video-progress-store";
 
 /**
  * Player tự dựng control bar (không dùng `controls` gốc của `<video>`) — lý
@@ -24,6 +25,13 @@ import { activeCue, videoPosterUrl, videoUrl, type VideoCue, type VideoLesson } 
  * viền đen còn lại (nếu có) chỉ là phần letterbox tối thiểu do tỉ lệ màn
  * hình khác tỉ lệ video — mọi player (YouTube, Netflix…) đều vậy, không
  * cắt hình để lấp đầy vì sẽ mất nội dung ở rìa khung hình.
+ *
+ * Video ~100-300MB, mạng di động dễ khựng giữa chừng — 3 việc để người xem
+ * không phải xem lại từ đầu mỗi lần: (1) tự lưu vị trí đang xem
+ * (`video-progress-store`, localStorage) và tự tua lại đúng chỗ lúc mở lại;
+ * (2) hiện vòng xoay lúc đang tải thay vì đứng hình im lặng trông như treo;
+ * (3) lỗi tải (`error`) thì hiện nút "Thử lại" gọi lại `.load()` rồi tua về
+ * đúng chỗ vừa dừng, không bắt xem lại từ đầu.
  */
 
 const ASPECT = "1706/1080";
@@ -55,15 +63,21 @@ export function VideoPlayer({ lesson }: { lesson: VideoLesson }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastSavedRef = useRef(0);
+  const resumedRef = useRef(false);
 
   const [time, setTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [playing, setPlaying] = useState(false);
+  const [buffering, setBuffering] = useState(false);
+  const [hasError, setHasError] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [controlsVisible, setControlsVisible] = useState(true);
   const [koCue, setKoCue] = useState<VideoCue | undefined>();
   const [viCue, setViCue] = useState<VideoCue | undefined>();
   const [showVi, setShowVi] = useState(true);
+
+  const setProgressTime = useVideoProgressStore((s) => s.setTime);
 
   /** Hiện control bar + phụ đề tạm ẩn lại sau vài giây không chạm tới — chỉ
    * khi đang phát (dừng thì luôn hiện, không có gì để "làm phiền"). */
@@ -78,13 +92,30 @@ export function VideoPlayer({ lesson }: { lesson: VideoLesson }) {
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
+
+    const saveProgress = (t: number) => {
+      lastSavedRef.current = t;
+      setProgressTime(lesson.id, t, video.duration || 0);
+    };
+
     const onTime = () => {
       const t = video.currentTime;
       setTime(t);
       setKoCue(activeCue(lesson.koCues, t));
       setViCue(activeCue(lesson.viCues, t));
+      // Lưu định kỳ mỗi ~5s lúc đang phát, không phải mỗi lần timeupdate
+      // (bắn liên tục) — đỡ ghi localStorage quá dày.
+      if (t - lastSavedRef.current >= 5) saveProgress(t);
     };
-    const onMeta = () => setDuration(video.duration || 0);
+    const onMeta = () => {
+      setDuration(video.duration || 0);
+      if (!resumedRef.current) {
+        resumedRef.current = true;
+        const saved = useVideoProgressStore.getState().lessons[lesson.id];
+        const t = resumeTime(saved);
+        if (t > 0) video.currentTime = t;
+      }
+    };
     const onPlay = () => {
       setPlaying(true);
       wake();
@@ -93,18 +124,38 @@ export function VideoPlayer({ lesson }: { lesson: VideoLesson }) {
       setPlaying(false);
       setControlsVisible(true);
       if (hideTimer.current) clearTimeout(hideTimer.current);
+      saveProgress(video.currentTime);
     };
+    const onWaiting = () => setBuffering(true);
+    const onPlaying = () => {
+      setBuffering(false);
+      setHasError(false);
+    };
+    const onError = () => {
+      setBuffering(false);
+      setHasError(true);
+    };
+
     video.addEventListener("timeupdate", onTime);
     video.addEventListener("loadedmetadata", onMeta);
     video.addEventListener("play", onPlay);
     video.addEventListener("pause", onPause);
+    video.addEventListener("waiting", onWaiting);
+    video.addEventListener("playing", onPlaying);
+    video.addEventListener("error", onError);
     return () => {
       video.removeEventListener("timeupdate", onTime);
       video.removeEventListener("loadedmetadata", onMeta);
       video.removeEventListener("play", onPlay);
       video.removeEventListener("pause", onPause);
+      video.removeEventListener("waiting", onWaiting);
+      video.removeEventListener("playing", onPlaying);
+      video.removeEventListener("error", onError);
+      // Rời trang (chuyển tập, quay lại danh sách…) — chốt lại vị trí cuối
+      // cùng luôn, không đợi tới mốc lưu định kỳ tiếp theo.
+      if (video.currentTime > 0) saveProgress(video.currentTime);
     };
-  }, [lesson, wake]);
+  }, [lesson, wake, setProgressTime]);
 
   useEffect(() => {
     const onChange = () => setIsFullscreen(isFullscreenNow());
@@ -121,6 +172,22 @@ export function VideoPlayer({ lesson }: { lesson: VideoLesson }) {
     if (!video) return;
     if (video.paused) video.play();
     else video.pause();
+  };
+
+  /** Lỗi tải (mạng chập chờn giữa video ~100-300MB) — tải lại rồi tua về
+   * đúng chỗ vừa dừng, không bắt xem lại từ đầu. */
+  const retry = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    const resumeAt = video.currentTime || useVideoProgressStore.getState().lessons[lesson.id]?.time || 0;
+    setHasError(false);
+    const onReady = () => {
+      video.currentTime = resumeAt;
+      video.play().catch(() => {});
+      video.removeEventListener("loadedmetadata", onReady);
+    };
+    video.addEventListener("loadedmetadata", onReady);
+    video.load();
   };
 
   const toggleFullscreen = async () => {
@@ -189,7 +256,7 @@ export function VideoPlayer({ lesson }: { lesson: VideoLesson }) {
           )}
         </div>
 
-        {!playing && (
+        {!playing && !hasError && (
           <button
             type="button"
             onClick={togglePlay}
@@ -200,6 +267,28 @@ export function VideoPlayer({ lesson }: { lesson: VideoLesson }) {
               <Play className="size-7 translate-x-0.5" fill="currentColor" aria-hidden />
             </span>
           </button>
+        )}
+
+        {/* Đang tải lại dữ liệu giữa chừng (mạng chập chờn) — cho biết app
+            không treo, chỉ đang chờ, để người xem không tưởng lỗi mà bỏ đi. */}
+        {buffering && !hasError && (
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+            <Loader2 className="size-10 animate-spin text-white/90" aria-hidden />
+          </div>
+        )}
+
+        {hasError && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/85 px-4 text-center">
+            <p className="text-sm text-white/90">Không tải được video — kiểm tra mạng rồi thử lại.</p>
+            <button
+              type="button"
+              onClick={retry}
+              className="inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-1.5 text-sm font-medium text-black transition-transform hover:scale-105"
+            >
+              <RotateCw className="size-3.5" aria-hidden />
+              Thử lại
+            </button>
+          </div>
         )}
 
         <div

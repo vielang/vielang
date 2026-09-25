@@ -10,6 +10,7 @@ import {
   getVideoLessons,
   videoLessonTitle,
 } from "@/lib/videos";
+import { mediaOriginBase } from "@/lib/books";
 
 export function generateStaticParams() {
   return getVideoLessons().map((v) => ({ id: v.id }));
@@ -34,6 +35,7 @@ export default async function VideoPlayerPage({ params }: { params: Promise<{ id
 
   return (
     <div className="flex flex-col gap-4">
+      <link rel="preconnect" href={mediaOriginBase()} />
       <BackLink href="/video">Học tiếng Hàn qua video</BackLink>
 
       <div>

@@ -143,6 +143,30 @@
   --standalone-safe-bottom: env(safe-area-inset-bottom);
 }
 
+/*
+ * PWA trên iOS: trang ngắn vẫn phải phủ kín màn hình, kể cả vùng vạch Home.
+ *
+ * html/body chỉ đặt `100%` thì trang ngắn (không cuộn được, vd Đánh dấu khi
+ * chưa ghim gì) cao bằng khung nhìn ban đầu mà WebKit tính — ở chế độ PWA
+ * với `viewport-fit=cover`, khung đó có thể hụt phần vạch Home. Thanh tab
+ * bám đáy bị đẩy lên đúng chừng ấy mà vẫn giữ khoảng đệm vùng an toàn, nên
+ * trông cao hơn các trang khác. `100vh` của WebKit ở chế độ PWA là CẢ màn
+ * hình (dvh/svh thì có thể bỏ vùng đó ra), nên dùng nó làm chiều cao tối
+ * thiểu.
+ *
+ * Để ngoài @layer để thắng `h-full`/`min-h-full` của Tailwind trên html/body.
+ */
+@media (display-mode: standalone) {
+  html,
+  body {
+    min-height: 100vh;
+  }
+}
+:root[data-standalone],
+:root[data-standalone] body {
+  min-height: 100vh;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

@@ -14,10 +14,18 @@ import { mediaOriginBase } from "@/lib/books";
  *
  * Import TĨNH (không fs.readFileSync) — cùng lý do với `lib/exams.ts`.
  */
+export interface WordSpan {
+  t: string;
+  at: number;
+}
+
 export interface VideoCue {
   s: number;
   e: number;
   t: string;
+  /** Mốc thời gian từng chữ trong câu — để overlay tô sáng dần lúc đọc tới
+   * (karaoke), lấy từ thẻ `<c>` gốc của YouTube. Xem `scripts/vtt.ts`. */
+  words: WordSpan[];
 }
 
 export interface VideoLesson {

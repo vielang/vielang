@@ -20,6 +20,11 @@ export interface LanguageConfig {
   description: string;
   /** Một dòng ngắn trong menu thả xuống của header — các bộ sách đang có. */
   blurb: string;
+  /** Có mục "Học qua video" (`/video`, xem `lib/videos.ts`) không — hiện chỉ
+   * tiếng Hàn. Đặt ở đây (không phải trong lib/videos.ts) để nav/series —
+   * dùng ở MỌI trang — khỏi phải kéo theo cả manifest video (JSON cue nặng)
+   * chỉ để biết có tab video hay không. */
+  hasVideo?: boolean;
 }
 
 export const LANGUAGES = [
@@ -29,6 +34,7 @@ export const LANGUAGES = [
     label: "Tiếng Hàn",
     heading: "Thư viện tiếng Hàn",
     blurb: "Giáo trình KIIP và sách bài tập",
+    hasVideo: true,
     description:
       "Sách văn hóa – xã hội Hàn Quốc (chương trình KIIP), dành cho người Việt học tiếng Hàn. Mỗi cấp độ gồm giáo trình chính và sách bài tập đi kèm.",
   },

@@ -1,4 +1,4 @@
-import type { LanguageCode } from "@/lib/languages";
+import type { LanguageCode, LanguageConfig } from "@/lib/languages";
 
 /**
  * BỘ SÁCH — tầng thứ ba của thư viện: Thư viện → ngôn ngữ → bộ sách (KIIP,
@@ -42,4 +42,39 @@ export function seriesHref(series: BookSeries, languageHref: string): string {
 export function seriesOfPath(path: string): BookSeries | undefined {
   const m = /^\/sach\/([^/]+)/.exec(path);
   return m ? getSeries(m[1]) : undefined;
+}
+
+export interface LibraryTabItem {
+  key: string;
+  label: string;
+  href: string;
+  active: boolean;
+}
+
+/**
+ * Hàng chọn tầng dưới của trang Thư viện — dùng CHUNG bởi trang ngôn ngữ
+ * (`/`, `/sach/<id>`) và trang `/video`, để "Học qua video" hiện làm một tab
+ * CÙNG CẤP với bộ sách (KIIP…), bấm qua lại giữa hai bên được.
+ *
+ * `activeKey`: id bộ sách đang xem, hoặc `"video"`.
+ */
+export function libraryTabs(language: LanguageConfig, activeKey: string): LibraryTabItem[] {
+  const languageHref = language.slug ? `/${language.slug}` : "/";
+  const allSeries = seriesOfLang(language.code);
+  const items: LibraryTabItem[] =
+    allSeries.length > 1
+      ? [
+          { key: "all", label: "Tất cả", href: languageHref, active: activeKey === "all" },
+          ...allSeries.map((s) => ({
+            key: s.id,
+            label: s.label,
+            href: seriesHref(s, languageHref),
+            active: activeKey === s.id,
+          })),
+        ]
+      : allSeries.map((s) => ({ key: s.id, label: s.label, href: languageHref, active: activeKey === s.id }));
+  if (language.hasVideo) {
+    items.push({ key: "video", label: "Học qua video", href: "/video", active: activeKey === "video" });
+  }
+  return items;
 }

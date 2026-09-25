@@ -59,10 +59,10 @@ describe("bộ sách", () => {
     expect(activeTrack("/sach/kiip")?.slug).toBe("");
   });
 
-  it("ngôn ngữ chỉ có một bộ thì link bộ sách trỏ về trang ngôn ngữ", () => {
+  it("ngôn ngữ chỉ có một bộ thì link bộ sách trỏ về trang ngôn ngữ, kèm mục video", () => {
     const library = activeTab("/")!;
     const korean = library.children!.find((c) => c.label === "Tiếng Hàn")!;
-    expect(korean.items?.map((i) => i.href)).toEqual(["/"]);
+    expect(korean.items?.map((i) => i.href)).toEqual(["/", "/video"]);
   });
 
   it("sách nào cũng thuộc một bộ có thật, cùng ngôn ngữ", () => {

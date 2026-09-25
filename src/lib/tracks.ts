@@ -1,4 +1,4 @@
-import { LANGUAGES } from "@/lib/languages";
+import { LANGUAGES, type LanguageConfig } from "@/lib/languages";
 import { getBook } from "@/lib/books";
 import { seriesOfPath } from "@/lib/series";
 
@@ -27,15 +27,18 @@ export interface Track {
   lang?: string;
   /** Các nhánh đường dẫn khác cũng thuộc mảng này (vd trang học bài). */
   paths?: string[];
+  /** Có mục "Học qua video" không — xem `LanguageConfig.hasVideo`. */
+  hasVideo?: boolean;
 }
 
 export const TRACKS: readonly Track[] = [
-  ...LANGUAGES.map((l) => ({
+  ...LANGUAGES.map((l: LanguageConfig) => ({
     slug: l.slug,
     label: l.label,
     blurb: l.blurb,
     kind: "books" as const,
     lang: l.code,
+    hasVideo: l.hasVideo,
   })),
   { slug: "it", label: "IT", blurb: "Lộ trình .NET developer", kind: "courses", paths: ["/learn"] },
 ];

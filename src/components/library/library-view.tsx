@@ -7,10 +7,9 @@ import type { LanguageConfig } from "@/lib/languages";
 import type { GrammarEntry } from "@/lib/page-grammar";
 import { GrammarIndex } from "@/components/grammar/grammar-index";
 import { SegmentedNav } from "@/components/layout/segmented-nav";
-import { seriesHref, seriesOfLang, type BookSeries } from "@/lib/series";
+import { libraryTabs, seriesOfLang, type BookSeries } from "@/lib/series";
 import { PageHeader, SectionLabel } from "@/components/layout/page-header";
 import { EmptyState } from "@/components/layout/empty-state";
-import { VideoPromoCard } from "@/components/video/video-promo-card";
 
 /**
  * Khung trang thư viện dùng chung cho trang gốc (tiếng Hàn) và mọi trang
@@ -28,7 +27,6 @@ export function LibraryView({
   books,
   grammar,
   bookTitles,
-  showVideoPromo = false,
 }: {
   language: LanguageConfig;
   series?: BookSeries;
@@ -42,34 +40,24 @@ export function LibraryView({
    */
   grammar?: GrammarEntry[];
   bookTitles?: Record<string, string>;
-  /** Hiện lối vào "Học tiếng Hàn qua video" — chỉ trang gốc tiếng Hàn (`/`). */
-  showVideoPromo?: boolean;
 }) {
   const groups = groupBooksByLevel(books);
   const hasGrammar = grammar !== undefined && grammar.length > 0;
   const allSeries = seriesOfLang(language.code);
-  const languageHref = language.slug ? `/${language.slug}` : "/";
+  // Chưa chọn bộ (trang ngôn ngữ) mà chỉ có ĐÚNG 1 bộ: trang đó CHÍNH LÀ bộ
+  // đó rồi (xem lib/series.ts `seriesHref`) — tô tab của bộ ấy luôn, không
+  // phải tô "Tất cả" (chỉ có ý nghĩa khi có từ 2 bộ trở lên).
+  const activeKey = series?.id ?? (allSeries.length > 1 ? "all" : (allSeries[0]?.id ?? "all"));
+  const tabs = libraryTabs(language, activeKey);
 
   return (
     <div className="flex flex-col gap-6">
       {/* Cùng một khung đầu trang với Luyện thi, Cẩm nang, Góc học tập: tiêu
-          đề, rồi hàng chọn tầng dưới (nếu có). */}
+          đề, rồi hàng chọn tầng dưới (nếu có) — "Học qua video" hiện cùng
+          hàng, cùng cấp với bộ sách (KIIP…). */}
       <div className="flex flex-col gap-3">
         <PageHeader title={language.heading} subtitle={series?.blurb ?? language.blurb} />
-        {allSeries.length > 1 && (
-          <SegmentedNav
-            label="Bộ sách"
-            items={[
-              { key: "all", label: "Tất cả", href: languageHref, active: !series },
-              ...allSeries.map((s) => ({
-                key: s.id,
-                label: s.label,
-                href: seriesHref(s, languageHref),
-                active: s.id === series?.id,
-              })),
-            ]}
-          />
-        )}
+        {tabs.length > 1 && <SegmentedNav label="Bộ sách" items={tabs} />}
       </div>
 
       {/* Tiếng Hàn: ô tra ngữ pháp (dòng gợi ý bên trong nói có bao nhiêu
@@ -83,8 +71,6 @@ export function LibraryView({
       {/* Đặt TRƯỚC lưới sách: mở thư viện ra phần lớn là để đọc tiếp cuốn
           đang dở, chứ không phải để chọn cuốn mới. Tự ẩn khi chưa đọc gì. */}
       <ContinueReading books={books} />
-
-      {showVideoPromo && <VideoPromoCard />}
 
       {groups.length === 0 ? (
         <EmptyState

@@ -68,12 +68,12 @@ export const NAV_TABS: NavTab[] = [
     children: TRACKS.map((t) => {
       const href = trackHref(t.slug);
       const series = t.lang ? seriesOfLang(t.lang) : [];
-      return {
-        href,
-        label: t.label,
-        description: t.blurb,
-        items: series.map((s) => ({ href: seriesHref(s, href), label: s.label, description: s.blurb })),
-      };
+      const items = series.map((s) => ({ href: seriesHref(s, href), label: s.label, description: s.blurb }));
+      // "Học qua video" đứng cùng cấp với bộ sách (KIIP…) trong menu.
+      if (t.hasVideo) {
+        items.push({ href: "/video", label: "Học qua video", description: "Phim có phụ đề Hàn – Việt, bật/tắt được" });
+      }
+      return { href, label: t.label, description: t.blurb, items };
     }),
     activeChild: (p) => {
       const track = activeTrack(p);

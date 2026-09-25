@@ -88,3 +88,33 @@ describe("màn hình thấp", () => {
     expect(audioTop()).toBeGreaterThan(0);
   });
 });
+
+describe("iPhone có tai thỏ / vạch Home", () => {
+  // Hai thanh công cụ trình đọc có đệm `max(8px, vùng an toàn)`: tai thỏ 47px
+  // làm thanh trên dãn thêm 39px, vạch Home 34px làm thanh dưới dãn thêm 26px.
+  function withInsets(top: number, bottom: number, run: () => void) {
+    const root = document.documentElement.style;
+    root.setProperty("--safe-top", `${top}px`);
+    root.setProperty("--safe-bottom", `${bottom}px`);
+    try {
+      run();
+    } finally {
+      root.removeProperty("--safe-top");
+      root.removeProperty("--safe-bottom");
+    }
+  }
+
+  it("nút audio lùi lên đúng phần thanh dưới dãn ra", () => {
+    const plain = audioTop();
+    withInsets(47, 34, () => expect(audioTop()).toBe(plain - 26));
+  });
+
+  it("panel bài giảng bắt đầu dưới thanh trên đã dãn, không đè lên nó", () => {
+    withInsets(47, 34, () => expect(notePanelAnchor().y).toBe(64 + 39));
+  });
+
+  it("vùng an toàn nhỏ hơn đệm sẵn có (8px) thì không xê dịch gì", () => {
+    const plain = audioTop();
+    withInsets(0, 6, () => expect(audioTop()).toBe(plain));
+  });
+});

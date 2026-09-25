@@ -266,6 +266,15 @@ export function AudioWidget({
     if (!d.moved && collapsed) expand();
   }
 
+  /**
+   * Cử chỉ bị trình duyệt huỷ (chuyển sang cuộn, có cuộc gọi đến…): chỉ bỏ
+   * lượt kéo. KHÔNG coi là một lần nhấn — trước đây dùng chung `onPointerUp`
+   * nên nút tròn tự bung ra dù người dùng không hề bấm.
+   */
+  function onPointerCancel(e: React.PointerEvent) {
+    if (drag.current?.pointerId === e.pointerId) drag.current = null;
+  }
+
   // Đang nghe tự động thì nhường chỗ cho `AutoplayBar` — 2 trình phát cùng
   // lúc là 2 tiếng chồng nhau.
   if (autoplayOn || (!hasLeft && !hasRight)) return null;
@@ -284,7 +293,7 @@ export function AudioWidget({
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
-          onPointerCancel={onPointerUp}
+          onPointerCancel={onPointerCancel}
           aria-label="Mở audio trang này"
           className="flex size-12 touch-none items-center justify-center rounded-full bg-black/70 text-white shadow-lg backdrop-blur transition-transform select-none active:scale-95"
         >
@@ -302,7 +311,7 @@ export function AudioWidget({
             onPointerDown={onPointerDown}
             onPointerMove={onPointerMove}
             onPointerUp={onPointerUp}
-            onPointerCancel={onPointerUp}
+            onPointerCancel={onPointerCancel}
             className="flex touch-none cursor-grab items-center justify-between px-2 py-1.5 drop-shadow-[0_1px_2px_rgb(0_0_0/0.9)] select-none active:cursor-grabbing"
           >
             <GripVertical className="size-4 text-white/50" aria-hidden />

@@ -142,3 +142,23 @@ describe("bài nghe hỏng giữa chừng", () => {
     expect(screen.queryByText(/Không tải được/)).toBeNull();
   });
 });
+
+describe("nút tròn lúc thu nhỏ", () => {
+  it("cử chỉ bị huỷ giữa chừng thì KHÔNG tự bung panel", () => {
+    useAudioWidgetStore.setState({ collapsed: true });
+    widget();
+    const button = screen.getByRole("button", { name: "Mở audio trang này" });
+    fireEvent.pointerDown(button, { pointerId: 1, clientX: 10, clientY: 10 });
+    fireEvent.pointerCancel(button, { pointerId: 1, clientX: 10, clientY: 10 });
+    expect(useAudioWidgetStore.getState().collapsed).toBe(true);
+  });
+
+  it("nhấn rồi nhả (không kéo) thì bung panel", () => {
+    useAudioWidgetStore.setState({ collapsed: true });
+    widget();
+    const button = screen.getByRole("button", { name: "Mở audio trang này" });
+    fireEvent.pointerDown(button, { pointerId: 1, clientX: 10, clientY: 10 });
+    fireEvent.pointerUp(button, { pointerId: 1, clientX: 10, clientY: 10 });
+    expect(useAudioWidgetStore.getState().collapsed).toBe(false);
+  });
+});

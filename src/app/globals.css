@@ -133,6 +133,13 @@
  */
 :root {
   --standalone-safe-bottom: 0px;
+  /*
+   * Vùng an toàn thật, để JS đọc được (getComputedStyle) — widget-dock dùng
+   * để đặt widget nổi của trình đọc không đè lên hai thanh công cụ, vốn dãn
+   * theo tai thỏ / vạch Home.
+   */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 @media (display-mode: standalone) {
   :root {

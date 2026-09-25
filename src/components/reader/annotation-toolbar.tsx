@@ -295,7 +295,7 @@ export function AnnotationToolbar({ bookId, pages }: { bookId: string; pages: nu
       {quotaExceeded && (
         // Cố định ở đáy chứ không bám theo thanh công cụ: thanh có thể đã bị
         // kéo ra mép hay thu nhỏ, mà báo lỗi thì phải luôn đọc được.
-        <div className="pointer-events-none fixed inset-x-0 bottom-16 z-30 flex justify-center px-3">
+        <div className="pointer-events-none fixed inset-x-0 bottom-[calc(4rem+max(0px,var(--safe-bottom)-8px))] z-30 flex justify-center px-3">
           <p className="pointer-events-auto flex items-center gap-1.5 rounded-full bg-destructive px-3 py-1.5 text-xs text-white shadow-lg">
             <AlertTriangle className="size-3.5" aria-hidden />
             Chưa lưu được nét vẽ — bộ nhớ trình duyệt bị chặn hoặc đã đầy.

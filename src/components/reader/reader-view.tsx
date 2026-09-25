@@ -207,32 +207,27 @@ export function ReaderView({
     [book.id, book.totalPages, page, router, effectiveDouble]
   );
 
+  const hasPrev = prevPages !== null;
+  const hasNext = nextPages !== null;
+
   // Nạp sẵn route hai bên: `router.push` của trang chưa nạp phải chờ tải
   // payload, đúng vào lúc hiệu ứng lật vừa xong nên thấy khựng. Ảnh đã có
   // `AdjacentPreload` lo.
+  //
+  // Chỉ nạp TRANG NEO của spread kề bên — lật trang chỉ đi tới đó (trang
+  // phải của spread không bao giờ là một URL được mở). Phụ thuộc vào SỐ chứ
+  // không vào mảng `prevPages`/`nextPages`: mảng dựng mới mỗi lượt vẽ, nên
+  // trước đây mỗi lần chạm hiện thanh công cụ là nạp lại cả hai bên.
   useEffect(() => {
-    for (const p of [...prevPages ?? [], ...nextPages ?? []]) {
-      router.prefetch(`/read/${book.id}/${p}`);
-    }
-  }, [book.id, prevPages, nextPages, router]);
+    if (hasPrev) router.prefetch(`/read/${book.id}/${prevAnchor}`);
+    if (hasNext) router.prefetch(`/read/${book.id}/${nextAnchor}`);
+  }, [book.id, hasPrev, hasNext, prevAnchor, nextAnchor, router]);
 
   // Lùi/tiến đúng 1 spread ở chế độ 2 trang (bước 1 hoặc 2 trang tuỳ spread
-  // hiện tại dài bao nhiêu), hoặc đúng 1 trang ở chế độ 1 trang.
-  const stepNext = useCallback(() => {
-    goTo(
-      effectiveDouble
-        ? getAdjacentSpreadAnchor(book.id, page, book.totalPages, 1)
-        : page + 1
-    );
-  }, [effectiveDouble, book.id, book.totalPages, page, goTo]);
-
-  const stepPrev = useCallback(() => {
-    goTo(
-      effectiveDouble
-        ? getAdjacentSpreadAnchor(book.id, page, book.totalPages, -1)
-        : page - 1
-    );
-  }, [effectiveDouble, book.id, book.totalPages, page, goTo]);
+  // hiện tại dài bao nhiêu), hoặc đúng 1 trang ở chế độ 1 trang — chính là
+  // hai trang neo đã tính ở trên.
+  const stepNext = useCallback(() => goTo(nextAnchor), [goTo, nextAnchor]);
+  const stepPrev = useCallback(() => goTo(prevAnchor), [goTo, prevAnchor]);
 
   /**
    * Nút mũi tên và phím mũi tên đi qua cùng một hiệu ứng lật như vuốt tay.
@@ -458,6 +453,8 @@ export function ReaderView({
         onAutoplayToggle={toggleAutoplay}
         onPrev={turnPrev}
         onNext={turnNext}
+        canPrev={hasPrev}
+        canNext={hasNext}
         onJump={goTo}
         onToggleBookmark={() => toggleBookmark(book.id, page)}
         onResetZoom={() => viewerRef.current?.resetZoom()}

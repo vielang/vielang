@@ -36,6 +36,7 @@ import {
   DOUBLE_TAP_STEP_WIDE,
   MAX_ZOOM,
   MIN_ZOOM,
+  isZoomed,
   useZoomStore,
 } from "@/lib/zoom-store";
 
@@ -334,7 +335,7 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
    */
   const [initialScale] = useState(() => useZoomStore.getState().scale);
   // Chỉ đổi khi vượt qua ngưỡng "đang phóng" — không phải mỗi khung hình.
-  const [zoomed, setZoomed] = useState(initialScale > 1.02);
+  const [zoomed, setZoomed] = useState(isZoomed(initialScale));
   const aspectRatio = getPageAspectRatio(book);
   // Đang vẽ lên trang: một ngón/chuột thuộc về cây bút, không còn là chạm để
   // ẩn thanh công cụ, vuốt lật trang hay kéo di chuyển trang nữa.
@@ -608,7 +609,7 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
         if (Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy) * 1.2) {
           // Đã phóng to thì kéo ngang là di chuyển vùng xem — trừ khi vùng
           // xem đã chạm mép ảnh theo đúng hướng đang kéo, lúc đó lật trang.
-          if (scaleRef.current > 1.02 && !atPanEdge(dx < 0 ? 1 : -1)) {
+          if (isZoomed(scaleRef.current) && !atPanEdge(dx < 0 ? 1 : -1)) {
             g.axis = "off";
             g.panning = true;
             return;
@@ -695,7 +696,7 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
         const x = e.clientX - e.currentTarget.getBoundingClientRect().left;
         const edge = (wide ? EDGE_TAP_WIDE : EDGE_TAP_NARROW) * width;
         const zone: 1 | -1 | 0 =
-          scaleRef.current > 1.02 || width <= 0 ? 0 : x < edge ? -1 : x > width - edge ? 1 : 0;
+          isZoomed(scaleRef.current) || width <= 0 ? 0 : x < edge ? -1 : x > width - edge ? 1 : 0;
         tapTimer.current = setTimeout(() => {
           tapTimer.current = null;
           if (zone === 0 || !commit(zone)) onTap();
@@ -716,7 +717,7 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
       if (e.ctrlKey || e.metaKey || drawing) return;
       const t = transformRef.current;
       if (!t) return;
-      if (scaleRef.current > 1.02) {
+      if (isZoomed(scaleRef.current)) {
         const [dx, dy] = e.shiftKey ? [e.deltaY, 0] : [e.deltaX, e.deltaY];
         t.panBy(-dx, -dy);
         return;
@@ -810,7 +811,7 @@ export const PageViewer = forwardRef<PageViewerHandle, PageViewerProps>(function
             onTransform={(_ref, state) => {
               scaleRef.current = state.scale;
               setZoomScale(state.scale);
-              const nowZoomed = state.scale > 1.02;
+              const nowZoomed = isZoomed(state.scale);
               setZoomed((was) => (was === nowZoomed ? was : nowZoomed));
             }}
           >

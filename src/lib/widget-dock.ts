@@ -40,8 +40,39 @@ export const AUDIO_WIDGET_SIZE = 48;
  */
 const AUDIO_BOTTOM_OFFSET = 84;
 
-/** Thanh công cụ trên cùng của trang đọc. */
+/** Thanh công cụ trên cùng của trang đọc (trên máy không có tai thỏ). */
 const TOP_BAR = 64;
+
+/**
+ * Đệm trong của hai thanh công cụ trình đọc ở phía mép màn hình: `max(8px,
+ * vùng an toàn)` — xem reader-controls. Các số 64/84 trong file này tính cho
+ * máy KHÔNG có tai thỏ/vạch Home (đệm đúng 8px).
+ */
+const BAR_EDGE_PADDING = 8;
+
+/** Vùng an toàn thật của máy (px), đọc từ biến CSS `--safe-top`/`--safe-bottom`. */
+function safeInset(side: "top" | "bottom"): number {
+  if (typeof window === "undefined") return 0;
+  const value = parseFloat(
+    getComputedStyle(document.documentElement).getPropertyValue(`--safe-${side}`)
+  );
+  return Number.isFinite(value) ? value : 0;
+}
+
+/**
+ * Hai thanh công cụ cao thêm bao nhiêu so với máy không có tai thỏ: đệm là
+ * `max(8px, vùng an toàn)`, nên chỉ phần vượt quá 8px mới làm thanh dãn ra.
+ * Không cộng phần này thì trên iPhone có tai thỏ, panel bài giảng neo ở y=64
+ * và nút audio neo cách đáy 84 đè lên đúng hai thanh công cụ.
+ */
+function barGrowth(side: "top" | "bottom"): number {
+  return Math.max(0, safeInset(side) - BAR_EDGE_PADDING);
+}
+
+/** Mép dưới của thanh công cụ trên, đã tính tai thỏ. */
+function topBarBottom(): number {
+  return TOP_BAR + barGrowth("top");
+}
 
 /**
  * Thanh phóng to: sát mép phải, ngay dưới thanh công cụ trên. Không kéo được.
@@ -50,11 +81,11 @@ const TOP_BAR = 64;
  * (dựng dọc ngay trên nút audio), canh giữa thì bật chế độ vẽ là hai thanh
  * đè lên nhau.
  */
-export const ZOOM_BAR_TOP = TOP_BAR + GAP;
+export const ZOOM_BAR_TOP = `calc(${TOP_BAR + GAP}px + max(0px, var(--safe-top) - ${BAR_EDGE_PADDING}px))`;
 
 /** Mép TRÊN của nút audio khi nó còn ở chỗ mặc định. */
 export function audioTop(): number {
-  return window.innerHeight - AUDIO_WIDGET_SIZE - AUDIO_BOTTOM_OFFSET;
+  return window.innerHeight - AUDIO_WIDGET_SIZE - AUDIO_BOTTOM_OFFSET - barGrowth("bottom");
 }
 
 /** Nút audio: góc dưới phải. Nhỏ nhất nên nhận chỗ đắt nhất. */
@@ -88,7 +119,7 @@ export function drawToolbarAnchor(width: number, height: number): DragPos {
 export function recorderAnchor(width: number, height: number): DragPos {
   return {
     x: DRAG_MARGIN,
-    y: Math.max(DRAG_MARGIN, window.innerHeight - height - AUDIO_BOTTOM_OFFSET),
+    y: Math.max(DRAG_MARGIN, window.innerHeight - height - AUDIO_BOTTOM_OFFSET - barGrowth("bottom")),
   };
 }
 
@@ -103,7 +134,9 @@ export function autoplayBarAnchor(
   height: number,
   toolbarVisible: boolean
 ): DragPos {
-  const bottom = toolbarVisible ? TOOLBAR_BOTTOM + GAP : AUTOPLAY_BOTTOM_HIDDEN;
+  const bottom = toolbarVisible
+    ? TOOLBAR_BOTTOM + barGrowth("bottom") + GAP
+    : Math.max(AUTOPLAY_BOTTOM_HIDDEN, safeInset("bottom") + GAP);
   return {
     x: Math.round((window.innerWidth - width) / 2),
     y: window.innerHeight - height - bottom,
@@ -124,7 +157,7 @@ const TOOL_COLUMN = 55;
 
 /** Panel bài giảng: mép TRÁI, ngay dưới thanh công cụ trên. */
 export function notePanelAnchor(): DragPos {
-  return { x: DRAG_MARGIN, y: TOP_BAR };
+  return { x: DRAG_MARGIN, y: topBarBottom() };
 }
 
 /**
@@ -139,7 +172,7 @@ export function notePanelAnchor(): DragPos {
  */
 export function notePanelSize(): { width: number; height: number } {
   const width = Math.min(400, window.innerWidth - DRAG_MARGIN * 2 - TOOL_COLUMN);
-  const available = audioTop() - GAP - TOP_BAR;
+  const available = audioTop() - GAP - topBarBottom();
   return {
     width: Math.max(260, width),
     height: Math.max(220, Math.min(560, available)),

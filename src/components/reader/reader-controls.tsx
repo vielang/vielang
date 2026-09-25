@@ -31,7 +31,7 @@ import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { useZoomStore } from "@/lib/zoom-store";
+import { isZoomed, useZoomStore } from "@/lib/zoom-store";
 import type { Book } from "@/lib/books";
 import type { Chapter } from "@/lib/chapters";
 
@@ -112,6 +112,8 @@ export function ReaderControls({
   onAutoplayToggle,
   onPrev,
   onNext,
+  canPrev,
+  canNext,
   onJump,
   onToggleBookmark,
   onResetZoom,
@@ -154,6 +156,13 @@ export function ReaderControls({
   onAutoplayToggle: () => void;
   onPrev: () => void;
   onNext: () => void;
+  /**
+   * Còn spread trước/sau không — do ReaderView tính. KHÔNG tự so `page` với
+   * tổng số trang: ở chế độ 2 trang, spread cuối có `page` = totalPages-1 nên
+   * nút "Trang sau" vẫn sáng mà bấm không đi đâu.
+   */
+  canPrev: boolean;
+  canNext: boolean;
   onJump: (page: number) => void;
   onToggleBookmark: () => void;
   onResetZoom: () => void;
@@ -165,7 +174,7 @@ export function ReaderControls({
 }) {
   const [pendingPage, setPendingPage] = useState(page);
   const [menuOpen, setMenuOpen] = useState(false);
-  const zoomed = useZoomStore((s) => Math.abs(s.scale - 1) > 0.01);
+  const zoomed = useZoomStore((s) => isZoomed(s.scale));
 
   function openJumpDialog() {
     setPendingPage(page);
@@ -301,7 +310,7 @@ export function ReaderControls({
           size="icon"
           className={cn(GHOST, "disabled:opacity-30")}
           onClick={onPrev}
-          disabled={page <= 1}
+          disabled={!canPrev}
           aria-label="Trang trước"
         >
           <ChevronLeft className="size-5" aria-hidden />
@@ -317,7 +326,7 @@ export function ReaderControls({
           size="icon"
           className={cn(GHOST, "disabled:opacity-30")}
           onClick={onNext}
-          disabled={page >= book.totalPages}
+          disabled={!canNext}
           aria-label="Trang sau"
         >
           <ChevronRight className="size-5" aria-hidden />

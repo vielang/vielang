@@ -27,7 +27,8 @@ export const DOUBLE_TAP_STEP_NARROW = 1.5;
  * Tách thành store riêng thay vì state của trang đọc: lúc chụm hai ngón mức
  * phóng đổi từng khung hình, để trong state của `ReaderView` là cả trang đọc
  * vẽ lại 60 lần/giây. Ở đây chỉ thanh phóng to — thứ duy nhất cần con số —
- * vẽ lại. Không lưu xuống đâu: lật trang là về 100% như cũ.
+ * vẽ lại. Không lưu xuống đâu: tải lại trang là về 100%. (Lật trang thì
+ * giữ nguyên mức phóng — xem `page-viewer`.)
  */
 interface ZoomState {
   scale: number;
@@ -38,6 +39,20 @@ export const useZoomStore = create<ZoomState>()((set) => ({
   scale: 1,
   setScale: (scale) => set({ scale }),
 }));
+
+/**
+ * Trên mức này mới coi là "đang phóng to". Chụm hai ngón hiếm khi nhả ra
+ * đúng 100%, hay dừng ở 101%: coi đó là chưa phóng, để chạm mép vẫn lật
+ * trang được.
+ *
+ * MỘT ngưỡng cho cả app. Trước đây khung ảnh dùng 102% còn nút "về 100%" dùng
+ * 101%, nên ở khoảng giữa nút hiện ra trong khi trang vẫn lật như chưa phóng.
+ */
+const ZOOMED_ABOVE = 1.02;
+
+export function isZoomed(scale: number): boolean {
+  return scale > ZOOMED_ABOVE;
+}
 
 /** Mức kế tiếp khi bấm ＋/－, bám vào lưới 25% (125, 150, …) chứ không cộng dồn lệch. */
 export function nextZoom(scale: number, direction: 1 | -1): number {

@@ -19,7 +19,7 @@ export function ExamCard() {
     ? `/exam/${active.examId}/mock`
     : last
       ? `/exam/${last.examId}/result?attempt=${last.id}`
-      : "/exam";
+      : "/exam/topik-i";
 
   return (
     <Link

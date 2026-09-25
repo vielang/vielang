@@ -73,6 +73,8 @@ const nextConfig: NextConfig = {
   // nhớ mãi đường chuyển cũ.
   redirects: async () => [
     { source: "/cam-nang", destination: "/cam-nang/visa", permanent: false },
+    // Luyện thi: mỗi cấp đề một trang (cấp nằm trên URL để header đổi được).
+    { source: "/exam", destination: "/exam/topik-i", permanent: false },
     // Trang đánh dấu đã chuyển vào Góc học tập. Vĩnh viễn (308): link cũ và lối
     // tắt trên màn hình chính vẫn mở đúng chỗ.
     { source: "/bookmarks", destination: "/my/danh-dau", permanent: true },

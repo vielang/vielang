@@ -18,6 +18,8 @@ export interface LanguageConfig {
   /** Tiêu đề trang thư viện của ngôn ngữ này */
   heading: string;
   description: string;
+  /** Một dòng ngắn trong menu thả xuống của header — các bộ sách đang có. */
+  blurb: string;
 }
 
 export const LANGUAGES = [
@@ -26,6 +28,7 @@ export const LANGUAGES = [
     slug: "",
     label: "Tiếng Hàn",
     heading: "Thư viện",
+    blurb: "Giáo trình KIIP và sách bài tập",
     description:
       "Sách văn hóa – xã hội Hàn Quốc (chương trình KIIP), dành cho người Việt học tiếng Hàn. Mỗi cấp độ gồm giáo trình chính và sách bài tập đi kèm.",
   },
@@ -34,6 +37,7 @@ export const LANGUAGES = [
     slug: "en",
     label: "Tiếng Anh",
     heading: "Thư viện tiếng Anh",
+    blurb: "Giáo trình English File",
     description:
       "Giáo trình học tiếng Anh, tổ chức theo cấp độ tương tự chương trình KIIP tiếng Hàn — giáo trình chính đi kèm sách bài tập ở mỗi cấp.",
   },

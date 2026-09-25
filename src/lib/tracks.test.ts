@@ -37,7 +37,17 @@ describe("activeTab", () => {
   it("không đổi hành vi của các tab khác", () => {
     expect(activeTab("/")?.href).toBe("/");
     expect(activeTab("/en")?.href).toBe("/");
-    expect(activeTab("/exam/102-topik1/practice")?.href).toBe("/exam");
+    expect(activeTab("/exam/102-topik1/practice")?.href).toBe("/exam/topik-i");
     expect(activeTab("/my")?.href).toBe("/my");
+  });
+});
+
+describe("mục con đang mở", () => {
+  it("sách tiếng Anh tô Tiếng Anh, đề thi tô đúng cấp", () => {
+    expect(activeTab("/en")?.activeChild?.("/en")).toBe("/en");
+    expect(activeTab("/exam/102-topik2/practice")?.activeChild?.("/exam/102-topik2/practice")).toBe(
+      "/exam/topik-ii"
+    );
+    expect(activeTab("/cam-nang/visa/e7")?.activeChild?.("/cam-nang/visa/e7")).toBe("/cam-nang/visa");
   });
 });

@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { practiceProgress, totalMinutes, type Exam, type ExamLevel } from "@/lib/exams";
 import { finishedAttempts, useExamStore, type MockAttempt } from "@/lib/exam-store";
 import { LevelBadge, ProgressRing } from "@/components/exam/exam-chrome";
@@ -8,11 +7,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { SegmentedNav } from "@/components/layout/segmented-nav";
 import { RowLink, RowList } from "@/components/layout/row-list";
 import { useIsClient } from "@/lib/use-is-client";
-
-const LEVELS: { id: ExamLevel; hint: string }[] = [
-  { id: "TOPIK I", hint: "Cấp 1–2 · Nghe, Đọc" },
-  { id: "TOPIK II", hint: "Cấp 3–6 · Nghe, Viết, Đọc" },
-];
+import { EXAM_LEVELS, examLevelHref } from "@/lib/exam-levels";
 
 function best(attempts: MockAttempt[]): MockAttempt | null {
   return attempts.reduce<MockAttempt | null>((b, a) => (b === null || (a.score ?? 0) > (b.score ?? 0) ? a : b), null);
@@ -22,12 +17,15 @@ function best(attempts: MockAttempt[]): MockAttempt | null {
  * Trang Luyện thi: đầu trang, tab cấp đề, rồi danh sách đề — mỗi kỳ một dòng
  * gọn: tiến độ luyện từng câu (vòng tròn) và điểm thi thử cao nhất kèm cấp.
  * Cùng khung với Thư viện và Cẩm nang (PageHeader + SegmentedNav + RowList).
+ *
+ * Cấp đề đến từ URL (`/exam/topik-i`, `/exam/topik-ii`) chứ không phải state
+ * của trang: header điện thoại hiện tab cấp đề và đổi được, chia sẻ link hay
+ * bấm quay lại cũng giữ đúng cấp.
  */
-export function ExamList({ exams }: { exams: Exam[] }) {
+export function ExamList({ exams, level }: { exams: Exam[]; level: ExamLevel }) {
   const isClient = useIsClient();
   const attempts = useExamStore((s) => s.attempts);
   const practice = useExamStore((s) => s.practice);
-  const [level, setLevel] = useState<ExamLevel>("TOPIK I");
 
   const shown = exams.filter((e) => e.level === level);
   const sample = shown[0];
@@ -44,11 +42,11 @@ export function ExamList({ exams }: { exams: Exam[] }) {
         />
         <SegmentedNav
           label="Cấp đề thi"
-          items={LEVELS.map((l) => ({
+          items={EXAM_LEVELS.map((l) => ({
             key: l.id,
             label: l.id,
             active: level === l.id,
-            onSelect: () => setLevel(l.id),
+            href: examLevelHref(l.id),
           }))}
         />
       </div>
@@ -56,7 +54,7 @@ export function ExamList({ exams }: { exams: Exam[] }) {
       {/* Gợi ý của cấp (trước đây là dòng thứ hai trong nút tab) chuyển xuống
           đây — tab chỉ còn một dòng như ở Thư viện và Cẩm nang. */}
       <p className="-mt-3 text-sm text-muted-foreground">
-        {LEVELS.find((l) => l.id === level)?.hint} · {shown.length} đề
+        {EXAM_LEVELS.find((l) => l.id === level)?.hint} · {shown.length} đề
         {sample ? ` · mỗi đề ${totalMinutes(sample)} phút` : ""}
         {triedExams > 0 && top
           ? ` · đã thi thử ${triedExams} đề, cao nhất ${top.score} điểm${top.level ? ` (${top.level})` : ""}`

@@ -20,6 +20,7 @@ import { activeAttempt, finishedAttempts, useExamStore } from "@/lib/exam-store"
 import { LevelBadge, ProgressBar } from "@/components/exam/exam-chrome";
 import { useIsClient } from "@/lib/use-is-client";
 import { BackLink } from "@/components/layout/back-link";
+import { examLevelHref } from "@/lib/exam-levels";
 
 function SectionIcon({ section }: { section: ExamSection }) {
   const Icon = section.audio ? Headphones : section.writing ? PenLine : ListChecks;
@@ -41,7 +42,7 @@ export function ExamOverview({ exam, source }: { exam: Exam; source?: string }) 
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-10">
-      <BackLink href="/exam">Luyện thi TOPIK</BackLink>
+      <BackLink href={examLevelHref(exam.level)}>Luyện thi {exam.level}</BackLink>
 
       <section className="-mt-4 flex flex-col gap-5">
         <div>

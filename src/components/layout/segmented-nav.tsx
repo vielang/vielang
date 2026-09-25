@@ -35,7 +35,8 @@ export function SegmentedNav({
     <nav
       aria-label={label}
       className={cn(
-        "-mx-4 px-4",
+        // Điện thoại: mục con đã nằm trên header (SiteHeader), khỏi lặp ở đây.
+        "-mx-4 px-4 max-lg:hidden",
         sticky &&
           "sticky top-[calc(3.5rem+env(safe-area-inset-top))] z-30 bg-background/95 py-2 backdrop-blur supports-[backdrop-filter]:bg-background/80"
       )}

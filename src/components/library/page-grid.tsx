@@ -136,6 +136,11 @@ export function PageGrid({
               <div className="group relative">
                 <Link
                   href={`/read/${bookId}/${page}`}
+                  // Không tải trước: lưới có hàng trăm ô, để mặc định là mỗi ô
+                  // hiện trong màn hình tự xin trước trang đọc của nó — vài
+                  // chục request (mỗi cái máy chủ phải dựng một trang) mỗi lần
+                  // mở sách, trong khi người ta chỉ bấm một ô.
+                  prefetch={false}
                   className="focus-visible:ring-ring block overflow-hidden rounded-lg border border-border bg-muted transition-shadow hover:shadow-md focus-visible:ring-2 focus-visible:outline-none"
                 >
                   <div className="relative aspect-[192/250] w-full">

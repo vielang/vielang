@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useSyncExternalStore, type MouseEvent } from "react";
+import { useEffect, type MouseEvent } from "react";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Check, ChevronRight, Clock, List } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, ChevronRight, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
@@ -17,8 +17,8 @@ import {
 import { getBookProgress, useProgressStore } from "@/lib/progress-store";
 import { useQuizAnswers } from "@/lib/quiz-store";
 import { isGradable } from "@/lib/quiz";
-
-const NO_SUBSCRIBE = () => () => {};
+import { useIsClient } from "@/lib/use-is-client";
+import { ARTICLE_PROSE_BASE, ArticleTocAside, ArticleTocMobile } from "@/components/layout/article-toc";
 
 /**
  * Nút "Chép" trong khối code (markup dựng sẵn lúc build). Bắt click ở khung
@@ -41,8 +41,8 @@ function handleCopyClick(event: MouseEvent<HTMLDivElement>) {
  * (khối code đã được Shiki tô màu, xem globals.css).
  */
 const LESSON_PROSE_CLASS =
-  "prose prose-base dark:prose-invert max-w-none prose-headings:font-heading prose-headings:scroll-mt-20 " +
-  "prose-table:text-sm prose-pre:border prose-pre:border-border prose-pre:leading-relaxed " +
+  ARTICLE_PROSE_BASE +
+  " prose-pre:border prose-pre:border-border prose-pre:leading-relaxed " +
   // Khối trích dẫn trong bài học là hộp "Học xong bạn sẽ / Cần biết trước",
   // không phải lời ai đó nói — bỏ chữ nghiêng, thêm nền cho ra dáng cái hộp.
   "prose-blockquote:not-italic prose-blockquote:font-normal prose-blockquote:rounded-r-lg " +
@@ -79,7 +79,7 @@ export function LessonView({
   prev: LessonOutline | null;
   next: LessonOutline | null;
 }) {
-  const isClient = useSyncExternalStore(NO_SUBSCRIBE, () => true, () => false);
+  const isClient = useIsClient();
   const progressByBook = useProgressStore((s) => s.books);
   const hasHydrated = useProgressStore((s) => s.hasHydrated);
   const markPageRead = useProgressStore((s) => s.markPageRead);
@@ -105,21 +105,6 @@ export function LessonView({
   }, [hasHydrated, progressId, no, setLastPage]);
 
   const toc = lesson.headings.filter((h) => h.level === 2);
-
-  // Đánh số ở ĐÂY chứ không gõ số vào tiêu đề trong file .md: chèn thêm một
-  // mục là phải đánh số lại cả bài, kiểu gì cũng sót.
-  const tocList = (
-    <ol className="flex flex-col gap-1 text-sm">
-      {toc.map((h, i) => (
-        <li key={h.id} className="flex gap-2">
-          <span className="w-5 shrink-0 text-right text-muted-foreground tabular-nums">{i + 1}.</span>
-          <a href={`#${h.id}`} className="text-muted-foreground hover:text-foreground">
-            {h.text}
-          </a>
-        </li>
-      ))}
-    </ol>
-  );
 
   return (
     // Màn hình rộng: bài ở giữa, mục lục cố định ở cột phải. Màn hình hẹp:
@@ -149,16 +134,7 @@ export function LessonView({
           <h1 className="font-heading text-2xl font-semibold tracking-tight">{lesson.title}</h1>
         </header>
 
-        {toc.length > 1 && (
-          <details className="group rounded-xl border border-border bg-muted/40 px-4 py-3 lg:hidden">
-            <summary className="flex cursor-pointer list-none items-center gap-1.5 text-sm text-muted-foreground">
-              <List className="size-4" aria-hidden />
-              Nội dung bài · {toc.length} mục
-              <ChevronRight className="ml-auto size-4 transition-transform group-open:rotate-90" aria-hidden />
-            </summary>
-            <div className="mt-2">{tocList}</div>
-          </details>
-        )}
+        {toc.length > 1 && <ArticleTocMobile headings={toc} />}
 
         {/* Nội dung do mình viết trong content/it, dựng sang HTML lúc build —
             không phải dữ liệu người dùng nhập. */}
@@ -209,17 +185,7 @@ export function LessonView({
         </footer>
       </article>
 
-      {toc.length > 1 && (
-        <aside className="hidden lg:block">
-          <nav aria-label="Nội dung bài" className="sticky top-20 flex flex-col gap-2">
-            <p className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-              <List className="size-3.5" aria-hidden />
-              Nội dung bài
-            </p>
-            {tocList}
-          </nav>
-        </aside>
-      )}
+      {toc.length > 1 && <ArticleTocAside headings={toc} />}
     </div>
   );
 }

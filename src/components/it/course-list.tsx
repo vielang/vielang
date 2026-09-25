@@ -1,14 +1,12 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
 import Link from "next/link";
 import { ArrowRight, BookOpen, Check, ChevronRight, Clock } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { courseProgressId, lessonHref, type CourseCard } from "@/lib/courses";
 import { getBookProgress, useProgressStore, type BookProgress } from "@/lib/progress-store";
-
-const NO_SUBSCRIBE = () => () => {};
+import { useIsClient } from "@/lib/use-is-client";
 
 /**
  * Mô tả khoá trong course.md kết thúc bằng "Cần học trước: …". Ở lộ trình,
@@ -26,7 +24,7 @@ function shortSummary(summary: string): string {
  * giữa các tab và sao lưu cùng dữ liệu học, khỏi dựng kho thứ hai.
  */
 export function CourseList({ courses }: { courses: CourseCard[] }) {
-  const isClient = useSyncExternalStore(NO_SUBSCRIBE, () => true, () => false);
+  const isClient = useIsClient();
   const progressByBook = useProgressStore((s) => s.books);
 
   const progressOf = (id: string): BookProgress | undefined =>

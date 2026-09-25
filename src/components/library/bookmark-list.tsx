@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { getThumbUrl, type Book } from "@/lib/books";
 import { getChapters } from "@/lib/chapters";
 import { useProgressStore } from "@/lib/progress-store";
+import { EmptyState } from "@/components/layout/empty-state";
 
 /**
  * Danh sách trang đã đánh dấu, gom theo sách.
@@ -44,22 +45,23 @@ export function BookmarkList({ books }: { books: readonly Book[] }) {
 
   if (groups.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-border py-20 text-center">
-        <Bookmark className="size-10 text-muted-foreground" aria-hidden />
-        <div>
-          <h2 className="text-lg font-semibold">Chưa đánh dấu trang nào</h2>
-          <p className="mx-auto mt-1 max-w-sm text-sm text-muted-foreground">
+      <EmptyState
+        dashed
+        icon={Bookmark}
+        title="Chưa đánh dấu trang nào"
+        description={
+          <>
             Khi đang đọc, bấm biểu tượng dấu trang trên thanh công cụ (hoặc phím{" "}
-            <kbd className="rounded border border-border bg-muted px-1 font-mono text-xs">
-              B
-            </kbd>
-            ) để ghim lại trang cần xem kỹ. Chúng sẽ nằm ở đây.
-          </p>
-        </div>
-        <Button asChild variant="outline">
-          <Link href="/">Về thư viện</Link>
-        </Button>
-      </div>
+            <kbd className="rounded border border-border bg-muted px-1 font-mono text-xs">B</kbd>)
+            để ghim lại trang cần xem kỹ. Chúng sẽ nằm ở đây.
+          </>
+        }
+        action={
+          <Button asChild variant="outline">
+            <Link href="/">Về thư viện</Link>
+          </Button>
+        }
+      />
     );
   }
 

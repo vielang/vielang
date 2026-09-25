@@ -1,9 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
-import Link from "next/link";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Clock, Headphones, ListChecks, PenLine, Play } from "lucide-react";
+import { Clock, Headphones, ListChecks, PenLine, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -35,8 +34,8 @@ import { useExamAudio } from "@/components/exam/use-exam-audio";
 import { useLeaveGuard } from "@/components/exam/use-leave-guard";
 import { WritingTaskView, hasWritten } from "@/components/exam/writing-parts";
 import { AnswerSheet, MobileAnswerSheet, jumpToQuestion } from "@/components/exam/answer-sheet";
-
-const NO_SUBSCRIBE = () => () => {};
+import { useIsClient } from "@/lib/use-is-client";
+import { BackLink } from "@/components/layout/back-link";
 
 function mmss(ms: number): string {
   const s = Math.max(0, Math.ceil(ms / 1000));
@@ -54,11 +53,7 @@ function mmss(ms: number): string {
  *   lưu, file nghe phát tiếp từ đúng chỗ lẽ ra đang phát.
  */
 export function MockView({ exam }: { exam: Exam }) {
-  const isClient = useSyncExternalStore(
-    NO_SUBSCRIBE,
-    () => true,
-    () => false
-  );
+  const isClient = useIsClient();
   const attempts = useExamStore((s) => s.attempts);
   const attempt = isClient ? activeAttempt(attempts, exam.id) : undefined;
   const startMock = useExamStore((s) => s.startMock);
@@ -73,13 +68,7 @@ export function MockView({ exam }: { exam: Exam }) {
 function MockIntro({ exam, onStart }: { exam: Exam; onStart: () => void }) {
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
-      <Link
-        href={`/exam/${exam.id}`}
-        className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-      >
-        <ArrowLeft className="size-4" aria-hidden />
-        {examTitle(exam)}
-      </Link>
+      <BackLink href={`/exam/${exam.id}`}>{examTitle(exam)}</BackLink>
       <section className="flex flex-col gap-4 rounded-2xl bg-muted/60 p-6">
         <h1 className="text-xl font-semibold tracking-tight">Thi thử {examTitle(exam)}</h1>
         <ul className="flex flex-col gap-2 text-sm">

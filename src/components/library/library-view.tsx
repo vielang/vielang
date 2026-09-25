@@ -8,15 +8,16 @@ import type { GrammarEntry } from "@/lib/page-grammar";
 import { GrammarIndex } from "@/components/grammar/grammar-index";
 import { TrackNav } from "@/components/layout/track-nav";
 import { PageHeader, SectionLabel } from "@/components/layout/page-header";
+import { EmptyState } from "@/components/layout/empty-state";
+
+/** Dòng phụ của trang Thư viện — chung cho mọi mảng (tiếng Hàn, tiếng Anh, IT). */
+export const LIBRARY_SUBTITLE = "Giáo trình tiếng Hàn KIIP, tiếng Anh và lộ trình IT.";
 
 /**
  * Khung trang thư viện dùng chung cho trang gốc (tiếng Hàn) và mọi trang
  * `/[lang]` khác. Không có sách nào khớp `language` -> hiện empty-state
  * "Sắp có nội dung" thay vì lưới trống.
  */
-/** Dòng phụ của trang Thư viện — chung cho mọi mảng (tiếng Hàn, tiếng Anh, IT). */
-export const LIBRARY_SUBTITLE = "Giáo trình tiếng Hàn KIIP, tiếng Anh và lộ trình IT.";
-
 export function LibraryView({
   language,
   books,
@@ -61,17 +62,12 @@ export function LibraryView({
       <ContinueReading books={books} />
 
       {groups.length === 0 ? (
-        <div className="flex flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-border py-24 text-center">
-          <Languages className="size-10 text-muted-foreground" aria-hidden />
-          <div>
-            <h2 className="text-lg font-semibold">Sắp có nội dung</h2>
-            <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-              Chưa có giáo trình {language.label.toLowerCase()} nào được thêm
-              vào. Phần này sẽ hiển thị sách theo từng cấp độ, cùng định dạng
-              với các ngôn ngữ khác.
-            </p>
-          </div>
-        </div>
+        <EmptyState
+          dashed
+          icon={Languages}
+          title="Sắp có nội dung"
+          description={`Chưa có giáo trình ${language.label.toLowerCase()} nào được thêm vào. Phần này sẽ hiển thị sách theo từng cấp độ, cùng định dạng với các ngôn ngữ khác.`}
+        />
       ) : (
         <div className="flex min-w-0 flex-col gap-6">
           {groups.map((group) => (

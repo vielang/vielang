@@ -1,14 +1,13 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { useState } from "react";
 import { practiceProgress, totalMinutes, type Exam, type ExamLevel } from "@/lib/exams";
 import { finishedAttempts, useExamStore, type MockAttempt } from "@/lib/exam-store";
 import { LevelBadge, ProgressRing } from "@/components/exam/exam-chrome";
 import { PageHeader } from "@/components/layout/page-header";
 import { SegmentedNav } from "@/components/layout/segmented-nav";
 import { RowLink, RowList } from "@/components/layout/row-list";
-
-const NO_SUBSCRIBE = () => () => {};
+import { useIsClient } from "@/lib/use-is-client";
 
 const LEVELS: { id: ExamLevel; hint: string }[] = [
   { id: "TOPIK I", hint: "Cấp 1–2 · Nghe, Đọc" },
@@ -25,7 +24,7 @@ function best(attempts: MockAttempt[]): MockAttempt | null {
  * Cùng khung với Thư viện và Cẩm nang (PageHeader + SegmentedNav + RowList).
  */
 export function ExamList({ exams }: { exams: Exam[] }) {
-  const isClient = useSyncExternalStore(NO_SUBSCRIBE, () => true, () => false);
+  const isClient = useIsClient();
   const attempts = useExamStore((s) => s.attempts);
   const practice = useExamStore((s) => s.practice);
   const [level, setLevel] = useState<ExamLevel>("TOPIK I");

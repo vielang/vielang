@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, RotateCcw, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -33,8 +33,8 @@ import { OptionList } from "@/components/exam/option-list";
 import { useExamAudio } from "@/components/exam/use-exam-audio";
 import { BlockPlayer } from "@/components/exam/block-player";
 import { WritingPractice } from "@/components/exam/writing-practice";
+import { useIsClient } from "@/lib/use-is-client";
 
-const NO_SUBSCRIBE = () => () => {};
 const MARKS = "①②③④";
 
 /**
@@ -59,11 +59,7 @@ export function PracticeView({ exam, sectionId, initialNo }: { exam: Exam; secti
 
 /** Luyện trắc nghiệm (nghe, đọc) theo khối. */
 function GroupPractice({ exam, section, initialNo }: { exam: Exam; section: ExamSection; initialNo?: number }) {
-  const isClient = useSyncExternalStore(
-    NO_SUBSCRIBE,
-    () => true,
-    () => false
-  );
+  const isClient = useIsClient();
   const { groups, questions } = section;
   const key = useCallback((no: number) => qKey(section.id, no), [section.id]);
   const groupIndexOf = useCallback(

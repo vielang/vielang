@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { SearchX } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/layout/empty-state";
 
 /**
  * 404 trong khu có header và thanh tab. Chữ nói CHUNG ("trang") chứ không
@@ -9,17 +10,16 @@ import { Button } from "@/components/ui/button";
  */
 export default function MainNotFound() {
   return (
-    <div className="flex flex-col items-center justify-center gap-4 py-24 text-center">
-      <SearchX className="size-10 text-muted-foreground" aria-hidden />
-      <div>
-        <h1 className="text-xl font-semibold">Không tìm thấy trang</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Nội dung bạn tìm không tồn tại hoặc đã được đổi địa chỉ.
-        </p>
-      </div>
-      <Button asChild>
-        <Link href="/">Về thư viện</Link>
-      </Button>
-    </div>
+    <EmptyState
+      as="h1"
+      icon={SearchX}
+      title="Không tìm thấy trang"
+      description="Nội dung bạn tìm không tồn tại hoặc đã được đổi địa chỉ."
+      action={
+        <Button asChild>
+          <Link href="/">Về thư viện</Link>
+        </Button>
+      }
+    />
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { ArrowRight, ChevronDown, Flame, Lightbulb } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -23,8 +23,8 @@ import { summarizeQuiz, WrongList } from "@/components/my/quiz-review";
 import { RedoList, SkillBars, WeakGrammarList } from "@/components/my/ability-panel";
 import { BackupPanel } from "@/components/my/backup-panel";
 import { ExamCard } from "@/components/my/exam-card";
+import { useIsClient } from "@/lib/use-is-client";
 
-const NO_SUBSCRIBE = () => () => {};
 const GOAL_CHOICES = [30, 60, 90, 150, 300];
 
 /**
@@ -42,7 +42,7 @@ const GOAL_CHOICES = [30, 60, 90, 150, 300];
  * luôn thì server ra "0 ngày" rồi nhảy sang số thật (lệch hydration).
  */
 export function MyPageView({ books }: { books: readonly Book[] }) {
-  const isClient = useSyncExternalStore(NO_SUBSCRIBE, () => true, () => false);
+  const isClient = useIsClient();
   const days = useActivityStore((s) => s.days);
   const studied = useActivityStore((s) => s.studied);
   const goal = useActivityStore((s) => s.weeklyGoalMinutes);

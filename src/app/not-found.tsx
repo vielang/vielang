@@ -1,20 +1,22 @@
 import Link from "next/link";
-import { BookOpenText } from "lucide-react";
+import { SearchX } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/layout/empty-state";
 
+/** 404 ngoài khu có header (vd đường dẫn trình đọc sai) — chiếm cả màn hình. */
 export default function NotFound() {
   return (
-    <div className="flex min-h-dvh flex-col items-center justify-center gap-4 p-6 text-center">
-      <BookOpenText className="size-10 text-muted-foreground" aria-hidden />
-      <div>
-        <h1 className="text-xl font-semibold">Không tìm thấy trang</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Trang hoặc sách bạn tìm không tồn tại.
-        </p>
-      </div>
-      <Button asChild>
-        <Link href="/">Về thư viện</Link>
-      </Button>
-    </div>
+    <EmptyState
+      as="h1"
+      icon={SearchX}
+      title="Không tìm thấy trang"
+      description="Trang hoặc sách bạn tìm không tồn tại."
+      className="min-h-dvh p-6"
+      action={
+        <Button asChild>
+          <Link href="/">Về thư viện</Link>
+        </Button>
+      }
+    />
   );
 }

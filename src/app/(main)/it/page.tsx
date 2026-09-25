@@ -4,6 +4,7 @@ import { courseCard, listCourses } from "@/lib/courses";
 import { CourseList } from "@/components/it/course-list";
 import { TrackNav } from "@/components/layout/track-nav";
 import { PageHeader, SectionLabel } from "@/components/layout/page-header";
+import { EmptyState } from "@/components/layout/empty-state";
 import { LIBRARY_SUBTITLE } from "@/components/library/library-view";
 
 export const metadata: Metadata = {
@@ -34,15 +35,12 @@ export default function ItLibraryPage() {
       </div>
 
       {courses.length === 0 ? (
-        <div className="flex flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-border py-24 text-center">
-          <Code2 className="size-10 text-muted-foreground" aria-hidden />
-          <div>
-            <h2 className="text-lg font-semibold">Sắp có nội dung</h2>
-            <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-              Các khoá học sẽ hiện ở đây theo lộ trình, mỗi khoá gồm nhiều chương và bài học ngắn.
-            </p>
-          </div>
-        </div>
+        <EmptyState
+          dashed
+          icon={Code2}
+          title="Sắp có nội dung"
+          description="Các khoá học sẽ hiện ở đây theo lộ trình, mỗi khoá gồm nhiều chương và bài học ngắn."
+        />
       ) : (
         <CourseList courses={courses} />
       )}

@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Check, CheckCircle2, ChevronRight, Grid3x3, XCircle } from "lucide-react";
+import { Check, CheckCircle2, ChevronRight, Grid3x3, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { examTitle, sectionVi, type Exam, type ExamSection } from "@/lib/exams";
+import { BackLink } from "@/components/layout/back-link";
 
 /**
  * Khung dùng chung của các màn luyện thi: đầu trang (về đề + chuyển phần +
@@ -96,13 +97,7 @@ export function PracticeHeader({
   return (
     <header className="flex flex-col gap-3">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <Link
-          href={`/exam/${exam.id}`}
-          className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-        >
-          <ArrowLeft className="size-4" aria-hidden />
-          {examTitle(exam)}
-        </Link>
+        <BackLink href={`/exam/${exam.id}`}>{examTitle(exam)}</BackLink>
         <nav aria-label="Phần thi" className="flex gap-0.5 rounded-lg bg-muted p-0.5 text-sm">
           {exam.sections.map((s) => (
             <Link

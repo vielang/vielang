@@ -1,22 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
-import Link from "next/link";
-import {
-  ArrowLeft,
-  BadgeCheck,
-  Building2,
-  ChevronRight,
-  Globe,
-  GraduationCap,
-  Info,
-  Languages,
-  List,
-  MapPin,
-  RotateCcw,
-  Wallet,
-  type LucideIcon,
-} from "lucide-react";
+import { BadgeCheck, Building2, Globe, GraduationCap, Info, Languages, MapPin, RotateCcw, Wallet, type LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import {
@@ -28,13 +13,13 @@ import {
   type GuideSection,
 } from "@/lib/guide";
 import { useGuideChecklistStore } from "@/lib/guide-checklist-store";
+import { ARTICLE_PROSE_BASE, ArticleTocAside, ArticleTocMobile } from "@/components/layout/article-toc";
+import { BackLink } from "@/components/layout/back-link";
 
 const EMPTY: string[] = [];
 
-/** Cùng bộ class `prose` với bài học IT, thêm phần riêng cho checklist ở globals.css. */
-const PROSE_CLASS =
-  "prose prose-base dark:prose-invert max-w-none prose-headings:font-heading prose-headings:scroll-mt-28 " +
-  "prose-table:text-sm prose-a:break-words";
+/** Cùng bộ class `prose` gốc với bài học IT; checklist có CSS riêng ở globals.css. */
+const PROSE_CLASS = ARTICLE_PROSE_BASE + " prose-a:break-words";
 
 /**
  * Nhắc kiểm tra lại — một dòng chữ nhỏ ngay dưới ngày cập nhật, không phải
@@ -107,20 +92,6 @@ export function GuideArticleView({
   );
   const toc = article.headings.filter((h) => h.level === 2 && h.text !== "Nguồn");
 
-  // Đánh số ở ĐÂY chứ không gõ số vào tiêu đề trong file .md — cùng cách với bài học IT.
-  const tocList = (
-    <ol className="flex flex-col gap-1 text-sm">
-      {toc.map((h, i) => (
-        <li key={h.id} className="flex gap-2">
-          <span className="w-5 shrink-0 text-right text-muted-foreground tabular-nums">{i + 1}.</span>
-          <a href={`#${h.id}`} className="text-muted-foreground hover:text-foreground">
-            {h.text}
-          </a>
-        </li>
-      ))}
-    </ol>
-  );
-
   return (
     // Màn rộng: bài ở giữa, mục lục dính ở cột phải. Màn hẹp: một cột, mục
     // lục gập lại thành một dòng — như trang bài học IT.
@@ -128,13 +99,7 @@ export function GuideArticleView({
       <article className="flex min-w-0 flex-col gap-5">
         {/* Quay về đúng tab của mục đang đọc — "Cẩm nang" trơn sẽ mở tab đầu
             (Visa) dù người ta đang đọc bài về trường. */}
-        <Link
-          href={`/cam-nang/${section.id}`}
-          className="inline-flex w-fit items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-        >
-          <ArrowLeft className="size-4" aria-hidden />
-          Cẩm nang · {section.title}
-        </Link>
+        <BackLink href={`/cam-nang/${section.id}`}>Cẩm nang · {section.title}</BackLink>
 
         <header className="-mt-1 flex flex-col gap-2">
           {article.facts.code && (
@@ -211,28 +176,12 @@ export function GuideArticleView({
           </div>
         )}
 
-        {toc.length > 2 && (
-          <details className="group rounded-lg bg-muted/40 px-3 py-2.5 lg:hidden">
-            <summary className="flex cursor-pointer list-none items-center gap-1.5 text-sm text-muted-foreground">
-              <List className="size-4" aria-hidden />
-              Nội dung bài · {toc.length} mục
-              <ChevronRight className="ml-auto size-4 transition-transform group-open:rotate-90" aria-hidden />
-            </summary>
-            <div className="mt-2">{tocList}</div>
-          </details>
-        )}
+        {toc.length > 2 && <ArticleTocMobile headings={toc} />}
 
         <div ref={body} className={PROSE_CLASS} dangerouslySetInnerHTML={{ __html: article.html }} />
       </article>
 
-      {toc.length > 2 && (
-        <aside className="hidden lg:block">
-          <nav aria-label="Nội dung bài" className="sticky top-24 flex flex-col gap-2">
-            <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">Nội dung bài</p>
-            {tocList}
-          </nav>
-        </aside>
-      )}
+      {toc.length > 2 && <ArticleTocAside headings={toc} />}
     </div>
   );
 }

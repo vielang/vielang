@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { useState } from "react";
 import { ChevronLeft, ChevronRight, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { qKey, writingBlocks, type Exam, type ExamSection } from "@/lib/exams";
@@ -15,8 +15,7 @@ import {
   rangeLabel,
   type GridItem,
 } from "@/components/exam/exam-chrome";
-
-const NO_SUBSCRIBE = () => () => {};
+import { useIsClient } from "@/lib/use-is-client";
 
 /**
  * Luyện phần viết (TOPIK II) THEO KHỐI như Nghe/Đọc: [51–52] (điền ㉠ ㉡, cùng
@@ -33,7 +32,7 @@ export function WritingPractice({
   section: ExamSection;
   initialNo?: number;
 }) {
-  const isClient = useSyncExternalStore(NO_SUBSCRIBE, () => true, () => false);
+  const isClient = useIsClient();
   const tasks = section.writing!.tasks;
   const blocks = writingBlocks(tasks);
   const blockOf = (no: number) => Math.max(0, blocks.findIndex((b) => b.some((t) => t.no === no)));

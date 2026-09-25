@@ -1,19 +1,18 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Check } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { courseProgressId, lessonHref, type CourseOutline } from "@/lib/courses";
 import { getBookProgress, useProgressStore } from "@/lib/progress-store";
-
-const NO_SUBSCRIBE = () => () => {};
+import { useIsClient } from "@/lib/use-is-client";
+import { BackLink } from "@/components/layout/back-link";
 
 /** Mục lục một khoá: các chương, bài đã học có dấu ✓, nút học tiếp. */
 export function CourseOverview({ course }: { course: CourseOutline }) {
-  const isClient = useSyncExternalStore(NO_SUBSCRIBE, () => true, () => false);
+  const isClient = useIsClient();
   const progressByBook = useProgressStore((s) => s.books);
   const read = new Set(
     isClient ? getBookProgress(progressByBook, courseProgressId(course.id)).readPages : []
@@ -23,10 +22,7 @@ export function CourseOverview({ course }: { course: CourseOutline }) {
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-8">
-      <Link href="/it" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
-        <ArrowLeft className="size-4" aria-hidden />
-        Khoá học IT
-      </Link>
+      <BackLink href="/it">Khoá học IT</BackLink>
 
       <section className="-mt-4 flex flex-col gap-4">
         <div>

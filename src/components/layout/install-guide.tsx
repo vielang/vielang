@@ -62,7 +62,7 @@ const ORDER: Platform[] = ["ios", "android", "desktop"];
  *
  * Không bao giờ đổi sau khi tải trang, nên `subscribe` là hàm rỗng.
  */
-const NO_SUBSCRIBE = () => () => {};
+import { NO_SUBSCRIBE } from "@/lib/use-is-client";
 
 function useDetectedPlatform(): Platform | null {
   return useSyncExternalStore(NO_SUBSCRIBE, currentPlatform, () => null);

@@ -1,12 +1,10 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
 import { ListChecks } from "lucide-react";
 import { Toggle } from "@/components/ui/toggle";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { answersHidden, useReaderPrefsStore } from "@/lib/reader-prefs-store";
-
-const NO_SUBSCRIBE = () => () => {};
+import { useIsClient } from "@/lib/use-is-client";
 
 /**
  * Công tắc bật/tắt chấm đáp án cho RIÊNG một cuốn sách.
@@ -23,7 +21,7 @@ const NO_SUBSCRIBE = () => () => {};
  * (bật) — đúng với đa số người dùng.
  */
 export function useAnswersShown(bookId: string): { shown: boolean; toggle: () => void } {
-  const isClient = useSyncExternalStore(NO_SUBSCRIBE, () => true, () => false);
+  const isClient = useIsClient();
   const hidden = useReaderPrefsStore((s) => answersHidden(s, bookId));
   const toggleAnswersHidden = useReaderPrefsStore((s) => s.toggleAnswersHidden);
   return { shown: !isClient || !hidden, toggle: () => toggleAnswersHidden(bookId) };

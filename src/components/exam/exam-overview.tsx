@@ -1,8 +1,7 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
 import Link from "next/link";
-import { ArrowLeft, ChevronRight, Headphones, ListChecks, PenLine, Play, Timer } from "lucide-react";
+import { ChevronRight, Headphones, ListChecks, PenLine, Play, Timer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   examTitle,
@@ -19,8 +18,8 @@ import {
 } from "@/lib/exams";
 import { activeAttempt, finishedAttempts, useExamStore } from "@/lib/exam-store";
 import { LevelBadge, ProgressBar } from "@/components/exam/exam-chrome";
-
-const NO_SUBSCRIBE = () => () => {};
+import { useIsClient } from "@/lib/use-is-client";
+import { BackLink } from "@/components/layout/back-link";
 
 function SectionIcon({ section }: { section: ExamSection }) {
   const Icon = section.audio ? Headphones : section.writing ? PenLine : ListChecks;
@@ -29,7 +28,7 @@ function SectionIcon({ section }: { section: ExamSection }) {
 
 /** Trang một đề: thi thử hoặc luyện tiếp, tiến độ từng phần, các lượt đã thi. */
 export function ExamOverview({ exam, source }: { exam: Exam; source?: string }) {
-  const isClient = useSyncExternalStore(NO_SUBSCRIBE, () => true, () => false);
+  const isClient = useIsClient();
   const attempts = useExamStore((s) => s.attempts);
   const stored = useExamStore((s) => s.practice[exam.id]);
   const practice = isClient ? stored : undefined;
@@ -42,10 +41,7 @@ export function ExamOverview({ exam, source }: { exam: Exam; source?: string }) 
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-10">
-      <Link href="/exam" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
-        <ArrowLeft className="size-4" aria-hidden />
-        Luyện thi TOPIK
-      </Link>
+      <BackLink href="/exam">Luyện thi TOPIK</BackLink>
 
       <section className="-mt-4 flex flex-col gap-5">
         <div>

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Pause, Play } from "lucide-react";
+import { Pause, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
@@ -24,8 +24,8 @@ import { OptionList } from "@/components/exam/option-list";
 import { useExamAudio } from "@/components/exam/use-exam-audio";
 import { LevelBadge, ProgressBar } from "@/components/exam/exam-chrome";
 import { WritingTaskView } from "@/components/exam/writing-parts";
-
-const NO_SUBSCRIBE = () => () => {};
+import { useIsClient } from "@/lib/use-is-client";
+import { BackLink } from "@/components/layout/back-link";
 
 function duration(a: MockAttempt): string {
   if (!a.finishedAt) return "";
@@ -35,7 +35,7 @@ function duration(a: MockAttempt): string {
 
 /** Kết quả một lượt thi thử + xem lại từng câu. */
 export function ResultView({ exam, attemptId }: { exam: Exam; attemptId?: string }) {
-  const isClient = useSyncExternalStore(NO_SUBSCRIBE, () => true, () => false);
+  const isClient = useIsClient();
   const attempts = useExamStore((s) => s.attempts);
   const [filter, setFilter] = useState<ReviewFilter>("wrong");
   if (!isClient) return null;
@@ -62,13 +62,7 @@ export function ResultView({ exam, attemptId }: { exam: Exam; attemptId?: string
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-8 pb-16">
-      <Link
-        href={`/exam/${exam.id}`}
-        className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-      >
-        <ArrowLeft className="size-4" aria-hidden />
-        {examTitle(exam)}
-      </Link>
+      <BackLink href={`/exam/${exam.id}`}>{examTitle(exam)}</BackLink>
 
       <section className="flex flex-col gap-6">
         <div className="flex flex-col gap-2">

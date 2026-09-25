@@ -20,6 +20,7 @@ import {
 } from "@/lib/progress-store";
 import { OfflineDownload } from "@/components/library/offline-download";
 import { AnswersToggle } from "@/components/library/answers-toggle";
+import { BookActionsMenu } from "@/components/library/book-actions-menu";
 
 /**
  * Đầu trang chi tiết sách.
@@ -60,6 +61,7 @@ export function BookDetailHeader({
     const point = findResumePoint(queue, listenPosition);
     if (point) resumeListenPage = queue[point.index].page;
   }
+  const listenLabel = resumeListenPage ? `Nghe tiếp — trang ${resumeListenPage}` : "Nghe tự động";
 
   return (
     <div className="flex flex-col gap-3 border-b border-border pb-5">
@@ -89,10 +91,14 @@ export function BookDetailHeader({
 
       {startedReading && <Progress value={percent} className="h-1 max-w-xs" />}
 
-      <div className="flex flex-wrap items-center gap-2">
-        <Button asChild size="sm">
+      {/* Điện thoại: chỉ giữ ngoài [Đọc tiếp] [🎧] [⋮], phần còn lại vào menu
+          (xem BookActionsMenu). Màn rộng đủ chỗ nên bày hết ra như cũ. */}
+      <div className="flex items-start gap-2 sm:flex-wrap sm:items-center">
+        <Button asChild size="sm" className="h-9 min-w-0 flex-1 sm:h-7 sm:flex-none">
           <Link href={`/read/${book.id}/${target}`}>
-            {startedReading ? `Đọc tiếp — trang ${target}` : "Bắt đầu đọc"}
+            <span className="truncate">
+              {startedReading ? `Đọc tiếp — trang ${target}` : "Bắt đầu đọc"}
+            </span>
           </Link>
         </Button>
 
@@ -100,8 +106,14 @@ export function BookDetailHeader({
           <Tooltip>
             <TooltipTrigger asChild>
               {/* Chỉ icon: việc phụ, mà để cả chữ thì hàng nút tràn sang
-                  dòng thứ hai trên điện thoại. */}
-              <Button asChild variant="ghost" size="icon" aria-label="Đọc lại từ trang 1">
+                  dòng thứ hai. Điện thoại thì nằm trong menu ⋮. */}
+              <Button
+                asChild
+                variant="ghost"
+                size="icon"
+                className="hidden sm:inline-flex"
+                aria-label="Đọc lại từ trang 1"
+              >
                 <Link href={`/read/${book.id}/1`}>
                   <RotateCcw className="size-4" aria-hidden />
                 </Link>
@@ -115,15 +127,33 @@ export function BookDetailHeader({
           // Phát ngay trong click rồi mới lật vào trình đọc — ra khỏi lượt
           // xử lý lần chạm là trình duyệt không cho phát nữa (xem
           // lib/autoplay-player.ts). Lật trang do AutoplayFollower lo.
-          <Button size="sm" variant="outline" onClick={() => continueAutoplay(book.id)}>
+          //
+          // Điện thoại: chỉ icon nhưng vẫn để NGOÀI menu — tính năng này mà
+          // giấu vào ⋮ thì gần như không ai tìm ra.
+          <Button
+            size="sm"
+            variant="outline"
+            className="size-9 shrink-0 p-0 sm:h-7 sm:w-auto sm:px-2.5"
+            onClick={() => continueAutoplay(book.id)}
+            aria-label={listenLabel}
+            title={listenLabel}
+          >
             <Headphones className="size-4" aria-hidden />
-            {resumeListenPage ? `Nghe tiếp — trang ${resumeListenPage}` : "Nghe tự động"}
+            <span className="hidden sm:inline">{listenLabel}</span>
           </Button>
         )}
 
-        <OfflineDownload book={book} />
+        <span className="hidden sm:contents">
+          <OfflineDownload book={book} />
+          {hasAnswers && <AnswersToggle bookId={book.id} />}
+        </span>
 
-        {hasAnswers && <AnswersToggle bookId={book.id} />}
+        <BookActionsMenu
+          book={book}
+          startedReading={startedReading}
+          hasAnswers={hasAnswers}
+          className="shrink-0 sm:hidden"
+        />
       </div>
     </div>
   );

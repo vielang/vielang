@@ -22,11 +22,16 @@ const NO_SUBSCRIBE = () => () => {};
  * React báo lệch hydration. Trước lúc đó công tắc hiện trạng thái mặc định
  * (bật) — đúng với đa số người dùng.
  */
-export function AnswersToggle({ bookId }: { bookId: string }) {
+export function useAnswersShown(bookId: string): { shown: boolean; toggle: () => void } {
   const isClient = useSyncExternalStore(NO_SUBSCRIBE, () => true, () => false);
   const hidden = useReaderPrefsStore((s) => answersHidden(s, bookId));
-  const toggle = useReaderPrefsStore((s) => s.toggleAnswersHidden);
-  const shown = !isClient || !hidden;
+  const toggleAnswersHidden = useReaderPrefsStore((s) => s.toggleAnswersHidden);
+  return { shown: !isClient || !hidden, toggle: () => toggleAnswersHidden(bookId) };
+}
+
+/** Công tắc bày thẳng trên hàng nút (màn rộng); điện thoại dùng mục trong menu ⋮. */
+export function AnswersToggle({ bookId }: { bookId: string }) {
+  const { shown, toggle } = useAnswersShown(bookId);
 
   return (
     <Tooltip>
@@ -35,7 +40,7 @@ export function AnswersToggle({ bookId }: { bookId: string }) {
           variant="outline"
           size="sm"
           pressed={shown}
-          onPressedChange={() => toggle(bookId)}
+          onPressedChange={toggle}
           aria-label="Hiện chấm đáp án trên trang"
         >
           <ListChecks aria-hidden />

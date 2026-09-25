@@ -3,6 +3,8 @@ import { Code2 } from "lucide-react";
 import { courseCard, listCourses } from "@/lib/courses";
 import { CourseList } from "@/components/it/course-list";
 import { TrackNav } from "@/components/layout/track-nav";
+import { PageHeader, SectionLabel } from "@/components/layout/page-header";
+import { LIBRARY_SUBTITLE } from "@/components/library/library-view";
 
 export const metadata: Metadata = {
   title: "Thư viện IT",
@@ -16,11 +18,15 @@ export default function ItLibraryPage() {
   const courses = listCourses().map(courseCard);
 
   return (
-    <div className="flex flex-col gap-8">
-      <TrackNav />
+    <div className="flex flex-col gap-6">
+      {/* Cùng khung đầu trang với các mảng khác của Thư viện — xem LibraryView. */}
+      <div className="flex flex-col gap-3">
+        <PageHeader title="Thư viện" subtitle={LIBRARY_SUBTITLE} />
+        <TrackNav />
+      </div>
 
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Lộ trình .NET developer</h1>
+      <div className="-mt-2">
+        <SectionLabel>Lộ trình .NET developer</SectionLabel>
         <p className="mt-1 text-sm text-muted-foreground">
           Học lần lượt từ trên xuống, khoá trước là nền cho khoá sau. Giải thích bằng tiếng Việt,
           thuật ngữ giữ nguyên tiếng Anh để bạn đọc được tài liệu gốc và đi phỏng vấn.

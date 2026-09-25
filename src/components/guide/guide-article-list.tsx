@@ -1,5 +1,5 @@
-import Link from "next/link";
-import { ChevronRight, ListChecks } from "lucide-react";
+import { ListChecks } from "lucide-react";
+import { RowLink, RowList } from "@/components/layout/row-list";
 import {
   articleHref,
   formatSchoolFact,
@@ -61,13 +61,9 @@ export function GuideArticleList({
   articles: GuideArticle[];
 }) {
   return (
-    <ul className="-mx-4 flex flex-col divide-y divide-border/60 sm:mx-0">
+    <RowList>
       {articles.map((article) => (
-        <li key={article.slug}>
-          <Link
-            href={articleHref(sectionId, article.slug)}
-            className="group flex items-center gap-3 px-4 py-3.5 transition-colors hover:bg-muted/50 active:bg-muted sm:-mx-3 sm:rounded-lg sm:px-3"
-          >
+        <RowLink key={article.slug} href={articleHref(sectionId, article.slug)}>
             {article.facts.code && (
               <span className="flex h-7 min-w-14 shrink-0 items-center justify-center self-start rounded-md bg-primary/10 px-1.5 text-xs font-semibold text-primary">
                 {article.facts.code}
@@ -86,13 +82,8 @@ export function GuideArticleList({
                 {article.checks}
               </span>
             )}
-            <ChevronRight
-              className="size-4 shrink-0 text-muted-foreground/60 transition-transform group-hover:translate-x-0.5"
-              aria-hidden
-            />
-          </Link>
-        </li>
+        </RowLink>
       ))}
-    </ul>
+    </RowList>
   );
 }

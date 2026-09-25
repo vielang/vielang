@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useSyncExternalStore } from "react";
-import Link from "next/link";
-import { ChevronRight } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { practiceProgress, totalMinutes, type Exam, type ExamLevel } from "@/lib/exams";
 import { finishedAttempts, useExamStore, type MockAttempt } from "@/lib/exam-store";
 import { LevelBadge, ProgressRing } from "@/components/exam/exam-chrome";
+import { PageHeader } from "@/components/layout/page-header";
+import { SegmentedNav } from "@/components/layout/segmented-nav";
+import { RowLink, RowList } from "@/components/layout/row-list";
 
 const NO_SUBSCRIBE = () => () => {};
 
@@ -20,8 +20,9 @@ function best(attempts: MockAttempt[]): MockAttempt | null {
 }
 
 /**
- * Danh sách đề theo cấp: mỗi kỳ một dòng gọn — tiến độ luyện từng câu (vòng
- * tròn) và điểm thi thử cao nhất kèm cấp.
+ * Trang Luyện thi: đầu trang, tab cấp đề, rồi danh sách đề — mỗi kỳ một dòng
+ * gọn: tiến độ luyện từng câu (vòng tròn) và điểm thi thử cao nhất kèm cấp.
+ * Cùng khung với Thư viện và Cẩm nang (PageHeader + SegmentedNav + RowList).
  */
 export function ExamList({ exams }: { exams: Exam[] }) {
   const isClient = useSyncExternalStore(NO_SUBSCRIBE, () => true, () => false);
@@ -36,44 +37,40 @@ export function ExamList({ exams }: { exams: Exam[] }) {
   const triedExams = new Set(done.map((a) => a.examId)).size;
 
   return (
-    <div className="flex flex-col gap-4">
-      <div role="tablist" aria-label="Cấp đề thi" className="grid grid-cols-2 gap-1 rounded-lg bg-muted p-1">
-        {LEVELS.map((l) => (
-          <button
-            key={l.id}
-            type="button"
-            role="tab"
-            aria-selected={level === l.id}
-            onClick={() => setLevel(l.id)}
-            className={cn(
-              "flex flex-col items-center rounded-md px-3 py-1.5 text-sm transition-colors",
-              level === l.id ? "bg-background font-medium shadow-sm" : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            {l.id}
-            <span className="text-xs font-normal text-muted-foreground">{l.hint}</span>
-          </button>
-        ))}
+    <>
+      <div className="flex flex-col gap-3">
+        <PageHeader
+          title="Luyện thi"
+          subtitle="Đề TOPIK thật đã công bố — luyện từng câu và chấm ngay, hoặc thi thử có tính giờ."
+        />
+        <SegmentedNav
+          label="Cấp đề thi"
+          items={LEVELS.map((l) => ({
+            key: l.id,
+            label: l.id,
+            active: level === l.id,
+            onSelect: () => setLevel(l.id),
+          }))}
+        />
       </div>
 
-      <p className="text-sm text-muted-foreground">
-        {shown.length} đề{sample ? ` · mỗi đề ${totalMinutes(sample)} phút` : ""}
+      {/* Gợi ý của cấp (trước đây là dòng thứ hai trong nút tab) chuyển xuống
+          đây — tab chỉ còn một dòng như ở Thư viện và Cẩm nang. */}
+      <p className="-mt-3 text-sm text-muted-foreground">
+        {LEVELS.find((l) => l.id === level)?.hint} · {shown.length} đề
+        {sample ? ` · mỗi đề ${totalMinutes(sample)} phút` : ""}
         {triedExams > 0 && top
           ? ` · đã thi thử ${triedExams} đề, cao nhất ${top.score} điểm${top.level ? ` (${top.level})` : ""}`
           : ""}
       </p>
 
-      <ul className="flex flex-col divide-y divide-border border-y border-border">
+      <RowList>
         {shown.map((exam) => {
           const mine = isClient ? finishedAttempts(attempts, exam.id) : [];
           const b = best(mine);
           const progress = practiceProgress(exam, isClient ? practice[exam.id] : undefined);
           return (
-            <li key={exam.id}>
-              <Link
-                href={`/exam/${exam.id}`}
-                className="group -mx-2 flex items-center gap-4 rounded-lg px-2 py-3.5 transition-colors hover:bg-muted/60"
-              >
+            <RowLink key={exam.id} href={`/exam/${exam.id}`}>
                 <span className="min-w-0 flex-1">
                   <span className="block font-medium">Kỳ {exam.round}</span>
                   <span className="block text-sm text-muted-foreground">Năm {exam.year}</span>
@@ -97,15 +94,10 @@ export function ExamList({ exams }: { exams: Exam[] }) {
                     <span className="text-xs text-muted-foreground">Chưa thi thử</span>
                   )}
                 </span>
-                <ChevronRight
-                  className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5"
-                  aria-hidden
-                />
-              </Link>
-            </li>
+            </RowLink>
           );
         })}
-      </ul>
-    </div>
+      </RowList>
+    </>
   );
 }

@@ -1,5 +1,6 @@
 import { groupArticles, type GuideArticle, type GuideSectionId } from "@/lib/guide";
 import { GuideArticleList } from "@/components/guide/guide-article-list";
+import { SectionLabel } from "@/components/layout/page-header";
 
 /**
  * Danh sách bài chia theo nhóm (Visa theo mục đích, Việc làm theo giai
@@ -18,10 +19,9 @@ export function GroupedArticleList({
       {groupArticles(sectionId, articles).map((group) => (
         <section key={group.title ?? "all"} className="flex flex-col gap-1">
           {group.title && (
-            <h2 className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+            <SectionLabel aside={<span className="tabular-nums">{group.articles.length}</span>}>
               {group.title}
-              <span className="ml-1.5 font-normal normal-case tabular-nums">· {group.articles.length}</span>
-            </h2>
+            </SectionLabel>
           )}
           <GuideArticleList sectionId={sectionId} articles={group.articles} />
         </section>

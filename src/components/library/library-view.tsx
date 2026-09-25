@@ -7,12 +7,16 @@ import type { LanguageConfig } from "@/lib/languages";
 import type { GrammarEntry } from "@/lib/page-grammar";
 import { GrammarIndex } from "@/components/grammar/grammar-index";
 import { TrackNav } from "@/components/layout/track-nav";
+import { PageHeader, SectionLabel } from "@/components/layout/page-header";
 
 /**
  * Khung trang thư viện dùng chung cho trang gốc (tiếng Hàn) và mọi trang
  * `/[lang]` khác. Không có sách nào khớp `language` -> hiện empty-state
  * "Sắp có nội dung" thay vì lưới trống.
  */
+/** Dòng phụ của trang Thư viện — chung cho mọi mảng (tiếng Hàn, tiếng Anh, IT). */
+export const LIBRARY_SUBTITLE = "Giáo trình tiếng Hàn KIIP, tiếng Anh và lộ trình IT.";
+
 export function LibraryView({
   language,
   books,
@@ -35,26 +39,21 @@ export function LibraryView({
   const hasGrammar = grammar !== undefined && grammar.length > 0;
 
   return (
-    <div className="flex flex-col gap-8">
-      {/* Chọn mảng kiến thức của THƯ VIỆN nằm ngay trong thư viện (trước đây ở
-          header): nó chỉ áp dụng cho trang này, mà đứng trên header thì
-          trông như điều hướng chính. */}
-      <TrackNav />
+    <div className="flex flex-col gap-6">
+      {/* Cùng một khung đầu trang với Luyện thi, Cẩm nang, Góc học tập: tiêu
+          đề, rồi hàng tab con ngay dưới. Chọn mảng kiến thức nằm ở đây chứ
+          không ở header vì nó chỉ áp dụng cho thư viện. */}
+      <div className="flex flex-col gap-3">
+        <PageHeader title="Thư viện" subtitle={LIBRARY_SUBTITLE} />
+        <TrackNav />
+      </div>
 
-      {/* Ô tra cứu THAY CHỖ tiêu đề: tiêu đề "Thư viện" chỉ nhắc lại thứ
-          người dùng vừa bấm để tới đây, còn ô này làm được việc. Dòng gợi ý
-          bên trong nó giữ lại phần thông tin mà tiêu đề từng mang. */}
+      {/* Tiếng Hàn: ô tra ngữ pháp (dòng gợi ý bên trong nói có bao nhiêu
+          điểm ngữ pháp). Ngôn ngữ khác chưa có ngữ pháp: một dòng giới thiệu. */}
       {hasGrammar ? (
         <GrammarIndex entries={grammar} bookTitles={bookTitles ?? {}} />
       ) : (
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            {language.heading}
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {language.description}
-          </p>
-        </div>
+        <p className="-mt-2 text-sm text-muted-foreground">{language.description}</p>
       )}
 
       {/* Đặt TRƯỚC lưới sách: mở thư viện ra phần lớn là để đọc tiếp cuốn
@@ -77,16 +76,11 @@ export function LibraryView({
         <div className="flex min-w-0 flex-col gap-6">
           {groups.map((group) => (
             <section key={group.level} className="flex min-w-0 flex-col gap-3">
-              <div className="flex items-baseline gap-2 border-b border-border pb-2">
-                <h2 className="text-base font-semibold tracking-tight">
-                  Cấp {group.level}
-                </h2>
-                {group.levelLabelKo && (
-                  <span className="font-korean text-sm text-muted-foreground">
-                    {group.levelLabelKo}
-                  </span>
-                )}
-              </div>
+              <SectionLabel
+                aside={group.levelLabelKo && <span className="font-korean">{group.levelLabelKo}</span>}
+              >
+                Cấp {group.level}
+              </SectionLabel>
               <div className="grid min-w-0 max-w-xl grid-cols-2 gap-4">
                 {group.books.map((book) => (
                   <BookCard key={book.id} book={book} compact />

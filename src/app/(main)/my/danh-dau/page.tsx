@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { BOOKS } from "@/lib/books";
 import { BookmarkList } from "@/components/library/bookmark-list";
+import { PageHeader } from "@/components/layout/page-header";
 
 export const metadata: Metadata = { title: "Trang đã đánh dấu" };
 
@@ -18,7 +19,7 @@ export const metadata: Metadata = { title: "Trang đã đánh dấu" };
  */
 export default function BookmarksPage() {
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
+    <div className="flex max-w-3xl flex-col gap-6">
       <Link
         href="/my"
         className="inline-flex w-fit items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
@@ -27,10 +28,7 @@ export default function BookmarksPage() {
         Góc học tập
       </Link>
       <div className="-mt-2">
-        <h1 className="text-2xl font-semibold tracking-tight">Trang đã đánh dấu</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Những trang bạn ghim lại để xem kỹ, gom theo từng cuốn.
-        </p>
+        <PageHeader title="Trang đã đánh dấu" subtitle="Những trang bạn ghim lại để xem kỹ, gom theo từng cuốn." />
       </div>
       <BookmarkList books={BOOKS} />
     </div>

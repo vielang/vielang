@@ -1,0 +1,5 @@
+# Mọi file chữ dùng LF, cả trong repo lẫn khi lấy về máy — kể cả máy Windows
+# bật core.autocrlf. Trước đây repo lưu LF nhưng máy Windows lấy về thành CRLF,
+# thư mục làm việc lẫn lộn hai kiểu và mỗi lần commit lại cảnh báo
+# "LF will be replaced by CRLF". Git tự nhận file nhị phân (ảnh, font…).
+* text=auto eol=lf

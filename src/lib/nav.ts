@@ -38,7 +38,7 @@ export const NAV_TABS: NavTab[] = [
   { href: "/exam", label: "Luyện thi", icon: GraduationCap, match: (p) => startsWith(p, "/exam") },
   // Không phải việc HỌC như bốn tab kia mà là thông tin để sống và làm việc ở
   // Hàn (visa, trường, việc làm) — xem lib/guide.ts.
-  { href: "/cam-nang", label: "Cẩm nang", icon: Compass, match: (p) => startsWith(p, "/cam-nang") },
+  { href: "/cam-nang/visa", label: "Cẩm nang", icon: Compass, match: (p) => startsWith(p, "/cam-nang") },
   { href: "/my", label: "Góc học tập", icon: ChartNoAxesColumn, match: (p) => startsWith(p, "/my") },
   { href: "/bookmarks", label: "Đánh dấu", icon: Bookmark, match: (p) => startsWith(p, "/bookmarks") },
 ];

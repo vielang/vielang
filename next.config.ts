@@ -68,6 +68,10 @@ function imageRewrites() {
 
 const nextConfig: NextConfig = {
   rewrites: async () => imageRewrites(),
+  // Cẩm nang không có trang tổng: mở thẳng mục đầu tiên. Tạm thời (307) chứ
+  // không vĩnh viễn — sau này có thể thêm trang tổng mà trình duyệt không
+  // nhớ mãi đường chuyển cũ.
+  redirects: async () => [{ source: "/cam-nang", destination: "/cam-nang/visa", permanent: false }],
   images: {
     // Còn lại cho ảnh từ xa nếu về sau cần; ảnh sách nay đi qua `imageRewrites`.
     remotePatterns: imageRemotePatterns(),

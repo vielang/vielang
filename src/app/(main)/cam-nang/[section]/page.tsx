@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
 import { GUIDE_SECTIONS, getSection, sectionArticles } from "@/lib/guide";
 import { GuideArticleList } from "@/components/guide/guide-article-list";
+import { GuideTabs } from "@/components/guide/guide-tabs";
 
 export function generateStaticParams() {
   return GUIDE_SECTIONS.map((s) => ({ section: s.id }));
@@ -23,6 +22,11 @@ export async function generateMetadata({
     : { title: "Không tìm thấy mục" };
 }
 
+/**
+ * Một mục của cẩm nang. `/cam-nang` không có trang riêng mà chuyển thẳng tới
+ * mục đầu tiên (xem `redirects` trong next.config.ts) — như Thư viện mở sẵn
+ * mảng tiếng Hàn.
+ */
 export default async function GuideSectionPage({ params }: { params: Promise<{ section: string }> }) {
   const found = getSection((await params).section);
   if (!found) notFound();
@@ -30,17 +34,17 @@ export default async function GuideSectionPage({ params }: { params: Promise<{ s
 
   return (
     <div className="flex flex-col gap-6">
-      <Link
-        href="/cam-nang"
-        className="inline-flex w-fit items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-      >
-        <ArrowLeft className="size-4" aria-hidden />
-        Cẩm nang
-      </Link>
-      <div className="-mt-2">
-        <h1 className="text-2xl font-semibold tracking-tight">{found.title}</h1>
-        <p className="mt-1 text-sm text-muted-foreground">{found.description}</p>
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight">Cẩm nang sống ở Hàn</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Tổng hợp từ nguồn chính thức, mỗi bài ghi rõ ngày cập nhật và nguồn để bạn đối chiếu.
+        </p>
       </div>
+
+      <GuideTabs active={found.id} />
+
+      <p className="-mt-2 text-sm text-muted-foreground">{found.description}</p>
+
       {articles.length > 0 ? (
         <GuideArticleList sectionId={found.id} articles={articles} />
       ) : (

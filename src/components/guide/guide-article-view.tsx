@@ -81,16 +81,15 @@ export function GuideArticleView({
 
   return (
     <article className="mx-auto flex w-full max-w-2xl flex-col gap-6">
-      <nav aria-label="Đường dẫn" className="flex min-w-0 items-center gap-1 text-sm text-muted-foreground">
-        <Link href="/cam-nang" className="inline-flex shrink-0 items-center gap-1 hover:text-foreground">
-          <ArrowLeft className="size-4" aria-hidden />
-          Cẩm nang
-        </Link>
-        <ChevronRight className="size-3.5 shrink-0" aria-hidden />
-        <Link href={`/cam-nang/${section.id}`} className="truncate hover:text-foreground">
-          {section.title}
-        </Link>
-      </nav>
+      {/* Quay về đúng tab của mục đang đọc — "Cẩm nang" trơn sẽ mở tab đầu
+          (Visa) dù người ta đang đọc bài về trường. */}
+      <Link
+        href={`/cam-nang/${section.id}`}
+        className="inline-flex w-fit items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+      >
+        <ArrowLeft className="size-4" aria-hidden />
+        Cẩm nang · {section.title}
+      </Link>
 
       <header className="-mt-2 flex flex-col gap-2">
         {article.facts.code && (

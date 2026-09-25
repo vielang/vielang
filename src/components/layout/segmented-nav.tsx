@@ -12,10 +12,10 @@ const ACTIVE = "bg-background font-medium shadow-sm";
 const IDLE = "text-muted-foreground hover:text-foreground";
 
 /**
- * Hàng tab con của các trang cấp một: mảng kiến thức ở Thư viện, cấp đề ở
- * Luyện thi, mục ở Cẩm nang. MỘT component cho cả ba — cùng kiểu, cùng chỗ
- * (ngay dưới tiêu đề trang), cùng dính dưới header khi cuộn để danh sách dài
- * vẫn đổi tab được mà không phải cuộn ngược lên.
+ * Hàng chọn tầng dưới cùng của một trang: bộ sách ở Thư viện, kỳ thi ở Luyện
+ * thi (tầng ngôn ngữ / mục đã nằm trên header). Cùng kiểu, cùng chỗ (ngay
+ * dưới tiêu đề trang), dính dưới header khi cuộn để danh sách dài vẫn đổi
+ * được mà không phải cuộn ngược lên.
  *
  * Mục có `href` là link (đổi trang), mục có `onSelect` là nút (đổi trạng thái
  * ngay trong trang, vd TOPIK I / II).
@@ -35,8 +35,7 @@ export function SegmentedNav({
     <nav
       aria-label={label}
       className={cn(
-        // Điện thoại: mục con đã nằm trên header (SiteHeader), khỏi lặp ở đây.
-        "-mx-4 px-4 max-lg:hidden",
+        "-mx-4 px-4",
         sticky &&
           "sticky top-[calc(3.5rem+env(safe-area-inset-top))] z-30 bg-background/95 py-2 backdrop-blur supports-[backdrop-filter]:bg-background/80"
       )}

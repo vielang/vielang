@@ -7,7 +7,8 @@ import { PageHeader } from "@/components/layout/page-header";
 import { SegmentedNav } from "@/components/layout/segmented-nav";
 import { RowLink, RowList } from "@/components/layout/row-list";
 import { useIsClient } from "@/lib/use-is-client";
-import { EXAM_LEVELS, examLevelHref } from "@/lib/exam-levels";
+import { examLevelHref, examLevelInfo, levelsOfLang } from "@/lib/exam-levels";
+import { LANGUAGES } from "@/lib/languages";
 
 function best(attempts: MockAttempt[]): MockAttempt | null {
   return attempts.reduce<MockAttempt | null>((b, a) => (b === null || (a.score ?? 0) > (b.score ?? 0) ? a : b), null);
@@ -27,6 +28,11 @@ export function ExamList({ exams, level }: { exams: Exam[]; level: ExamLevel }) 
   const attempts = useExamStore((s) => s.attempts);
   const practice = useExamStore((s) => s.practice);
 
+  const info = examLevelInfo(level);
+  // Tầng ngôn ngữ đã chọn trên header; hàng chọn trong trang là KỲ THI của
+  // ngôn ngữ đó (TOPIK I, TOPIK II, …) — một kỳ thì khỏi hiện hàng.
+  const siblings = levelsOfLang(info.lang);
+  const langLabel = LANGUAGES.find((l) => l.code === info.lang)?.label ?? "";
   const shown = exams.filter((e) => e.level === level);
   const sample = shown[0];
   const done = isClient ? attempts.filter((a) => a.finishedAt && shown.some((e) => e.id === a.examId)) : [];
@@ -37,24 +43,26 @@ export function ExamList({ exams, level }: { exams: Exam[]; level: ExamLevel }) 
     <>
       <div className="flex flex-col gap-3">
         <PageHeader
-          title="Luyện thi"
+          title={`Luyện thi ${langLabel.replace(/^Tiếng/, "tiếng")}`.trim()}
           subtitle="Đề TOPIK thật đã công bố — luyện từng câu và chấm ngay, hoặc thi thử có tính giờ."
         />
-        <SegmentedNav
-          label="Cấp đề thi"
-          items={EXAM_LEVELS.map((l) => ({
-            key: l.id,
-            label: l.id,
-            active: level === l.id,
-            href: examLevelHref(l.id),
-          }))}
-        />
+        {siblings.length > 1 && (
+          <SegmentedNav
+            label="Kỳ thi"
+            items={siblings.map((l) => ({
+              key: l.id,
+              label: l.id,
+              active: level === l.id,
+              href: examLevelHref(l.id),
+            }))}
+          />
+        )}
       </div>
 
       {/* Gợi ý của cấp (trước đây là dòng thứ hai trong nút tab) chuyển xuống
           đây — tab chỉ còn một dòng như ở Thư viện và Cẩm nang. */}
       <p className="-mt-3 text-sm text-muted-foreground">
-        {EXAM_LEVELS.find((l) => l.id === level)?.hint} · {shown.length} đề
+        {info.hint} · {shown.length} đề
         {sample ? ` · mỗi đề ${totalMinutes(sample)} phút` : ""}
         {triedExams > 0 && top
           ? ` · đã thi thử ${triedExams} đề, cao nhất ${top.score} điểm${top.level ? ` (${top.level})` : ""}`

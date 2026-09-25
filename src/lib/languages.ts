@@ -27,7 +27,7 @@ export const LANGUAGES = [
     code: "ko",
     slug: "",
     label: "Tiếng Hàn",
-    heading: "Thư viện",
+    heading: "Thư viện tiếng Hàn",
     blurb: "Giáo trình KIIP và sách bài tập",
     description:
       "Sách văn hóa – xã hội Hàn Quốc (chương trình KIIP), dành cho người Việt học tiếng Hàn. Mỗi cấp độ gồm giáo trình chính và sách bài tập đi kèm.",

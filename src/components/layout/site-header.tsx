@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { cn } from "@/lib/utils";
-import { NAV_TABS, activeTab, type NavTab } from "@/lib/nav";
+import { NAV_TABS, activeTab, type NavChild, type NavTab } from "@/lib/nav";
 
 /**
  * Header.
@@ -156,35 +156,92 @@ function DesktopNav({ current, pathname }: { current: NavTab | undefined; pathna
                   aria-hidden
                 />
               </NavigationMenu.Trigger>
-              <NavigationMenu.Content className="absolute top-full left-0 z-50 mt-2 w-72 rounded-xl border bg-popover p-1.5 text-popover-foreground shadow-lg">
-                <ul className="flex flex-col">
-                  {tab.children.map((child) => (
-                    <li key={child.href}>
-                      <NavigationMenu.Link asChild active={child.href === active}>
-                        <Link
-                          href={child.href}
-                          aria-current={child.href === active ? "page" : undefined}
-                          className={cn(
-                            "block rounded-lg px-3 py-2 transition-colors outline-none hover:bg-muted focus-visible:bg-muted",
-                            child.href === active && "bg-muted"
-                          )}
-                        >
-                          <span className="block text-sm font-medium">{child.label}</span>
-                          {child.description && (
-                            <span className="mt-0.5 block text-xs text-muted-foreground">
-                              {child.description}
-                            </span>
-                          )}
-                        </Link>
-                      </NavigationMenu.Link>
-                    </li>
-                  ))}
-                </ul>
+              <NavigationMenu.Content className="absolute top-full left-0 z-50 mt-2 w-max max-w-[calc(100vw-2rem)] rounded-xl border bg-popover p-1.5 text-popover-foreground shadow-lg">
+                {tab.children.some((c) => c.items?.length) ? (
+                  <MenuColumns items={tab.children} active={active} />
+                ) : (
+                  <ul className="flex w-72 flex-col">
+                    {tab.children.map((child) => (
+                      <li key={child.href}>
+                        <NavigationMenu.Link asChild active={child.href === active}>
+                          <Link
+                            href={child.href}
+                            aria-current={child.href === active ? "page" : undefined}
+                            className={cn(
+                              "block rounded-lg px-3 py-2 transition-colors outline-none hover:bg-muted focus-visible:bg-muted",
+                              child.href === active && "bg-muted"
+                            )}
+                          >
+                            <span className="block text-sm font-medium">{child.label}</span>
+                            {child.description && (
+                              <span className="mt-0.5 block text-xs text-muted-foreground">
+                                {child.description}
+                              </span>
+                            )}
+                          </Link>
+                        </NavigationMenu.Link>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </NavigationMenu.Content>
             </NavigationMenu.Item>
           );
         })}
       </NavigationMenu.List>
     </NavigationMenu.Root>
+  );
+}
+
+/**
+ * Menu nhiều cột: mỗi mục con (ngôn ngữ) một cột, liệt kê luôn tầng dưới (bộ
+ * sách, kỳ thi) — nhảy thẳng tới bằng một cú bấm. Tên cột cũng là link, tới
+ * trang chung của ngôn ngữ đó.
+ */
+function MenuColumns({ items, active }: { items: NavChild[]; active: string | undefined }) {
+  return (
+    <div className="flex gap-1">
+      {items.map((col) => (
+        <div key={col.href} className="flex w-52 flex-col">
+          <NavigationMenu.Link asChild active={col.href === active}>
+            <Link
+              href={col.href}
+              aria-current={col.href === active ? "page" : undefined}
+              className={cn(
+                "rounded-lg px-3 py-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase transition-colors outline-none hover:bg-muted hover:text-foreground focus-visible:bg-muted",
+                col.href === active && "text-foreground"
+              )}
+            >
+              {col.label}
+            </Link>
+          </NavigationMenu.Link>
+          {col.items?.length ? (
+            <ul className="flex flex-col">
+              {col.items.map((item) => (
+                <li key={item.href + item.label}>
+                  <NavigationMenu.Link asChild>
+                    <Link
+                      href={item.href}
+                      className="block rounded-lg px-3 py-2 transition-colors outline-none hover:bg-muted focus-visible:bg-muted"
+                    >
+                      <span className="block text-sm font-medium">{item.label}</span>
+                      {item.description && (
+                        <span className="mt-0.5 block text-xs text-muted-foreground">
+                          {item.description}
+                        </span>
+                      )}
+                    </Link>
+                  </NavigationMenu.Link>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            col.description && (
+              <p className="px-3 pb-2 text-xs text-muted-foreground">{col.description}</p>
+            )
+          )}
+        </div>
+      ))}
+    </div>
   );
 }

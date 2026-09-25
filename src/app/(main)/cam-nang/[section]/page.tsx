@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { GUIDE_SECTIONS, getSection, sectionArticles } from "@/lib/guide";
 import { GroupedArticleList } from "@/components/guide/grouped-article-list";
 import { PageHeader } from "@/components/layout/page-header";
-import { GuideTabs } from "@/components/guide/guide-tabs";
 import { SchoolExplorer } from "@/components/guide/school-explorer";
 import { VisaRoadmap } from "@/components/guide/visa-roadmap";
 
@@ -42,18 +41,10 @@ export default async function GuideSectionPage({ params }: { params: Promise<{ s
   const articles = sectionArticles(found.id);
 
   return (
-    // Cùng khung với Thư viện và Luyện thi: tiêu đề, tab con ngay dưới, một
-    // dòng giới thiệu; danh sách giới hạn bề ngang như Luyện thi.
+    // Cùng khung với Thư viện và Luyện thi; chọn mục (Visa, Trường, Việc làm)
+    // nằm trên header. Danh sách giới hạn bề ngang như Luyện thi.
     <div className="flex max-w-3xl flex-col gap-6">
-      <div className="flex flex-col gap-3">
-        <PageHeader
-          title="Cẩm nang"
-          subtitle="Visa, trường đại học và việc làm cho người Việt ở Hàn — tổng hợp từ nguồn chính thức."
-        />
-        <GuideTabs active={found.id} />
-      </div>
-
-      <p className="-mt-3 text-sm text-muted-foreground">{found.description}</p>
+      <PageHeader title={`Cẩm nang ${found.title}`} subtitle={found.description} />
 
       {articles.length === 0 ? (
         <p className="py-16 text-center text-sm text-muted-foreground">Mục này đang được biên soạn.</p>

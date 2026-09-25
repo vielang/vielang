@@ -6,25 +6,30 @@ import { groupBooksByLevel } from "@/lib/library";
 import type { LanguageConfig } from "@/lib/languages";
 import type { GrammarEntry } from "@/lib/page-grammar";
 import { GrammarIndex } from "@/components/grammar/grammar-index";
-import { TrackNav } from "@/components/layout/track-nav";
+import { SegmentedNav } from "@/components/layout/segmented-nav";
+import { seriesHref, seriesOfLang, type BookSeries } from "@/lib/series";
 import { PageHeader, SectionLabel } from "@/components/layout/page-header";
 import { EmptyState } from "@/components/layout/empty-state";
-
-/** Dòng phụ của trang Thư viện — chung cho mọi mảng (tiếng Hàn, tiếng Anh, IT). */
-export const LIBRARY_SUBTITLE = "Giáo trình tiếng Hàn KIIP, tiếng Anh và lộ trình IT.";
 
 /**
  * Khung trang thư viện dùng chung cho trang gốc (tiếng Hàn) và mọi trang
  * `/[lang]` khác. Không có sách nào khớp `language` -> hiện empty-state
  * "Sắp có nội dung" thay vì lưới trống.
+ *
+ * Ngôn ngữ đã chọn trên header (điện thoại) / menu (máy tính), nên đầu trang
+ * không lặp lại hàng chọn ngôn ngữ mà là tầng dưới: hàng chọn BỘ SÁCH — chỉ
+ * hiện khi ngôn ngữ có từ hai bộ. `series` có giá trị = trang một bộ
+ * (`/sach/<id>`), bỏ trống = trang ngôn ngữ, gồm mọi bộ.
  */
 export function LibraryView({
   language,
+  series,
   books,
   grammar,
   bookTitles,
 }: {
   language: LanguageConfig;
+  series?: BookSeries;
   books: readonly Book[];
   /**
    * Điểm ngữ pháp để tra cứu. Bỏ trống thì giữ tiêu đề như cũ.
@@ -38,15 +43,29 @@ export function LibraryView({
 }) {
   const groups = groupBooksByLevel(books);
   const hasGrammar = grammar !== undefined && grammar.length > 0;
+  const allSeries = seriesOfLang(language.code);
+  const languageHref = language.slug ? `/${language.slug}` : "/";
 
   return (
     <div className="flex flex-col gap-6">
       {/* Cùng một khung đầu trang với Luyện thi, Cẩm nang, Góc học tập: tiêu
-          đề, rồi hàng tab con ngay dưới. Chọn mảng kiến thức nằm ở đây chứ
-          không ở header vì nó chỉ áp dụng cho thư viện. */}
+          đề, rồi hàng chọn tầng dưới (nếu có). */}
       <div className="flex flex-col gap-3">
-        <PageHeader title="Thư viện" subtitle={LIBRARY_SUBTITLE} />
-        <TrackNav />
+        <PageHeader title={language.heading} subtitle={series?.blurb ?? language.blurb} />
+        {allSeries.length > 1 && (
+          <SegmentedNav
+            label="Bộ sách"
+            items={[
+              { key: "all", label: "Tất cả", href: languageHref, active: !series },
+              ...allSeries.map((s) => ({
+                key: s.id,
+                label: s.label,
+                href: seriesHref(s, languageHref),
+                active: s.id === series?.id,
+              })),
+            ]}
+          />
+        )}
       </div>
 
       {/* Tiếng Hàn: ô tra ngữ pháp (dòng gợi ý bên trong nói có bao nhiêu

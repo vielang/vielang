@@ -1,4 +1,5 @@
 import type { ExamLevel } from "@/lib/exam-types";
+import { LANGUAGES, type LanguageConfig } from "@/lib/languages";
 
 /**
  * Cấp đề thi và đường dẫn của từng cấp (`/exam/topik-i`, `/exam/topik-ii`).
@@ -11,14 +12,38 @@ import type { ExamLevel } from "@/lib/exam-types";
 export interface ExamLevelInfo {
   id: ExamLevel;
   slug: string;
+  /** Ngôn ngữ của kỳ thi — tầng giữa: Luyện thi → ngôn ngữ → kỳ thi. */
+  lang: string;
   /** Kỹ năng và dải cấp — dòng giới thiệu dưới tab. */
   hint: string;
 }
 
 export const EXAM_LEVELS: readonly ExamLevelInfo[] = [
-  { id: "TOPIK I", slug: "topik-i", hint: "Cấp 1–2 · Nghe, Đọc" },
-  { id: "TOPIK II", slug: "topik-ii", hint: "Cấp 3–6 · Nghe, Viết, Đọc" },
+  { id: "TOPIK I", slug: "topik-i", lang: "ko", hint: "Cấp 1–2 · Nghe, Đọc" },
+  { id: "TOPIK II", slug: "topik-ii", lang: "ko", hint: "Cấp 3–6 · Nghe, Viết, Đọc" },
 ];
+
+/**
+ * Ngôn ngữ có kỳ thi — chỉ những ngôn ngữ này mới hiện trong Luyện thi (chưa
+ * có đề thì hiện ra chỉ để thấy trang trống).
+ */
+export function examLanguages(): LanguageConfig[] {
+  return LANGUAGES.filter((lang) => EXAM_LEVELS.some((l) => l.lang === lang.code));
+}
+
+export function levelsOfLang(lang: string): ExamLevelInfo[] {
+  return EXAM_LEVELS.filter((l) => l.lang === lang);
+}
+
+/** Trang của một ngôn ngữ trong Luyện thi = kỳ thi đầu tiên của nó. */
+export function examLangHref(lang: string): string {
+  const first = levelsOfLang(lang)[0];
+  return first ? examLevelHref(first.id) : examLevelHref(EXAM_LEVELS[0].id);
+}
+
+export function examLevelInfo(level: ExamLevel): ExamLevelInfo {
+  return EXAM_LEVELS.find((l) => l.id === level) ?? EXAM_LEVELS[0];
+}
 
 export function examLevelHref(level: ExamLevel): string {
   const info = EXAM_LEVELS.find((l) => l.id === level) ?? EXAM_LEVELS[0];

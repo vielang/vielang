@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { TRACKS, activeTrack, trackHref } from "@/lib/tracks";
 import { activeTab } from "@/lib/nav";
+import { BOOKS } from "@/lib/books";
+import { getSeries } from "@/lib/series";
 
 describe("tracks", () => {
   it("có tab IT bên cạnh các ngôn ngữ", () => {
@@ -43,11 +45,29 @@ describe("activeTab", () => {
 });
 
 describe("mục con đang mở", () => {
-  it("sách tiếng Anh tô Tiếng Anh, đề thi tô đúng cấp", () => {
+  it("sách tiếng Anh tô Tiếng Anh, đề thi tô ngôn ngữ của kỳ thi", () => {
     expect(activeTab("/en")?.activeChild?.("/en")).toBe("/en");
-    expect(activeTab("/exam/102-topik2/practice")?.activeChild?.("/exam/102-topik2/practice")).toBe(
-      "/exam/topik-ii"
-    );
+    expect(activeTab("/exam/102-topik2/practice")?.activeChild?.("/exam/102-topik2/practice")).toBe("/exam/topik-i");
     expect(activeTab("/cam-nang/visa/e7")?.activeChild?.("/cam-nang/visa/e7")).toBe("/cam-nang/visa");
+  });
+});
+
+describe("bộ sách", () => {
+  it("trang một bộ sách thuộc Thư viện, tô đúng ngôn ngữ", () => {
+    expect(activeTab("/sach/english-file")?.href).toBe("/");
+    expect(activeTrack("/sach/english-file")?.slug).toBe("en");
+    expect(activeTrack("/sach/kiip")?.slug).toBe("");
+  });
+
+  it("ngôn ngữ chỉ có một bộ thì link bộ sách trỏ về trang ngôn ngữ", () => {
+    const library = activeTab("/")!;
+    const korean = library.children!.find((c) => c.label === "Tiếng Hàn")!;
+    expect(korean.items?.map((i) => i.href)).toEqual(["/"]);
+  });
+
+  it("sách nào cũng thuộc một bộ có thật, cùng ngôn ngữ", () => {
+    for (const book of BOOKS) {
+      expect(getSeries(book.series)?.lang).toBe(book.lang);
+    }
   });
 });

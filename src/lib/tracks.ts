@@ -1,5 +1,6 @@
 import { LANGUAGES } from "@/lib/languages";
 import { getBook } from "@/lib/books";
+import { seriesOfPath } from "@/lib/series";
 
 /**
  * Các MẢNG KIẾN THỨC của thư viện — nguồn duy nhất cho tab con của Thư viện
@@ -51,8 +52,8 @@ export function trackHref(slug: string): string {
  */
 export function activeTrack(pathname: string): Track | undefined {
   const book = /^\/books\/([^/]+)/.exec(pathname);
-  if (book) {
-    const lang = getBook(book[1])?.lang;
+  if (book || pathname.startsWith("/sach/")) {
+    const lang = book ? getBook(book[1])?.lang : seriesOfPath(pathname)?.lang;
     const byLang = lang ? TRACKS.find((t) => t.lang === lang) : undefined;
     if (byLang) return byLang;
   }

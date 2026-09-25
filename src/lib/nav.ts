@@ -1,6 +1,14 @@
 import { ChartNoAxesColumn, Compass, GraduationCap, Library, type LucideIcon } from "lucide-react";
 import { TRACKS, activeTrack, trackHref } from "@/lib/tracks";
-import { EXAM_LEVELS, examLevelHref, examLevelOfPath } from "@/lib/exam-levels";
+import {
+  examLangHref,
+  examLanguages,
+  examLevelHref,
+  examLevelInfo,
+  examLevelOfPath,
+  levelsOfLang,
+} from "@/lib/exam-levels";
+import { seriesHref, seriesOfLang } from "@/lib/series";
 import { GUIDE_SECTIONS } from "@/lib/guide-sections";
 
 /**
@@ -21,6 +29,12 @@ export interface NavChild {
   label: string;
   /** Một dòng ngắn dưới nhãn trong menu thả xuống. */
   description?: string;
+  /**
+   * Tầng dưới nữa (bộ sách của một ngôn ngữ, kỳ thi của một ngôn ngữ): menu
+   * máy tính xếp thành cột để nhảy thẳng tới. Trên điện thoại tầng này nằm
+   * trong trang (hàng chọn ngay dưới tiêu đề), header chỉ hiện tầng trên.
+   */
+  items?: NavChild[];
 }
 
 export interface NavTab {
@@ -44,26 +58,40 @@ export const NAV_TABS: NavTab[] = [
     match: (p) =>
       p === "/" ||
       startsWith(p, "/books") ||
+      startsWith(p, "/sach") ||
       TRACKS.some(
         (t) =>
           (t.slug && startsWith(p, `/${t.slug}`)) ||
           (t.paths?.some((base) => startsWith(p, base)) ?? false)
       ),
-    children: TRACKS.map((t) => ({ href: trackHref(t.slug), label: t.label, description: t.blurb })),
+    children: TRACKS.map((t) => {
+      const href = trackHref(t.slug);
+      const series = t.lang ? seriesOfLang(t.lang) : [];
+      return {
+        href,
+        label: t.label,
+        description: t.blurb,
+        items: series.map((s) => ({ href: seriesHref(s, href), label: s.label, description: s.blurb })),
+      };
+    }),
     activeChild: (p) => {
       const track = activeTrack(p);
       return track ? trackHref(track.slug) : undefined;
     },
   },
   {
-    href: examLevelHref("TOPIK I"),
+    href: examLangHref(examLanguages()[0]?.code ?? "ko"),
     label: "Luyện thi",
     icon: GraduationCap,
     match: (p) => startsWith(p, "/exam"),
-    children: EXAM_LEVELS.map((l) => ({ href: examLevelHref(l.id), label: l.id, description: l.hint })),
+    children: examLanguages().map((lang) => ({
+      href: examLangHref(lang.code),
+      label: lang.label,
+      items: levelsOfLang(lang.code).map((l) => ({ href: examLevelHref(l.id), label: l.id, description: l.hint })),
+    })),
     activeChild: (p) => {
       const level = examLevelOfPath(p);
-      return level ? examLevelHref(level) : undefined;
+      return level ? examLangHref(examLevelInfo(level).lang) : undefined;
     },
   },
   // Không phải việc HỌC như các tab kia mà là thông tin để sống và làm việc ở

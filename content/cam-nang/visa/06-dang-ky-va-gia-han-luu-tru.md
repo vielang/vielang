@@ -1,5 +1,6 @@
 ---
 title: Đăng ký người nước ngoài, gia hạn lưu trú và báo đổi địa chỉ
+group: Thủ tục chung
 summary: Các hạn phải nhớ sau khi sang Hàn: làm thẻ 외국인등록증 trong 90 ngày, gia hạn trước khi hết hạn, báo chuyển nhà trong 15 ngày, và mức phạt nếu trễ.
 updated: 2026-09-25
 code: Thủ tục

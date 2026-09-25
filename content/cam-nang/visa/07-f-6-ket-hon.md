@@ -1,5 +1,6 @@
 ---
 title: Visa F-6: kết hôn với người Hàn Quốc
+group: Gia đình và định cư
 summary: Điều kiện, hồ sơ xin visa F-6-1 từ Việt Nam năm 2026, và đường đi tiếp lên vĩnh trú F-5-2 hoặc nhập tịch.
 updated: 2026-09-25
 code: F-6

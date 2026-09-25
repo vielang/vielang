@@ -51,7 +51,17 @@ Thêm cho bài **visa**:
 
 ```
 code: D-2
+group: Du học            (Du học | Làm việc | Gia đình và định cư | Thủ tục chung)
 ```
+
+Thêm cho bài **việc làm**:
+
+```
+group: Đang làm việc     (Trước khi sang Hàn | Đang làm việc | Khi về nước)
+```
+
+Danh sách nhóm nằm ở `src/lib/guide-groups.ts`; gõ sai tên nhóm thì bước
+build báo lỗi. Trong một nhóm, bài xếp theo số đầu tên file.
 
 Thêm cho bài **trường**:
 

@@ -1,5 +1,6 @@
 ---
 title: Trước khi về nước: nhận đủ các khoản tiền
+group: Khi về nước
 summary: Danh sách các khoản tiền lao động E-9 được nhận khi về nước (퇴직금, 출국만기보험, 귀국비용보험, 국민연금 반환일시금), thủ tục trước khi bay và cách nhận khi đã về Việt Nam.
 updated: 2026-09-25
 ---

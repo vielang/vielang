@@ -1,5 +1,6 @@
 ---
 title: Phiếu lương, thuế thu nhập và quyết toán thuế cuối năm
+group: Đang làm việc
 summary: Đọc từng dòng trên phiếu lương, biết mình bị trừ bao nhiêu cho bảo hiểm và thuế, và làm quyết toán thuế (연말정산) để không mất tiền hoàn thuế.
 updated: 2026-09-25
 ---

@@ -1,5 +1,6 @@
 ---
 title: Visa D-2: du học đại học và sau đại học
+group: Du học
 summary: Hồ sơ xin visa D-2 từ Việt Nam và cách đổi từ D-4 sang D-2 ngay tại Hàn sau khi học xong trường tiếng.
 updated: 2026-09-25
 code: D-2

@@ -1,5 +1,6 @@
 ---
 title: Visa D-4-1: học tiếng Hàn tại 어학당
+group: Du học
 summary: Điều kiện, hồ sơ và cách nộp visa học tiếng D-4-1 từ Việt Nam theo hướng dẫn mới nhất của cơ quan ngoại giao Hàn Quốc.
 updated: 2026-09-25
 code: D-4

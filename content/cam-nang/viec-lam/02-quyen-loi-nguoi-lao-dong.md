@@ -1,5 +1,6 @@
 ---
 title: Quyền lợi cơ bản của lao động nước ngoài
+group: Đang làm việc
 summary: Lương tối thiểu, giờ làm, bảo hiểm, trợ cấp thôi việc và cách đòi lương bị nợ khi làm việc ở Hàn Quốc.
 updated: 2026-09-25
 ---

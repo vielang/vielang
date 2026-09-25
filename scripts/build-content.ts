@@ -28,6 +28,7 @@ import { readdir, readFile, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { Marked } from "marked";
 import { BOOKS } from "../src/lib/books";
+import { GUIDE_GROUPS } from "../src/lib/guide-groups";
 import type { QuizItem, QuizSection } from "../src/lib/quiz";
 import type { TranslationRegion } from "../src/lib/page-translation";
 import type { GrammarPoint } from "../src/lib/page-grammar";
@@ -875,6 +876,11 @@ async function buildGuide(): Promise<number> {
       if (!meta.title) throw new Error(`${at}: thiếu "title"`);
       if (!meta.updated) throw new Error(`${at}: thiếu "updated" — bài cẩm nang phải ghi ngày cập nhật`);
       if (!/^## Nguồn\s*$/m.test(body)) throw new Error(`${at}: thiếu mục "## Nguồn"`);
+      const groups = GUIDE_GROUPS[section];
+      if (groups && !groups.includes(meta.group ?? "")) {
+        // Gõ sai tên nhóm thì bài rơi vào nhóm "Khác" mà không ai hay — chặn ở đây.
+        throw new Error(`${at}: "group" phải là một trong: ${groups.join(", ")}`);
+      }
       const { title, summary, updated, ...facts } = meta;
       const checklist = interactiveChecklist(marked.parse(body) as string);
       const { html, headings } = withHeadingIds(

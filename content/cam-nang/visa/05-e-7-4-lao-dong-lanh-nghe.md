@@ -1,5 +1,6 @@
 ---
 title: Visa E-7-4: từ E-9 lên lao động lành nghề
+group: Làm việc
 summary: Điều kiện, cách tính điểm K-point E74 và cách nộp để chuyển từ E-9 sang E-7-4, kèm số điểm KIIP và TOPIK mang lại.
 updated: 2026-09-25
 code: E-7-4

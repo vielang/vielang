@@ -1,5 +1,6 @@
 ---
 title: Visa F-5: vĩnh trú
+group: Gia đình và định cư
 summary: Các diện vĩnh trú người Việt hay xin, điều kiện thu nhập, lý lịch, và vì sao phải hoàn thành KIIP giai đoạn 5 hoặc thi 영주용 종합평가.
 updated: 2026-09-25
 code: F-5

@@ -1,5 +1,6 @@
 ---
 title: Tìm việc an toàn ở Hàn Quốc
+group: Trước khi sang Hàn
 summary: Biết visa của mình được làm việc gì, tìm việc qua kênh chính thức và tránh bẫy môi giới, làm việc trái phép.
 updated: 2026-09-25
 ---

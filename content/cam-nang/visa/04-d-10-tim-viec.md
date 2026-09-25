@@ -1,5 +1,6 @@
 ---
 title: Visa D-10-1: ở lại Hàn tìm việc sau khi tốt nghiệp
+group: Du học
 summary: Ai được đổi từ D-2 sang D-10-1, được ở bao lâu, được làm gì trong thời gian tìm việc, và KIIP giúp gì.
 updated: 2026-09-25
 code: D-10

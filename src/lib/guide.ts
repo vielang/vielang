@@ -13,6 +13,7 @@
  */
 import data from "../../content/cam-nang/guide.json";
 import type { LessonHeading } from "@/lib/courses";
+import { GUIDE_GROUPS } from "@/lib/guide-groups";
 
 export interface GuideArticle {
   /** Phần đuôi URL: `/cam-nang/<mục>/<slug>` */
@@ -102,6 +103,91 @@ export function formatSchoolFact(key: string, value: string): string {
     return value === "0" ? "Không yêu cầu" : `Cấp ${value}`;
   }
   return value;
+}
+
+/**
+ * Chia bài của một mục theo nhóm (GUIDE_GROUPS), giữ thứ tự nhóm đã định.
+ * Mục không chia nhóm thì trả về một nhóm không tên chứa tất cả.
+ */
+export function groupArticles(
+  sectionId: GuideSectionId,
+  articles: GuideArticle[]
+): { title: string | null; articles: GuideArticle[] }[] {
+  const groups = GUIDE_GROUPS[sectionId];
+  if (!groups) return [{ title: null, articles }];
+  return groups
+    .map((title) => ({ title, articles: articles.filter((a) => a.facts.group === title) }))
+    .filter((g) => g.articles.length > 0);
+}
+
+/**
+ * Lộ trình visa thường gặp, vẽ ở đầu tab Visa. Mỗi bước trỏ tới bài nói về
+ * visa đó (có thể ở mục khác, vd E-9 nằm ở Việc làm).
+ *
+ * CHỈ ghi những lối chuyển mà chính các bài đã nêu kèm nguồn — sơ đồ là lời
+ * khẳng định "đi được đường này", vẽ thêm một mũi tên không có trong bài là
+ * dắt người đọc đi sai.
+ */
+export interface VisaStep {
+  code: string;
+  sectionId: GuideSectionId;
+  slug: string;
+}
+
+export const VISA_PATHS: readonly { title: string; steps: readonly VisaStep[] }[] = [
+  {
+    title: "Du học",
+    steps: [
+      { code: "D-4", sectionId: "visa", slug: "d-4-hoc-tieng" },
+      { code: "D-2", sectionId: "visa", slug: "d-2-du-hoc" },
+      { code: "D-10", sectionId: "visa", slug: "d-10-tim-viec" },
+      { code: "F-2-7", sectionId: "visa", slug: "f-2-7-cu-tru-theo-diem" },
+      { code: "F-5", sectionId: "visa", slug: "f-5-vinh-tru" },
+    ],
+  },
+  {
+    title: "Lao động",
+    steps: [
+      { code: "E-9", sectionId: "viec-lam", slug: "lao-dong-eps-e-9" },
+      { code: "E-7-4", sectionId: "visa", slug: "e-7-4-lao-dong-lanh-nghe" },
+    ],
+  },
+  {
+    title: "Kết hôn",
+    steps: [
+      { code: "F-6", sectionId: "visa", slug: "f-6-ket-hon" },
+      { code: "F-5", sectionId: "visa", slug: "f-5-vinh-tru" },
+    ],
+  },
+];
+
+/** Vùng của trường, suy từ `city` — dùng cho bộ lọc. */
+export type SchoolRegion = "Seoul" | "Gyeonggi – Incheon" | "Tỉnh khác";
+
+export function schoolRegion(city: string | undefined): SchoolRegion {
+  if (!city) return "Tỉnh khác";
+  if (/^Seoul\b/.test(city)) return "Seoul";
+  if (/Gyeonggi|Incheon/.test(city)) return "Gyeonggi – Incheon";
+  return "Tỉnh khác";
+}
+
+/**
+ * Mức TOPIK tối thiểu CHUNG của trường, dạng số để lọc: "Cấp 3 (…)" -> 3,
+ * "0" / "Không bắt buộc…" -> 0. Không ghi thì null — chưa rõ, không loại
+ * trường đó ra khỏi kết quả lọc nhưng cũng không khẳng định là đạt.
+ */
+export function schoolTopik(topik: string | undefined): number | null {
+  if (topik === undefined) return null;
+  if (/^\d$/.test(topik)) return Number(topik);
+  if (/^Không/i.test(topik)) return 0;
+  const m = /^Cấp (\d)/.exec(topik);
+  return m ? Number(m[1]) : null;
+}
+
+/** Học phí thấp nhất (triệu won/học kỳ) từ "3,3–5,1 triệu won/học kỳ", để sắp xếp. */
+export function schoolTuitionFrom(tuition: string | undefined): number | null {
+  const m = tuition ? /^(\d+(?:,\d+)?)/.exec(tuition) : null;
+  return m ? Number(m[1].replace(",", ".")) : null;
 }
 
 /** "2026-09-25" -> "25/09/2026" */

@@ -1,5 +1,6 @@
 ---
 title: Bị tai nạn lao động, bệnh nghề nghiệp
+group: Đang làm việc
 summary: Bảo hiểm tai nạn lao động (산재보험) bảo vệ cả lao động nước ngoài; biết mình được nhận gì, tự nộp đơn ra sao khi chủ không hợp tác.
 updated: 2026-09-25
 ---

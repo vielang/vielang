@@ -1,5 +1,6 @@
 ---
 title: Visa F-2-7: cư trú theo thang điểm
+group: Gia đình và định cư
 summary: Ai được xin F-2-7, cách tự tính điểm, và KIIP giúp bạn được bao nhiêu điểm.
 updated: 2026-09-25
 code: F-2-7

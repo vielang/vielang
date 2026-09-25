@@ -1,5 +1,6 @@
 ---
 title: Làm thêm hợp pháp cho du học sinh (D-2, D-4)
+group: Đang làm việc
 summary: Điều kiện, số giờ được làm mỗi tuần theo bậc học, ngành nghề bị cấm và cách xin giấy phép làm thêm (시간제취업 허가) trước khi đi làm.
 updated: 2026-09-25
 ---

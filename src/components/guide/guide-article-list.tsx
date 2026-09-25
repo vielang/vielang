@@ -28,9 +28,11 @@ function Meta({ sectionId, article }: { sectionId: GuideSectionId; article: Guid
   if (sectionId !== "truong") {
     return <span className="line-clamp-2 text-sm text-muted-foreground">{article.summary}</span>;
   }
-  const { city, topik, tuition, certified } = article.facts;
+  const { city, kind, topik, tuition, certified } = article.facts;
   const parts = [
     city ? brief(city) : null,
+    // Trường tư là số đông, chỉ nói khi KHÁC tư thục (quốc lập: học phí thấp hẳn).
+    kind && kind !== "Tư thục" ? kind : null,
     topik !== undefined ? `TOPIK ${brief(formatSchoolFact("topik", topik)).toLowerCase()}` : null,
     tuition ? brief(tuition) : null,
   ].filter(Boolean);

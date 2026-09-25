@@ -1,5 +1,6 @@
 ---
 title: Đi làm theo chương trình EPS (visa E-9)
+group: Trước khi sang Hàn
 summary: Quy trình đi Hàn làm việc theo 고용허가제 từ Việt Nam, thời hạn làm việc và điều kiện đổi nơi làm.
 updated: 2026-09-25
 ---

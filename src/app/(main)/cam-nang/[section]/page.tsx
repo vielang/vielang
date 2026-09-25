@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { GUIDE_SECTIONS, getSection, sectionArticles } from "@/lib/guide";
-import { GuideArticleList } from "@/components/guide/guide-article-list";
+import { GroupedArticleList } from "@/components/guide/grouped-article-list";
 import { GuideTabs } from "@/components/guide/guide-tabs";
+import { SchoolExplorer } from "@/components/guide/school-explorer";
+import { VisaRoadmap } from "@/components/guide/visa-roadmap";
 
 export function generateStaticParams() {
   return GUIDE_SECTIONS.map((s) => ({ section: s.id }));
@@ -29,6 +31,9 @@ export async function generateMetadata({
  *
  * Phần đầu cố ý gọn (tiêu đề nhỏ, một dòng mô tả): trên điện thoại, mỗi dòng
  * chữ ở đây đẩy danh sách — thứ người ta vào để xem — xuống thêm một đoạn.
+ *
+ * Mỗi mục trình bày theo cách người ta tìm trong mục đó: Visa có sơ đồ lộ
+ * trình và nhóm theo mục đích, Trường có bộ lọc, Việc làm nhóm theo giai đoạn.
  */
 export default async function GuideSectionPage({ params }: { params: Promise<{ section: string }> }) {
   const found = getSection((await params).section);
@@ -41,14 +46,19 @@ export default async function GuideSectionPage({ params }: { params: Promise<{ s
 
       <GuideTabs active={found.id} />
 
-      <p className="text-sm text-muted-foreground">
-        {found.description} <span className="whitespace-nowrap">{articles.length} bài.</span>
-      </p>
+      <p className="text-sm text-muted-foreground">{found.description}</p>
 
-      {articles.length > 0 ? (
-        <GuideArticleList sectionId={found.id} articles={articles} />
-      ) : (
+      {articles.length === 0 ? (
         <p className="py-16 text-center text-sm text-muted-foreground">Mục này đang được biên soạn.</p>
+      ) : found.id === "truong" ? (
+        <SchoolExplorer articles={articles} />
+      ) : (
+        <>
+          {found.id === "visa" && <VisaRoadmap />}
+          <div className="mt-2">
+            <GroupedArticleList sectionId={found.id} articles={articles} />
+          </div>
+        </>
       )}
     </div>
   );

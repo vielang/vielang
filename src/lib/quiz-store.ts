@@ -88,6 +88,8 @@ export const useQuizStore = create<QuizState>()(
     {
       name: "kiip-quiz-v1",
       storage: createJSONStorage(() => localStorage),
+      // Chỉ lưu dữ liệu — không ghi cờ hasHydrated vào localStorage (và vào file sao lưu).
+      partialize: (s) => ({ pages: s.pages }),
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
       },

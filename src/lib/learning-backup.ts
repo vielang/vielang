@@ -18,6 +18,11 @@ export const BACKUP_KEYS = [
   "kiip-exam-v1",
   "kiip-notes-v1",
   "kiip-reader-prefs-v1",
+  // Checklist hồ sơ của Cẩm nang và chỗ nghe tự động dở — thêm sau, từng bị
+  // sót khỏi danh sách này. `learning-backup.test.ts` giờ tự dò mọi store lưu
+  // localStorage, thiếu khoá nào là báo.
+  "kiip-guide-v1",
+  "kiip-autoplay-v1",
 ] as const;
 
 const APP_ID = "vietopik-learning-backup";

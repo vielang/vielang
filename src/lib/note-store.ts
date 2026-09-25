@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
+import { syncAcrossTabs } from "@/lib/cross-tab-sync";
 
 /** Bản note do người dùng tự sửa, đè lên bản gốc trong content/notes. */
 export interface LocalNote {
@@ -63,12 +64,19 @@ export const useNoteStore = create<NoteState>()(
     {
       name: "kiip-notes-v1",
       storage: createJSONStorage(() => localStorage),
+      // Chỉ lưu dữ liệu — không ghi cờ hasHydrated vào localStorage (và vào file sao lưu).
+      partialize: (s) => ({ notes: s.notes }),
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
       },
     }
   )
 );
+
+// Nhiều tab cùng mở thì tab ghi sau không được xoá mất bài giảng tab kia vừa
+// sửa — xem `cross-tab-sync`. Trước đây chỉ trình đọc và cửa sổ bài giảng
+// riêng tự nghe thay đổi (useNoteStoreSync), hai tab thường thì ghi đè nhau.
+syncAcrossTabs(useNoteStore);
 
 /** Tiptap trả về `<p></p>` cho document rỗng — coi như "không có nội dung". */
 export function isBlankHtml(html: string | null | undefined): boolean {

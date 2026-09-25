@@ -87,6 +87,8 @@ export const useProgressStore = create<ProgressState>()(
     {
       name: "kiip-progress-v1",
       storage: createJSONStorage(() => localStorage),
+      // Chỉ lưu dữ liệu — không ghi cờ hasHydrated vào localStorage (và vào file sao lưu).
+      partialize: (s) => ({ books: s.books }),
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
       },

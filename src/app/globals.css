@@ -118,6 +118,31 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+/*
+ * Khoảng đệm dưới đáy cho thanh tab điện thoại: CHỈ khi app chạy từ màn hình
+ * chính (PWA), để biểu tượng không đè lên vạch Home.
+ *
+ * Mở trong Safari thì bằng 0. Safari tự giữ trang nằm trên thanh công cụ của
+ * nó, còn `env(safe-area-inset-bottom)` lại đổi theo thanh đó đang mở hay đã
+ * thu gọn (từ iOS 15) — trang ngắn không cuộn được thì thanh công cụ không
+ * bao giờ thu gọn, và thanh tab của app bị cao vọt lên riêng ở những trang
+ * đó (Đánh dấu, Góc học tập khi chưa có dữ liệu).
+ *
+ * Hai cách nhận ra PWA: media query cho trình duyệt theo chuẩn, và thuộc tính
+ * `data-standalone` do script trong <head> gắn cho Safari iOS (xem layout.tsx).
+ */
+:root {
+  --standalone-safe-bottom: 0px;
+}
+@media (display-mode: standalone) {
+  :root {
+    --standalone-safe-bottom: env(safe-area-inset-bottom);
+  }
+}
+:root[data-standalone] {
+  --standalone-safe-bottom: env(safe-area-inset-bottom);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

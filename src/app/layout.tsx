@@ -57,6 +57,17 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
       className={`${inter.variable} ${notoSansKr.variable} h-full antialiased`}
     >
+      <head>
+        {/* Đánh dấu app đang chạy từ màn hình chính (PWA) TRƯỚC khi vẽ trang
+            — xem `--standalone-safe-bottom` trong globals.css. Safari iOS
+            không theo media query `display-mode`, chỉ có cờ riêng
+            `navigator.standalone`, mà cờ đó CSS không đọc được. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `if(navigator.standalone)document.documentElement.setAttribute("data-standalone","")`,
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col">
         <ThemeProvider
           attribute="class"

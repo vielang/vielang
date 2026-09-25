@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useLayoutEffect } from "react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { NAV_TABS, activeTab, hidesTabBar } from "@/lib/nav";
@@ -15,17 +16,30 @@ import { NAV_TABS, activeTab, hidesTabBar } from "@/lib/nav";
  */
 export function TabBar() {
   const pathname = usePathname();
+
+  // Gắn lại cờ PWA mà script trong <head> đã gắn (xem layout.tsx): ở chế độ
+  // dev, Strict Mode dựng lại <html> và xoá mất thuộc tính không có trong
+  // JSX. Bản build thật thì script là đủ, dòng này không đổi gì.
+  useLayoutEffect(() => {
+    if ((navigator as Navigator & { standalone?: boolean }).standalone) {
+      document.documentElement.setAttribute("data-standalone", "");
+    }
+  }, []);
+
   if (hidesTabBar(pathname)) return null;
   const current = activeTab(pathname);
 
   return (
     <>
-      <div aria-hidden className="h-[max(4rem,calc(3.5rem+env(safe-area-inset-bottom)))] lg:hidden" />
+      {/* Đệm đáy theo `--standalone-safe-bottom` chứ không lấy thẳng
+          env(safe-area-inset-bottom): trong Safari con số đó đổi theo thanh
+          công cụ của trình duyệt — xem globals.css. */}
+      <div aria-hidden className="h-[max(4rem,calc(3.5rem+var(--standalone-safe-bottom)))] lg:hidden" />
       <nav
         aria-label="Điều hướng chính"
         className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 backdrop-blur lg:hidden"
       >
-        <ul className="mx-auto flex max-w-md items-stretch pb-[env(safe-area-inset-bottom)]">
+        <ul className="mx-auto flex max-w-md items-stretch pb-(--standalone-safe-bottom)">
           {NAV_TABS.map((tab) => {
             const isActive = tab === current;
             return (

@@ -6,7 +6,7 @@ nameKo: 한양대학교
 city: Seoul
 kind: Tư thục
 certified: Có
-topik: Cấp 4 để vào học chuyên ngành, chưa có vẫn nộp được (chương trình tiếng Anh: không yêu cầu)
+topik: Cấp 4 để vào chuyên ngành (chưa có vẫn nộp được, học đủ cấp 4 ở trường; chương trình tiếng Anh: không yêu cầu)
 tuition: 5,3–7,8 triệu won/học kỳ (kỳ 2 năm 2026)
 languageSchool: Có
 website: https://oia.hanyang.ac.kr

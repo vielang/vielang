@@ -2,7 +2,21 @@
 
 import { useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
-import { ArrowLeft, ChevronRight, Info, List, RotateCcw } from "lucide-react";
+import {
+  ArrowLeft,
+  BadgeCheck,
+  Building2,
+  ChevronRight,
+  Globe,
+  GraduationCap,
+  Info,
+  Languages,
+  List,
+  MapPin,
+  RotateCcw,
+  Wallet,
+  type LucideIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import {
@@ -19,17 +33,27 @@ const EMPTY: string[] = [];
 
 /** Cùng bộ class `prose` với bài học IT, thêm phần riêng cho checklist ở globals.css. */
 const PROSE_CLASS =
-  "prose prose-base dark:prose-invert max-w-none prose-headings:font-heading prose-headings:scroll-mt-20 " +
+  "prose prose-base dark:prose-invert max-w-none prose-headings:font-heading prose-headings:scroll-mt-28 " +
   "prose-table:text-sm prose-a:break-words";
 
 /**
- * Nhắc kiểm tra lại, đặt ngay đầu bài chứ không để cuối: người ta đọc tới
- * mục hồ sơ là đi làm luôn, ít ai kéo xuống tận chân trang.
+ * Nhắc kiểm tra lại — một dòng chữ nhỏ ngay dưới ngày cập nhật, không phải
+ * một cái khung màu: đặt ở đầu bài vì người ta đọc tới hồ sơ là đi làm luôn,
+ * nhưng không được to tới mức chiếm cả màn hình đầu.
  */
 const DISCLAIMER: Record<GuideSection["id"], string> = {
-  visa: "Quy định visa và lệ phí thay đổi thường xuyên. Kiểm tra lại tại HiKorea (1345) hoặc Đại sứ quán trước khi nộp hồ sơ.",
-  truong: "Học phí và điều kiện tuyển sinh đổi theo từng kỳ. Kiểm tra lại trên trang tuyển sinh của trường trước khi nộp.",
-  "viec-lam": "Mức lương và quy định lao động đổi theo năm. Khi có tranh chấp, hỏi đường dây nóng 1350 hoặc trung tâm hỗ trợ lao động nước ngoài.",
+  visa: "Quy định và lệ phí có thể đổi. Đối chiếu HiKorea (1345) hoặc Đại sứ quán trước khi nộp.",
+  truong: "Học phí, điều kiện đổi theo từng kỳ. Xem lại trang tuyển sinh của trường trước khi nộp.",
+  "viec-lam": "Quy định lao động đổi theo năm. Có tranh chấp, hỏi đường dây nóng 1350.",
+};
+
+const FACT_ICONS: Record<string, LucideIcon> = {
+  city: MapPin,
+  kind: Building2,
+  topik: GraduationCap,
+  tuition: Wallet,
+  certified: BadgeCheck,
+  languageSchool: Languages,
 };
 
 export function GuideArticleView({
@@ -76,117 +100,139 @@ export function GuideArticleView({
   }, [onChange]);
 
   const done = hasHydrated ? checked.length : 0;
-  const facts = Object.entries(SCHOOL_FACT_LABELS).filter(([key]) => article.facts[key]);
+  // Tên Hàn thường đã nằm trong tiêu đề ("Đại học Korea (고려대학교)") — khỏi
+  // lặp lại trong lưới thông số.
+  const facts = Object.entries(SCHOOL_FACT_LABELS).filter(
+    ([key]) => article.facts[key] && !(key === "nameKo" && article.title.includes(article.facts.nameKo))
+  );
   const toc = article.headings.filter((h) => h.level === 2 && h.text !== "Nguồn");
 
+  // Đánh số ở ĐÂY chứ không gõ số vào tiêu đề trong file .md — cùng cách với bài học IT.
+  const tocList = (
+    <ol className="flex flex-col gap-1 text-sm">
+      {toc.map((h, i) => (
+        <li key={h.id} className="flex gap-2">
+          <span className="w-5 shrink-0 text-right text-muted-foreground tabular-nums">{i + 1}.</span>
+          <a href={`#${h.id}`} className="text-muted-foreground hover:text-foreground">
+            {h.text}
+          </a>
+        </li>
+      ))}
+    </ol>
+  );
+
   return (
-    <article className="mx-auto flex w-full max-w-2xl flex-col gap-6">
-      {/* Quay về đúng tab của mục đang đọc — "Cẩm nang" trơn sẽ mở tab đầu
-          (Visa) dù người ta đang đọc bài về trường. */}
-      <Link
-        href={`/cam-nang/${section.id}`}
-        className="inline-flex w-fit items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-      >
-        <ArrowLeft className="size-4" aria-hidden />
-        Cẩm nang · {section.title}
-      </Link>
+    // Màn rộng: bài ở giữa, mục lục dính ở cột phải. Màn hẹp: một cột, mục
+    // lục gập lại thành một dòng — như trang bài học IT.
+    <div className="mx-auto w-full max-w-2xl lg:grid lg:max-w-none lg:grid-cols-[minmax(0,42rem)_12rem] lg:justify-center lg:gap-10">
+      <article className="flex min-w-0 flex-col gap-5">
+        {/* Quay về đúng tab của mục đang đọc — "Cẩm nang" trơn sẽ mở tab đầu
+            (Visa) dù người ta đang đọc bài về trường. */}
+        <Link
+          href={`/cam-nang/${section.id}`}
+          className="inline-flex w-fit items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="size-4" aria-hidden />
+          Cẩm nang · {section.title}
+        </Link>
 
-      <header className="-mt-2 flex flex-col gap-2">
-        {article.facts.code && (
-          <span className="w-fit rounded-md bg-primary/10 px-2 py-0.5 font-mono text-sm font-semibold text-primary">
-            {article.facts.code}
-          </span>
-        )}
-        <h1 className="font-heading text-2xl font-semibold tracking-tight">{article.title}</h1>
-        {/* Tiêu đề thường đã kèm tên Hàn trong ngoặc — đừng nhắc lại ngay dưới. */}
-        {article.facts.nameKo && !article.title.includes(article.facts.nameKo) && (
-          <p className="font-korean -mt-1 text-sm text-muted-foreground">{article.facts.nameKo}</p>
-        )}
-        {article.summary && <p className="text-muted-foreground">{article.summary}</p>}
-        <p className="text-xs text-muted-foreground tabular-nums">
-          Cập nhật {formatUpdated(article.updated)}
-        </p>
-      </header>
-
-      <p className="flex gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm">
-        <Info className="mt-0.5 size-4 shrink-0 text-amber-600 dark:text-amber-400" aria-hidden />
-        <span>{DISCLAIMER[section.id]}</span>
-      </p>
-
-      {facts.length > 0 && (
-        <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 rounded-xl border border-border px-4 py-3 text-sm">
-          {facts.map(([key, label]) => (
-            <div key={key} className="contents">
-              <dt className="text-muted-foreground">{label}</dt>
-              <dd className={key === "nameKo" ? "font-korean" : undefined}>
-                {formatSchoolFact(key, article.facts[key])}
-              </dd>
-            </div>
-          ))}
-          {article.facts.website && (
-            <div className="contents">
-              <dt className="text-muted-foreground">Website</dt>
-              <dd className="min-w-0 truncate">
-                <a
-                  href={article.facts.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary underline-offset-4 hover:underline"
-                >
-                  {article.facts.website.replace(/^https?:\/\//, "").replace(/\/$/, "")}
-                </a>
-              </dd>
-            </div>
+        <header className="-mt-1 flex flex-col gap-2">
+          {article.facts.code && (
+            <span className="w-fit rounded-md bg-primary/10 px-2 py-0.5 text-sm font-semibold text-primary">
+              {article.facts.code}
+            </span>
           )}
-        </dl>
-      )}
+          <h1 className="font-heading text-2xl font-semibold leading-tight tracking-tight">{article.title}</h1>
+          {article.summary && <p className="text-muted-foreground">{article.summary}</p>}
+          <p className="flex items-start gap-1.5 text-xs text-muted-foreground">
+            <Info className="mt-px size-3.5 shrink-0" aria-hidden />
+            <span>
+              <span className="tabular-nums">Cập nhật {formatUpdated(article.updated)}.</span>{" "}
+              {DISCLAIMER[section.id]}
+            </span>
+          </p>
+        </header>
 
-      {article.checks > 0 && (
-        <div className="flex items-center gap-3 rounded-xl border border-border bg-muted/40 px-4 py-3 text-sm">
-          <span className="shrink-0 tabular-nums">
-            Hồ sơ: <strong>{done}</strong>/{article.checks} đã chuẩn bị
-          </span>
-          <Progress value={(done / article.checks) * 100} className="h-1 flex-1" />
-          {done > 0 && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="size-7 shrink-0"
-              onClick={() => reset(id)}
-              aria-label="Bỏ tick toàn bộ checklist"
-              title="Bỏ tick toàn bộ"
-            >
-              <RotateCcw className="size-3.5" aria-hidden />
-            </Button>
-          )}
-        </div>
-      )}
+        {facts.length > 0 && (
+          <dl className="grid grid-cols-2 gap-x-4 gap-y-3 border-y border-border/60 py-4 text-sm">
+            {facts.map(([key, label]) => {
+              const Icon = FACT_ICONS[key];
+              return (
+                <div key={key} className="flex min-w-0 flex-col gap-0.5">
+                  <dt className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    {Icon && <Icon className="size-3.5 shrink-0" aria-hidden />}
+                    {label}
+                  </dt>
+                  <dd className={key === "nameKo" ? "font-korean" : "font-medium"}>
+                    {formatSchoolFact(key, article.facts[key])}
+                  </dd>
+                </div>
+              );
+            })}
+            {article.facts.website && (
+              <div className="col-span-2 flex min-w-0 flex-col gap-0.5">
+                <dt className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <Globe className="size-3.5 shrink-0" aria-hidden />
+                  Website
+                </dt>
+                <dd className="min-w-0 truncate">
+                  <a
+                    href={article.facts.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium text-primary underline-offset-4 hover:underline"
+                  >
+                    {article.facts.website.replace(/^https?:\/\//, "").replace(/\/$/, "")}
+                  </a>
+                </dd>
+              </div>
+            )}
+          </dl>
+        )}
+
+        {article.checks > 0 && (
+          <div className="flex items-center gap-3 rounded-lg bg-muted/60 px-3 py-2.5 text-sm">
+            <span className="shrink-0 tabular-nums">
+              Hồ sơ: <strong>{done}</strong>/{article.checks} đã chuẩn bị
+            </span>
+            <Progress value={(done / article.checks) * 100} className="h-1 flex-1" />
+            {done > 0 && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-7 shrink-0"
+                onClick={() => reset(id)}
+                aria-label="Bỏ tick toàn bộ checklist"
+                title="Bỏ tick toàn bộ"
+              >
+                <RotateCcw className="size-3.5" aria-hidden />
+              </Button>
+            )}
+          </div>
+        )}
+
+        {toc.length > 2 && (
+          <details className="group rounded-lg bg-muted/40 px-3 py-2.5 lg:hidden">
+            <summary className="flex cursor-pointer list-none items-center gap-1.5 text-sm text-muted-foreground">
+              <List className="size-4" aria-hidden />
+              Nội dung bài · {toc.length} mục
+              <ChevronRight className="ml-auto size-4 transition-transform group-open:rotate-90" aria-hidden />
+            </summary>
+            <div className="mt-2">{tocList}</div>
+          </details>
+        )}
+
+        <div ref={body} className={PROSE_CLASS} dangerouslySetInnerHTML={{ __html: article.html }} />
+      </article>
 
       {toc.length > 2 && (
-        <details className="group rounded-xl border border-border bg-muted/40 px-4 py-3">
-          <summary className="flex cursor-pointer list-none items-center gap-1.5 text-sm text-muted-foreground">
-            <List className="size-4" aria-hidden />
-            Nội dung bài · {toc.length} mục
-            <ChevronRight className="ml-auto size-4 transition-transform group-open:rotate-90" aria-hidden />
-          </summary>
-          <ol className="mt-2 flex flex-col gap-1 text-sm">
-            {toc.map((h, i) => (
-              <li key={h.id} className="flex gap-2">
-                <span className="w-5 shrink-0 text-right text-muted-foreground tabular-nums">{i + 1}.</span>
-                <a href={`#${h.id}`} className="text-muted-foreground hover:text-foreground">
-                  {h.text}
-                </a>
-              </li>
-            ))}
-          </ol>
-        </details>
+        <aside className="hidden lg:block">
+          <nav aria-label="Nội dung bài" className="sticky top-24 flex flex-col gap-2">
+            <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">Nội dung bài</p>
+            {tocList}
+          </nav>
+        </aside>
       )}
-
-      <div
-        ref={body}
-        className={PROSE_CLASS}
-        dangerouslySetInnerHTML={{ __html: article.html }}
-      />
-    </article>
+    </div>
   );
 }

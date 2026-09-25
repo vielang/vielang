@@ -39,8 +39,8 @@ beforeEach(() => {
 describe("bài cẩm nang", () => {
   it("ghi ngày cập nhật và nhắc kiểm tra lại ngay đầu bài", () => {
     render(<GuideArticleView section={visa} article={article()} />);
-    expect(screen.getByText("Cập nhật 25/09/2026")).toBeTruthy();
-    expect(screen.getByText(/Kiểm tra lại tại HiKorea/)).toBeTruthy();
+    expect(screen.getByText("Cập nhật 25/09/2026.")).toBeTruthy();
+    expect(screen.getByText(/Đối chiếu HiKorea \(1345\)/)).toBeTruthy();
   });
 
   it("tick giấy tờ thì nhớ lại và đếm tiến độ", () => {

@@ -840,6 +840,28 @@ function externalLinks(html: string): string {
   return html.replace(/<a href="(https?:\/\/[^"]+)"/g, '<a href="$1" target="_blank" rel="noopener noreferrer"');
 }
 
+/**
+ * Bảng (bảng điểm F-2-7, bảng lương…) rộng hơn màn điện thoại: bọc trong một
+ * khung cuộn ngang riêng, để chỉ bảng cuộn chứ không kéo cả trang tràn ngang.
+ */
+function scrollableTables(html: string): string {
+  return html.replace(/<table>([\s\S]*?)<\/table>/g, '<div class="table-scroll"><table>$1</table></div>');
+}
+
+/**
+ * Mục Nguồn: ghi tên miền cạnh mỗi link (`hikorea.go.kr`, `law.go.kr`…) để
+ * người đọc thấy ngay nguồn có phải trang chính thức không, khỏi phải bấm
+ * vào mới biết.
+ */
+function sourceDomains(html: string): string {
+  const at = html.search(/<h2[^>]*>Nguồn<\/h2>/);
+  if (at === -1) return html;
+  const tail = html
+    .slice(at)
+    .replace(/(<a href="https?:\/\/(?:www\.)?([^/"]+)[^"]*"[^>]*>[\s\S]*?<\/a>)/g, '$1 <span class="source-domain">$2</span>');
+  return html.slice(0, at) + tail;
+}
+
 async function buildGuide(): Promise<number> {
   if (!(await exists(GUIDE_ROOT))) return 0;
   const sections: Record<string, unknown[]> = {};
@@ -855,7 +877,9 @@ async function buildGuide(): Promise<number> {
       if (!/^## Nguồn\s*$/m.test(body)) throw new Error(`${at}: thiếu mục "## Nguồn"`);
       const { title, summary, updated, ...facts } = meta;
       const checklist = interactiveChecklist(marked.parse(body) as string);
-      const { html, headings } = withHeadingIds(externalLinks(checklist.html.trim()));
+      const { html, headings } = withHeadingIds(
+        sourceDomains(scrollableTables(externalLinks(checklist.html.trim())))
+      );
       articles.push({
         slug: lessonSlug(file),
         title,

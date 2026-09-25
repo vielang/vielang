@@ -320,6 +320,30 @@
   @apply pl-0;
 }
 
+/*
+ * Bảng trong bài cẩm nang: cuộn ngang trong khung riêng (gắn lúc build),
+ * trang không bị kéo tràn ra ngoài màn điện thoại.
+ */
+.prose .table-scroll {
+  @apply -mx-4 my-6 overflow-x-auto px-4 sm:mx-0 sm:px-0;
+}
+.prose .table-scroll table {
+  @apply my-0;
+}
+
+/* Mục Nguồn: chữ nhỏ, link không gạch chân — là phần tra cứu, không phải thân bài. */
+.prose h2#nguon ~ ul {
+  @apply text-sm;
+}
+.prose h2#nguon ~ ul a {
+  @apply font-normal no-underline hover:underline;
+}
+
+/* Tên miền cạnh link trong mục Nguồn — nhìn là biết có phải trang chính thức. */
+.prose .source-domain {
+  @apply ml-1 rounded bg-muted px-1.5 py-0.5 font-mono text-[0.7rem] whitespace-nowrap text-muted-foreground;
+}
+
 /* Cặp phản ví dụ: viền trái đỏ cho khối "// SAI", xanh cho khối "// ĐÚNG". */
 .prose pre[data-verdict="wrong"] {
   border-left: 3px solid var(--destructive);

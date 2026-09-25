@@ -425,3 +425,17 @@
 .prose blockquote p:last-of-type::after {
   content: none;
 }
+
+/*
+ * Hiện sau một nhịp (300ms) — cho vòng xoay chờ: mạng nhanh thì trang tới
+ * trước khi nó kịp hiện, không có gì nháy lên rồi tắt. Xem loading.tsx.
+ */
+@keyframes show-after-delay {
+  to {
+    opacity: 1;
+  }
+}
+.show-after-delay {
+  opacity: 0;
+  animation: show-after-delay 150ms ease-out 300ms forwards;
+}

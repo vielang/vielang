@@ -243,7 +243,7 @@ function imageBaseUrl(): string {
     if (!warnedMissingBase) {
       console.warn(
         "⚠ Thiếu biến môi trường NEXT_PUBLIC_IMAGE_BASE_URL — ảnh sách sẽ không " +
-          "tải được. Xem web/.env.local.example."
+          "tải được. Xem .env.local.example."
       );
       warnedMissingBase = true;
     }

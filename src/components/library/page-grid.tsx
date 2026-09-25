@@ -2,13 +2,14 @@
 
 import { Fragment } from "react";
 import Image from "next/image";
-import Link from "next/link";
+import Link, { useLinkStatus } from "next/link";
 import {
   BookOpen,
   Bookmark,
   Check,
   Languages,
   ListChecks,
+  Loader2,
   NotebookText,
   Volume2,
 } from "lucide-react";
@@ -21,6 +22,29 @@ import { useIsClient } from "@/lib/use-is-client";
 
 function chapterAnchor(lesson: number): string {
   return `bai-${lesson}`;
+}
+
+/**
+ * Phản hồi ngay trên ô vừa bấm trong lúc chờ mở trang đọc: ô mờ đi, hiện
+ * vòng xoay nhỏ. Cần vì ô trong lưới cố ý không tải trước (xem `prefetch`
+ * bên dưới) — mạng chậm thì bấm xong chưa thấy gì, người ta bấm lại lần nữa.
+ *
+ * Luôn nằm sẵn trong ô, chỉ đổi độ mờ: thêm/bớt phần tử lúc bấm là ô nhảy
+ * bố cục (lời khuyên của tài liệu Next cho `useLinkStatus`).
+ */
+function TilePending() {
+  const { pending } = useLinkStatus();
+  return (
+    <span
+      aria-hidden
+      className={cn(
+        "pointer-events-none absolute inset-0 flex items-center justify-center bg-background/60 transition-opacity",
+        pending ? "opacity-100" : "opacity-0"
+      )}
+    >
+      <Loader2 className={cn("size-5 text-foreground/70", pending && "animate-spin")} />
+    </span>
+  );
 }
 
 /**
@@ -211,6 +235,7 @@ export function PageGrid({
                     <span className="absolute bottom-1 left-1.5 rounded bg-background/80 px-1 text-[10px] tabular-nums text-foreground">
                       {page}
                     </span>
+                    <TilePending />
                   </div>
                 </Link>
 

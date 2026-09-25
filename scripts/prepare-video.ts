@@ -1,22 +1,29 @@
 #!/usr/bin/env tsx
 /**
  * Chuẩn bị video "Học tiếng Hàn qua video" (`/video`): đọc video + phụ đề
- * đã tải bằng yt-dlp ở `../yt-dlp/<playlistId>/`, upload video (+ ảnh bìa
- * cắt bằng ffmpeg) lên R2, gộp phụ đề `.ko-orig.vtt`/`.vi.vtt` (dạng roll-up
- * của YouTube auto-sub, xem `vtt.ts`) thành cue sạch, ghi ra
- * `content/videos/<playlistId>.json` (COMMIT vào git — nhẹ, chỉ là text).
+ * đã tải bằng yt-dlp ở `../yt-dlp/<playlistId>/`, CHỌN `--count` tập đầu
+ * tiên (theo thứ tự playlist) dài hơn `--min-duration` giây — các đoạn ngắn
+ * hơn là clip "xem trước tập sau" (~30s), không phải nội dung thật — rồi
+ * upload video (+ ảnh bìa cắt bằng ffmpeg) lên R2, gộp phụ đề `.ko-orig.vtt`/
+ * `.vi.vtt` (dạng roll-up của YouTube auto-sub, xem `vtt.ts`) thành cue
+ * sạch, ghi đè `content/videos/<playlistId>.json` (COMMIT vào git — nhẹ,
+ * chỉ là text).
+ *
+ * Manifest là TOÀN BỘ tập đang chọn, không cộng dồn qua từng lần chạy: tập
+ * nào bị chọn ở lần trước mà lần này không còn đạt tiêu chí (hoặc bị đẩy ra
+ * ngoài top N) sẽ bị XOÁ khỏi manifest VÀ khỏi R2. Tập vẫn còn trong danh
+ * sách chọn thì bỏ qua việc upload lại (trừ `--force`) — chỉ tính lại cue.
  *
  * Video gốc (~100MB/tập) không tải hết cùng lúc được (yt-dlp có thể bị
- * YouTube chặn tạm giữa chừng) — script CHỈ xử lý những tập đã có file .mp4
- * hoàn chỉnh (không phải file .part hay file trung gian `.fNNN.mp4` chưa
- * merge), bỏ qua và báo rõ những tập chưa sẵn sàng. Idempotent: chạy lại
- * nhiều lần an toàn, tập nào đã upload thì bỏ qua trừ khi `--force`; manifest
- * cũ được GIỮ LẠI cho tập chưa xử lý lại được ở lần chạy này.
+ * YouTube chặn tạm giữa chừng) — những tập chưa có file .mp4 hoàn chỉnh
+ * (không phải file .part hay file trung gian `.fNNN.mp4` chưa merge) bị bỏ
+ * qua khỏi vòng chọn, không tính là "không đạt thời lượng".
  *
  * Dùng:
- *   npm run prepare-video                    # 10 tập đầu, bỏ qua đã có
- *   npm run prepare-video -- --max 20         # nhiều/ít hơn 10 tập đầu
- *   npm run prepare-video -- --force          # upload lại kể cả đã có
+ *   npm run prepare-video                        # 10 tập đầu dài hơn 60s
+ *   npm run prepare-video -- --count 20           # nhiều/ít hơn 10 tập
+ *   npm run prepare-video -- --min-duration 120   # ngưỡng dài khác 60s
+ *   npm run prepare-video -- --force              # upload lại kể cả đã có
  *
  * Cần các biến môi trường trong .env.local (giống prepare-audio.ts) và
  * `ffmpeg`/`ffprobe` có sẵn trong PATH (dùng để cắt ảnh bìa + đo thời lượng).
@@ -33,6 +40,7 @@ import {
   S3Client,
   PutObjectCommand,
   HeadObjectCommand,
+  DeleteObjectCommand,
 } from "@aws-sdk/client-s3";
 import { parseVtt, type Cue } from "./vtt";
 
@@ -52,8 +60,10 @@ function requireEnv(name: string): string {
 
 const args = process.argv.slice(2);
 const force = args.includes("--force");
-const maxIdx = args.indexOf("--max");
-const max = maxIdx >= 0 ? Number(args[maxIdx + 1]) : 10;
+const countIdx = args.indexOf("--count");
+const count = countIdx >= 0 ? Number(args[countIdx + 1]) : 10;
+const minDurIdx = args.indexOf("--min-duration");
+const minDuration = minDurIdx >= 0 ? Number(args[minDurIdx + 1]) : 60;
 
 const ACCOUNT_ID = requireEnv("R2_ACCOUNT_ID");
 const ACCESS_KEY_ID = requireEnv("R2_ACCESS_KEY_ID");
@@ -110,6 +120,14 @@ async function uploadFile(key: string, filePath: string, contentType: string) {
   return "uploaded" as const;
 }
 
+async function deleteObject(key: string) {
+  try {
+    await s3.send(new DeleteObjectCommand({ Bucket: BUCKET, Key: key }));
+  } catch {
+    /* không có thì thôi */
+  }
+}
+
 async function probeDuration(mp4Path: string): Promise<number | null> {
   try {
     const { stdout } = await run("ffprobe", [
@@ -143,18 +161,20 @@ interface SourceItem {
   id: string;
   base: string; // "01 - 지붕뚫고 하이킥 ..., #01" (không đuôi file)
   koVttPath: string;
+  mp4Path: string;
 }
 
-async function findSourceItems(srcDir: string, max: number): Promise<SourceItem[]> {
+async function findAllSourceItems(srcDir: string): Promise<SourceItem[]> {
   const files = await readdir(srcDir);
   const items: SourceItem[] = [];
   for (const file of files) {
     const m = /^(\d+) - (.+)\.ko-orig\.vtt$/.exec(file);
     if (!m) continue;
-    items.push({ id: m[1], base: `${m[1]} - ${m[2]}`, koVttPath: path.join(srcDir, file) });
+    const base = `${m[1]} - ${m[2]}`;
+    items.push({ id: m[1], base, koVttPath: path.join(srcDir, file), mp4Path: path.join(srcDir, `${base}.mp4`) });
   }
   items.sort((a, b) => Number(a.id) - Number(b.id));
-  return items.slice(0, max);
+  return items;
 }
 
 function parseTitle(base: string): { showTitle: string; episode: number; part: number } | null {
@@ -164,12 +184,35 @@ function parseTitle(base: string): { showTitle: string; episode: number; part: n
   return { showTitle: m[1].replace(/\s+/g, " ").trim(), episode: Number(m[2]), part: Number(m[3]) };
 }
 
-async function processItem(srcDir: string, item: SourceItem, tmpDir: string): Promise<ManifestEntry | null> {
-  const mp4Path = path.join(srcDir, `${item.base}.mp4`);
-  if (!existsSync(mp4Path)) {
-    console.log(`  ⏭ #${item.id}: chưa có file .mp4 hoàn chỉnh — bỏ qua (chạy lại sau khi tải xong).`);
-    return null;
+interface Selected {
+  item: SourceItem;
+  duration: number | null;
+}
+
+/** Duyệt theo thứ tự playlist, đo thời lượng từng tập ĐÃ có mp4 hoàn chỉnh,
+ * chọn `count` tập đầu tiên dài hơn `minDuration` giây. */
+async function selectItems(all: SourceItem[]): Promise<{ selected: Selected[]; notReadyCount: number; tooShortCount: number }> {
+  const selected: Selected[] = [];
+  let notReadyCount = 0;
+  let tooShortCount = 0;
+  for (const item of all) {
+    if (selected.length >= count) break;
+    if (!existsSync(item.mp4Path)) {
+      notReadyCount++;
+      continue;
+    }
+    const duration = await probeDuration(item.mp4Path);
+    if (duration === null || duration < minDuration) {
+      tooShortCount++;
+      continue;
+    }
+    selected.push({ item, duration });
   }
+  return { selected, notReadyCount, tooShortCount };
+}
+
+async function processItem(sel: Selected, tmpDir: string): Promise<ManifestEntry | null> {
+  const { item, duration } = sel;
   const titleInfo = parseTitle(item.base);
   if (!titleInfo) {
     console.log(`  ⏭ #${item.id}: không khớp mẫu tên file, bỏ qua — "${item.base}"`);
@@ -177,21 +220,20 @@ async function processItem(srcDir: string, item: SourceItem, tmpDir: string): Pr
   }
 
   const koCues = parseVtt(await readFile(item.koVttPath, "utf8"));
-  const viVttPath = path.join(srcDir, `${item.base}.vi.vtt`);
+  const viVttPath = path.join(path.dirname(item.mp4Path), `${item.base}.vi.vtt`);
   const hasVi = existsSync(viVttPath);
   const viCues = hasVi ? parseVtt(await readFile(viVttPath, "utf8")) : [];
 
-  const duration = await probeDuration(mp4Path);
   const posterPath = path.join(tmpDir, `${item.id}.jpg`);
-  const hasPoster = await makePoster(mp4Path, duration, posterPath);
+  const hasPoster = await makePoster(item.mp4Path, duration, posterPath);
 
-  const videoStatus = await uploadFile(`videos/${PLAYLIST_ID}/${item.id}.mp4`, mp4Path, "video/mp4");
+  const videoStatus = await uploadFile(`videos/${PLAYLIST_ID}/${item.id}.mp4`, item.mp4Path, "video/mp4");
   const posterStatus = hasPoster
     ? await uploadFile(`videos/${PLAYLIST_ID}/${item.id}.jpg`, posterPath, "image/jpeg")
     : "skipped";
 
   console.log(
-    `  ✓ #${item.id} Tập ${titleInfo.episode} · Phần ${titleInfo.part} — video ${videoStatus}, ảnh bìa ${posterStatus}${hasVi ? "" : " (chưa có phụ đề tiếng Việt)"}`
+    `  ✓ #${item.id} Tập ${titleInfo.episode} · Phần ${titleInfo.part} (${Math.round(duration ?? 0)}s) — video ${videoStatus}, ảnh bìa ${posterStatus}${hasVi ? "" : " (chưa có phụ đề tiếng Việt)"}`
   );
 
   return {
@@ -215,34 +257,44 @@ async function main() {
   }
 
   const manifestPath = path.resolve(process.cwd(), "content", "videos", `${PLAYLIST_ID}.json`);
-  const existing: Record<string, ManifestEntry> = existsSync(manifestPath)
-    ? Object.fromEntries(
-        (JSON.parse(await readFile(manifestPath, "utf8")) as ManifestEntry[]).map((e) => [e.id, e])
-      )
-    : {};
+  const previousIds: string[] = existsSync(manifestPath)
+    ? (JSON.parse(await readFile(manifestPath, "utf8")) as ManifestEntry[]).map((e) => e.id)
+    : [];
 
-  const items = await findSourceItems(srcDir, max);
-  console.log(`Bucket: ${BUCKET}  |  playlist: ${PLAYLIST_ID}  |  ${items.length} tập trong phạm vi  |  force=${force}`);
+  const all = await findAllSourceItems(srcDir);
+  const { selected, notReadyCount, tooShortCount } = await selectItems(all);
+  console.log(
+    `Bucket: ${BUCKET}  |  playlist: ${PLAYLIST_ID}  |  chọn ${selected.length}/${count} tập dài hơn ${minDuration}s` +
+      `  |  bỏ qua: ${tooShortCount} tập ngắn, ${notReadyCount} tập chưa tải xong  |  force=${force}`
+  );
 
   const tmpDir = await mkdtemp(path.join(tmpdir(), "prepare-video-"));
+  const manifest: ManifestEntry[] = [];
   try {
-    for (const item of items) {
-      const entry = await processItem(srcDir, item, tmpDir);
-      if (entry) existing[item.id] = entry;
+    for (const sel of selected) {
+      const entry = await processItem(sel, tmpDir);
+      if (entry) manifest.push(entry);
     }
   } finally {
     await rm(tmpDir, { recursive: true, force: true });
   }
+  manifest.sort((a, b) => a.order - b.order);
 
-  const manifest = Object.values(existing).sort((a, b) => a.order - b.order);
+  const selectedIds = new Set(manifest.map((e) => e.id));
+  const removedIds = previousIds.filter((id) => !selectedIds.has(id));
+  for (const id of removedIds) {
+    await deleteObject(`videos/${PLAYLIST_ID}/${id}.mp4`);
+    await deleteObject(`videos/${PLAYLIST_ID}/${id}.jpg`);
+    console.log(`  ✗ Đã xoá tập #${id} khỏi R2 (không còn trong danh sách chọn).`);
+  }
+
   await writeFile(manifestPath, JSON.stringify(manifest), "utf8");
 
-  const ready = manifest.filter((e) => items.some((i) => i.id === e.id));
-  const missing = items.filter((i) => !existing[i.id]);
   console.log(`\n=== Tổng kết ===`);
-  console.log(`  Sẵn sàng: ${ready.length}/${items.length}`);
-  if (missing.length > 0) {
-    console.log(`  Còn thiếu: ${missing.map((i) => `#${i.id}`).join(", ")} — chạy lại lệnh này sau khi yt-dlp tải xong.`);
+  console.log(`  Sẵn sàng: ${manifest.length}/${count}`);
+  if (removedIds.length > 0) console.log(`  Đã gỡ: ${removedIds.map((id) => `#${id}`).join(", ")}`);
+  if (manifest.length < count) {
+    console.log(`  Chưa đủ ${count} — chạy lại lệnh này sau khi yt-dlp tải thêm.`);
   }
   console.log(`  Đã ghi ${manifestPath}`);
 }

@@ -8,6 +8,7 @@
  *   content/grammar/<bookId>/<page>.json -> content/grammar/<bookId>.json
  *   content/answers/<bookId>/<page>.json -> content/answers/<bookId>.json
  *   content/it/<khoá>/<chương>/<bài>.md  -> content/it/courses.json
+ *   content/cam-nang/<mục>/<bài>.md      -> content/cam-nang/guide.json
  *
  * Vì sao Markdown -> HTML ngay ở bước build: note hiển thị/sửa bằng Tiptap
  * (xem components/reader/note-editor.tsx), mà Tiptap đọc/ghi HTML. Convert
@@ -794,6 +795,85 @@ async function buildCourses(): Promise<number> {
   return courses.reduce((n, c) => n + c.modules.reduce((m, mod) => m + mod.lessons.length, 0), 0);
 }
 
+// ---------------------------------------------------------------------------
+// Cẩm nang (visa, trường, việc làm — xem src/lib/guide.ts)
+
+const GUIDE_ROOT = path.join(CONTENT_ROOT, "cam-nang");
+
+/** Thư mục con = mục của cẩm nang. Thứ tự và tên hiển thị nằm ở src/lib/guide.ts. */
+const GUIDE_SECTIONS = ["visa", "truong", "viec-lam"] as const;
+
+/** Khoá ổn định cho một dòng checklist: băm nội dung, không theo thứ tự. */
+function checkKey(text: string): string {
+  let h = 5381;
+  for (const ch of text) h = ((h << 5) + h + ch.charCodeAt(0)) >>> 0;
+  return h.toString(36);
+}
+
+/**
+ * Checklist hồ sơ (`- [ ] …`) thành ô tick được. Marked vẽ ô `disabled`;
+ * ở đây bỏ `disabled` và gắn khoá để app nhớ ô nào đã tick (xem
+ * GuideArticleView).
+ *
+ * Khoá băm theo NỘI DUNG dòng chứ không theo thứ tự: bài được sửa, chèn
+ * thêm giấy tờ vào giữa thì các ô đã tick vẫn đúng chỗ. Đổi chữ của một dòng
+ * thì dòng đó mất dấu tick — chấp nhận được, vì nội dung đã khác.
+ */
+function interactiveChecklist(html: string): { html: string; checks: number } {
+  let checks = 0;
+  const out = html.replace(
+    /<li><input[^>]*type="checkbox"[^>]*>\s*([\s\S]*?)<\/li>/g,
+    (_all, inner: string) => {
+      checks++;
+      const key = checkKey(decodeEntities(inner.replace(/<[^>]+>/g, "")).trim());
+      return (
+        `<li class="check-item"><label><input type="checkbox" data-check="${key}">` +
+        `<span>${inner}</span></label></li>`
+      );
+    }
+  );
+  return { html: out, checks };
+}
+
+/** Link ra ngoài (nguồn chính thức) mở tab mới — đọc xong vẫn còn bài để đối chiếu. */
+function externalLinks(html: string): string {
+  return html.replace(/<a href="(https?:\/\/[^"]+)"/g, '<a href="$1" target="_blank" rel="noopener noreferrer"');
+}
+
+async function buildGuide(): Promise<number> {
+  if (!(await exists(GUIDE_ROOT))) return 0;
+  const sections: Record<string, unknown[]> = {};
+  let count = 0;
+  for (const section of GUIDE_SECTIONS) {
+    const dir = path.join(GUIDE_ROOT, section);
+    const articles = [];
+    for (const file of await listFiles(dir, ".md")) {
+      const at = `cam-nang/${section}/${file}`;
+      const { meta, body } = frontMatter(await readFile(path.join(dir, file), "utf8"));
+      if (!meta.title) throw new Error(`${at}: thiếu "title"`);
+      if (!meta.updated) throw new Error(`${at}: thiếu "updated" — bài cẩm nang phải ghi ngày cập nhật`);
+      if (!/^## Nguồn\s*$/m.test(body)) throw new Error(`${at}: thiếu mục "## Nguồn"`);
+      const { title, summary, updated, ...facts } = meta;
+      const checklist = interactiveChecklist(marked.parse(body) as string);
+      const { html, headings } = withHeadingIds(externalLinks(checklist.html.trim()));
+      articles.push({
+        slug: lessonSlug(file),
+        title,
+        summary: summary ?? "",
+        updated,
+        facts,
+        html,
+        headings,
+        checks: checklist.checks,
+      });
+    }
+    sections[section] = articles;
+    count += articles.length;
+  }
+  await writeFile(path.join(GUIDE_ROOT, "guide.json"), JSON.stringify(sections, null, 2) + "\n", "utf8");
+  return count;
+}
+
 async function exists(p: string): Promise<boolean> {
   try {
     await stat(p);
@@ -817,6 +897,8 @@ async function main() {
   }
   const lessons = await buildCourses();
   if (lessons) console.log(`  IT: ${lessons} bài học`);
+  const guide = await buildGuide();
+  if (guide) console.log(`  Cẩm nang: ${guide} bài`);
 }
 
 main().catch((err) => {

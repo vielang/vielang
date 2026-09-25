@@ -62,6 +62,7 @@ next-env.d.ts
 # đề thi: tài nguyên sinh ra từ PDF/MP3 gốc, đưa lên R2 bằng prepare-exams — không commit
 /public/img/exams/
 /content/it/courses.json
+/content/cam-nang/guide.json
 
 # Công cụ kiểm tra cú pháp C# của bài học IT (chạy bằng .NET SDK)
 scripts/csharp-check/bin/

@@ -247,6 +247,30 @@
   @apply my-2 rounded-lg bg-muted/50 px-3 py-2;
 }
 
+/*
+ * Checklist hồ sơ của bài cẩm nang ("- [ ]" trong Markdown, dựng thành ô tick
+ * được lúc build): bỏ chấm đầu dòng, cả dòng là vùng bấm — ô tick trên điện
+ * thoại bé, bắt nhắm trúng ô thì rất khó chịu.
+ */
+.prose li.check-item {
+  @apply list-none pl-0;
+}
+.prose li.check-item::marker {
+  content: none;
+}
+.prose li.check-item label {
+  @apply flex cursor-pointer items-start gap-2.5;
+}
+.prose li.check-item input {
+  @apply mt-1.5 size-4 shrink-0 cursor-pointer accent-primary;
+}
+.prose li.check-item input:checked + span {
+  @apply text-muted-foreground line-through decoration-muted-foreground/60;
+}
+.prose ul:has(> li.check-item) {
+  @apply pl-0;
+}
+
 /* Cặp phản ví dụ: viền trái đỏ cho khối "// SAI", xanh cho khối "// ĐÚNG". */
 .prose pre[data-verdict="wrong"] {
   border-left: 3px solid var(--destructive);

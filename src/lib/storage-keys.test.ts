@@ -81,3 +81,9 @@ describe("khoá chỗ nghe dở", () => {
     expect(source("src", "lib", "autoplay-player.ts")).toContain('name: "kiip-autoplay-v1"');
   });
 });
+
+describe("khoá checklist hồ sơ cẩm nang", () => {
+  it("giữ nguyên tên, nếu không thì mất các giấy tờ người dùng đã tick", () => {
+    expect(source("src", "lib", "guide-checklist-store.ts")).toContain('name: "kiip-guide-v1"');
+  });
+});

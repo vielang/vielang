@@ -9,6 +9,19 @@ interface Params {
   page: string;
 }
 
+/**
+ * Mảng rỗng = dựng tĩnh MỖI TRANG ở lần đầu có người mở, rồi giữ lại (ISR),
+ * thay vì dựng ở máy chủ mỗi lượt như route động.
+ *
+ * Quan trọng cho vuốt lật trang: route động có `loading.tsx` thì
+ * `router.prefetch` chỉ tải tới màn chờ, nên mỗi cú vuốt đều hiện màn đen
+ * rồi chờ máy chủ trả lời. Route tĩnh thì tải trước được TRỌN trang kế bên,
+ * vuốt tới nơi là có ngay. Không dựng sẵn lúc build vì có gần 2.700 trang.
+ */
+export function generateStaticParams(): Params[] {
+  return [];
+}
+
 function resolve(params: Params) {
   const book = getBook(params.bookId);
   const page = Number(params.page);

@@ -239,6 +239,12 @@ function PageImage({
         // origin, không qua bộ tối ưu của Vercel — xem `next.config.ts`.
         unoptimized
         priority
+        // next/image mặc định `async`: trình duyệt được phép vẽ khung hình
+        // đầu tiên khi ảnh chưa giải mã xong, nên dù ảnh đã nằm sẵn trong
+        // cache (nhờ `AdjacentPreload`) vẫn lộ ô chờ xám một nhịp sau mỗi
+        // lần lật. `sync` bắt vẽ luôn ảnh ở khung đầu — một ảnh webp ~130KB
+        // giải mã chỉ mất vài ms.
+        decoding="sync"
         draggable={false}
         className="object-contain"
         onLoad={onLoad}
@@ -299,6 +305,7 @@ function NeighbourSpread({
             fill
             sizes="100vw"
             unoptimized
+            decoding="sync"
             draggable={false}
             className="object-contain"
           />

@@ -19,7 +19,9 @@ export function AdjacentPreload({
 }) {
   const first = Math.min(...pages);
   const last = Math.max(...pages);
-  const targets = [first - 2, first - 1, last + 1, last + 2].filter(
+  // Nghiêng về phía trước: đọc sách gần như luôn lật tới, nên tải sẵn 4 trang
+  // sau (~500KB) để vuốt liền mấy trang vẫn có ảnh, còn phía sau 2 trang là đủ.
+  const targets = [first - 2, first - 1, last + 1, last + 2, last + 3, last + 4].filter(
     (p) => p >= 1 && p <= totalPages && !pages.includes(p)
   );
   if (targets.length === 0) return null;

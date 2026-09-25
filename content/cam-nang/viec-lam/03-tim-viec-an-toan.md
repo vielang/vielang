@@ -11,7 +11,7 @@ updated: 2026-09-25
 Các visa người Việt hay gặp:
 
 - **E-9** (비전문취업, lao động phổ thông theo EPS): chỉ làm ở nơi đã được cấp phép, đúng ngành. Muốn đổi nơi làm phải qua 고용센터 (trung tâm việc làm). Xem bài về EPS.
-- **D-2** (du học) và **D-4** (học tiếng): về nguyên tắc không được đi làm. Muốn làm thêm (아르바이트) phải xin **phép trước** tại cơ quan xuất nhập cảnh (체류자격외 활동허가, giấy phép hoạt động ngoài tư cách lưu trú). Số giờ được làm mỗi tuần bị giới hạn, tùy bậc học, năm học, điểm TOPIK và trường. Quy định này đổi thường xuyên. Hỏi phòng hỗ trợ du học sinh của trường hoặc HiKorea trước khi nhận việc.
+- **D-2** (du học) và **D-4** (học tiếng): về nguyên tắc không được đi làm. Muốn làm thêm (아르바이트) phải xin **phép trước** tại cơ quan xuất nhập cảnh (체류자격외 활동허가, giấy phép hoạt động ngoài tư cách lưu trú). Năm 2026: sinh viên đại học đạt mức tiếng Hàn được làm tối đa 25 giờ/tuần ngày thường, thạc sĩ, tiến sĩ 30 giờ; D-4 tối đa 20 giờ/tuần. Chi tiết và ngoại lệ: xem bài Làm thêm hợp pháp cho du học sinh.
 - **D-10** (구직, tìm việc): dành cho người tìm việc chuyên môn (nhóm E-1 đến E-7). Được tìm việc và thực tập ngắn hạn. Làm thêm cũng phải xin phép như trên.
 - **E-7** (특정활동, hoạt động đặc định): việc chuyên môn, kỹ thuật cho đúng công ty và đúng nghề đã được cấp. Đổi công ty phải xin phép trước.
 - **F-2** (거주, cư trú), **F-5** (영주, vĩnh trú), **F-6** (결혼이민, kết hôn): theo 출입국관리법 시행령 (Nghị định thi hành Luật Xuất nhập cảnh), F-5 và F-6 không bị giới hạn ngành nghề. F-2 phần lớn cũng vậy nhưng tùy loại F-2 cụ thể.
@@ -63,6 +63,7 @@ Dù làm trái phép, bạn vẫn có quyền đòi lương cho phần việc đ
 - [HiKorea — Cổng dịch vụ xuất nhập cảnh](https://www.hikorea.go.kr)
 - [찾기쉬운 생활법령정보 — 결혼에 따른 체류자격](https://www.easylaw.go.kr/CSP/CnpClsMain.laf?csmSeq=47&ccfNo=2&cciNo=1&cnpClsNo=1)
 - [찾기쉬운 생활법령정보 — 외국인유학생 아르바이트: 시간제 근로](https://www.easylaw.go.kr/CSP/CnpClsMain.laf?popMenu=ov&csmSeq=508&ccfNo=3&cciNo=7&cnpClsNo=1&menuType=qna)
+- [찾기쉬운 생활법령정보 — 외국인유학생 시간제 취업 (sổ tay 법무부 bản 7/8/2026)](https://easylaw.go.kr/CSP/CnpClsMain.laf?popMenu=ov&csmSeq=2853&ccfNo=3&cciNo=6&cnpClsNo=1)
 - [한국고용정보원 — 디지털 고용서비스 고용24](https://www.keis.or.kr/keis/ko/conts/101/web.do)
 - [워크넷 — 서비스 종료 안내](https://m.work.go.kr/worknetServiceNotice.do)
 - [EPS — Hệ thống quản lý tuyển dụng lao động nước ngoài](https://www.eps.go.kr/eo/EmployPerSystem.eo)

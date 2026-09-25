@@ -14,7 +14,7 @@ Có hai đường: xin visa từ Việt Nam, hoặc đang ở Hàn với visa D-
 ## Điều kiện chính
 
 - Có **giấy nhập học tiêu chuẩn** (표준입학허가서) của trường.
-- **Tài chính** (hướng dẫn ngày 05/01/2026 của Tổng Lãnh sự quán TP.HCM, trùng với Đại sứ quán Hà Nội): sổ tiết kiệm đứng tên người xin visa,
+- **Tài chính** (hướng dẫn ngày 05/01/2026 của Tổng Lãnh sự quán TP.HCM; thông báo của KVAC Hà Nội cập nhật 11/06/2026 ghi cùng mức): sổ tiết kiệm đứng tên người xin visa,
   - trường vùng thủ đô: ít nhất **20 triệu won**, đã gửi **từ 3 tháng** trở lên;
   - trường địa phương: ít nhất **16 triệu won**, đã gửi từ 3 tháng trở lên.
   - D-2-4 đến D-2-8 không cần gửi đủ 3 tháng. "Trường consulting" thì phải gửi từ 6 tháng.
@@ -59,7 +59,7 @@ Danh sách dưới đây theo hướng dẫn của Đại học Yonsei. Trườn
 
 **Nộp từ Việt Nam:**
 
-- Phí visa: theo trang hướng dẫn của Đại sứ quán Hà Nội, visa một lần trên 90 ngày là **50 USD**.
+- Phí visa: theo trang hướng dẫn của Đại sứ quán Hà Nội và bảng phí cho công dân Việt Nam của KVAC Hà Nội, visa một lần trên 90 ngày (D-1 đến G-1) là **50 USD**.
 - Phí nộp hộ tại KVAC Hà Nội: 390.000 đồng/bộ, chỉ nhận tiền mặt.
 - Thời gian xét: khoảng **20 ngày làm việc**. Học bổng toàn phần và D-2-4 đến D-2-8 khoảng **10 ngày làm việc**.
 
@@ -114,6 +114,8 @@ Giai đoạn KIIP bạn hoàn thành còn được tính điểm khi xin visa c�
 - [Đại sứ quán — Uỷ quyền xin visa du học từ 20/10/2025](https://overseas.mofa.go.kr/vn-vi/brd/m_2164/view.do?seq=758165)
 - [Đại sứ quán — Hướng dẫn thủ tục visa (phí visa)](https://overseas.mofa.go.kr/vn-vi/wpge/m_2154/contents.do)
 - [KVAC Hà Nội — Lệ phí nộp hồ sơ](https://visaforkorea-vt.com/info/service)
+- [KVAC Hà Nội — Câu hỏi thường gặp, mục "Phí visa" (bảng phí thẩm tra cho công dân Việt Nam)](https://visaforkorea-vt.com/customercenter/faq/list/)
+- [KVAC Hà Nội — Hồ sơ cần thiết khi xin visa du học (thay đổi ngày 11/06/2026)](https://visaforkorea-vt.com/customercenter/notice/view/611)
 - [HiKorea — Bảng lệ phí thủ tục lưu trú](https://www.hikorea.go.kr/info/InfoDatail.pt?CAT_SEQ=174&PARENT_ID=19)
 - [법무부 출입국·외국인정책본부 — Tăng phí cấp thẻ người nước ngoài từ 01/01/2025](https://www.immigration.go.kr/bbs/immigration/47/590299/artclView.do)
 - [Đại học Yonsei — Hướng dẫn đổi visa D-4 sang D-2 (PDF)](https://graduate.yonsei.ac.kr/graduate/academic/notice_haksa.do?mode=download&articleNo=124577&attachNo=105616)

@@ -15,7 +15,7 @@ Nếu muốn vào thẳng hệ đại học, cao học thì xem bài visa D-2.
 
 - Có **giấy nhập học tiêu chuẩn** (표준입학허가서) của trường tiếng.
 - Chứng minh được học lực và tài chính. Với D-4, kể cả trường "ưu tú" (tỷ lệ bất hợp pháp dưới 1%) vẫn phải nộp hai loại giấy này.
-- **Tài chính** (theo hướng dẫn ngày 05/01/2026 của Tổng Lãnh sự quán TP.HCM, trùng với hướng dẫn của Đại sứ quán Hà Nội): sổ tiết kiệm đứng tên người xin visa,
+- **Tài chính** (theo hướng dẫn ngày 05/01/2026 của Tổng Lãnh sự quán TP.HCM; thông báo của KVAC Hà Nội cập nhật 11/06/2026 ghi cùng mức): sổ tiết kiệm đứng tên người xin visa,
   - trường ở vùng thủ đô: số dư ít nhất **10 triệu won**, đã gửi **từ 6 tháng** trở lên;
   - trường ở địa phương: ít nhất **8 triệu won**, đã gửi từ 6 tháng trở lên.
   - Sổ bằng tiền đồng được quy đổi theo tỷ giá ngày nộp. Không nhận sổ tiết kiệm chuyển nhượng.
@@ -50,7 +50,7 @@ Giấy tờ Việt Nam cấp phải có bản dịch tiếng Hàn hoặc tiếng
 
 ## Lệ phí và thời gian xử lý
 
-- **Phí visa**: theo trang hướng dẫn của Đại sứ quán Hà Nội, visa một lần trên 90 ngày là **50 USD**.
+- **Phí visa**: theo trang hướng dẫn của Đại sứ quán Hà Nội và bảng phí cho công dân Việt Nam của KVAC Hà Nội, visa một lần trên 90 ngày (D-1 đến G-1) là **50 USD**.
 - **Phí nộp hộ tại Trung tâm tiếp nhận hồ sơ visa (KVAC) Hà Nội**: 390.000 đồng/bộ, tính riêng ngoài phí visa, chỉ nhận tiền mặt.
 - **Thời gian xét** (bảng của Đại sứ quán Hà Nội): hồ sơ du học/học tiếng thông thường khoảng **20 ngày làm việc**; nộp bằng mã code khoảng **7 ngày làm việc**. Có thể lâu hơn nếu phải bổ sung giấy hoặc phỏng vấn.
 
@@ -86,4 +86,6 @@ D-4-1 không bắt buộc có TOPIK. Học xong 어학당 và muốn lên đại
 - [Đại sứ quán — Danh sách cơ sở khám lao chỉ định (15/09/2025)](https://overseas.mofa.go.kr/vn-vi/brd/m_2164/view.do?seq=758163)
 - [Đại sứ quán — Hướng dẫn thủ tục visa (phí visa)](https://overseas.mofa.go.kr/vn-vi/wpge/m_2154/contents.do)
 - [KVAC Hà Nội — Lệ phí nộp hồ sơ và dịch vụ hỗ trợ](https://visaforkorea-vt.com/info/service)
+- [KVAC Hà Nội — Câu hỏi thường gặp, mục "Phí visa" (bảng phí thẩm tra cho công dân Việt Nam)](https://visaforkorea-vt.com/customercenter/faq/list/)
+- [KVAC Hà Nội — Hồ sơ cần thiết khi xin visa du học (thay đổi ngày 11/06/2026)](https://visaforkorea-vt.com/customercenter/notice/view/611)
 - [Korea Visa Portal — Tra cứu kết quả visa](https://www.visa.go.kr/openPage.do?MENU_ID=10301)

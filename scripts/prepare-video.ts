@@ -4,10 +4,12 @@
  * đã tải bằng yt-dlp ở `../yt-dlp/<playlistId>/`, CHỌN `--count` tập đầu
  * tiên (theo thứ tự playlist) dài hơn `--min-duration` giây — các đoạn ngắn
  * hơn là clip "xem trước tập sau" (~30s), không phải nội dung thật — rồi
- * upload video (+ ảnh bìa cắt bằng ffmpeg) lên R2, gộp phụ đề `.ko-orig.vtt`/
- * `.vi.vtt` (dạng roll-up của YouTube auto-sub, xem `vtt.ts`) thành cue
- * sạch, ghi đè `content/videos/<playlistId>.json` (COMMIT vào git — nhẹ,
- * chỉ là text).
+ * transcode về H.264 + AAC nếu cần (yt-dlp hay lấy bản AV1 + Opus của
+ * YouTube — Safari/iOS không giải mã được hai codec đó, phát ra câm re, xem
+ * `transcodeForCompat`) rồi upload (+ ảnh bìa cắt bằng ffmpeg) lên R2, gộp
+ * phụ đề `.ko-orig.vtt`/`.vi.vtt` (dạng roll-up của YouTube auto-sub, xem
+ * `vtt.ts`) thành cue sạch, ghi đè `content/videos/<playlistId>.json`
+ * (COMMIT vào git — nhẹ, chỉ là text).
  *
  * Manifest là TOÀN BỘ tập đang chọn, không cộng dồn qua từng lần chạy: tập
  * nào bị chọn ở lần trước mà lần này không còn đạt tiêu chí (hoặc bị đẩy ra
@@ -157,6 +159,46 @@ async function makePoster(mp4Path: string, duration: number | null, outPath: str
   }
 }
 
+/**
+ * yt-dlp lấy "best video/audio" của YouTube, mà với video mới thường là
+ * AV1 (hình) + Opus (tiếng) đóng gói trong .mp4 — Chrome/Firefox/Android
+ * phát được (nên "máy khác vẫn xem được"), nhưng Safari/iOS KHÔNG giải mã
+ * được AV1 lẫn Opus nên `<video>` câm luôn, không lỗi rõ ràng nào bắn ra.
+ *
+ * Chuyển hẳn sang H.264 + AAC (10.5.2020~ mọi iPhone đều phát được) trước
+ * khi upload. File đã sẵn H.264 thì chỉ remux (đưa moov atom lên đầu cho
+ * tua nhanh hơn) — không encode lại cho đỡ tốn thời gian.
+ */
+async function needsTranscode(mp4Path: string): Promise<boolean> {
+  try {
+    const { stdout } = await run("ffprobe", [
+      "-v", "error", "-select_streams", "v:0",
+      "-show_entries", "stream=codec_name",
+      "-of", "default=noprint_wrappers=1:nokey=1",
+      mp4Path,
+    ]);
+    return stdout.trim() !== "h264";
+  } catch {
+    return true;
+  }
+}
+
+async function transcodeForCompat(mp4Path: string, tmpDir: string, id: string): Promise<string> {
+  const outPath = path.join(tmpDir, `${id}.compat.mp4`);
+  const transcode = await needsTranscode(mp4Path);
+  const args = transcode
+    ? [
+        "-y", "-loglevel", "error", "-nostats", "-i", mp4Path,
+        "-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-pix_fmt", "yuv420p",
+        "-c:a", "aac", "-b:a", "160k",
+        "-movflags", "+faststart",
+        outPath,
+      ]
+    : ["-y", "-loglevel", "error", "-nostats", "-i", mp4Path, "-c", "copy", "-movflags", "+faststart", outPath];
+  await run("ffmpeg", args, { maxBuffer: 1024 * 1024 * 32 });
+  return outPath;
+}
+
 interface SourceItem {
   id: string;
   base: string; // "01 - 지붕뚫고 하이킥 ..., #01" (không đuôi file)
@@ -227,7 +269,13 @@ async function processItem(sel: Selected, tmpDir: string): Promise<ManifestEntry
   const posterPath = path.join(tmpDir, `${item.id}.jpg`);
   const hasPoster = await makePoster(item.mp4Path, duration, posterPath);
 
-  const videoStatus = await uploadFile(`videos/${PLAYLIST_ID}/${item.id}.mp4`, item.mp4Path, "video/mp4");
+  // Transcode TỐN THỜI GIAN (vài chục giây/tập) — chỉ làm khi thật sự sắp
+  // upload, không phải mỗi lần chạy script.
+  const videoKey = `videos/${PLAYLIST_ID}/${item.id}.mp4`;
+  const willUploadVideo = force || !(await objectExists(videoKey));
+  const videoStatus = willUploadVideo
+    ? await uploadFile(videoKey, await transcodeForCompat(item.mp4Path, tmpDir, item.id), "video/mp4")
+    : ("skipped" as const);
   const posterStatus = hasPoster
     ? await uploadFile(`videos/${PLAYLIST_ID}/${item.id}.jpg`, posterPath, "image/jpeg")
     : "skipped";

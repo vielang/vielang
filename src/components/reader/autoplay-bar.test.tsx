@@ -25,8 +25,8 @@ function drag(el: HTMLElement, dx: number, dy: number) {
 
 beforeEach(() => {
   useAutoplayStore.setState({
-    bookId: "step1",
-    queue: buildPlaylist("step1"),
+    bookId: "en-elementary",
+    queue: buildPlaylist("en-elementary"),
     index: 0,
     status: "playing",
     visiblePages: [1],
@@ -38,7 +38,7 @@ beforeEach(() => {
 
 describe("thanh nghe tự động", () => {
   it("chưa kéo thì đứng giữa đáy, ngay trên thanh lật trang", () => {
-    render(<AutoplayBar bookId="step1" toolbarVisible />);
+    render(<AutoplayBar bookId="en-elementary" toolbarVisible />);
     const pos = useAutoplayStore.getState().barPos!;
     expect(pos.x).toBe(Math.round((window.innerWidth - TEST_ELEMENT_WIDTH) / 2));
     expect(pos.y).toBeLessThan(window.innerHeight - TEST_ELEMENT_HEIGHT - 64);
@@ -46,14 +46,14 @@ describe("thanh nghe tự động", () => {
   });
 
   it("chưa kéo thì bám theo thanh lật trang: ẩn thanh là tụt xuống sát đáy", () => {
-    const { rerender } = render(<AutoplayBar bookId="step1" toolbarVisible />);
+    const { rerender } = render(<AutoplayBar bookId="en-elementary" toolbarVisible />);
     const above = useAutoplayStore.getState().barPos!.y;
-    rerender(<AutoplayBar bookId="step1" toolbarVisible={false} />);
+    rerender(<AutoplayBar bookId="en-elementary" toolbarVisible={false} />);
     expect(useAutoplayStore.getState().barPos!.y).toBeGreaterThan(above);
   });
 
   it("kéo được đi chỗ khác, và đứng yên đó dù thanh lật trang ẩn/hiện", () => {
-    const { rerender } = render(<AutoplayBar bookId="step1" toolbarVisible />);
+    const { rerender } = render(<AutoplayBar bookId="en-elementary" toolbarVisible />);
     const before = useAutoplayStore.getState().barPos!;
     drag(bar(), -200, -300);
 
@@ -61,12 +61,12 @@ describe("thanh nghe tự động", () => {
     expect(after.barMoved).toBe(true);
     expect(after.barPos).toEqual({ x: before.x - 200, y: before.y - 300 });
 
-    rerender(<AutoplayBar bookId="step1" toolbarVisible={false} />);
+    rerender(<AutoplayBar bookId="en-elementary" toolbarVisible={false} />);
     expect(useAutoplayStore.getState().barPos).toEqual(after.barPos);
   });
 
   it("kéo bắt đầu ngay trên một cái nút thì không vô tình bấm nút đó", () => {
-    render(<AutoplayBar bookId="step1" toolbarVisible />);
+    render(<AutoplayBar bookId="en-elementary" toolbarVisible />);
     const close = screen.getByRole("button", { name: "Tắt nghe tự động" });
     drag(close, 100, 0);
     fireEvent.click(close);
@@ -77,7 +77,7 @@ describe("thanh nghe tự động", () => {
   });
 
   it("không kéo ra khỏi màn hình được", () => {
-    render(<AutoplayBar bookId="step1" toolbarVisible />);
+    render(<AutoplayBar bookId="en-elementary" toolbarVisible />);
     drag(bar(), 5000, 5000);
     const pos = useAutoplayStore.getState().barPos!;
     expect(pos.x + TEST_ELEMENT_WIDTH).toBeLessThanOrEqual(window.innerWidth);

@@ -1,6 +1,7 @@
 import { ChartNoAxesColumn, Compass, GraduationCap, Library, type LucideIcon } from "lucide-react";
 import { TRACKS, activeTrack, trackHref } from "@/lib/tracks";
 import {
+  EXAM_LEVELS,
   examLangHref,
   examLanguages,
   examLevelHref,
@@ -17,7 +18,7 @@ import { GUIDE_SECTIONS } from "@/lib/guide-sections";
  *
  * Các mục này cố ý đặt theo VIỆC người học làm, không theo nội dung: thêm
  * giáo trình mới, thêm mảng kiến thức mới (lib/tracks) hay thêm kỳ thi mới
- * (IELTS… bên cạnh TOPIK) đều nằm gọn trong "Thư viện" / "Luyện thi", không
+ * (IELTS… bên cạnh TOEIC) đều nằm gọn trong "Thư viện" / "Luyện thi", không
  * phải đụng vào thanh điều hướng.
  *
  * Mỗi tab có thể có MỤC CON (mảng kiến thức, cấp đề, mục cẩm nang). Mục con
@@ -50,7 +51,14 @@ export interface NavTab {
 
 const startsWith = (path: string, base: string) => path === base || path.startsWith(`${base}/`);
 
-export const NAV_TABS: NavTab[] = [
+/**
+ * Luyện thi và Cẩm nang chỉ hiện khi đã có nội dung (kỳ thi, mục bài) — tab
+ * dẫn vào trang trống thì thà không có.
+ */
+const hasExams = EXAM_LEVELS.length > 0;
+const hasGuide = GUIDE_SECTIONS.length > 0;
+
+const ALL_TABS: (NavTab | false)[] = [
   {
     href: "/",
     label: "Thư viện",
@@ -59,7 +67,6 @@ export const NAV_TABS: NavTab[] = [
       p === "/" ||
       startsWith(p, "/books") ||
       startsWith(p, "/sach") ||
-      startsWith(p, "/video") ||
       TRACKS.some(
         (t) =>
           (t.slug && startsWith(p, `/${t.slug}`)) ||
@@ -69,10 +76,6 @@ export const NAV_TABS: NavTab[] = [
       const href = trackHref(t.slug);
       const series = t.lang ? seriesOfLang(t.lang) : [];
       const items = series.map((s) => ({ href: seriesHref(s, href), label: s.label, description: s.blurb }));
-      // "Học qua video" đứng cùng cấp với bộ sách (KIIP…) trong menu.
-      if (t.hasVideo) {
-        items.push({ href: "/video", label: "Học qua video", description: "Phim có phụ đề Hàn – Việt, bật/tắt được" });
-      }
       return { href, label: t.label, description: t.blurb, items };
     }),
     activeChild: (p) => {
@@ -80,8 +83,8 @@ export const NAV_TABS: NavTab[] = [
       return track ? trackHref(track.slug) : undefined;
     },
   },
-  {
-    href: examLangHref(examLanguages()[0]?.code ?? "ko"),
+  hasExams && {
+    href: examLangHref(examLanguages()[0]?.code ?? ""),
     label: "Luyện thi",
     icon: GraduationCap,
     match: (p) => startsWith(p, "/exam"),
@@ -95,10 +98,10 @@ export const NAV_TABS: NavTab[] = [
       return level ? examLangHref(examLevelInfo(level).lang) : undefined;
     },
   },
-  // Không phải việc HỌC như các tab kia mà là thông tin để sống và làm việc ở
-  // Hàn (visa, trường, việc làm) — xem lib/guide.ts.
-  {
-    href: "/cam-nang/visa",
+  // Không phải bài HỌC như các tab kia mà là kiến thức nghề — lộ trình,
+  // phỏng vấn, công cụ, việc làm IT (xem lib/guide.ts).
+  hasGuide && {
+    href: `/cam-nang/${GUIDE_SECTIONS[0]?.id ?? ""}`,
     label: "Cẩm nang",
     icon: Compass,
     match: (p) => startsWith(p, "/cam-nang"),
@@ -114,6 +117,8 @@ export const NAV_TABS: NavTab[] = [
   { href: "/my", label: "Góc học tập", icon: ChartNoAxesColumn, match: (p) => startsWith(p, "/my") },
 ];
 
+export const NAV_TABS: NavTab[] = ALL_TABS.filter((t): t is NavTab => t !== false);
+
 export function activeTab(path: string): NavTab | undefined {
   return NAV_TABS.find((t) => t.match(path));
 }
@@ -127,5 +132,5 @@ export function activeTab(path: string): NavTab | undefined {
  * transcript, thanh tab chỉ ăn bớt chỗ đọc transcript.
  */
 export function hidesTabBar(path: string): boolean {
-  return /^\/exam\/[^/]+\/(practice|mock)$/.test(path) || /^\/video\/[^/]+$/.test(path);
+  return /^\/exam\/[^/]+\/(practice|mock)$/.test(path);
 }

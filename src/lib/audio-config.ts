@@ -3,9 +3,6 @@
  * trực tiếp ảnh trang thật của từng sách (mục lục + vài trang mẫu mỗi
  * sách) — KHÔNG suy diễn bằng công thức, vì độ dài phần 복습 (ôn tập)
  * không đều nhau giữa các sách nên công thức tuyến tính đơn giản sẽ sai.
- *
- * step4 đã verify bằng ảnh trang thật (trang 12, 17, 18, 120, 204): layout
- * giống hệt step3 (cùng seri, cùng số file audio/bài).
  */
 
 export type AudioTrackType = "S" | "L" | "P" | "intro";
@@ -20,33 +17,8 @@ interface AudioLayout {
   offsets: Partial<Record<number, AudioTrackType[]>>;
 }
 
-const STEP_1_2_LAYOUT: AudioLayout = {
-  lessonStartPages: [12, 22, 32, 42, 52, 62, 72, 82, 92, 112, 122, 132, 142, 152, 162, 172, 182, 192],
-  offsets: {
-    6: ["S", "L"], // trang "말하기와 듣기"
-    9: ["P"], // trang cuối bài "발음"
-  },
-};
-
-const STEP_3_LAYOUT: AudioLayout = {
-  lessonStartPages: [12, 24, 36, 48, 60, 72, 84, 96, 118, 130, 142, 154, 166, 178, 190, 202],
-  offsets: {
-    5: ["S"], // trang "말하기"
-    6: ["L", "P"], // trang "듣기" + "발음" gộp chung
-  },
-};
-
-const STEP_4_LAYOUT: AudioLayout = {
-  lessonStartPages: [12, 24, 36, 48, 60, 72, 84, 96, 120, 132, 144, 156, 168, 180, 192, 204],
-  offsets: STEP_3_LAYOUT.offsets, // đã verify giống step3 bằng ảnh trang thật
-};
-
-export const AUDIO_LAYOUTS: Record<string, AudioLayout> = {
-  step1: STEP_1_2_LAYOUT,
-  step2: STEP_1_2_LAYOUT,
-  step3: STEP_3_LAYOUT,
-  step4: STEP_4_LAYOUT,
-};
+/** Giáo trình có audio theo bài — hiện chưa có cuốn nào dùng bố cục này. */
+export const AUDIO_LAYOUTS: Record<string, AudioLayout> = {};
 
 const TRACK_LABELS: Record<AudioTrackType, string> = {
   S: "Nói theo mẫu (말하기)",
@@ -128,24 +100,8 @@ interface WorkbookAudioLayout {
   pageStep: number;
 }
 
-const WORKBOOK_1_2_LAYOUT: WorkbookAudioLayout = {
-  lessonCount: 18,
-  firstPage: 14,
-  pageStep: 6,
-};
-
-const WORKBOOK_3_4_LAYOUT: WorkbookAudioLayout = {
-  lessonCount: 16,
-  firstPage: 15,
-  pageStep: 8,
-};
-
-export const WORKBOOK_AUDIO_LAYOUTS: Record<string, WorkbookAudioLayout> = {
-  "wb-step1": WORKBOOK_1_2_LAYOUT,
-  "wb-step2": WORKBOOK_1_2_LAYOUT,
-  "wb-step3": WORKBOOK_3_4_LAYOUT,
-  "wb-step4": WORKBOOK_3_4_LAYOUT,
-};
+/** Sách bài tập có audio theo bài — hiện chưa có cuốn nào dùng bố cục này. */
+export const WORKBOOK_AUDIO_LAYOUTS: Record<string, WorkbookAudioLayout> = {};
 
 /** Với 1 trang sách bài tập, trả về số thứ tự track (1-based) gắn ở trang đó (0, 1 hoặc 2 track). */
 export function resolveWorkbookPageAudio(bookId: string, page: number): number[] {

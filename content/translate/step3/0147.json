@@ -1,9 +1,0 @@
-[
-  {
-    "id": "p147-dialog",
-    "rect": [0.14, 0.165, 0.44, 0.27],
-    "label": "Hội thoại",
-    "ko": "라민: 안녕하세요? 집 좀 보려고 하는데요.\n부동산 중개인: 어서 오세요. 어떤 집을 구하세요?\n라민: 방 두 개인 월세 빌라를 찾고 있어요.\n부동산 중개인: 잠깐만요. 마침 새로 나온 집이 있어요. 남향인 데다가 새로 수리해서 깨끗하고요.\n라민: 아, 그래요? 근처에 지하철역이 있으면 좋겠어요.\n부동산 중개인: 네, 있어요. 걸어서 5분 거리에 지하철이 있어요. 한번 보시겠어요?\n라민: 네, 지금 바로 보여 주세요.",
-    "vi": "Ramin: Xin chào? Tôi muốn xem nhà ạ.\nMôi giới nhà đất: Mời anh vào. Anh tìm nhà kiểu nào ạ?\nRamin: Tôi đang tìm nhà villa hai phòng thuê theo tháng.\nMôi giới nhà đất: Anh đợi một chút. Đúng lúc có căn vừa mới ra. Nhà hướng Nam, lại vừa sửa mới nên sạch sẽ nữa.\nRamin: À, vậy ạ? Tôi mong gần đó có ga tàu điện ngầm.\nMôi giới nhà đất: Vâng, có đấy ạ. Đi bộ 5 phút là tới ga tàu điện ngầm. Anh xem thử nhé?\nRamin: Vâng, anh cho tôi xem ngay bây giờ đi ạ."
-  }
-]

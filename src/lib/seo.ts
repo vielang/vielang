@@ -18,10 +18,10 @@ export const SITE_URL = (
 export const SITE_NAME = "VieLang";
 
 export const SITE_DESCRIPTION =
-  "Học tiếng Hàn chương trình KIIP (사회통합프로그램) cho người Việt: đọc sách có dịch tiếng Việt, giải thích ngữ pháp, audio, luyện đề TOPIK và cẩm nang visa, việc làm, du học ở Hàn Quốc.";
+  "Học lập trình và tiếng Anh bằng tiếng Việt: lộ trình .NET developer (C#, OOP, SQL, ASP.NET Core, cấu trúc dữ liệu, kiến trúc phần mềm) và giáo trình tiếng Anh English File có audio.";
 
 /** Ảnh chia sẻ mặc định — sinh bằng `npm run make-icons`. */
-const OG_IMAGE = { url: "/og.png", width: 1200, height: 630, alt: "VieLang – Học tiếng Hàn KIIP & TOPIK cho người Việt" };
+const OG_IMAGE = { url: "/og.png", width: 1200, height: 630, alt: "VieLang – Học lập trình và tiếng Anh bằng tiếng Việt" };
 
 export function absoluteUrl(path: string): string {
   return `${SITE_URL}${path.startsWith("/") ? path : `/${path}`}`;

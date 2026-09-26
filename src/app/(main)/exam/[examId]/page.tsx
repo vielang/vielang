@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: { params: Promise<{ examId: s
   if (!exam) return { title: "Không tìm thấy đề" };
   return pageMetadata({
     title: `Đề thi ${exam.level} kỳ ${exam.round} (${exam.year}) – làm online, chấm điểm`,
-    description: `Đề thi ${exam.level} lần thứ ${exam.round} năm ${exam.year}: làm bài online có file nghe, chấm điểm tự động và quy ra cấp TOPIK.`,
+    description: `Đề thi ${exam.level} lần thứ ${exam.round} năm ${exam.year}: làm bài online có file nghe, chấm điểm tự động.`,
     path: `/exam/${exam.id}`,
   });
 }

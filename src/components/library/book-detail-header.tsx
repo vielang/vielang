@@ -70,7 +70,7 @@ export function BookDetailHeader({
           {book.titleVi}
         </h1>
         {book.titleKo && (
-          <p className="font-korean mt-0.5 text-sm text-muted-foreground">
+          <p className="mt-0.5 text-sm text-muted-foreground">
             {book.titleKo}
           </p>
         )}

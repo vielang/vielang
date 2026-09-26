@@ -12,30 +12,6 @@
  * Import TĨNH từng đề (xem `EXAMS`), cùng lý do với `lib/page-answers.ts`:
  * Output File Tracing của Next không lần được file đọc qua path dựng động.
  */
-import e35 from "../../content/exams/35-topik1.json";
-import e35b from "../../content/exams/35-topik2.json";
-import e36 from "../../content/exams/36-topik1.json";
-import e36b from "../../content/exams/36-topik2.json";
-import e37 from "../../content/exams/37-topik1.json";
-import e37b from "../../content/exams/37-topik2.json";
-import e41 from "../../content/exams/41-topik1.json";
-import e41b from "../../content/exams/41-topik2.json";
-import e47 from "../../content/exams/47-topik1.json";
-import e47b from "../../content/exams/47-topik2.json";
-import e52 from "../../content/exams/52-topik1.json";
-import e52b from "../../content/exams/52-topik2.json";
-import e60 from "../../content/exams/60-topik1.json";
-import e60b from "../../content/exams/60-topik2.json";
-import e64 from "../../content/exams/64-topik1.json";
-import e64b from "../../content/exams/64-topik2.json";
-import e83 from "../../content/exams/83-topik1.json";
-import e83b from "../../content/exams/83-topik2.json";
-import e91 from "../../content/exams/91-topik1.json";
-import e91b from "../../content/exams/91-topik2.json";
-import e96 from "../../content/exams/96-topik1.json";
-import e96b from "../../content/exams/96-topik2.json";
-import e102 from "../../content/exams/102-topik1.json";
-import e102b from "../../content/exams/102-topik2.json";
 import { mediaOriginBase } from "@/lib/books";
 import {
   examAssetBase,
@@ -53,9 +29,8 @@ import {
 
 export * from "@/lib/exam-types";
 
-const EXAMS = [
-  e102, e102b, e96, e96b, e91, e91b, e83, e83b, e64, e64b, e60, e60b, e52, e52b, e47, e47b, e41, e41b, e37, e37b, e36, e36b, e35, e35b,
-] as unknown as Exam[];
+// Đề TOPIK đã gỡ khỏi VieLang; đề TOEIC sẽ thêm ở đây.
+const EXAMS: Exam[] = [];
 
 export function listExams(): Exam[] {
   return [...EXAMS].sort((a, b) => b.round - a.round || a.level.localeCompare(b.level));

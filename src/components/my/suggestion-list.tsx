@@ -22,7 +22,7 @@ export function SuggestionList({ items }: { items: Suggestion[] }) {
                 <Icon className="size-4 text-foreground/80" aria-hidden />
               </span>
               <span className="min-w-0 flex-1">
-                <span className="font-korean block truncate text-sm font-medium">{s.title}</span>
+                <span className="block truncate text-sm font-medium">{s.title}</span>
                 <span className="block truncate text-xs text-muted-foreground">{s.detail}</span>
               </span>
               <ChevronRight

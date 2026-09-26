@@ -1,55 +1,45 @@
-import { BOOKS, type Book } from "@/lib/books";
-import { getLanguage } from "@/lib/languages";
-import { getAllGrammar } from "@/lib/page-grammar";
-import { LibraryView } from "@/components/library/library-view";
 import type { Metadata } from "next";
 import { SITE_DESCRIPTION, pageMetadata } from "@/lib/seo";
+import { Code2 } from "lucide-react";
+import { courseCard, listCourses } from "@/lib/courses";
+import { CourseList } from "@/components/it/course-list";
+import { PageHeader } from "@/components/layout/page-header";
+import { EmptyState } from "@/components/layout/empty-state";
+
+const TITLE = "VieLang – Học lập trình và tiếng Anh bằng tiếng Việt";
 
 export const metadata: Metadata = {
-  ...pageMetadata({
-    title: "VieLang – Học tiếng Hàn KIIP, TOPIK cho người Việt",
-    description: SITE_DESCRIPTION,
-    path: "/",
-  }),
+  ...pageMetadata({ title: TITLE, description: SITE_DESCRIPTION, path: "/" }),
   // Trang chủ không ghép đuôi "| VieLang" — tên đã nằm đầu tiêu đề.
-  title: { absolute: "VieLang – Học tiếng Hàn KIIP, TOPIK cho người Việt" },
+  title: { absolute: TITLE },
 };
 
-const KOREAN = getLanguage("")!;
-
 /**
- * Nhãn ngắn bằng tiếng Việt cho huy hiệu sách trong kết quả tra cứu, vd
- * "Sơ cấp 1".
- *
- * Suy từ `level` chứ không chép tay danh sách: thêm sách mới là tự có nhãn.
- * `titleVi` thì quá dài cho một huy hiệu, còn `levelLabelKo` (초급1) tuy
- * đúng với bìa sách nhưng đây là giao diện tiếng Việt — bắt người ta đọc
- * chữ Hàn để biết mình đang xem sách nào thì ngược đời.
- *
- * Bốn quyển tiếng Hàn chia hai bậc, mỗi bậc hai quyển. Sách tiếng Anh dùng
- * thang cấp độ khác hẳn nên trả về `titleVi` cho an toàn — chúng cũng chưa
- * có nội dung ngữ pháp.
+ * Trang chủ = mảng IT, mảng mặc định của Thư viện — lộ trình .NET developer:
+ * C# Core → OOP → SQL/Oracle → ASP.NET Core → WinForms → DSA → kiến trúc.
+ * Tiếng Anh ở `/en`. Link cũ `/it` chuyển về đây (next.config.ts).
  */
-function shortLabel(book: Book): string {
-  if (book.lang !== "ko" || book.level > 4) return book.titleVi;
-  const tier = book.level <= 2 ? "Sơ cấp" : "Trung cấp";
-  const n = book.level <= 2 ? book.level : book.level - 2;
-  return `${tier} ${n}`;
-}
-
-export default function LibraryPage() {
-  const books = BOOKS.filter((b) => b.lang === KOREAN.code);
+export default function HomePage() {
+  const courses = listCourses().map(courseCard);
 
   return (
-    <LibraryView
-      language={KOREAN}
-      books={books}
-      grammar={getAllGrammar()}
-      // Dựng bảng tên ở phía máy chủ: client chỉ cần đúng vài cái tên, gửi
-      // nguyên mảng BOOKS sang là lãng phí.
-      bookTitles={Object.fromEntries(
-        BOOKS.map((book) => [book.id, shortLabel(book)])
+    <div className="flex flex-col gap-6">
+      {/* Cùng khung đầu trang với các mảng khác của Thư viện — xem LibraryView. */}
+      <PageHeader
+        title="Thư viện IT"
+        subtitle="Lộ trình .NET developer — học lần lượt từ trên xuống, khoá trước là nền cho khoá sau. Giải thích bằng tiếng Việt, thuật ngữ giữ nguyên tiếng Anh để bạn đọc được tài liệu gốc và đi phỏng vấn."
+      />
+
+      {courses.length === 0 ? (
+        <EmptyState
+          dashed
+          icon={Code2}
+          title="Sắp có nội dung"
+          description="Các khoá học sẽ hiện ở đây theo lộ trình, mỗi khoá gồm nhiều chương và bài học ngắn."
+        />
+      ) : (
+        <CourseList courses={courses} />
       )}
-    />
+    </div>
   );
 }

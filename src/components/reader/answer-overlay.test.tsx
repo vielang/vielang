@@ -2,7 +2,6 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { AnswerOverlay } from "./answer-overlay";
 import type { AnswerKey } from "@/lib/page-answers";
-import { getPageAnswers } from "@/lib/page-answers";
 import { useActivityStore } from "@/lib/activity-store";
 
 const KEYS: AnswerKey[] = [
@@ -143,52 +142,5 @@ describe("tự chấm trong bong bóng đáp án", () => {
     tap(screen.getByRole("button", { name: "Đúng hết" }));
 
     expect(useActivityStore.getState().grades["step1:19:p19-read"]?.grade).toBe(1);
-  });
-});
-
-describe("dữ liệu đáp án sách bài tập", () => {
-  // Sách bài tập dùng mã sách có gạch ngang ("wb-step1") — quên nối file dữ
-  // liệu của nó vào `page-answers` thì trang vẫn mở bình thường, chỉ lặng lẽ
-  // không có chấm nào.
-  it("nạp được, và mỗi bài trên trang là một chấm riêng", () => {
-    const keys = getPageAnswers("wb-step1", 10);
-
-    expect(keys.length).toBeGreaterThanOrEqual(2);
-    expect(new Set(keys.map((k) => k.section)).size).toBe(keys.length);
-  });
-});
-
-describe("dữ liệu đáp án Sơ cấp 1, bài 1", () => {
-  // Chép từ bảng 모범 답안 trang 212. Test này giữ cho dữ liệu khỏi trôi
-  // khỏi sách khi có người sửa tay file JSON.
-  it("trang 18 — 듣기", () => {
-    const [key] = getPageAnswers("step1", 18);
-
-    expect(key.section).toBe("듣기");
-    expect(key.source).toBe(212);
-    expect(key.answers).toEqual([
-      { label: "1)", text: "네 ✓" },
-      { label: "2)", text: "②" },
-    ]);
-  });
-
-  it("trang 19 — 읽기", () => {
-    const [key] = getPageAnswers("step1", 19);
-
-    expect(key.section).toBe("읽기");
-    expect(key.answers.map((a) => a.text)).toEqual(["네 ✓", "아니요 ✓", "아니요 ✓"]);
-  });
-
-  it("khớp với đáp án của bài tập tự làm trong quiz", async () => {
-    // Hai nguồn cùng chép từ một bảng đáp án — lệch nhau là một bên chép sai.
-    const { getPageQuiz } = await import("@/lib/quiz");
-    const quiz19 = getPageQuiz("step1", 19).flatMap((s) => s.items);
-    const picked = quiz19
-      .filter((i) => i.kind === "choice")
-      .map((i) => (i.kind === "choice" ? i.options[i.answer] : ""));
-
-    const [key] = getPageAnswers("step1", 19);
-
-    expect(picked).toEqual(key.answers.map((a) => a.text.replace(/\s*✓$/, "")));
   });
 });

@@ -51,7 +51,7 @@ function WritingInput({
           const key = textKey(task.no, i);
           return (
             <label key={key} className="flex items-center gap-2">
-              <span className="font-korean text-lg" aria-hidden>
+              <span className="text-lg" aria-hidden>
                 {mark}
               </span>
               <input
@@ -61,7 +61,7 @@ function WritingInput({
                 readOnly={readOnly}
                 aria-label={`Câu ${task.no}, chỗ trống ${mark}`}
                 lang="ko"
-                className="h-10 min-w-0 flex-1 rounded-md border border-input bg-background px-3 font-korean text-[0.95rem] outline-none focus-visible:ring-2 focus-visible:ring-ring read-only:bg-muted/50"
+                className="h-10 min-w-0 flex-1 rounded-md border border-input bg-background px-3 text-[0.95rem] outline-none focus-visible:ring-2 focus-visible:ring-ring read-only:bg-muted/50"
               />
             </label>
           );
@@ -84,7 +84,7 @@ function WritingInput({
         lang="ko"
         spellCheck={false}
         aria-label={`Bài viết câu ${task.no}`}
-        className="w-full resize-y rounded-md border border-input bg-background px-3 py-2 font-korean text-[0.95rem] leading-relaxed outline-none focus-visible:ring-2 focus-visible:ring-ring read-only:bg-muted/50"
+        className="w-full resize-y rounded-md border border-input bg-background px-3 py-2 text-[0.95rem] leading-relaxed outline-none focus-visible:ring-2 focus-visible:ring-ring read-only:bg-muted/50"
       />
       {Number.isFinite(max) && <LengthMeter n={n} min={min} max={max} />}
       <p

@@ -4,16 +4,14 @@ import { ContinueReading } from "@/components/library/continue-reading";
 import type { Book } from "@/lib/books";
 import { groupBooksByLevel } from "@/lib/library";
 import type { LanguageConfig } from "@/lib/languages";
-import type { GrammarEntry } from "@/lib/page-grammar";
-import { GrammarIndex } from "@/components/grammar/grammar-index";
 import { SegmentedNav } from "@/components/layout/segmented-nav";
 import { libraryTabs, seriesOfLang, type BookSeries } from "@/lib/series";
 import { PageHeader, SectionLabel } from "@/components/layout/page-header";
 import { EmptyState } from "@/components/layout/empty-state";
 
 /**
- * Khung trang thư viện dùng chung cho trang gốc (tiếng Hàn) và mọi trang
- * `/[lang]` khác. Không có sách nào khớp `language` -> hiện empty-state
+ * Khung trang thư viện sách dùng chung cho mọi trang `/[lang]` và
+ * `/sach/<bộ>`. Không có sách nào khớp `language` -> hiện empty-state
  * "Sắp có nội dung" thay vì lưới trống.
  *
  * Ngôn ngữ đã chọn trên header (điện thoại) / menu (máy tính), nên đầu trang
@@ -25,24 +23,12 @@ export function LibraryView({
   language,
   series,
   books,
-  grammar,
-  bookTitles,
 }: {
   language: LanguageConfig;
   series?: BookSeries;
   books: readonly Book[];
-  /**
-   * Điểm ngữ pháp để tra cứu. Bỏ trống thì giữ tiêu đề như cũ.
-   *
-   * Chỉ giáo trình tiếng Hàn mới có nội dung ngữ pháp, mà khung này dùng
-   * chung cho cả `/[lang]` — đặt ô tra cứu rỗng lên trang tiếng Anh thì gõ
-   * gì cũng không ra, tệ hơn là không có.
-   */
-  grammar?: GrammarEntry[];
-  bookTitles?: Record<string, string>;
 }) {
   const groups = groupBooksByLevel(books);
-  const hasGrammar = grammar !== undefined && grammar.length > 0;
   const allSeries = seriesOfLang(language.code);
   // Chưa chọn bộ (trang ngôn ngữ) mà chỉ có ĐÚNG 1 bộ: trang đó CHÍNH LÀ bộ
   // đó rồi (xem lib/series.ts `seriesHref`) — tô tab của bộ ấy luôn, không
@@ -53,20 +39,13 @@ export function LibraryView({
   return (
     <div className="flex flex-col gap-6">
       {/* Cùng một khung đầu trang với Luyện thi, Cẩm nang, Góc học tập: tiêu
-          đề, rồi hàng chọn tầng dưới (nếu có) — "Học qua video" hiện cùng
-          hàng, cùng cấp với bộ sách (KIIP…). */}
+          đề, rồi hàng chọn bộ sách (nếu có từ hai bộ). */}
       <div className="flex flex-col gap-3">
         <PageHeader title={language.heading} subtitle={series?.blurb ?? language.blurb} />
         {tabs.length > 1 && <SegmentedNav label="Bộ sách" items={tabs} />}
       </div>
 
-      {/* Tiếng Hàn: ô tra ngữ pháp (dòng gợi ý bên trong nói có bao nhiêu
-          điểm ngữ pháp). Ngôn ngữ khác chưa có ngữ pháp: một dòng giới thiệu. */}
-      {hasGrammar ? (
-        <GrammarIndex entries={grammar} bookTitles={bookTitles ?? {}} />
-      ) : (
-        <p className="-mt-2 text-sm text-muted-foreground">{language.description}</p>
-      )}
+      <p className="-mt-2 text-sm text-muted-foreground">{language.description}</p>
 
       {/* Đặt TRƯỚC lưới sách: mở thư viện ra phần lớn là để đọc tiếp cuốn
           đang dở, chứ không phải để chọn cuốn mới. Tự ẩn khi chưa đọc gì. */}
@@ -84,7 +63,7 @@ export function LibraryView({
           {groups.map((group) => (
             <section key={group.level} className="flex min-w-0 flex-col gap-3">
               <SectionLabel
-                aside={group.levelLabelKo && <span className="font-korean">{group.levelLabelKo}</span>}
+                aside={group.levelLabelKo}
               >
                 Cấp {group.level}
               </SectionLabel>

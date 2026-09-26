@@ -26,7 +26,9 @@ function el(): HTMLMediaElement {
   return played[played.length - 1];
 }
 
-const queue = buildPlaylist("step1");
+/** Sách có bài nghe còn lại — dùng làm dữ liệu mẫu cho danh sách phát. */
+const BOOK = "en-elementary";
+const queue = buildPlaylist(BOOK);
 
 beforeEach(() => {
   vi.useFakeTimers();
@@ -47,14 +49,14 @@ afterEach(() => {
 
 describe("nghe tự động", () => {
   it("phát ngay bài được chọn, trong đúng lượt gọi", () => {
-    startAutoplay("step1", 2);
+    startAutoplay(BOOK, 2);
     expect(play).toHaveBeenCalledTimes(1);
     expect(el().getAttribute("src")).toBe(queue[2].url);
-    expect(useAutoplayStore.getState()).toMatchObject({ bookId: "step1", index: 2, status: "playing" });
+    expect(useAutoplayStore.getState()).toMatchObject({ bookId: BOOK, index: 2, status: "playing" });
   });
 
   it("hết bài thì nghỉ một nhịp rồi phát bài kế trên CÙNG thẻ audio", () => {
-    startAutoplay("step1");
+    startAutoplay(BOOK);
     const first = el();
     first.dispatchEvent(new Event("ended"));
     expect(play).toHaveBeenCalledTimes(1);
@@ -68,7 +70,7 @@ describe("nghe tự động", () => {
   });
 
   it("hết bài cuối thì tắt hẳn", () => {
-    startAutoplay("step1", queue.length - 1);
+    startAutoplay(BOOK, queue.length - 1);
     el().dispatchEvent(new Event("ended"));
     vi.advanceTimersByTime(GAP_MS);
     expect(useAutoplayStore.getState()).toMatchObject({ bookId: null, status: "idle" });
@@ -76,7 +78,7 @@ describe("nghe tự động", () => {
 
   it("trình duyệt chặn phát thì chuyển sang tạm dừng, bấm phát là chạy lại", async () => {
     playResult = () => Promise.reject(new DOMException("chặn", "NotAllowedError"));
-    startAutoplay("step1");
+    startAutoplay(BOOK);
     await vi.waitFor(() => expect(useAutoplayStore.getState().status).toBe("paused"));
 
     playResult = () => Promise.resolve();
@@ -86,7 +88,7 @@ describe("nghe tự động", () => {
   });
 
   it("tạm dừng lúc đang nghỉ giữa 2 bài thì không tự sang bài kế", () => {
-    startAutoplay("step1");
+    startAutoplay(BOOK);
     el().dispatchEvent(new Event("ended"));
     toggleAutoplayPause();
     vi.advanceTimersByTime(GAP_MS * 2);
@@ -94,7 +96,7 @@ describe("nghe tự động", () => {
   });
 
   it("lỗi tải thì thử lại, thua hết lượt thì bỏ qua sang bài sau", () => {
-    startAutoplay("step1");
+    startAutoplay(BOOK);
     for (let i = 0; i < MAX_AUTO_RETRIES; i++) {
       el().dispatchEvent(new Event("error"));
       vi.advanceTimersByTime(retryDelay(i));
@@ -107,7 +109,7 @@ describe("nghe tự động", () => {
   });
 
   it("tới/lùi đổi bài, lùi ở bài đầu thì đứng yên", () => {
-    startAutoplay("step1");
+    startAutoplay(BOOK);
     autoplayNext();
     expect(useAutoplayStore.getState().index).toBe(1);
     autoplayPrev();
@@ -118,53 +120,53 @@ describe("nghe tự động", () => {
 
 describe("nhớ chỗ nghe dở", () => {
   it("ghi lại bài đang nghe, tắt đi rồi vẫn còn", () => {
-    startAutoplay("step1", 3);
+    startAutoplay(BOOK, 3);
     stopAutoplay();
-    expect(useAutoplayResumeStore.getState().positions.step1).toMatchObject({
+    expect(useAutoplayResumeStore.getState().positions[BOOK]).toMatchObject({
       url: queue[3].url,
     });
   });
 
   it("nghe tiếp vào đúng bài và tua tới đúng giây", () => {
     useAutoplayResumeStore.setState({
-      positions: { step1: { url: queue[5].url, time: 42 } },
+      positions: { [BOOK]: { url: queue[5].url, time: 42 } },
     });
-    continueAutoplay("step1");
+    continueAutoplay(BOOK);
     expect(useAutoplayStore.getState().index).toBe(5);
     el().dispatchEvent(new Event("loadedmetadata"));
     expect(el().currentTime).toBe(42);
   });
 
   it("chưa nghe lần nào, hoặc bài đã ghi không còn, thì nghe từ đầu", () => {
-    continueAutoplay("step1");
+    continueAutoplay(BOOK);
     expect(useAutoplayStore.getState().index).toBe(0);
     stopAutoplay();
 
     useAutoplayResumeStore.setState({
-      positions: { step1: { url: "https://x/khong-con.mp3", time: 10 } },
+      positions: { [BOOK]: { url: "https://x/khong-con.mp3", time: 10 } },
     });
-    continueAutoplay("step1");
+    continueAutoplay(BOOK);
     expect(useAutoplayStore.getState().index).toBe(0);
   });
 
   it("nghe hết sách thì xoá chỗ dở, lần sau nghe lại từ đầu", () => {
-    startAutoplay("step1", queue.length - 1);
+    startAutoplay(BOOK, queue.length - 1);
     el().dispatchEvent(new Event("ended"));
     vi.advanceTimersByTime(GAP_MS);
-    expect(useAutoplayResumeStore.getState().positions.step1).toBeUndefined();
+    expect(useAutoplayResumeStore.getState().positions[BOOK]).toBeUndefined();
   });
 });
 
 describe("các ca dễ hỏng", () => {
   it("đang chờ tua tới chỗ dở thì không ghi đè chỗ dở bằng giây 0", () => {
     useAutoplayResumeStore.setState({
-      positions: { step1: { url: queue[5].url, time: 42 } },
+      positions: { [BOOK]: { url: queue[5].url, time: 42 } },
     });
-    continueAutoplay("step1");
+    continueAutoplay(BOOK);
     // Trình duyệt đặt lại về 0 khi đổi `src` và bắn timeupdate/pause.
     el().dispatchEvent(new Event("timeupdate"));
     stopAutoplay();
-    expect(useAutoplayResumeStore.getState().positions.step1).toEqual({
+    expect(useAutoplayResumeStore.getState().positions[BOOK]).toEqual({
       url: queue[5].url,
       time: 42,
     });
@@ -172,9 +174,9 @@ describe("các ca dễ hỏng", () => {
 
   it("lỗi tải ngay lúc đang chờ tua thì thử lại vẫn tua tới đúng chỗ dở", () => {
     useAutoplayResumeStore.setState({
-      positions: { step1: { url: queue[5].url, time: 42 } },
+      positions: { [BOOK]: { url: queue[5].url, time: 42 } },
     });
-    continueAutoplay("step1");
+    continueAutoplay(BOOK);
     el().dispatchEvent(new Event("error"));
     vi.advanceTimersByTime(retryDelay(0));
     el().dispatchEvent(new Event("loadedmetadata"));
@@ -182,7 +184,7 @@ describe("các ca dễ hỏng", () => {
   });
 
   it("mất mạng thì tạm dừng; có mạng lại bấm phát là nạp lại bài chứ không kẹt", () => {
-    startAutoplay("step1");
+    startAutoplay(BOOK);
     const online = vi.spyOn(navigator, "onLine", "get").mockReturnValue(false);
     el().dispatchEvent(new Event("error"));
     expect(useAutoplayStore.getState().status).toBe("paused");
@@ -198,7 +200,7 @@ describe("các ca dễ hỏng", () => {
   });
 
   it("bấm lùi lúc đang nghỉ giữa 2 bài thì phát lại bài vừa rồi, không nhảy sang bài kế", () => {
-    startAutoplay("step1", 2);
+    startAutoplay(BOOK, 2);
     Object.defineProperty(el(), "currentTime", { configurable: true, writable: true, value: 120 });
     el().dispatchEvent(new Event("ended"));
     autoplayPrev();
@@ -227,8 +229,8 @@ describe("sống sót qua một lần tải lại cả trang", () => {
   }
 
   it("đang nghe thì ghi dấu vào tab, tắt thì xoá dấu", () => {
-    startAutoplay("step1", 3);
-    expect(session()).toMatchObject({ bookId: "step1", paused: false });
+    startAutoplay(BOOK, 3);
+    expect(session()).toMatchObject({ bookId: BOOK, paused: false });
     toggleAutoplayPause();
     expect(session()).toMatchObject({ paused: true });
     stopAutoplay();
@@ -236,57 +238,57 @@ describe("sống sót qua một lần tải lại cả trang", () => {
   });
 
   it("tải lại giữa chừng thì nghe tiếp đúng bài, đúng giây", () => {
-    startAutoplay("step1", 3);
+    startAutoplay(BOOK, 3);
     useAutoplayResumeStore.setState({
-      positions: { step1: { url: queue[4].url, time: 17 } },
+      positions: { [BOOK]: { url: queue[4].url, time: 17 } },
     });
     simulateReload();
     play.mockClear();
 
-    restoreAutoplaySession(`/read/step1/${queue[4].page}`);
-    expect(useAutoplayStore.getState()).toMatchObject({ bookId: "step1", index: 4, status: "playing" });
+    restoreAutoplaySession(`/read/${BOOK}/${queue[4].page}`);
+    expect(useAutoplayStore.getState()).toMatchObject({ bookId: BOOK, index: 4, status: "playing" });
     expect(play).toHaveBeenCalledTimes(1);
     el().dispatchEvent(new Event("loadedmetadata"));
     expect(el().currentTime).toBe(17);
   });
 
   it("trình duyệt chặn tự phát sau tải lại thì vẫn giữ thanh, ở trạng thái chờ bấm", async () => {
-    startAutoplay("step1", 3);
+    startAutoplay(BOOK, 3);
     simulateReload();
     playResult = () => Promise.reject(new DOMException("chặn", "NotAllowedError"));
 
-    restoreAutoplaySession(`/read/step1/${queue[3].page}`);
+    restoreAutoplaySession(`/read/${BOOK}/${queue[3].page}`);
     await vi.waitFor(() => expect(useAutoplayStore.getState().status).toBe("paused"));
-    expect(useAutoplayStore.getState().bookId).toBe("step1");
+    expect(useAutoplayStore.getState().bookId).toBe(BOOK);
   });
 
   it("đang tạm dừng lúc tải lại thì khôi phục ở trạng thái dừng, không tự phát", () => {
-    startAutoplay("step1", 3);
+    startAutoplay(BOOK, 3);
     toggleAutoplayPause();
     simulateReload();
     play.mockClear();
 
-    restoreAutoplaySession(`/read/step1/${queue[3].page}`);
-    expect(useAutoplayStore.getState()).toMatchObject({ bookId: "step1", status: "paused" });
+    restoreAutoplaySession(`/read/${BOOK}/${queue[3].page}`);
+    expect(useAutoplayStore.getState()).toMatchObject({ bookId: BOOK, status: "paused" });
     expect(play).not.toHaveBeenCalled();
   });
 
   it("quay lại tab sau lâu quá thì không tự phát tiếng", () => {
-    startAutoplay("step1", 3);
+    startAutoplay(BOOK, 3);
     vi.advanceTimersByTime(10 * 60 * 1000);
     simulateReload();
     play.mockClear();
 
-    restoreAutoplaySession(`/read/step1/${queue[3].page}`);
+    restoreAutoplaySession(`/read/${BOOK}/${queue[3].page}`);
     expect(useAutoplayStore.getState().status).toBe("paused");
     expect(play).not.toHaveBeenCalled();
   });
 
   it("không ở trình đọc của sách đó thì không khôi phục, và bỏ dấu cũ", () => {
-    startAutoplay("step1", 3);
+    startAutoplay(BOOK, 3);
     simulateReload();
 
-    restoreAutoplaySession("/books/step1");
+    restoreAutoplaySession(`/books/${BOOK}`);
     expect(useAutoplayStore.getState().status).toBe("idle");
     expect(session()).toBeNull();
   });

@@ -7,11 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import type { Book } from "@/lib/books";
+import { courseProgressId, lessonHref, type CourseCard } from "@/lib/courses";
+import { EXAM_LEVELS } from "@/lib/exam-levels";
 import { countStudyDays, currentStreak, minutesThisWeek } from "@/lib/activity";
 import { useActivityStore } from "@/lib/activity-store";
 import { computeAbility } from "@/lib/ability";
 import { buildSuggestions, companionMessage, greeting, shortBookName } from "@/lib/companion";
-import { useProgressStore, resumePage } from "@/lib/progress-store";
+import { getBookProgress, useProgressStore, resumePage } from "@/lib/progress-store";
 import { useQuizStore } from "@/lib/quiz-store";
 import { useRecordingHydration, useRecordingStore } from "@/lib/recording-store";
 import { StudyHeatmap } from "@/components/my/study-heatmap";
@@ -34,14 +36,14 @@ const GOAL_CHOICES = [30, 60, 90, 150, 300];
  * 1. "Hôm nay mình thế nào, giờ làm gì?" → lời nhắn + nút học tiếp.
  * 2. "Tuần này có đều không?" → 7 ngày và số phút so với mục tiêu.
  * 3. "Nên ôn gì?" → tối đa 3 gợi ý cụ thể.
- * 4. Sách đang học, kỹ năng.
+ * 4. Khoá học, sách đang học, kỹ năng.
  * 5. Mọi thứ chi tiết (lịch 12 tuần, danh sách đầy đủ, sao lưu) gập lại ở
  *    cuối — có khi cần, nhưng không đứng chắn đường.
  *
  * Chỉ vẽ sau khi đã ở trình duyệt: server không biết gì về localStorage, vẽ
  * luôn thì server ra "0 ngày" rồi nhảy sang số thật (lệch hydration).
  */
-export function MyPageView({ books }: { books: readonly Book[] }) {
+export function MyPageView({ books, courses = [] }: { books: readonly Book[]; courses?: readonly CourseCard[] }) {
   const isClient = useIsClient();
   const days = useActivityStore((s) => s.days);
   const studied = useActivityStore((s) => s.studied);
@@ -63,6 +65,7 @@ export function MyPageView({ books }: { books: readonly Book[] }) {
   const weekMinutes = minutesThisWeek(days, now);
   const goalPercent = Math.min(100, Math.round((weekMinutes / goal) * 100));
   const rows = booksInProgress(books, progressByBook, studied);
+  const courseRows = coursesInProgress(courses, progressByBook);
   const quiz = summarizeQuiz(quizPages);
   const ability = computeAbility(grades, quizPages);
   const suggestions = buildSuggestions(ability, quiz.wrong, books);
@@ -70,7 +73,7 @@ export function MyPageView({ books }: { books: readonly Book[] }) {
   const studiedTotal = Object.values(studied).reduce((n, pages) => n + pages.length, 0);
   const recordingTotal = Object.values(recordings).reduce((n, list) => n + list.length, 0);
 
-  if (rows.length === 0 && studyDays === 0 && ability.total === 0) {
+  if (rows.length === 0 && courseRows.length === 0 && studyDays === 0 && ability.total === 0) {
     return <Welcome />;
   }
 
@@ -180,7 +183,47 @@ export function MyPageView({ books }: { books: readonly Book[] }) {
         )}
       </section>
 
-      {/* 4. Sách đang học */}
+      {/* 4. Khoá học đang học */}
+      {courseRows.length > 0 && (
+        <section className="flex flex-col gap-3" aria-labelledby="courses-title">
+          <h2 id="courses-title" className="text-base font-semibold">
+            Khoá học đang học
+          </h2>
+          <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {courseRows.map(({ course, done, next }) => (
+              <li key={course.id} className="flex flex-col gap-2 rounded-xl border border-border p-4">
+                <Link href={`/it/${course.id}`} className="font-medium hover:underline">
+                  {course.title}
+                </Link>
+                <div
+                  className="h-1.5 overflow-hidden rounded-full bg-muted"
+                  role="progressbar"
+                  aria-valuenow={done}
+                  aria-valuemin={0}
+                  aria-valuemax={course.total}
+                  aria-label={`Đã học ${done}/${course.total} bài`}
+                >
+                  <div className="h-full rounded-full bg-primary" style={{ width: `${(done / course.total) * 100}%` }} />
+                </div>
+                <p className="text-xs text-muted-foreground tabular-nums">
+                  Đã học {done}/{course.total} bài
+                </p>
+                {next && (
+                  <Link
+                    href={lessonHref(course.id, next.slug)}
+                    className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
+                  >
+                    Học tiếp: {next.title}
+                    <ArrowRight className="size-3.5" aria-hidden />
+                  </Link>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {/* Sách đang học */}
       {rows.length > 0 && (
         <section className="flex flex-col gap-3" aria-labelledby="books-title">
           <h2 id="books-title" className="text-base font-semibold">
@@ -197,13 +240,15 @@ export function MyPageView({ books }: { books: readonly Book[] }) {
       {/* Trang đã đánh dấu — ngay sau sách đang học, vì cùng nói về việc đọc. */}
       <BookmarkStrip books={books} progressByBook={progressByBook} />
 
-      {/* Luyện thi TOPIK */}
-      <section className="flex flex-col gap-3" aria-labelledby="exam-title">
-        <h2 id="exam-title" className="text-base font-semibold">
-          Luyện thi TOPIK
-        </h2>
-        <ExamCard />
-      </section>
+      {/* Luyện thi — chỉ khi đã có kỳ thi */}
+      {EXAM_LEVELS.length > 0 && (
+        <section className="flex flex-col gap-3" aria-labelledby="exam-title">
+          <h2 id="exam-title" className="text-base font-semibold">
+            Luyện thi
+          </h2>
+          <ExamCard />
+        </section>
+      )}
 
       {/* 5. Kỹ năng */}
       {ability.total > 0 && (
@@ -247,6 +292,26 @@ export function MyPageView({ books }: { books: readonly Book[] }) {
   );
 }
 
+/**
+ * Khoá học đã bắt đầu, khoá học gần đây nhất lên trước. Tiến độ khoá học nằm
+ * chung kho với sách (xem `courseProgressId`), mỗi "trang" là số thứ tự bài.
+ * Bài học tiếp = bài có số nhỏ nhất chưa học.
+ */
+function coursesInProgress(
+  courses: readonly CourseCard[],
+  progressByBook: Parameters<typeof getBookProgress>[0]
+) {
+  return courses
+    .map((course) => {
+      const p = getBookProgress(progressByBook, courseProgressId(course.id));
+      const read = new Set(p.readPages);
+      const nextIndex = course.lessons.findIndex((_, i) => !read.has(i + 1));
+      return { course, done: read.size, next: nextIndex >= 0 ? course.lessons[nextIndex] : undefined, updatedAt: p.updatedAt };
+    })
+    .filter((row) => row.done > 0)
+    .sort((a, b) => (b.updatedAt ?? "").localeCompare(a.updatedAt ?? ""));
+}
+
 /** Mục gập/mở, dùng `<details>` gốc — bàn phím và trình đọc màn hình tự lo. */
 function Disclosure({
   title,
@@ -285,13 +350,13 @@ function Welcome() {
       <div className="flex flex-col gap-2">
         <h2 className="text-xl font-semibold tracking-tight">Bắt đầu hành trình nào 🌱</h2>
         <p className="text-sm text-muted-foreground text-pretty">
-          Mở một cuốn sách và học vài trang. Mình sẽ ghi lại thời gian học, trang đã học,
+          Mở một khoá học hoặc một cuốn sách và học vài bài. Mình sẽ ghi lại thời gian học, trang đã học,
           và gợi ý bài nên ôn — tất cả ngay trên máy của bạn, không cần tài khoản.
         </p>
       </div>
       <Button asChild className="self-start">
         <Link href="/">
-          Chọn sách để học
+          Chọn khoá học
           <ArrowRight className="size-4" aria-hidden />
         </Link>
       </Button>

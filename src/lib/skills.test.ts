@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { BOOKS } from "@/lib/books";
 import { getAnswerPages, getPageAnswers } from "@/lib/page-answers";
-import { grammarHeading, skillOfSection, textbookGrammarFor } from "./skills";
+import { grammarHeading, skillOfSection } from "./skills";
 
 describe("kỹ năng theo tên mục", () => {
   it.each([
@@ -24,7 +24,7 @@ describe("kỹ năng theo tên mục", () => {
     expect(skillOfSection("문화와 정보 — 한국의 화폐")).toBeNull();
   });
 
-  it("mọi mục đáp án của cả tám cuốn đều xếp được vào một kỹ năng", () => {
+  it("mọi mục đáp án của mọi cuốn đều xếp được vào một kỹ năng", () => {
     // Chốt cho dữ liệu soạn sau này: đặt tên mục lạ thì mục đó lặng lẽ biến
     // khỏi thống kê năng lực.
     const unmapped: string[] = [];
@@ -46,22 +46,4 @@ describe("điểm ngữ pháp của sách bài tập", () => {
     expect(grammarHeading("어휘 1")).toBeNull();
   });
 
-  it("ghép với đúng điểm ngữ pháp trong giáo trình", () => {
-    const entry = textbookGrammarFor("wb-step1", 12, "문법 · 명 이에요/예요 1");
-    expect(entry).toMatchObject({ bookId: "step1", page: 15, title: "명 이에요/예요" });
-  });
-
-  it("mọi bài ngữ pháp của bốn sách bài tập đều ghép được", () => {
-    const unmatched: string[] = [];
-    for (const wb of ["wb-step1", "wb-step2", "wb-step3", "wb-step4"]) {
-      for (const page of getAnswerPages(wb)) {
-        for (const key of getPageAnswers(wb, page)) {
-          if (grammarHeading(key.section) && !textbookGrammarFor(wb, page, key.section)) {
-            unmatched.push(`${wb} p${page}: ${key.section}`);
-          }
-        }
-      }
-    }
-    expect(unmatched).toEqual([]);
-  });
 });

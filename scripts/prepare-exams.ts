@@ -77,7 +77,7 @@ async function main() {
   try {
     exams = (await readdir(ROOT)).filter((e) => !examFilter || e === examFilter);
   } catch {
-    console.error(`✗ Chưa có ${ROOT} — chạy "npm run import-topik" trước.`);
+    console.error(`✗ Chưa có ${ROOT} — chạy "npm run import-topik" (đã gỡ cùng đề TOPIK; TOEIC sẽ có script nhập riêng) trước.`);
     process.exit(1);
   }
 

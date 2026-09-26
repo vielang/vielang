@@ -22,24 +22,7 @@ interface WorkbookChapterLayout {
   pageStep: number;
 }
 
-const WORKBOOK_CHAPTERS_1_2: WorkbookChapterLayout = {
-  lessonCount: 18,
-  firstPage: 10,
-  pageStep: 6,
-};
-
-const WORKBOOK_CHAPTERS_3_4: WorkbookChapterLayout = {
-  lessonCount: 16,
-  firstPage: 10,
-  pageStep: 8,
-};
-
-const WORKBOOK_CHAPTERS: Record<string, WorkbookChapterLayout> = {
-  "wb-step1": WORKBOOK_CHAPTERS_1_2,
-  "wb-step2": WORKBOOK_CHAPTERS_1_2,
-  "wb-step3": WORKBOOK_CHAPTERS_3_4,
-  "wb-step4": WORKBOOK_CHAPTERS_3_4,
-};
+const WORKBOOK_CHAPTERS: Record<string, WorkbookChapterLayout> = {};
 
 /**
  * Ranh giới "Unit N" cho sách không có audio (vd English File) — verify tay

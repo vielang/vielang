@@ -21,7 +21,6 @@ export interface BookSeries {
 }
 
 export const SERIES: readonly BookSeries[] = [
-  { id: "kiip", lang: "ko", label: "KIIP", blurb: "Chương trình hội nhập xã hội — giáo trình và sách bài tập" },
   { id: "english-file", lang: "en", label: "English File", blurb: "Giáo trình English File theo từng cấp độ" },
 ];
 
@@ -73,8 +72,5 @@ export function libraryTabs(language: LanguageConfig, activeKey: string): Librar
           })),
         ]
       : allSeries.map((s) => ({ key: s.id, label: s.label, href: languageHref, active: activeKey === s.id }));
-  if (language.hasVideo) {
-    items.push({ key: "video", label: "Học qua video", href: "/video", active: activeKey === "video" });
-  }
   return items;
 }

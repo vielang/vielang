@@ -11,10 +11,10 @@ import type { MetadataRoute } from "next";
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "VieLang – Đọc sách tiếng Hàn",
+    name: "VieLang – Học lập trình và tiếng Anh",
     short_name: "VieLang",
     description:
-      "Đọc sách văn hóa – xã hội Hàn Quốc (chương trình KIIP) dành cho người Việt học tiếng Hàn.",
+      "Học lập trình và tiếng Anh bằng tiếng Việt: lộ trình .NET developer (C#, OOP, SQL, ASP.NET Core, cấu trúc dữ liệu, kiến trúc phần mềm) và giáo trình tiếng Anh English File có audio.",
     start_url: "/",
     display: "standalone",
     background_color: "#0a0a0a",

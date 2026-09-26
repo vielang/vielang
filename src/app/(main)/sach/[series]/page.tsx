@@ -6,7 +6,7 @@ import { LANGUAGES } from "@/lib/languages";
 import { SERIES, getSeries } from "@/lib/series";
 import { LibraryView } from "@/components/library/library-view";
 
-// Trang một bộ sách (KIIP, Sejong…). Mã bộ duy nhất trên mọi ngôn ngữ nên
+// Trang một bộ sách (English File…). Mã bộ duy nhất trên mọi ngôn ngữ nên
 // URL phẳng `/sach/<id>`; ngôn ngữ suy từ bộ — xem lib/series.ts.
 export function generateStaticParams() {
   return SERIES.map((s) => ({ series: s.id }));
@@ -22,7 +22,7 @@ export async function generateMetadata({
   const series = getSeries((await params).series);
   if (!series) return { title: "Không tìm thấy trang" };
   return pageMetadata({
-    title: series.id === "kiip" ? "Giáo trình KIIP (사회통합프로그램) – đọc online, dịch tiếng Việt" : series.label,
+    title: `Giáo trình ${series.label} – đọc online`,
     description: series.blurb,
     path: `/sach/${series.id}`,
   });

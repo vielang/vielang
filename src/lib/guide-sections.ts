@@ -4,7 +4,7 @@
  * cần danh sách mục ở MỌI trang, kéo theo cả nội dung bài vào gói JS chung là
  * phí. lib/guide.ts dùng lại từ đây.
  */
-export type GuideSectionId = "visa" | "truong" | "viec-lam";
+export type GuideSectionId = string;
 
 export interface GuideSection {
   id: GuideSectionId;
@@ -13,21 +13,6 @@ export interface GuideSection {
   description: string;
 }
 
-/** Thứ tự hiển thị các mục. Thêm mục = thêm thư mục + một dòng ở đây và ở build-content. */
-export const GUIDE_SECTIONS: readonly GuideSection[] = [
-  {
-    id: "visa",
-    title: "Visa",
-    description: "Điều kiện, hồ sơ và các bước cho từng loại visa.",
-  },
-  {
-    id: "truong",
-    title: "Trường đại học",
-    description: "Tuyển sinh, học phí, học bổng và trường tiếng của từng trường.",
-  },
-  {
-    id: "viec-lam",
-    title: "Việc làm",
-    description: "Đi làm hợp pháp, quyền lợi người lao động và tìm việc an toàn.",
-  },
-];
+/** Thứ tự hiển thị các mục. Thêm mục = thêm thư mục content/cam-nang/<id> + một dòng ở đây. */
+// Chủ đề IT sẽ thêm ở đây. Rỗng thì tab Cẩm nang tự ẩn (xem lib/nav.ts).
+export const GUIDE_SECTIONS: readonly GuideSection[] = [];

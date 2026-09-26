@@ -2,9 +2,8 @@
  * Danh sách ngôn ngữ/giáo trình mà site phục vụ — nguồn duy nhất cho cả nav
  * header lẫn route thư viện theo ngôn ngữ.
  *
- * `slug: ""` là ngôn ngữ mặc định, sống ở route gốc `/` (đang là tiếng Hàn,
- * để không phá các link cũ). Ngôn ngữ khác sống ở `/<slug>` — xem
- * `(main)/[lang]/page.tsx`. Thêm ngôn ngữ mới: thêm 1 entry ở đây, rồi thêm
+ * Mỗi ngôn ngữ sống ở `/<slug>` — xem `(main)/[lang]/page.tsx`. Trang gốc
+ * `/` là mảng IT (xem lib/tracks.ts), không phải một ngôn ngữ. Thêm ngôn ngữ mới: thêm 1 entry ở đây, rồi thêm
  * sách vào BOOKS (lib/books.ts) với `lang` khớp `code` — không cần đụng route
  * hay component nào khác.
  */
@@ -20,24 +19,9 @@ export interface LanguageConfig {
   description: string;
   /** Một dòng ngắn trong menu thả xuống của header — các bộ sách đang có. */
   blurb: string;
-  /** Có mục "Học qua video" (`/video`, xem `lib/videos.ts`) không — hiện chỉ
-   * tiếng Hàn. Đặt ở đây (không phải trong lib/videos.ts) để nav/series —
-   * dùng ở MỌI trang — khỏi phải kéo theo cả manifest video (JSON cue nặng)
-   * chỉ để biết có tab video hay không. */
-  hasVideo?: boolean;
 }
 
 export const LANGUAGES = [
-  {
-    code: "ko",
-    slug: "",
-    label: "Tiếng Hàn",
-    heading: "Thư viện tiếng Hàn",
-    blurb: "Giáo trình KIIP và sách bài tập",
-    hasVideo: true,
-    description:
-      "Sách văn hóa – xã hội Hàn Quốc (chương trình KIIP), dành cho người Việt học tiếng Hàn. Mỗi cấp độ gồm giáo trình chính và sách bài tập đi kèm.",
-  },
   {
     code: "en",
     slug: "en",
@@ -45,7 +29,7 @@ export const LANGUAGES = [
     heading: "Thư viện tiếng Anh",
     blurb: "Giáo trình English File",
     description:
-      "Giáo trình học tiếng Anh, tổ chức theo cấp độ tương tự chương trình KIIP tiếng Hàn — giáo trình chính đi kèm sách bài tập ở mỗi cấp.",
+      "Giáo trình học tiếng Anh English File theo từng cấp độ, có audio nghe theo trang, ghi chú và đánh dấu ngay trên sách.",
   },
 ] as const satisfies readonly LanguageConfig[];
 

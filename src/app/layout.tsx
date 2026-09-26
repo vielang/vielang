@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Noto_Sans_KR } from "next/font/google";
+import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ServiceWorker } from "@/components/service-worker";
@@ -16,19 +16,11 @@ const inter = Inter({
   display: "swap",
 });
 
-const notoSansKr = Noto_Sans_KR({
-  variable: "--font-korean",
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-  display: "swap",
-  preload: false,
-});
-
 export const metadata: Metadata = {
   // Gốc cho mọi URL tương đối trong metadata (canonical, og:image…).
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "VieLang – Học tiếng Hàn KIIP, TOPIK cho người Việt",
+    default: "VieLang – Học lập trình và tiếng Anh bằng tiếng Việt",
     template: "%s | VieLang",
   },
   description: SITE_DESCRIPTION,
@@ -100,7 +92,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="vi"
       suppressHydrationWarning
-      className={`${inter.variable} ${notoSansKr.variable} h-full antialiased`}
+      className={`${inter.variable} h-full antialiased`}
     >
       <head>
         {/* Đánh dấu app đang chạy từ màn hình chính (PWA) TRƯỚC khi vẽ trang

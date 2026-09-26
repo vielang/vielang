@@ -12,17 +12,14 @@
     "test": "vitest run",
     "prepare-images": "tsx scripts/prepare-images.ts",
     "prepare-audio": "tsx scripts/prepare-audio.ts",
-    "prepare-video": "tsx scripts/prepare-video.ts",
     "build-content": "tsx scripts/build-content.ts",
     "check-csharp": "dotnet run --project scripts/csharp-check",
     "check-code": "dotnet run --project scripts/csharp-compile",
     "check-prose": "tsx scripts/check-prose.ts",
     "copy-excalidraw-fonts": "tsx scripts/copy-excalidraw-fonts.ts",
-    "crawl-orgs": "tsx scripts/crawl-kiip-orgs.ts",
     "make-icons": "tsx scripts/make-icons.ts",
     "check-media": "tsx scripts/check-media-range.mts",
     "prepare-exams": "tsx scripts/prepare-exams.ts",
-    "import-topik": "tsx scripts/import-topik.ts",
     "check-sql": "tsx scripts/check-sql.mts"
   },
   "dependencies": {

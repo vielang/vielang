@@ -1,9 +1,0 @@
-[
-  {
-    "id": "p53-dialog",
-    "rect": [0.14, 0.165, 0.47, 0.35],
-    "label": "Hội thoại",
-    "ko": "직원: 어서 오세요. 무엇을 도와드릴까요?\n라흐만: 어제 산 건데 단추가 떨어져 가지고 교환하고 싶은데요.\n직원: 아, 그러세요? 잠시 제품 먼저 확인해 보겠습니다. (잠시 후) 이거 새 제품인데 색상이나 디자인이 맞는지 확인해 보시겠어요?\n라흐만: 이거 좋습니다.\n직원: 그럼 이걸로 교환해 드리겠습니다. 결제하신 카드하고 영수증은 가지고 오셨지요?\n라흐만: 네, 여기요.\n직원: 이 제품도 교환이나 환불 원하시면 일주일 이내에 가격표 제거하지 마시고 가져오세요.",
-    "vi": "Nhân viên: Mời anh vào. Tôi có thể giúp gì ạ?\nRahman: Cái này tôi mua hôm qua, bị rụng cúc nên tôi muốn đổi ạ.\nNhân viên: À, vậy ạ? Tôi xin phép kiểm tra sản phẩm trước một chút. (một lát sau) Đây là hàng mới, anh xem giúp màu sắc và kiểu dáng có đúng không ạ?\nRahman: Cái này được ạ.\nNhân viên: Vậy tôi đổi sang cái này cho anh. Anh có mang theo thẻ đã thanh toán và hoá đơn chứ ạ?\nRahman: Có, đây ạ.\nNhân viên: Sản phẩm này nếu anh muốn đổi hoặc hoàn tiền thì trong vòng một tuần, đừng gỡ nhãn giá và mang đến nhé ạ."
-  }
-]

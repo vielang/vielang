@@ -3,7 +3,6 @@ import { existsSync } from "node:fs";
 import path from "node:path";
 import {
   countChars,
-  getExam,
   groupAudio,
   isImage,
   isPointsOnly,
@@ -22,11 +21,111 @@ import {
   sectionMax,
   type Answers,
   type Exam,
+  type ExamQuestion,
 } from "./exams";
 import { tagsIn } from "./exam-html";
 
-const exam = getExam("102-topik1")!;
-const exam2 = getExam("102-topik2")!;
+/**
+ * Đề mẫu tự soạn, rút gọn — bộ chấm điểm, chia phần, nghe lại theo khối
+ * không phụ thuộc đề thật nào (sẽ dùng lại cho TOEIC), nên không bám vào dữ
+ * liệu đề đã nhập. Mỗi phần vẫn đủ 100 điểm để quy ra cấp như đề thật.
+ */
+const OPTIONS: ExamQuestion["options"] = [{ html: "①" }, { html: "②" }, { html: "③" }, { html: "④" }];
+
+const q = (
+  no: number,
+  points: number,
+  answer: ExamQuestion["answer"],
+  timing: Pick<ExamQuestion, "audio" | "replay"> = {}
+): ExamQuestion => ({ no, points, answer, layout: 4, prompt: { html: "" }, options: OPTIONS, ...timing });
+
+/**
+ * TOPIK I rút gọn. Phần nghe:
+ * - khối [1~2]: lời chỉ dẫn 0–5 giây, mỗi câu một đoạn riêng;
+ * - khối [3~4]: nghe một hội thoại (60–70) rồi trả lời hai câu — đoạn của
+ *   câu 4 chỉ còn tiếng đọc số câu và khoảng dừng.
+ */
+const exam: Exam = {
+  id: "mau-1",
+  round: 1,
+  year: 2025,
+  level: "TOPIK I",
+  assetDir: "mau",
+  source: "Đề mẫu",
+  sections: [
+    {
+      id: "listening",
+      title: "Nghe",
+      minutes: 40,
+      audio: "listening.mp3",
+      groups: [
+        { from: 1, to: 2, instruction: "※ [1~2] 다음을 듣고", audio: [0, 5] },
+        { from: 3, to: 4, instruction: "※ [3~4] 다음을 듣고", audio: [55, 60], dialogue: [60, 70] },
+      ],
+      questions: [
+        q(1, 30, 2, { audio: [5, 30], replay: [5, 10] }),
+        q(2, 25, 1, { audio: [30, 55], replay: [30, 35] }),
+        q(3, 25, 4, { audio: [60, 90], replay: [60, 75] }),
+        q(4, 20, 3, { audio: [90, 115], replay: [90, 95] }),
+      ],
+    },
+    {
+      id: "reading",
+      title: "Đọc",
+      minutes: 60,
+      groups: [{ from: 5, to: 8, instruction: "※ [5~8] 다음을 읽고" }],
+      questions: [q(5, 25, 1), q(6, 25, 2), q(7, 25, 3), q(8, 25, 4)],
+    },
+  ],
+};
+
+/**
+ * TOPIK II rút gọn: nghe → viết → đọc, phần đọc đánh số LẠI từ 1. Khối nghe
+ * [1~2] không có lời chỉ dẫn riêng, hội thoại chung nằm trong đoạn câu 1.
+ */
+const exam2: Exam = {
+  id: "mau-2",
+  round: 1,
+  year: 2025,
+  level: "TOPIK II",
+  assetDir: "mau",
+  source: "Đề mẫu",
+  sections: [
+    {
+      id: "listening",
+      title: "Nghe",
+      minutes: 60,
+      audio: "listening.mp3",
+      groups: [{ from: 1, to: 2, instruction: "※ [1~2] 다음을 듣고", dialogue: [5, 20] }],
+      questions: [
+        q(1, 50, 1, { audio: [5, 40], replay: [5, 25] }),
+        q(2, 50, 2, { audio: [40, 60], replay: [40, 45] }),
+      ],
+    },
+    {
+      id: "writing",
+      title: "Viết",
+      minutes: 50,
+      groups: [],
+      questions: [],
+      writing: {
+        tasks: [
+          { no: 51, points: 10, kind: "blanks", image: "writing/51.webp", answer: "answer-key/51.webp" },
+          { no: 52, points: 10, kind: "blanks", image: "writing/52.webp", answer: "answer-key/52.webp" },
+          { no: 53, points: 30, kind: "essay", chars: [200, 300], image: "writing/53.webp", answer: "answer-key/53.webp" },
+          { no: 54, points: 50, kind: "essay", chars: [600, 700], image: "writing/54.webp", answer: "answer-key/54.webp" },
+        ],
+      },
+    },
+    {
+      id: "reading",
+      title: "Đọc",
+      minutes: 70,
+      groups: [{ from: 1, to: 2, instruction: "※ [1~2] 다음을 읽고" }],
+      questions: [q(1, 50, 3), q(2, 50, 4)],
+    },
+  ],
+};
 
 /** Chọn đúng hết mọi câu trắc nghiệm. */
 const allRight = (e: Exam): Answers =>
@@ -49,10 +148,10 @@ describe("chấm điểm và quy ra cấp", () => {
   });
 
   it("câu bỏ trống hay sai thì không có điểm, điểm tính theo đúng hệ số từng câu", () => {
-    // Câu 1 (4 điểm) đúng, câu 3 (3 điểm) sai, còn lại bỏ trống.
-    const r = scoreExam(exam, { "listening:1": 1, "listening:3": 1 });
-    expect(r.score).toBe(4);
-    expect(r.sections[0]).toMatchObject({ score: 4, correct: 1, total: 30 });
+    // Câu 1 (30 điểm) đúng, câu 3 (25 điểm) sai, còn lại bỏ trống.
+    const r = scoreExam(exam, { "listening:1": 2, "listening:3": 1 });
+    expect(r.score).toBe(30);
+    expect(r.sections[0]).toMatchObject({ score: 30, correct: 1, total: 4 });
   });
 });
 
@@ -67,14 +166,14 @@ describe("thang cấp và tiến độ luyện", () => {
   it("tiến độ tính cả câu trắc nghiệm đã kiểm tra và câu viết đã tự chấm", () => {
     expect(practiceProgress(exam2, { checked: ["listening:1", "reading:1"], grades: { 53: 20 } })).toEqual({
       done: 3,
-      total: 104,
+      total: 8,
     });
   });
 
   it("luyện tiếp từ câu đầu tiên chưa làm, theo thứ tự các phần", () => {
     expect(nextPracticeTarget(exam, undefined)).toEqual({ section: "listening", no: 1 });
     const listening = exam.sections[0].questions.map((q) => qKey("listening", q.no));
-    expect(nextPracticeTarget(exam, { checked: [...listening, "reading:31"] })).toEqual({ section: "reading", no: 32 });
+    expect(nextPracticeTarget(exam, { checked: [...listening, "reading:5"] })).toEqual({ section: "reading", no: 6 });
     const l2 = exam2.sections[0].questions.map((q) => qKey("listening", q.no));
     expect(nextPracticeTarget(exam2, { checked: l2, grades: { 51: 10 } })).toEqual({ section: "writing", no: 52 });
   });
@@ -104,7 +203,7 @@ describe("TOPIK II", () => {
   it("phần viết chia 3 khối [51–52] [53] [54], mỗi câu có ảnh đề và đáp án mẫu riêng", () => {
     const tasks = exam2.sections[1].writing!.tasks;
     expect(writingBlocks(tasks).map((b) => b.map((t) => t.no))).toEqual([[51, 52], [53], [54]]);
-    for (const e of listExams().filter((x) => x.level === "TOPIK II")) {
+    for (const e of [exam2, ...listExams().filter((x) => x.level === "TOPIK II")]) {
       const ts = e.sections.find((s) => s.writing)!.writing!.tasks;
       expect(new Set(ts.map((t) => t.image)).size).toBe(4);
       expect(new Set(ts.map((t) => t.answer)).size).toBe(4);
@@ -156,10 +255,10 @@ describe("lời chỉ dẫn", () => {
 describe("nghe lại một câu", () => {
   it("câu dùng chung hội thoại thì phát hội thoại trước", () => {
     const listening = exam.sections[0];
-    const q26 = listening.questions.find((q) => q.no === 26)!;
-    const segs = questionAudio(listening, q26);
+    const q4 = listening.questions.find((q) => q.no === 4)!;
+    const segs = questionAudio(listening, q4);
     expect(segs).toHaveLength(2);
-    expect(segs[1]).toEqual(q26.replay);
+    expect(segs[1]).toEqual(q4.replay);
   });
 
   it("nghe lại chỉ phát phần lời đọc — không kèm khoảng dừng trả lời ~20 giây", () => {
@@ -182,17 +281,17 @@ describe("nghe lại một câu", () => {
 
   it("audio của khối như đề thật: một đoạn liền từ lời chỉ dẫn tới hết khoảng dừng câu cuối", () => {
     const listening = exam.sections[0];
-    const g = listening.groups[0]; // [1~4]
+    const g = listening.groups[0]; // [1~2]
     const items = listening.questions.filter((q) => q.no >= g.from && q.no <= g.to);
     const [[start, end]] = groupAudio(listening, g);
     expect(start).toBe(g.audio![0]);
-    // Dừng trong khoảng dừng của câu 4, trước khi tiếng chuông của khối sau vang lên.
+    // Dừng trong khoảng dừng của câu 2, trước khi tiếng chuông của khối sau vang lên.
     expect(end).toBeLessThan(items.at(-1)!.audio![1] - 0.5);
     expect(end).toBeGreaterThan(items.at(-1)!.replay![1]);
   });
 
   it("mọi khối của mọi đề là MỘT đoạn liền (không lấn sang khối sau)", () => {
-    for (const e of listExams())
+    for (const e of [exam, exam2, ...listExams()])
       for (const s of e.sections.filter((x) => x.questions.some((q) => q.audio)))
         for (const g of s.groups) {
           const segs = groupAudio(s, g);
@@ -206,8 +305,8 @@ describe("nghe lại một câu", () => {
 
   it("TOPIK II khối hai câu: hội thoại phát một lần, rồi tới câu sau", () => {
     const listening = exam2.sections[0];
-    const g = listening.groups.find((x) => x.from === 21)!;
-    const [q21, q22] = listening.questions.filter((q) => q.no === 21 || q.no === 22);
+    const g = listening.groups.find((x) => x.from === 1)!;
+    const [q21, q22] = listening.questions.filter((q) => q.no === 1 || q.no === 2);
     const segs = groupAudio(listening, g);
     expect(segs).toHaveLength(1);
     expect(segs[0][0]).toBe(q21.audio![0]);
@@ -222,13 +321,8 @@ describe("nghe lại một câu", () => {
   });
 });
 
-/** Soát dữ liệu MỌI đề — đề nhập sau này cũng phải qua được. */
-it("đủ 12 kỳ, mỗi kỳ cả TOPIK I và TOPIK II", () => {
-  const rounds = [102, 96, 91, 83, 64, 60, 52, 47, 41, 37, 36, 35];
-  expect(listExams().map((e) => e.id)).toEqual(rounds.flatMap((r) => [`${r}-topik1`, `${r}-topik2`]));
-});
-
-describe.each(listExams().map((e) => [e.id, e] as [string, Exam]))("dữ liệu đề %s", (_id, e) => {
+/** Soát dữ liệu MỌI đề — đề nhập sau này cũng phải qua được (đề mẫu chạy kèm để phần soát luôn có việc). */
+describe.each([exam, exam2, ...listExams()].map((e) => [e.id, e] as [string, Exam]))("dữ liệu đề %s", (_id, e) => {
   it("số câu liền mạch trong từng phần, đáp án 1–4, mỗi phần đủ 100 điểm", () => {
     for (const s of e.sections) {
       const nos = s.writing ? s.writing.tasks.map((t) => t.no) : s.questions.map((q) => q.no);

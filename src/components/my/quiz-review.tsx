@@ -62,7 +62,7 @@ export function WrongList({ wrong }: { wrong: WrongItem[] }) {
             href={`/read/${w.bookId}/${w.page}`}
             className="flex flex-col gap-0.5 py-2 text-sm hover:text-primary"
           >
-            <span className="font-korean truncate">{w.prompt}</span>
+            <span className="truncate">{w.prompt}</span>
             <span className="truncate text-xs text-muted-foreground">
               Trang {w.page} · {w.where} ·{" "}
               {(() => {

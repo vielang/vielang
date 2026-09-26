@@ -27,11 +27,12 @@
  * File .json sinh ra KHÔNG commit vào git (xem .gitignore) — luôn sinh lại từ
  * nguồn qua npm lifecycle hook (`predev`, `prebuild`), nên không bao giờ lệch.
  */
-import { readdir, readFile, stat, writeFile } from "node:fs/promises";
+import { mkdir, readdir, readFile, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { Marked } from "marked";
 import { BOOKS } from "../src/lib/books";
 import { GUIDE_GROUPS } from "../src/lib/guide-groups";
+import { GUIDE_SECTIONS as GUIDE_SECTION_LIST } from "../src/lib/guide-sections";
 import type { QuizItem, QuizSection } from "../src/lib/quiz";
 import type { TranslationRegion } from "../src/lib/page-translation";
 import type { GrammarPoint } from "../src/lib/page-grammar";
@@ -800,12 +801,13 @@ async function buildCourses(): Promise<number> {
 }
 
 // ---------------------------------------------------------------------------
-// Cẩm nang (visa, trường, việc làm — xem src/lib/guide.ts)
+// Cẩm nang (xem src/lib/guide.ts)
 
 const GUIDE_ROOT = path.join(CONTENT_ROOT, "cam-nang");
 
 /** Thư mục con = mục của cẩm nang. Thứ tự và tên hiển thị nằm ở src/lib/guide.ts. */
-const GUIDE_SECTIONS = ["visa", "truong", "viec-lam"] as const;
+// Danh sách mục lấy từ src/lib/guide-sections.ts — một nguồn duy nhất.
+const GUIDE_SECTIONS = GUIDE_SECTION_LIST.map((s) => s.id);
 
 /** Khoá ổn định cho một dòng checklist: băm nội dung, không theo thứ tự. */
 function checkKey(text: string): string {
@@ -867,7 +869,8 @@ function sourceDomains(html: string): string {
 }
 
 async function buildGuide(): Promise<number> {
-  if (!(await exists(GUIDE_ROOT))) return 0;
+  // Chưa có mục nào vẫn phải sinh guide.json rỗng: lib/guide.ts import tĩnh file này.
+  await mkdir(GUIDE_ROOT, { recursive: true });
   const sections: Record<string, unknown[]> = {};
   let count = 0;
   for (const section of GUIDE_SECTIONS) {
@@ -937,6 +940,11 @@ async function buildIndex(root: string): Promise<void> {
 }
 
 async function main() {
+  // Sách chưa có nội dung nào thì thư mục cũng chưa có — tạo trước để các
+  // file gộp (lib/* import tĩnh) luôn tồn tại.
+  for (const root of [NOTES_ROOT, QUIZ_ROOT, TRANSLATE_ROOT, GRAMMAR_ROOT, ANSWERS_ROOT]) {
+    await mkdir(root, { recursive: true });
+  }
   for (const book of BOOKS) {
     const notes = await buildNotes(book.id);
     const questions = await buildQuiz(book.id);

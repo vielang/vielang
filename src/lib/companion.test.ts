@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { BOOKS } from "@/lib/books";
+import { BOOKS, type Book } from "@/lib/books";
 import { EMPTY_DAY, type DayStats } from "@/lib/activity";
-import { computeAbility } from "@/lib/ability";
+import { computeAbility, type Ability } from "@/lib/ability";
 import {
   buildSuggestions,
   companionMessage,
@@ -17,8 +17,25 @@ const base = { now: WED, streak: 0, weekMinutes: 0, goal: 90 };
 
 describe("tên sách ngắn", () => {
   it("đủ ngắn để không đẩy mất số trang trên điện thoại", () => {
-    expect(shortBookName(BOOKS.find((b) => b.id === "wb-step1")!)).toBe("Bài tập Sơ cấp 1");
-    expect(shortBookName(BOOKS.find((b) => b.id === "step3")!)).toBe("Giáo trình Trung cấp 1");
+    const book = (over: Partial<Book>): Book => ({
+      id: "mau",
+      sourceDir: "mau",
+      lang: "en",
+      series: "mau",
+      level: 1,
+      kind: "textbook",
+      titleVi: "Sách bài tập – Văn hóa Xã hội Hàn Quốc, Tập 1",
+      totalPages: 100,
+      ...over,
+    });
+    expect(shortBookName(book({ kind: "workbook", levelLabelKo: "초급1" }))).toBe("Bài tập Sơ cấp 1");
+    expect(shortBookName(book({ levelLabelKo: "중급1" }))).toBe("Giáo trình Trung cấp 1");
+  });
+
+  it("sách không có nhãn cấp độ thì giữ nguyên tên", () => {
+    expect(shortBookName(BOOKS.find((b) => b.id === "en-elementary")!)).toBe(
+      "English File – Elementary"
+    );
   });
 });
 
@@ -60,24 +77,46 @@ describe("lời nhắn đồng hành", () => {
 
 describe("gợi ý việc nên làm", () => {
   it("mỗi loại một việc, tối đa ba, ngữ pháp yếu nhất lên đầu", () => {
-    const ability = computeAbility(
-      {
-        "wb-step1:12:p12-1": { grade: 0, at: "" },
-        "wb-step1:10:p10-1": { grade: 0, at: "" },
-        "wb-step1:10:p10-2": { grade: 0.5, at: "" },
-      },
-      {}
-    );
+    const ability: Ability = {
+      skills: [],
+      total: 3,
+      weakGrammar: [
+        {
+          entry: {
+            id: "g1",
+            slug: "present-simple",
+            rect: [0, 0, 0, 0],
+            title: "Present simple",
+            vi: "Thì hiện tại đơn",
+            exKo: "",
+            exVi: "",
+            bookId: "en-elementary",
+            page: 15,
+          },
+          heading: "Present simple",
+          count: 1,
+          score: 0,
+          bookId: "en-elementary",
+          page: 12,
+        },
+      ],
+      redo: [
+        { bookId: "en-elementary", page: 12, section: "Grammar 1", grade: 0 },
+        { bookId: "en-elementary", page: 10, section: "Vocabulary 1", grade: 0 },
+        { bookId: "en-elementary", page: 10, section: "Vocabulary 2", grade: 0.5 },
+      ],
+    };
     const out = buildSuggestions(
       ability,
-      [{ bookId: "step1", page: 19, where: "읽기 1 · 2)" }],
+      [{ bookId: "en-elementary", page: 19, where: "Reading · 2)" }],
       BOOKS
     );
 
     expect(out.map((s) => s.kind)).toEqual(["grammar", "redo", "quiz"]);
-    expect(out[0].href).toBe("/read/step1/15"); // trang giải thích trong giáo trình
+    expect(out[0].href).toBe("/read/en-elementary/15"); // trang giải thích trong giáo trình
     // Bài của chính điểm ngữ pháp vừa gợi ý thì không nhắc lại lần nữa.
-    expect(out[1].href).toBe("/read/wb-step1/10");
+    expect(out[1].href).toBe("/read/en-elementary/10");
+    expect(out[2].detail).toBe("English File – Elementary · trang 19 · Reading · 2)");
   });
 
   it("chưa có gì để gợi ý thì trả rỗng", () => {

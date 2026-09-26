@@ -9,6 +9,29 @@ import { useReaderPrefsStore } from "@/lib/reader-prefs-store";
 const book = BOOKS[0];
 
 /**
+ * Chấm ngữ pháp ở trang 15 và chấm đáp án ở trang 18 — dữ liệu mẫu tự soạn,
+ * để test cơ chế chấm của trình đọc mà không bám vào nội dung sách thật.
+ */
+vi.mock("@/lib/page-grammar", async (importOriginal) => {
+  const real = await importOriginal<typeof import("@/lib/page-grammar")>();
+  return {
+    ...real,
+    getPageGrammar: (_bookId: string, page: number) =>
+      page === 15
+        ? [{ id: "g1", slug: "mau", rect: real.GRAMMAR_DOT_RECT, title: "Mẫu", vi: "Mẫu", exKo: "", exVi: "" }]
+        : [],
+  };
+});
+
+vi.mock("@/lib/page-answers", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/page-answers")>()),
+  getPageAnswers: (_bookId: string, page: number) =>
+    page === 18
+      ? [{ id: "p18", rect: [0.8, 0.5, 0.03, 0.024], section: "Listening", source: 120, answers: [] }]
+      : [],
+}));
+
+/**
  * Tự dựng sự kiện con trỏ thay vì dùng `fireEvent`, để đặt được toạ độ
  * và loại sự kiện đúng như trình duyệt bắn ra.
  */
@@ -325,7 +348,7 @@ describe("chạm trúng chấm trên trang", () => {
 describe("chấm đáp án theo công tắc của từng sách", () => {
   afterEach(() => useReaderPrefsStore.setState({ hiddenAnswerBooks: [] }));
 
-  // step1 trang 18 có chấm đáp án (mục 듣기).
+  // Trang 18 có chấm đáp án (xem dữ liệu mẫu ở đầu file).
   const page18 = { pages: [18], prevPages: [17], nextPages: [19] };
 
   it("mặc định hiện chấm đáp án", () => {
@@ -342,7 +365,7 @@ describe("chấm đáp án theo công tắc của từng sách", () => {
   });
 
   it("tắt cuốn khác thì cuốn này vẫn hiện", () => {
-    useReaderPrefsStore.setState({ hiddenAnswerBooks: ["wb-step1"] });
+    useReaderPrefsStore.setState({ hiddenAnswerBooks: ["en-advanced"] });
     view(page18);
 
     expect(document.querySelector("[data-answer-key]")).not.toBeNull();

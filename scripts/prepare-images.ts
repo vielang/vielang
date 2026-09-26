@@ -15,7 +15,7 @@
  *
  * Dùng:
  *   npm run prepare-images                 # tất cả sách, bỏ qua ảnh đã có
- *   npm run prepare-images -- --book step1 # chỉ 1 sách
+ *   npm run prepare-images -- --book en-beginner # chỉ 1 sách
  *   npm run prepare-images -- --force      # upload lại kể cả đã có
  *   npm run prepare-images -- --skip-thumbs
  *

@@ -18,10 +18,8 @@ export interface ExamLevelInfo {
   hint: string;
 }
 
-export const EXAM_LEVELS: readonly ExamLevelInfo[] = [
-  { id: "TOPIK I", slug: "topik-i", lang: "ko", hint: "Cấp 1–2 · Nghe, Đọc" },
-  { id: "TOPIK II", slug: "topik-ii", lang: "ko", hint: "Cấp 3–6 · Nghe, Viết, Đọc" },
-];
+// Chưa có kỳ thi nào — TOEIC sẽ thêm ở đây. Rỗng thì tab Luyện thi tự ẩn (xem lib/nav.ts).
+export const EXAM_LEVELS: readonly ExamLevelInfo[] = [];
 
 /**
  * Ngôn ngữ có kỳ thi — chỉ những ngôn ngữ này mới hiện trong Luyện thi (chưa

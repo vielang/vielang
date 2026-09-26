@@ -101,7 +101,7 @@ export function ExamOverview({ exam, source }: { exam: Exam; source?: string }) 
                   <span className="flex min-w-0 flex-1 flex-col gap-1.5">
                     <span className="flex flex-wrap items-baseline gap-x-2">
                       <span className="font-medium">{sectionVi(s.id)}</span>
-                      <span className="font-korean text-xs text-muted-foreground">{s.title}</span>
+                      <span className="text-xs text-muted-foreground">{s.title}</span>
                     </span>
                     <ProgressBar value={done} max={count} />
                   </span>

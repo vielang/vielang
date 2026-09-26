@@ -4,20 +4,19 @@ import { getAudioPages } from "./audio";
 
 describe("buildPlaylist", () => {
   it("đi theo thứ tự trang, trong trang theo thứ tự track", () => {
-    const queue = buildPlaylist("step1");
-    expect(queue[0]).toMatchObject({ page: 1, type: "intro" });
-    // Bài 1 bắt đầu trang 12: "말하기와 듣기" ở trang 18 có S rồi L, "발음" ở trang 21.
-    expect(queue.slice(1, 4).map((t) => [t.page, t.type])).toEqual([
-      [18, "S"],
-      [18, "L"],
-      [21, "P"],
+    const queue = buildPlaylist("en-elementary");
+    // Trang 7 có "1.2" rồi "1.3", trang 8 bắt đầu bằng "1.5".
+    expect(queue.slice(0, 3).map((t) => [t.page, t.type])).toEqual([
+      [7, "1.2"],
+      [7, "1.3"],
+      [8, "1.5"],
     ]);
     const pages = queue.map((t) => t.page);
     expect(pages).toEqual([...pages].sort((a, b) => a - b));
   });
 
   it("phủ đủ mọi trang có bài nghe", () => {
-    for (const bookId of ["step1", "wb-step3", "en-elementary"]) {
+    for (const bookId of ["en-elementary", "en-pre-intermediate"]) {
       const pages = new Set(buildPlaylist(bookId).map((t) => t.page));
       expect([...pages]).toEqual(getAudioPages(bookId));
     }
@@ -37,11 +36,12 @@ describe("buildPlaylist", () => {
 });
 
 describe("startIndexFor", () => {
-  const queue = buildPlaylist("step1");
+  const queue = buildPlaylist("en-elementary");
 
   it("bắt đầu từ bài đầu tiên ở trang này hoặc sau đó", () => {
-    expect(queue[startIndexFor(queue, 18)]).toMatchObject({ page: 18, type: "S" });
-    expect(queue[startIndexFor(queue, 19)]).toMatchObject({ page: 21, type: "P" });
+    expect(queue[startIndexFor(queue, 8)]).toMatchObject({ page: 8, type: "1.5" });
+    // Trang 15 không có bài nghe — nhảy tới trang 16.
+    expect(queue[startIndexFor(queue, 15)]).toMatchObject({ page: 16, type: "2.3" });
   });
 
   it("đã qua bài cuối thì quay về đầu sách", () => {

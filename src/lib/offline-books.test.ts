@@ -37,13 +37,13 @@ describe("đường ảnh lúc tải về", () => {
   it("khớp từng ký tự với đường ảnh lúc đọc", () => {
     // Service worker tra cache theo NGUYÊN URL. Lệch một ký tự là tải cả cuốn
     // về rồi lúc mất mạng vẫn trắng trang — mà không có lỗi nào bắn ra.
-    expect(pageImageUrl("step1", 20)).toBe(getPageUrl("step1", 20));
+    expect(pageImageUrl("en-elementary", 20)).toBe(getPageUrl("en-elementary", 20));
   });
 
   it("là đường cùng origin, không phải URL R2 trần", () => {
     // `sw.js` bỏ qua mọi request khác origin, nên trỏ thẳng r2.dev là mất
     // sạch cache ảnh lẫn tính năng offline.
-    expect(pageImageUrl("step1", 20).startsWith("/img/books/")).toBe(true);
+    expect(pageImageUrl("en-elementary", 20).startsWith("/img/books/")).toBe(true);
   });
 });
 
@@ -53,15 +53,15 @@ describe("sách tải theo đời URL cũ", () => {
     // mấy khoá đó không bao giờ khớp nữa: giao diện vẫn khoe "Đã tải
     // offline" mà mở ra lúc mất mạng thì trắng trang.
     const deleted = mockCaches({
-      [bookCacheName("step1")]: [
-        "/_next/image?url=%2Fbooks%2Fstep1%2Fpages%2F0001.webp&w=1080&q=90",
-        "/read/step1/1",
+      [bookCacheName("en-elementary")]: [
+        "/_next/image?url=%2Fbooks%2Fen-elementary%2Fpages%2F0001.webp&w=1080&q=90",
+        "/read/en-elementary/1",
       ],
     });
 
     return listOfflineBooks().then((ids) => {
       expect(ids).toEqual([]);
-      expect(deleted).toEqual([bookCacheName("step1")]);
+      expect(deleted).toEqual([bookCacheName("en-elementary")]);
     });
   });
 });
@@ -69,24 +69,24 @@ describe("sách tải theo đời URL cũ", () => {
 describe("sách tải theo đời URL mới", () => {
   it("được giữ nguyên", async () => {
     const deleted = mockCaches({
-      [bookCacheName("step2")]: [
-        "/img/books/step2/pages/0001.webp",
-        "/read/step2/1",
+      [bookCacheName("en-pre-intermediate")]: [
+        "/img/books/en-pre-intermediate/pages/0001.webp",
+        "/read/en-pre-intermediate/1",
       ],
     });
 
-    expect(await listOfflineBooks()).toEqual(["step2"]);
+    expect(await listOfflineBooks()).toEqual(["en-pre-intermediate"]);
     expect(deleted).toEqual([]);
   });
 
   it("chỉ dọn cuốn đời cũ, không đụng cuốn đời mới", async () => {
     const deleted = mockCaches({
-      [bookCacheName("step1")]: ["/_next/image?url=x&w=1080&q=90"],
-      [bookCacheName("step2")]: ["/img/books/step2/pages/0001.webp"],
+      [bookCacheName("en-elementary")]: ["/_next/image?url=x&w=1080&q=90"],
+      [bookCacheName("en-pre-intermediate")]: ["/img/books/en-pre-intermediate/pages/0001.webp"],
     });
 
-    expect(await listOfflineBooks()).toEqual(["step2"]);
-    expect(deleted).toEqual([bookCacheName("step1")]);
+    expect(await listOfflineBooks()).toEqual(["en-pre-intermediate"]);
+    expect(deleted).toEqual([bookCacheName("en-elementary")]);
   });
 });
 
@@ -104,19 +104,19 @@ describe("trình duyệt chặn Cache API", () => {
 
 describe("gói tải về gồm cả bài nghe", () => {
   it("đếm đúng số bài nghe của cuốn", () => {
-    // Sơ cấp 1: 18 bài × 3 track (말하기, 듣기, 발음) + 1 track mở đầu.
-    expect(countAudioTracks("step1")).toBe(55);
+    // Elementary: mỗi track in trên trang là một file — 221 track trong bảng trang.
+    expect(countAudioTracks("en-elementary")).toBe(221);
   });
 
   it("ước lượng khớp với thứ THẬT SỰ tải về", () => {
     // Đây mới là bất biến, chứ không phải “có cộng audio hay không”. Báo
     // một đằng tải một nẻo thì hoặc người dùng hết chỗ máy, hoặc tưởng đã
     // mang sách theo mà hoá ra không — cả hai đều chỉ lộ ra lúc mất mạng.
-    const step1 = BOOKS.find((b) => b.id === "step1")!;
-    const images = step1.totalPages * 180 * 1024;
-    const audio = countAudioTracks("step1") * 1300 * 1024;
+    const book = BOOKS.find((b) => b.id === "en-elementary")!;
+    const images = book.totalPages * 180 * 1024;
+    const audio = countAudioTracks("en-elementary") * 1300 * 1024;
 
-    expect(estimateBytes(step1)).toBe(
+    expect(estimateBytes(book)).toBe(
       AUDIO_CAN_BE_CACHED ? images + audio : images
     );
   });
@@ -137,17 +137,17 @@ describe("xoá sách offline", () => {
     // Cả hai nằm chung `kiip-book-<id>` chính là để chuyện này đúng: không
     // có đường nào sót lại âm thầm chiếm chỗ trên máy người dùng.
     const store: Record<string, string[]> = {
-      [bookCacheName("step1")]: [
-        "/img/books/step1/pages/0001.webp",
-        "/img/books/step1/audio/1-S.mp3",
-        "/read/step1/1",
+      [bookCacheName("en-elementary")]: [
+        "/img/books/en-elementary/pages/0001.webp",
+        "/img/books/en-elementary/audio/1.2.mp3",
+        "/read/en-elementary/1",
       ],
     };
     const deleted = mockCaches(store);
 
-    await deleteOfflineBook("step1");
+    await deleteOfflineBook("en-elementary");
 
-    expect(deleted).toEqual([bookCacheName("step1")]);
-    expect(store[bookCacheName("step1")]).toBeUndefined();
+    expect(deleted).toEqual([bookCacheName("en-elementary")]);
+    expect(store[bookCacheName("en-elementary")]).toBeUndefined();
   });
 });

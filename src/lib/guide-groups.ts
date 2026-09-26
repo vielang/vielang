@@ -9,9 +9,4 @@
  * Mục không có ở đây (Trường đại học) thì không chia nhóm: trường lọc theo
  * vùng, loại trường, TOPIK thay vì theo nhóm.
  */
-export const GUIDE_GROUPS: Partial<Record<string, readonly string[]>> = {
-  // Theo MỤC ĐÍCH ở Hàn, vì người đọc đi tìm visa từ việc mình định làm.
-  visa: ["Du học", "Làm việc", "Gia đình và định cư", "Thủ tục chung"],
-  // Theo GIAI ĐOẠN, vì mỗi lúc cần một loại thông tin khác nhau.
-  "viec-lam": ["Trước khi sang Hàn", "Đang làm việc", "Khi về nước"],
-};
+export const GUIDE_GROUPS: Partial<Record<string, readonly string[]>> = {};

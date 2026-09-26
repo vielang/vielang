@@ -11,7 +11,7 @@
  *
  * Dùng:
  *   npm run prepare-audio                 # tất cả sách, bỏ qua file đã có
- *   npm run prepare-audio -- --book step1 # chỉ 1 sách
+ *   npm run prepare-audio -- --book en-elementary # chỉ 1 sách
  *   npm run prepare-audio -- --force      # upload lại kể cả đã có
  *
  * Cần các biến môi trường trong .env.local (giống prepare-images.ts):

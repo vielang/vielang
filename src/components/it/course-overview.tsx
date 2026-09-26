@@ -22,7 +22,7 @@ export function CourseOverview({ course }: { course: CourseOutline }) {
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-8">
-      <BackLink href="/it">Khoá học IT</BackLink>
+      <BackLink href="/">Khoá học IT</BackLink>
 
       <section className="-mt-4 flex flex-col gap-4">
         <div>

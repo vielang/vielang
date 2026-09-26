@@ -1,9 +1,0 @@
-[
-  {
-    "id": "p158-dialog",
-    "rect": [0.15, 0.18, 0.43, 0.235],
-    "label": "Hội thoại",
-    "ko": "직원: 어서 오세요. 어떻게 오셨어요?\n라민: 비자 연장 신청을 하려면 어떻게 해야 돼요?\n직원: 여기 신청서를 쓰세요. 사진과 신분증은 가져오셨어요?\n라민: 네, 여기 가져왔어요.\n직원: 수수료는 6만 원입니다.\n라민: 이번에 신청하면 체류 기간이 얼마나 연장돼요?\n직원: 최대 2년까지 연장됩니다.",
-    "vi": "Nhân viên: Mời anh vào. Anh cần gì ạ?\nRamin: Tôi muốn xin gia hạn visa thì phải làm thế nào ạ?\nNhân viên: Anh điền vào tờ đơn này. Anh mang ảnh và giấy tờ tuỳ thân theo chưa ạ?\nRamin: Có, tôi mang theo đây ạ.\nNhân viên: Lệ phí là 60.000 won ạ.\nRamin: Lần này đăng ký thì được gia hạn thời gian lưu trú bao lâu ạ?\nNhân viên: Được gia hạn tối đa đến 2 năm ạ."
-  }
-]

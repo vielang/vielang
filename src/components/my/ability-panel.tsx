@@ -58,7 +58,7 @@ export function WeakGrammarList({ items }: { items: WeakGrammar[] }) {
     <ul className="flex flex-col divide-y divide-border">
       {items.map((g) => (
         <li key={`${g.bookId}:${g.page}:${g.heading}`} className="flex flex-col gap-1 py-2.5">
-          <p className="font-korean font-medium">{g.entry?.title ?? g.heading}</p>
+          <p className="font-medium">{g.entry?.title ?? g.heading}</p>
           {g.entry && <p className="text-sm text-muted-foreground">{g.entry.vi}</p>}
           <p className="flex flex-wrap gap-x-4 text-sm">
             {g.entry && (
@@ -96,7 +96,7 @@ export function RedoList({ items }: { items: RedoItem[] }) {
             className="flex items-center justify-between gap-3 py-2 text-sm hover:text-primary"
           >
             <span className="min-w-0">
-              <span className="font-korean block truncate">
+              <span className="block truncate">
                 Trang {r.page} · {r.section}
               </span>
               <span className="block truncate text-xs text-muted-foreground">

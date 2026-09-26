@@ -5,7 +5,6 @@ import { QuizPanel } from "@/components/reader/quiz-panel";
 import { useQuizStore } from "@/lib/quiz-store";
 import { useActivityStore } from "@/lib/activity-store";
 import { dayKey } from "@/lib/activity";
-import { getPageQuiz } from "@/lib/quiz";
 import { getLesson, lessonQuizId, listCourses } from "@/lib/courses";
 import type { QuizSection } from "@/lib/quiz";
 
@@ -157,33 +156,24 @@ describe("kiểu bài học: đánh số câu và nhãn A/B/C/D", () => {
 });
 
 describe("bài tập trong sách vẫn chạy như cũ", () => {
-  const sections = getPageQuiz("step1", 19);
-
-  it("trang sách thật có bài tập để làm", () => {
-    expect(sections.length).toBeGreaterThan(0);
-  });
+  const sections = SECTIONS;
+  const first = SECTIONS[0].items[0];
+  if (first.kind !== "choice") throw new Error("câu đầu phải là trắc nghiệm");
 
   it("QuizPanel lưu dưới khoá bookId:page, đúng định dạng đã có", () => {
-    render(<QuizPanel bookId="step1" page={19} sections={sections} />);
+    render(<QuizPanel bookId="en-elementary" page={19} sections={sections} />);
 
-    const first = sections.flatMap((s) => s.items).find((i) => i.kind === "choice");
-    if (!first || first.kind !== "choice") throw new Error("trang 19 không có câu trắc nghiệm");
+    fireEvent.click(screen.getByRole("button", { name: first.options[0] }));
 
-    // Trang sách có nhiều câu trùng phương án — lấy câu đầu tiên.
-    fireEvent.click(screen.getAllByRole("button", { name: first.options[0] })[0]);
-
-    expect(useQuizStore.getState().pages["step1:19"]?.answers[first.id]).toBe(0);
+    expect(useQuizStore.getState().pages["en-elementary:19"]?.answers[first.id]).toBe(0);
   });
 
   it("đọc được bài làm đã lưu từ phiên trước", () => {
-    const first = sections.flatMap((s) => s.items).find((i) => i.kind === "choice");
-    if (!first || first.kind !== "choice") throw new Error("trang 19 không có câu trắc nghiệm");
-
     // Đúng hình dạng mà bản trước đã ghi vào localStorage.
     useQuizStore.setState({
-      pages: { "step1:19": { answers: { [first.id]: first.answer }, checked: [first.id] } },
+      pages: { "en-elementary:19": { answers: { [first.id]: first.answer }, checked: [first.id] } },
     });
-    render(<QuizPanel bookId="step1" page={19} sections={sections} />);
+    render(<QuizPanel bookId="en-elementary" page={19} sections={sections} />);
 
     expect(screen.getByText("Đúng")).toBeTruthy();
   });

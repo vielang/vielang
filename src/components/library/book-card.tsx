@@ -65,7 +65,7 @@ export function BookCard({
           </h3>
         </Link>
         {book.titleKo && (
-          <p className="font-korean -mt-1 text-xs text-muted-foreground">
+          <p className="-mt-1 text-xs text-muted-foreground">
             {book.titleKo}
           </p>
         )}

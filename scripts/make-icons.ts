@@ -56,8 +56,8 @@ const OG_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
   </g>
   <g font-family="Segoe UI, Arial, Helvetica, sans-serif" fill="#ffffff">
     <text x="380" y="290" font-size="96" font-weight="700">VieLang</text>
-    <text x="380" y="360" font-size="38" fill="#d4d4d4">Học tiếng Hàn KIIP &amp; TOPIK cho người Việt</text>
-    <text x="380" y="420" font-size="30" fill="#a3a3a3">Dịch sách · Ngữ pháp · Luyện đề · Cẩm nang sống ở Hàn</text>
+    <text x="380" y="360" font-size="38" fill="#d4d4d4">Học lập trình &amp; tiếng Anh bằng tiếng Việt</text>
+    <text x="380" y="420" font-size="30" fill="#a3a3a3">C# · SQL · ASP.NET Core · English File</text>
   </g>
 </svg>`;
 

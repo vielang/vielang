@@ -1,9 +1,0 @@
-[
-  {
-    "id": "p123-dialog",
-    "rect": [0.14, 0.165, 0.49, 0.29],
-    "label": "Hội thoại",
-    "ko": "아나이스: 노트북에 문제가 있어서 서비스 문의 좀 드리려고 하는데요.\n직원: 네, 고객님. 어떤 문제가 있는지 말씀해 주시겠어요?\n아나이스: 어제부터 전원이 안 켜지는데 어떻게 해야 되나요?\n직원: 갑자기 문제가 생긴 건가요? 혹시 다른 문제는 없으셨어요?\n아나이스: 며칠 전부터 속도가 좀 느려졌어요.\n직원: 고객님, 가까운 서비스 센터에 방문하셔서 점검을 받아 보셔야 할 것 같습니다.\n아나이스: 아, 그래요? 그럼 예약 좀 부탁드려요.",
-    "vi": "Anaïs: Máy tính xách tay của tôi có vấn đề nên tôi muốn hỏi về dịch vụ ạ.\nNhân viên: Vâng, thưa quý khách. Chị cho biết máy đang gặp vấn đề gì ạ?\nAnaïs: Từ hôm qua máy không lên nguồn, tôi phải làm sao ạ?\nNhân viên: Vấn đề mới xảy ra đột ngột ạ? Trước đó chị có gặp vấn đề nào khác không?\nAnaïs: Từ mấy hôm trước máy chạy hơi chậm.\nNhân viên: Thưa quý khách, có lẽ chị nên đến trung tâm bảo hành gần nhất để được kiểm tra ạ.\nAnaïs: À, vậy ạ? Vậy nhờ anh đặt lịch giúp tôi."
-  }
-]

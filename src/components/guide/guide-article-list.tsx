@@ -1,50 +1,6 @@
 import { ListChecks } from "lucide-react";
 import { RowLink, RowList } from "@/components/layout/row-list";
-import {
-  articleHref,
-  formatSchoolFact,
-  type GuideArticle,
-  type GuideSectionId,
-} from "@/lib/guide";
-
-/**
- * Phần đầu của một thông số, bỏ phần giải thích trong ngoặc: "Cấp 3 (ngành
- * thể thao: cấp 2)" -> "Cấp 3". Dòng trong danh sách chỉ đủ chỗ cho con số
- * chính; phần ngoại lệ đã có đầy đủ trong bài.
- */
-function brief(value: string): string {
-  return value.replace(/\s*\(.*$/, "");
-}
-
-/**
- * Dòng phụ dưới tên bài: với trường là mấy thông số người ta so sánh khi
- * chọn trường (ở đâu, cần TOPIK mấy, học phí bao nhiêu); bài khác là tóm tắt.
- *
- * Không nhắc "đạt chứng nhận quốc tế hoá" khi trường có — hiện gần như trường
- * nào trong danh sách cũng có, nhắc lại chỉ thêm chữ. Trường KHÔNG có mới
- * đáng nói, vì xin visa khó hơn hẳn.
- */
-function Meta({ sectionId, article }: { sectionId: GuideSectionId; article: GuideArticle }) {
-  if (sectionId !== "truong") {
-    return <span className="line-clamp-2 text-sm text-muted-foreground">{article.summary}</span>;
-  }
-  const { city, kind, topik, tuition, certified } = article.facts;
-  const parts = [
-    city ? brief(city) : null,
-    // Trường tư là số đông, chỉ nói khi KHÁC tư thục (quốc lập: học phí thấp hẳn).
-    kind && kind !== "Tư thục" ? kind : null,
-    topik !== undefined ? `TOPIK ${brief(formatSchoolFact("topik", topik)).toLowerCase()}` : null,
-    tuition ? brief(tuition) : null,
-  ].filter(Boolean);
-  return (
-    <span className="text-sm text-muted-foreground">
-      {parts.join(" · ")}
-      {certified === "Không" && (
-        <span className="text-amber-600 dark:text-amber-400"> · Chưa có chứng nhận quốc tế hoá</span>
-      )}
-    </span>
-  );
-}
+import { articleHref, type GuideArticle, type GuideSectionId } from "@/lib/guide";
 
 /**
  * Danh sách bài của một mục cẩm nang.
@@ -71,7 +27,7 @@ export function GuideArticleList({
             )}
             <span className="flex min-w-0 flex-1 flex-col gap-0.5">
               <span className="font-medium leading-snug">{article.title}</span>
-              <Meta sectionId={sectionId} article={article} />
+              <span className="line-clamp-2 text-sm text-muted-foreground">{article.summary}</span>
             </span>
             {article.checks > 0 && (
               <span

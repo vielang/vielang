@@ -1,9 +1,0 @@
-[
-  {
-    "id": "p101-dialog",
-    "rect": [0.135, 0.165, 0.5, 0.33],
-    "label": "Hội thoại",
-    "ko": "후엔: 제가 요즘 속이 좋지 않아 밥을 못 먹는데 어떤 음식을 만들어 먹으면 좋을까요?\n고천: 소화가 잘 되는 야채죽은 어때요? 요리하기도 아주 쉬워요.\n후엔: 어떻게 만들어요? 좀 가르쳐 주세요.\n고천: 먼저 밥에 물을 넣고 끓인 다음 채소를 썰어 넣고 끓여요.\n후엔: 얼마나요?\n고천: 큰 채소가 익을 때까지 끓이면 돼요. 오래 걸리지 않아요. 간단해요.\n후엔: 우와! 생각보다 어렵지 않네요. 집에서 만들어 먹어야겠어요.\n고천: 그래요. 만들다가 모르는 게 있으면 언제든지 저한테 물어보세요.",
-    "vi": "Huyền: Dạo này bụng dạ em không tốt nên không ăn cơm được, em nên nấu món gì để ăn nhỉ?\nCao Thiên: Cháo rau dễ tiêu thì sao? Nấu cũng rất dễ.\nHuyền: Nấu thế nào ạ? Chị chỉ em với.\nCao Thiên: Trước hết cho nước vào cơm rồi đun sôi, sau đó thái rau bỏ vào nấu tiếp.\nHuyền: Nấu bao lâu ạ?\nCao Thiên: Cứ nấu đến khi miếng rau to chín là được. Không mất nhiều thời gian đâu. Đơn giản lắm.\nHuyền: Ồ! Không khó như em nghĩ. Em phải nấu ở nhà ăn mới được.\nCao Thiên: Ừ. Trong lúc nấu có gì không biết thì cứ hỏi chị bất cứ lúc nào."
-  }
-]

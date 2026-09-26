@@ -23,10 +23,7 @@ export function VideoTranscript({
   activeIdx,
   time,
   loopIdx,
-  showVi,
   blurVi,
-  karaoke,
-  autoScroll,
   hasVi,
   onSeek,
   className,
@@ -35,10 +32,7 @@ export function VideoTranscript({
   activeIdx: number;
   time: number;
   loopIdx: number | null;
-  showVi: boolean;
   blurVi: boolean;
-  karaoke: boolean;
-  autoScroll: boolean;
   hasVi: boolean;
   onSeek: (idx: number) => void;
   className?: string;
@@ -47,7 +41,7 @@ export function VideoTranscript({
   const [userScrolled, setUserScrolled] = useState(false);
   const [revealed, setRevealed] = useState<Set<number>>(() => new Set());
 
-  const follow = autoScroll && !userScrolled;
+  const follow = !userScrolled;
 
   useEffect(() => {
     const list = listRef.current;
@@ -61,9 +55,7 @@ export function VideoTranscript({
 
   // Chỉ thao tác CỦA NGƯỜI DÙNG (lăn chuột, vuốt, phím) mới tính là tự cuộn —
   // `scroll` thì bắn cả khi chính mình gọi scrollTo ở trên.
-  const onManualScroll = () => {
-    if (autoScroll) setUserScrolled(true);
-  };
+  const onManualScroll = () => setUserScrolled(true);
 
   const toggleReveal = (i: number) =>
     setRevealed((prev) => {
@@ -77,7 +69,7 @@ export function VideoTranscript({
     <div className={cn("relative flex min-h-0 flex-col overflow-hidden bg-background lg:rounded-xl lg:border lg:border-border", className)}>
       <div className="flex shrink-0 items-center justify-between gap-2 border-b border-border/60 px-4 py-2 lg:px-3">
         <h2 className="text-sm font-semibold">Transcript</h2>
-        <VideoSettingsPopover hasVi={hasVi}>
+        <VideoSettingsPopover hasVi={hasVi} side="bottom">
           <button
             type="button"
             aria-label="Cài đặt"
@@ -111,9 +103,8 @@ export function VideoTranscript({
             // Chỉ câu đang phát cần biết thời gian (tô từng chữ) — các dòng
             // khác nhận hằng số để `memo` bỏ qua, không vẽ lại cả trăm dòng
             // mỗi khung hình.
-            time={i === activeIdx && karaoke ? time : -1}
+            time={i === activeIdx ? time : -1}
             looping={i === loopIdx}
-            showVi={showVi}
             blurred={blurVi && !revealed.has(i)}
             onSeek={onSeek}
             onReveal={toggleReveal}
@@ -121,7 +112,7 @@ export function VideoTranscript({
         ))}
       </ol>
 
-      {autoScroll && userScrolled && (
+      {userScrolled && (
         <button
           type="button"
           onClick={() => setUserScrolled(false)}
@@ -146,7 +137,6 @@ const TranscriptRow = memo(function TranscriptRow({
   active,
   time,
   looping,
-  showVi,
   blurred,
   onSeek,
   onReveal,
@@ -156,7 +146,6 @@ const TranscriptRow = memo(function TranscriptRow({
   active: boolean;
   time: number;
   looping: boolean;
-  showVi: boolean;
   blurred: boolean;
   onSeek: (idx: number) => void;
   onReveal: (idx: number) => void;
@@ -190,7 +179,7 @@ const TranscriptRow = memo(function TranscriptRow({
               ))
             : line.ko.t}
         </p>
-        {showVi && line.vi && !isSound && (
+        {line.vi && !isSound && (
           <p
             className={cn(
               "text-sm leading-snug text-muted-foreground transition-[filter]",

@@ -12,18 +12,16 @@ import { syncAcrossTabs } from "@/lib/cross-tab-sync";
  * đã khá thì tắt/che tiếng Việt để tự nghe hiểu trước, rồi mới chạm để xem
  * bản dịch — che chứ không tắt hẳn, vì bí thì vẫn cần tra được ngay.
  */
-export const SUBTITLE_SIZES = ["Nhỏ", "Vừa", "Lớn", "Rất lớn"] as const;
-export const PLAYBACK_RATES = [0.5, 0.75, 0.9, 1, 1.25, 1.5] as const;
+export const SUBTITLE_SIZE_COUNT = 4;
+export const PLAYBACK_RATES = [0.5, 0.75, 1, 1.25, 1.5] as const;
 
 export interface VideoPrefs {
   /** Phụ đề tiếng Hàn đè trên video. */
   subKo: boolean;
   /** Phụ đề tiếng Việt đè trên video. */
   subVi: boolean;
-  /** Chỉ số trong `SUBTITLE_SIZES`. */
+  /** 0 (nhỏ) … `SUBTITLE_SIZE_COUNT - 1` (rất lớn). */
   subSize: number;
-  /** Tô sáng dần từng chữ tiếng Hàn theo lời thoại. */
-  karaoke: boolean;
   /** Làm mờ tiếng Việt (phụ đề lẫn transcript), chạm/rê chuột mới hiện. */
   blurVi: boolean;
   playbackRate: number;
@@ -31,23 +29,16 @@ export interface VideoPrefs {
   autoPause: boolean;
   /** Bảng transcript cạnh/dưới video. */
   showTranscript: boolean;
-  /** Dòng tiếng Việt dưới mỗi câu trong transcript. */
-  transcriptVi: boolean;
-  /** Transcript tự cuộn theo câu đang phát. */
-  autoScroll: boolean;
 }
 
 export const DEFAULT_VIDEO_PREFS: VideoPrefs = {
   subKo: true,
   subVi: true,
   subSize: 1,
-  karaoke: true,
   blurVi: false,
   playbackRate: 1,
   autoPause: false,
   showTranscript: true,
-  transcriptVi: true,
-  autoScroll: true,
 };
 
 interface VideoPrefsState extends VideoPrefs {

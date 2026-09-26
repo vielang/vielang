@@ -491,14 +491,12 @@ export function VideoPlayer({ lesson, info }: { lesson: VideoLesson; info: React
             className="font-korean max-w-[94%] rounded bg-black/70 px-2.5 py-1 text-center leading-snug font-medium text-white"
             style={{ fontSize: KO_SIZE[prefs.subSize] * sizeScale }}
           >
-            {prefs.karaoke
-              ? koCue.words.map((w, i) => (
-                  <span key={i} className={cn("transition-opacity duration-150", w.at <= time ? "opacity-100" : "opacity-40")}>
-                    {w.t}
-                    {i < koCue.words.length - 1 && " "}
-                  </span>
-                ))
-              : koCue.t}
+            {koCue.words.map((w, i) => (
+              <span key={i} className={cn("transition-opacity duration-150", w.at <= time ? "opacity-100" : "opacity-40")}>
+                {w.t}
+                {i < koCue.words.length - 1 && " "}
+              </span>
+            ))}
           </p>
         )}
         {prefs.subVi && hasVi && viText && (
@@ -641,10 +639,7 @@ export function VideoPlayer({ lesson, info }: { lesson: VideoLesson; info: React
           activeIdx={currentIdx}
           time={time}
           loopIdx={loopIdx}
-          showVi={prefs.transcriptVi && hasVi}
           blurVi={prefs.blurVi}
-          karaoke={prefs.karaoke}
-          autoScroll={prefs.autoScroll}
           hasVi={hasVi}
           onSeek={seekToCue}
         />

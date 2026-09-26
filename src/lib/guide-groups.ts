@@ -6,7 +6,7 @@
  * danh sách này để kiểm tên nhóm, mà guide.ts lại `import` guide.json — thứ
  * chính bước build sinh ra.
  *
- * Mục không có ở đây (Trường đại học) thì không chia nhóm: trường lọc theo
- * vùng, loại trường, TOPIK thay vì theo nhóm.
+ * Mục không có ở đây thì không chia nhóm. Chỉ thêm nhóm khi mục đã đủ nhiều
+ * bài để cần chia; khai báo nhóm rồi thì mọi bài trong mục phải có `group:`.
  */
 export const GUIDE_GROUPS: Partial<Record<string, readonly string[]>> = {};

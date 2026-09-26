@@ -32,7 +32,7 @@ export function GuideArticleList({
             {article.checks > 0 && (
               <span
                 className="hidden shrink-0 items-center gap-1 text-xs text-muted-foreground sm:inline-flex"
-                title="Có checklist hồ sơ tick được"
+                title="Có checklist tick được"
               >
                 <ListChecks className="size-3.5" aria-hidden />
                 {article.checks}

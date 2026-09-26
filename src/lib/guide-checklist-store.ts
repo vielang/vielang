@@ -14,10 +14,10 @@ interface GuideChecklistState {
 }
 
 /**
- * Giấy tờ đã chuẩn bị trong checklist hồ sơ của bài cẩm nang.
+ * Các dòng đã tick trong checklist của bài cẩm nang.
  *
- * Gom hồ sơ visa mất vài tuần, người ta quay lại nhiều lần để xem còn thiếu
- * gì — không nhớ thì checklist chỉ là một danh sách đọc suông.
+ * Chuẩn bị phỏng vấn hay làm CV kéo dài nhiều ngày, người ta quay lại nhiều
+ * lần để xem còn thiếu gì — không nhớ thì checklist chỉ là danh sách đọc suông.
  */
 export const useGuideChecklistStore = create<GuideChecklistState>()(
   persist(

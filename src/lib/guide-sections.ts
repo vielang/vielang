@@ -14,5 +14,10 @@ export interface GuideSection {
 }
 
 /** Thứ tự hiển thị các mục. Thêm mục = thêm thư mục content/cam-nang/<id> + một dòng ở đây. */
-// Chủ đề IT sẽ thêm ở đây. Rỗng thì tab Cẩm nang tự ẩn (xem lib/nav.ts).
-export const GUIDE_SECTIONS: readonly GuideSection[] = [];
+// Rỗng thì tab Cẩm nang tự ẩn (xem lib/nav.ts). Mục đầu là đích của tab và của `/cam-nang`.
+export const GUIDE_SECTIONS: readonly GuideSection[] = [
+  { id: "lo-trinh", title: "Lộ trình nghề", description: "Lộ trình học và phát triển nghề lập trình." },
+  { id: "phong-van", title: "Phỏng vấn", description: "Chuẩn bị và câu hỏi phỏng vấn kèm đáp án." },
+  { id: "cong-cu", title: "Công cụ", description: "Công cụ làm việc hằng ngày của developer." },
+  { id: "viec-lam", title: "Việc làm IT", description: "CV, portfolio, tìm việc, lương, remote." },
+];

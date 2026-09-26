@@ -3,9 +3,9 @@ import { GuideArticleList } from "@/components/guide/guide-article-list";
 import { SectionLabel } from "@/components/layout/page-header";
 
 /**
- * Danh sách bài chia theo nhóm (Visa theo mục đích, Việc làm theo giai
- * đoạn — xem lib/guide-groups.ts). Tên nhóm là dòng chữ nhỏ, không phải
- * khung: nhóm chỉ để mắt lướt tìm đúng chỗ, nội dung vẫn là các dòng bài.
+ * Danh sách bài chia theo nhóm (xem lib/guide-groups.ts). Tên nhóm là dòng
+ * chữ nhỏ, không phải khung: nhóm chỉ để mắt lướt tìm đúng chỗ, nội dung vẫn
+ * là các dòng bài.
  */
 export function GroupedArticleList({
   sectionId,

@@ -847,17 +847,17 @@ function externalLinks(html: string): string {
 }
 
 /**
- * Bảng (bảng điểm F-2-7, bảng lương…) rộng hơn màn điện thoại: bọc trong một
- * khung cuộn ngang riêng, để chỉ bảng cuộn chứ không kéo cả trang tràn ngang.
+ * Bảng rộng hơn màn điện thoại: bọc trong một khung cuộn ngang riêng, để chỉ
+ * bảng cuộn chứ không kéo cả trang tràn ngang.
  */
 function scrollableTables(html: string): string {
   return html.replace(/<table>([\s\S]*?)<\/table>/g, '<div class="table-scroll"><table>$1</table></div>');
 }
 
 /**
- * Mục Nguồn: ghi tên miền cạnh mỗi link (`hikorea.go.kr`, `law.go.kr`…) để
- * người đọc thấy ngay nguồn có phải trang chính thức không, khỏi phải bấm
- * vào mới biết.
+ * Mục Nguồn: ghi tên miền cạnh mỗi link (`learn.microsoft.com`,
+ * `git-scm.com`…) để người đọc thấy ngay nguồn có phải trang chính thức
+ * không, khỏi phải bấm vào mới biết.
  */
 function sourceDomains(html: string): string {
   const at = html.search(/<h2[^>]*>Nguồn<\/h2>/);

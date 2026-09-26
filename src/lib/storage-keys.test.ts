@@ -82,8 +82,8 @@ describe("khoá chỗ nghe dở", () => {
   });
 });
 
-describe("khoá checklist hồ sơ cẩm nang", () => {
-  it("giữ nguyên tên, nếu không thì mất các giấy tờ người dùng đã tick", () => {
+describe("khoá checklist cẩm nang", () => {
+  it("giữ nguyên tên, nếu không thì mất các dòng người dùng đã tick", () => {
     expect(source("src", "lib", "guide-checklist-store.ts")).toContain('name: "kiip-guide-v1"');
   });
 });

@@ -303,7 +303,7 @@
 }
 
 /*
- * Checklist hồ sơ của bài cẩm nang ("- [ ]" trong Markdown, dựng thành ô tick
+ * Checklist của bài cẩm nang ("- [ ]" trong Markdown, dựng thành ô tick
  * được lúc build): bỏ chấm đầu dòng, cả dòng là vùng bấm — ô tick trên điện
  * thoại bé, bắt nhắm trúng ô thì rất khó chịu.
  */

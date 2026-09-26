@@ -1,10 +1,10 @@
 /**
- * Cẩm nang (`/cam-nang`) — thông tin thực tế cho người Việt ở Hàn: visa,
- * trường đại học, việc làm.
+ * Cẩm nang (`/cam-nang`) — kiến thức nghề cho người học lập trình: lộ trình,
+ * phỏng vấn, công cụ, việc làm IT.
  *
- * Khác sách và khoá học: đây KHÔNG phải bài để học mà là thông tin để làm
- * theo (nộp hồ sơ, chọn trường, đi làm), nên sai là người đọc mất tiền, mất
- * visa. Mọi bài bắt buộc có ngày cập nhật và mục Nguồn — bước build từ chối
+ * Khác khoá học: đây KHÔNG phải bài dạy một khái niệm mà là thông tin để làm
+ * theo (chuẩn bị phỏng vấn, viết CV, dựng môi trường). Mọi bài bắt buộc có
+ * ngày cập nhật và mục Nguồn — bước build từ chối
  * bài thiếu hai thứ đó (xem `buildGuide` trong scripts/build-content.ts).
  *
  * Nguồn: `content/cam-nang/<mục>/<bài>.md`, gộp thành `guide.json` lúc build
@@ -22,11 +22,11 @@ export interface GuideArticle {
   summary: string;
   /** Ngày cập nhật nội dung, dạng YYYY-MM-DD. */
   updated: string;
-  /** Các khoá khai báo riêng của từng mục (mã visa, thông tin trường…). */
+  /** Các khoá khai báo riêng của từng mục (vd `group`). */
   facts: Record<string, string>;
   html: string;
   headings: LessonHeading[];
-  /** Số dòng checklist tick được trong bài (hồ sơ visa). */
+  /** Số dòng checklist tick được trong bài (vd việc cần làm trước buổi phỏng vấn). */
   checks: number;
 }
 

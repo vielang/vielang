@@ -87,3 +87,43 @@ export function formatVideoDuration(sec: number | null): string | undefined {
 export function activeCue(cues: VideoCue[], t: number): VideoCue | undefined {
   return cues.find((c) => t >= c.s && t < c.e);
 }
+
+/** Chỉ số cue đang phát tại `t`, -1 nếu đang ở khoảng lặng giữa hai câu. */
+export function cueIndexAt(cues: VideoCue[], t: number): number {
+  return cues.findIndex((c) => t >= c.s && t < c.e);
+}
+
+/** Câu gần nhất đã bắt đầu tính tới `t` (kể cả khi đang ở khoảng lặng sau
+ * nó) — "câu hiện tại" cho các nút câu trước/câu sau/nghe lại. -1 nếu chưa
+ * tới câu đầu tiên. */
+export function lastStartedCueIndex(cues: VideoCue[], t: number): number {
+  let idx = -1;
+  for (let i = 0; i < cues.length && cues[i].s <= t; i++) idx = i;
+  return idx;
+}
+
+export interface TranscriptLine {
+  ko: VideoCue;
+  /** Bản dịch ghép với câu này, `undefined` nếu tập không có phụ đề Việt. */
+  vi?: string;
+}
+
+/**
+ * Ghép mỗi câu tiếng Hàn với phần dịch tiếng Việt cùng khoảng thời gian.
+ *
+ * Phụ đề Việt dịch tự động từ chính phụ đề Hàn nên gần như trùng mốc từng
+ * câu, nhưng không tuyệt đối (vài câu bị tách/gộp — số câu hai bên lệch nhau
+ * 1-2). Vì vậy ghép theo THỜI GIAN chứ không theo thứ tự: câu Việt thuộc về
+ * câu Hàn chứa điểm giữa của nó.
+ */
+export function buildTranscript(lesson: Pick<VideoLesson, "koCues" | "viCues">): TranscriptLine[] {
+  const vi: string[][] = lesson.koCues.map(() => []);
+  for (const c of lesson.viCues) {
+    const mid = (c.s + c.e) / 2;
+    let idx = cueIndexAt(lesson.koCues, mid);
+    if (idx < 0) idx = Math.max(0, lastStartedCueIndex(lesson.koCues, mid));
+    vi[idx]?.push(c.t);
+  }
+  const hasVi = lesson.viCues.length > 0;
+  return lesson.koCues.map((ko, i) => ({ ko, vi: hasVi ? vi[i].join(" ") : undefined }));
+}

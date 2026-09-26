@@ -26,10 +26,15 @@ function PopoverContent({
   className,
   align = "center",
   sideOffset = 6,
+  container,
   ...props
-}: React.ComponentProps<typeof PopoverPrimitive.Content>) {
+}: React.ComponentProps<typeof PopoverPrimitive.Content> & {
+  /** Nơi gắn portal — mặc định `body`. Đang fullscreen một phần tử thì phải
+   * gắn vào chính phần tử đó, nếu không popover nằm ngoài vùng hiển thị. */
+  container?: HTMLElement | null
+}) {
   return (
-    <PopoverPrimitive.Portal>
+    <PopoverPrimitive.Portal container={container}>
       <PopoverPrimitive.Content
         data-slot="popover-content"
         align={align}

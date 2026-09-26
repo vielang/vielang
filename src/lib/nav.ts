@@ -122,7 +122,10 @@ export function activeTab(path: string): NavTab | undefined {
  * Màn hình KHÔNG có thanh tab: đang làm bài (luyện tập, thi thử) đã có thanh
  * thao tác / phiếu trả lời gắn đáy, thêm thanh tab nữa là chồng nhau và dễ
  * bấm nhầm ra khỏi bài.
+ *
+ * Trang xem video cũng vậy: màn hình điện thoại đã chia hết cho video và
+ * transcript, thanh tab chỉ ăn bớt chỗ đọc transcript.
  */
 export function hidesTabBar(path: string): boolean {
-  return /^\/exam\/[^/]+\/(practice|mock)$/.test(path);
+  return /^\/exam\/[^/]+\/(practice|mock)$/.test(path) || /^\/video\/[^/]+$/.test(path);
 }

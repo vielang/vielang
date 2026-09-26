@@ -33,19 +33,21 @@ export default async function VideoPlayerPage({ params }: { params: Promise<{ id
   if (!lesson) notFound();
   const { prev, next } = adjacentVideoLessons(id);
 
-  return (
-    <div className="flex flex-col gap-4">
-      <link rel="preconnect" href={mediaOriginBase()} />
-      <BackLink href="/video">Học tiếng Hàn qua video</BackLink>
-
-      <div>
-        <h1 className="text-xl font-semibold tracking-tight">{videoLessonTitle(lesson)}</h1>
-        <p className="font-korean text-sm text-muted-foreground">{lesson.showTitle}</p>
+  const info = (
+    <div className="flex flex-col gap-2 px-4 py-3 lg:px-0 lg:py-4">
+      <div className="hidden lg:block">
+        <BackLink href="/video">Học tiếng Hàn qua video</BackLink>
       </div>
-
-      <VideoPlayer lesson={lesson} />
-
-      <div className="flex items-center justify-between gap-3 border-t border-border pt-3 text-sm">
+      <div className="flex items-baseline justify-between gap-3">
+        <div className="min-w-0">
+          <h1 className="text-base font-semibold tracking-tight lg:text-xl">{videoLessonTitle(lesson)}</h1>
+          <p className="font-korean truncate text-xs text-muted-foreground lg:text-sm">{lesson.showTitle}</p>
+        </div>
+        <Link href="/video" className="shrink-0 text-xs text-muted-foreground hover:text-foreground lg:hidden">
+          Tất cả tập
+        </Link>
+      </div>
+      <div className="flex items-center justify-between gap-3 text-sm">
         {prev ? (
           <Link
             href={`/video/${prev.id}`}
@@ -70,5 +72,13 @@ export default async function VideoPlayerPage({ params }: { params: Promise<{ id
         )}
       </div>
     </div>
+  );
+
+  return (
+    <>
+      <link rel="preconnect" href={mediaOriginBase()} />
+      {/* `key`: chuyển tập thì dựng lại player từ đầu (vị trí, câu đang lặp…). */}
+      <VideoPlayer key={lesson.id} lesson={lesson} info={info} />
+    </>
   );
 }

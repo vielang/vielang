@@ -8,9 +8,9 @@ import { syncAcrossTabs } from "@/lib/cross-tab-sync";
  * Tuỳ chọn khi xem video — chọn một lần, áp dụng cho mọi tập (lưu
  * localStorage, cùng khuôn với `reader-prefs-store.ts`).
  *
- * Mặc định hướng tới người mới: hiện cả hai dòng phụ đề, không tự dừng. Người
- * đã khá thì tắt/che tiếng Việt để tự nghe hiểu trước, rồi mới chạm để xem
- * bản dịch — che chứ không tắt hẳn, vì bí thì vẫn cần tra được ngay.
+ * Mặc định chỉ hiện phụ đề tiếng Hàn: người học tự nghe – đọc hiểu trước,
+ * cần thì bật tiếng Việt (nút trên thanh điều khiển, phím V) hoặc xem bản
+ * dịch ngay dưới mỗi câu trong transcript.
  */
 export const SUBTITLE_SIZE_COUNT = 4;
 export const PLAYBACK_RATES = [0.5, 0.75, 1, 1.25, 1.5] as const;
@@ -33,7 +33,7 @@ export interface VideoPrefs {
 
 export const DEFAULT_VIDEO_PREFS: VideoPrefs = {
   subKo: true,
-  subVi: true,
+  subVi: false,
   subSize: 1,
   blurVi: false,
   playbackRate: 1,

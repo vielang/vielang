@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Clock, Headphones, ListChecks, PenLine, Play } from "lucide-react";
+import { Clock, Headphones, ListChecks, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -21,7 +21,6 @@ import {
   sectionCount,
   sectionVi,
   totalMinutes,
-  writingBlocks,
   type Exam,
   type ExamSection,
 } from "@/lib/exams";
@@ -32,7 +31,6 @@ import { ProgressBar, SectionStepper } from "@/components/exam/exam-chrome";
 import { OptionList } from "@/components/exam/option-list";
 import { useExamAudio } from "@/components/exam/use-exam-audio";
 import { useLeaveGuard } from "@/components/exam/use-leave-guard";
-import { WritingTaskView, hasWritten } from "@/components/exam/writing-parts";
 import { AnswerSheet, MobileAnswerSheet, jumpToQuestion } from "@/components/exam/answer-sheet";
 import { useIsClient } from "@/lib/use-is-client";
 import { BackLink } from "@/components/layout/back-link";
@@ -45,7 +43,7 @@ function mmss(ms: number): string {
 /**
  * Thi thử: giống thi thật nhất có thể.
  *
- * - Tính giờ theo từng phần (TOPIK I: nghe 40', đọc 60'). Hết giờ tự sang
+ * - Tính giờ theo từng phần (TOEIC: nghe 45', đọc 75'). Hết giờ tự sang
  *   phần sau / tự nộp. Sang phần sau là không quay lại phần trước.
  * - Phần nghe phát LIỀN MẠCH một lần, không tạm dừng, không tua — như phòng
  *   thi. Câu đang phát được tô và cuộn tới.
@@ -74,13 +72,7 @@ function MockIntro({ exam, onStart }: { exam: Exam; onStart: () => void }) {
         <ul className="flex flex-col gap-2 text-sm">
           {exam.sections.map((s) => (
             <li key={s.id} className="flex items-center gap-2">
-              {s.audio ? (
-                <Headphones className="size-4" aria-hidden />
-              ) : s.writing ? (
-                <PenLine className="size-4" aria-hidden />
-              ) : (
-                <ListChecks className="size-4" aria-hidden />
-              )}
+              {s.audio ? <Headphones className="size-4" aria-hidden /> : <ListChecks className="size-4" aria-hidden />}
               <span className="font-medium">{sectionVi(s.id)}</span>
               <span className="text-muted-foreground">
                 {sectionCount(s)} câu · {s.minutes} phút
@@ -93,9 +85,7 @@ function MockIntro({ exam, onStart }: { exam: Exam; onStart: () => void }) {
           <li>Phần nghe phát liền một lần như phòng thi — không tạm dừng, không tua lại được.</li>
           <li>Đã sang phần sau thì không quay lại phần trước.</li>
           <li>Lỡ tải lại trang thì vẫn làm tiếp được, đồng hồ không dừng.</li>
-          {exam.sections.some((s) => s.writing) && (
-            <li>Phần viết không chấm tự động: nộp bài xong, bạn đối chiếu đáp án mẫu chính thức rồi tự chấm.</li>
-          )}
+          <li>Nộp bài xong có điểm quy đổi ước tính và lời giải thích từng câu.</li>
         </ul>
         <Button onClick={onStart} className="self-start">
           <Play className="size-4" aria-hidden />
@@ -109,7 +99,6 @@ function MockIntro({ exam, onStart }: { exam: Exam; onStart: () => void }) {
 function MockRunning({ exam, attempt }: { exam: Exam; attempt: MockAttempt }) {
   const router = useRouter();
   const setAnswer = useExamStore((s) => s.setMockAnswer);
-  const setText = useExamStore((s) => s.setMockText);
   const nextSection = useExamStore((s) => s.nextMockSection);
   const finish = useExamStore((s) => s.finishMock);
 
@@ -125,7 +114,7 @@ function MockRunning({ exam, attempt }: { exam: Exam; attempt: MockAttempt }) {
     setConfirm(false);
     if (isLast) {
       const result = scoreExam(exam, attempt.answers);
-      finish(attempt.id, result.score, result.level);
+      finish(attempt.id, result.score);
       router.push(`/exam/${exam.id}/result?attempt=${attempt.id}`);
     } else {
       nextSection(attempt.id, exam.sections[attempt.sectionIndex + 1].minutes);
@@ -153,15 +142,12 @@ function MockRunning({ exam, attempt }: { exam: Exam; attempt: MockAttempt }) {
     return () => window.clearInterval(t);
   }, [attempt.deadline]);
 
-  const texts = attempt.texts ?? {};
   const total = sectionCount(section);
-  const answered = section.writing
-    ? section.writing.tasks.filter((t) => hasWritten(t, texts)).length
-    : section.questions.filter((q) => attempt.answers[qKey(section.id, q.no)] !== undefined).length;
+  const answered = section.questions.filter((q) => attempt.answers[qKey(section.id, q.no)] !== undefined).length;
   const onAnswer = (no: number, choice: number) => setAnswer(attempt.id, qKey(section.id, no), choice);
 
   return (
-    // Máy tính dùng cả bề ngang (đề + phiếu trả lời, hoặc đề viết + ô viết).
+    // Máy tính dùng cả bề ngang (đề + phiếu trả lời).
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-5 pb-6 lg:max-w-none lg:pb-12">
       <div className="sticky top-[calc(3.5rem+env(safe-area-inset-top))] z-30 -mx-4 flex flex-col gap-2 border-b border-border bg-background/95 px-4 pt-2 pb-2.5 backdrop-blur">
         <div className="flex items-center justify-between gap-3">
@@ -186,43 +172,31 @@ function MockRunning({ exam, attempt }: { exam: Exam; attempt: MockAttempt }) {
         <div className="flex items-center gap-3">
           <ProgressBar value={answered} max={total} className="flex-1" />
           <span className="shrink-0 text-xs text-muted-foreground tabular-nums">
-            {section.writing ? "đã viết" : "đã chọn"} {answered}/{total}
+            đã chọn {answered}/{total}
           </span>
         </div>
       </div>
 
-      {section.writing ? (
-        <WritingSection
-          key={section.id}
-          exam={exam}
-          section={section}
-          texts={texts}
-          onChange={(key, text) => setText(attempt.id, key, text)}
-        />
-      ) : (
-        // Máy tính: đề bên trái, phiếu trả lời dính bên phải như phiếu tô
-        // đáp án ở phòng thi. Điện thoại: phiếu mở từ nút nổi.
-        <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_13rem] lg:gap-10">
-          <SectionQuestions key={section.id} exam={exam} section={section} attempt={attempt} onAnswer={onAnswer} />
-          <aside aria-label="Phiếu trả lời" className="hidden lg:block">
-            <div className="sticky top-40 flex max-h-[calc(100vh-11rem)] flex-col gap-2">
-              <p className="text-xs font-medium text-muted-foreground">Phiếu trả lời · {sectionVi(section.id)}</p>
-              <div className="overflow-y-auto pr-1">
-                <AnswerSheet
-                  section={section}
-                  answers={attempt.answers}
-                  onAnswer={onAnswer}
-                  onJump={jumpToQuestion}
-                />
-              </div>
+      {/* Máy tính: đề bên trái, phiếu trả lời dính bên phải như phiếu tô
+          đáp án ở phòng thi. Điện thoại: phiếu kéo lên từ đáy màn hình. */}
+      <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_13rem] lg:gap-10">
+        <SectionQuestions key={section.id} exam={exam} section={section} attempt={attempt} onAnswer={onAnswer} />
+        <aside aria-label="Phiếu trả lời" className="hidden lg:block">
+          <div className="sticky top-40 flex max-h-[calc(100vh-11rem)] flex-col gap-2">
+            <p className="text-xs font-medium text-muted-foreground">Phiếu trả lời · {sectionVi(section.id)}</p>
+            <div className="overflow-y-auto pr-1">
+              <AnswerSheet
+                section={section}
+                answers={attempt.answers}
+                onAnswer={onAnswer}
+                onJump={jumpToQuestion}
+              />
             </div>
-          </aside>
-        </div>
-      )}
+          </div>
+        </aside>
+      </div>
 
-      {!section.writing && (
-        <MobileAnswerSheet section={section} answers={attempt.answers} onAnswer={onAnswer} />
-      )}
+      <MobileAnswerSheet section={section} answers={attempt.answers} onAnswer={onAnswer} />
 
       <Dialog open={leaveGuard.pending} onOpenChange={(open) => !open && leaveGuard.stay()}>
         <DialogContent>
@@ -247,7 +221,7 @@ function MockRunning({ exam, attempt }: { exam: Exam; attempt: MockAttempt }) {
           <DialogHeader>
             <DialogTitle>{isLast ? "Nộp bài?" : `Kết thúc phần ${sectionVi(section.id)}?`}</DialogTitle>
             <DialogDescription>
-              {answered < total ? `Còn ${total - answered} câu chưa ${section.writing ? "viết" : "chọn"}. ` : ""}
+              {answered < total ? `Còn ${total - answered} câu chưa chọn. ` : ""}
               {isLast
                 ? "Nộp rồi thì không sửa được nữa."
                 : `Sang phần ${sectionVi(exam.sections[attempt.sectionIndex + 1].id)} rồi thì không quay lại được.`}
@@ -328,10 +302,7 @@ function SectionQuestions({
             .filter((q) => q.no >= g.from && q.no <= g.to)
             .map((q) => (
               <div key={q.no} id={`q-${q.no}`} className="flex scroll-mt-36 flex-col gap-3 py-1">
-                <p className="flex items-baseline gap-2">
-                  <span className="font-semibold tabular-nums">{q.no}.</span>
-                  <span className="text-xs text-muted-foreground">{q.points} điểm</span>
-                </p>
+                <p className="font-semibold tabular-nums">{q.no}.</p>
                 <PromptView exam={exam} question={q} />
                 <OptionList
                   exam={exam}
@@ -341,34 +312,6 @@ function SectionQuestions({
                 />
               </div>
             ))}
-        </section>
-      ))}
-    </div>
-  );
-}
-
-/**
- * Phần viết khi thi thử: các khối [51–52], [53], [54] như luyện tập — mỗi câu
- * một ảnh đề riêng + ô viết; bài viết trên máy tính chia đôi (đề | ô viết).
- */
-function WritingSection({
-  exam,
-  section,
-  texts,
-  onChange,
-}: {
-  exam: Exam;
-  section: ExamSection;
-  texts: Record<string, string>;
-  onChange: (key: string, text: string) => void;
-}) {
-  return (
-    <div className="flex flex-col gap-10">
-      {writingBlocks(section.writing!.tasks).map((block, bi) => (
-        <section key={block[0].no} className={cn("flex flex-col gap-8", bi > 0 && "border-t border-border pt-10")}>
-          {block.map((t) => (
-            <WritingTaskView key={t.no} exam={exam} task={t} texts={texts} onText={onChange} stickyTop="lg:top-40" />
-          ))}
         </section>
       ))}
     </div>

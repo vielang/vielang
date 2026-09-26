@@ -2,24 +2,28 @@
 
 import Link from "next/link";
 import { ChevronRight, GraduationCap } from "lucide-react";
-import { examTitle, getExam } from "@/lib/exams";
+import { examTitle, getExam, milestoneLabel, reachedMilestone } from "@/lib/exams";
 import { finishedAttempts, useExamStore } from "@/lib/exam-store";
+import { EXAM_LEVELS, examLevelHref } from "@/lib/exam-levels";
 
 /**
- * Thẻ "Luyện thi TOPIK" trên Góc học tập: lượt thi thử gần nhất (điểm, cấp),
- * hoặc lượt đang làm dở để làm tiếp, hoặc lời mời thử một đề.
+ * Thẻ "Luyện thi" trên Góc học tập: lượt thi thử gần nhất (điểm, mốc), hoặc
+ * lượt đang làm dở để làm tiếp, hoặc lời mời thử một đề.
  */
 export function ExamCard() {
-  const attempts = useExamStore((s) => s.attempts);
+  // Chỉ lượt của đề còn trên web — bản lưu cũ có thể còn lượt của đề đã gỡ,
+  // dẫn tới đó là trang 404.
+  const attempts = useExamStore((s) => s.attempts).filter((a) => getExam(a.examId));
   const active = attempts.find((a) => !a.finishedAt);
   const last = finishedAttempts(attempts)[0];
   const exam = getExam((active ?? last)?.examId ?? "");
+  const reached = last && exam ? reachedMilestone(exam, last.score ?? 0) : null;
 
   const href = active
     ? `/exam/${active.examId}/mock`
     : last
       ? `/exam/${last.examId}/result?attempt=${last.id}`
-      : "/exam/topik-i";
+      : examLevelHref(EXAM_LEVELS[0].id);
 
   return (
     <Link
@@ -38,7 +42,8 @@ export function ExamCard() {
         ) : last && exam ? (
           <>
             <span className="block font-medium">
-              {examTitle(exam)}: {last.score} điểm · {last.level ? `đạt ${last.level}` : "chưa đạt cấp"}
+              {examTitle(exam)}: {last.score} điểm
+              {reached ? ` · mốc ${milestoneLabel(exam, reached)}` : ""}
             </span>
             <span className="block text-sm text-muted-foreground">
               Lần thi thử gần nhất, {new Date(last.finishedAt!).toLocaleDateString("vi-VN")} — xem lại câu sai
@@ -46,9 +51,9 @@ export function ExamCard() {
           </>
         ) : (
           <>
-            <span className="block font-medium">Thử sức với đề TOPIK thật</span>
+            <span className="block font-medium">Thử sức với đề luyện TOEIC</span>
             <span className="block text-sm text-muted-foreground">
-              Luyện từng câu hoặc thi thử có tính giờ để biết mình đang ở cấp nào.
+              Luyện từng câu có giải thích, hoặc thi thử có tính giờ để biết mình đang ở khoảng điểm nào.
             </span>
           </>
         )}

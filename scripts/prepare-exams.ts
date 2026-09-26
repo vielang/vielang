@@ -3,11 +3,11 @@
  * Đẩy tài nguyên đề thi (ảnh trang WebP + file nghe MP3) lên R2.
  *
  *   npm run prepare-exams                    # mọi đề, bỏ qua file đã có
- *   npm run prepare-exams -- --exam 102       # chỉ một kỳ
+ *   npm run prepare-exams -- --exam toeic-01  # chỉ một đề (tên thư mục tài nguyên)
  *   npm run prepare-exams -- --force         # đẩy lại kể cả đã có
  *
- * Nguồn: public/img/exams/<kỳ>/** (ảnh WebP + file nghe, do `import-topik`
- * chép sang). Đích: exams/<kỳ>/** trên bucket — đúng chỗ mà `examAssetUrl`
+ * Nguồn: public/img/exams/<assetDir>/** (ảnh WebP + file nghe của đề). Đích:
+ * exams/<assetDir>/** trên bucket — đúng chỗ mà `examAssetUrl`
  * (qua rewrite /img/exams) và `examAudioUrl` (thẳng R2) đọc.
  *
  * Thư mục nguồn KHÔNG commit (xem .gitignore): lúc dev Next phục vụ thẳng từ
@@ -77,7 +77,7 @@ async function main() {
   try {
     exams = (await readdir(ROOT)).filter((e) => !examFilter || e === examFilter);
   } catch {
-    console.error(`✗ Chưa có ${ROOT} — chạy "npm run import-topik" (đã gỡ cùng đề TOPIK; TOEIC sẽ có script nhập riêng) trước.`);
+    console.error(`✗ Chưa có ${ROOT} — đặt ảnh / file nghe của đề vào đó trước.`);
     process.exit(1);
   }
 

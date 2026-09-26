@@ -148,11 +148,12 @@ describe("khoá học đang học", () => {
 });
 
 describe("luyện thi", () => {
-  it("chưa có kỳ thi nào thì không hiện mục luyện thi", () => {
+  it("có kỳ thi (TOEIC) thì hiện mục luyện thi; chưa thi thử lần nào thì mời thử đề", () => {
     useActivityStore.setState({ days: studiedToday(5) });
     render(<MyPageView books={BOOKS} />);
 
-    expect(screen.queryByRole("heading", { name: "Luyện thi" })).toBeNull();
+    expect(screen.getByRole("heading", { name: "Luyện thi" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: /Thử sức với đề luyện TOEIC/ }).getAttribute("href")).toBe("/exam/toeic");
   });
 });
 

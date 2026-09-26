@@ -3,20 +3,13 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { syncAcrossTabs } from "@/lib/cross-tab-sync";
-import type { Answers, Grades, QuestionKey, Texts } from "@/lib/exams";
+import type { Answers, QuestionKey } from "@/lib/exams";
 
 /** Bài luyện tập (không tính giờ) của một đề. */
 export interface PracticeState {
   answers: Answers;
-  /**
-   * Câu đã bấm "Kiểm tra" — để mở lại vẫn thấy kết quả. Câu viết: đã mở đáp
-   * án mẫu.
-   */
+  /** Câu đã bấm "Kiểm tra" — để mở lại vẫn thấy kết quả và lời giải thích. */
   checked: string[];
-  /** Chữ đã viết ở câu viết (TOPIK II). */
-  texts?: Texts;
-  /** Điểm tự chấm câu viết. */
-  grades?: Grades;
 }
 
 /**
@@ -32,16 +25,15 @@ export interface MockAttempt {
   startedAt: string;
   finishedAt?: string;
   answers: Answers;
-  texts?: Texts;
-  /** Điểm tự chấm câu viết — chấm SAU khi nộp, đối chiếu đáp án mẫu. */
-  grades?: Grades;
   /** Phần đang làm (chỉ số trong `exam.sections`). Sang phần sau là KHÔNG quay lại được. */
   sectionIndex: number;
   /** Mốc hết giờ của phần đang làm (ms, Date.now()). */
   deadline: number;
-  /** Điểm lúc nộp (cập nhật khi tự chấm câu viết), lưu sẵn để danh sách lịch sử khỏi phải chấm lại. */
+  /**
+   * Điểm quy đổi lúc nộp, lưu sẵn để danh sách lịch sử khỏi phải chấm lại.
+   * (Bản lưu cũ có thể còn trường thừa như `level`, `texts` — không đọc tới.)
+   */
   score?: number;
-  level?: string | null;
 }
 
 interface ExamState {
@@ -53,16 +45,11 @@ interface ExamState {
   setPracticeAnswer: (examId: string, key: QuestionKey, choice: number) => void;
   checkPractice: (examId: string, key: string) => void;
   resetPractice: (examId: string, keys: string[]) => void;
-  setPracticeText: (examId: string, key: string, text: string) => void;
-  setPracticeGrade: (examId: string, no: number, points: number) => void;
 
   startMock: (examId: string, firstSectionMinutes: number, now?: number) => MockAttempt;
   setMockAnswer: (attemptId: string, key: QuestionKey, choice: number) => void;
-  setMockText: (attemptId: string, key: string, text: string) => void;
   nextMockSection: (attemptId: string, minutes: number, now?: number) => void;
-  finishMock: (attemptId: string, score: number, level: string | null, now?: number) => void;
-  /** Tự chấm một câu viết của lượt đã nộp; `score`/`level` là kết quả chấm lại. */
-  gradeMock: (attemptId: string, no: number, points: number, score: number, level: string | null) => void;
+  finishMock: (attemptId: string, score: number, now?: number) => void;
   discardMock: (attemptId: string) => void;
 }
 
@@ -77,9 +64,9 @@ function updateAttempt(
 }
 
 /**
- * Bản lưu cũ (version 0) khoá bài làm bằng số câu trơn — lúc đó mới có
- * TOPIK I, số câu không trùng giữa hai phần: 1–30 là nghe, 31–70 là đọc.
- * TOPIK II đánh số lại từ 1 ở phần đọc, nên từ version 1 khoá là "<phần>:<số>".
+ * Bản lưu cũ (version 0) khoá bài làm bằng số câu trơn, theo bộ đề đầu tiên
+ * của app: 1–30 là nghe, 31–70 là đọc. Từ version 1 khoá là "<phần>:<số>"
+ * (xem `qKey`). Giữ bước chuyển này để bản lưu cũ vẫn đọc được, không vỡ.
  */
 export function migrateExamState(persisted: unknown, version: number): unknown {
   if (version >= 1 || !persisted || typeof persisted !== "object") return persisted;
@@ -136,12 +123,6 @@ export const useExamStore = create<ExamState>()(
             return { ...prev, answers, checked: prev.checked.filter((k) => !keys.includes(k)) };
           }),
 
-        setPracticeText: (examId, key, text) =>
-          updatePractice(examId, (prev) => ({ ...prev, texts: { ...prev.texts, [key]: text } })),
-
-        setPracticeGrade: (examId, no, points) =>
-          updatePractice(examId, (prev) => ({ ...prev, grades: { ...prev.grades, [no]: points } })),
-
         startMock: (examId, minutes, now = Date.now()) => {
           const attempt: MockAttempt = {
             id: `${examId}-${now.toString(36)}`,
@@ -165,13 +146,6 @@ export const useExamStore = create<ExamState>()(
             ),
           })),
 
-        setMockText: (id, key, text) =>
-          set((s) => ({
-            attempts: updateAttempt(s.attempts, id, (a) =>
-              a.finishedAt ? a : { ...a, texts: { ...a.texts, [key]: text } }
-            ),
-          })),
-
         nextMockSection: (id, minutes, now = Date.now()) =>
           set((s) => ({
             attempts: updateAttempt(s.attempts, id, (a) => ({
@@ -181,22 +155,13 @@ export const useExamStore = create<ExamState>()(
             })),
           })),
 
-        finishMock: (id, score, level, now = Date.now()) =>
+        finishMock: (id, score, now = Date.now()) =>
           set((s) => ({
             attempts: updateAttempt(s.attempts, id, (a) => ({
               ...a,
               finishedAt: new Date(now).toISOString(),
               score,
-              level,
             })),
-          })),
-
-        gradeMock: (id, no, points, score, level) =>
-          set((s) => ({
-            attempts: updateAttempt(s.attempts, id, (a) =>
-              // Chấm sau khi nộp — bài viết thì vẫn không sửa được.
-              a.finishedAt ? { ...a, grades: { ...a.grades, [no]: points }, score, level } : a
-            ),
           })),
 
         discardMock: (id) => set({ attempts: get().attempts.filter((a) => a.id !== id) }),

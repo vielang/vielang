@@ -2,9 +2,9 @@ import { listExams, type ExamLevel } from "@/lib/exams";
 import { ExamList } from "@/components/exam/exam-list";
 
 /**
- * Tab "Luyện thi", một trang cho mỗi cấp đề (`/exam/topik-i`, `/exam/topik-ii`
- * — `/exam` chuyển thẳng tới cấp đầu, xem next.config). Nay mới có TOPIK;
- * thêm kỳ thi khác thì thêm tầng kỳ thi phía trên, thanh điều hướng giữ nguyên.
+ * Tab "Luyện thi", một trang cho mỗi kỳ thi (`/exam/toeic` — `/exam` chuyển
+ * thẳng tới đó, xem next.config). Thêm kỳ thi khác thì thêm vào
+ * `EXAM_LEVELS` và một route như `exam/toeic`, thanh điều hướng giữ nguyên.
  *
  * Canh trái, cùng bề ngang danh sách với Cẩm nang.
  */

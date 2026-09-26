@@ -1,8 +1,8 @@
 "use client";
 
-import { practiceProgress, totalMinutes, type Exam, type ExamLevel } from "@/lib/exams";
+import { examTitle, practiceProgress, totalMinutes, type Exam, type ExamLevel } from "@/lib/exams";
 import { finishedAttempts, useExamStore, type MockAttempt } from "@/lib/exam-store";
-import { LevelBadge, ProgressRing } from "@/components/exam/exam-chrome";
+import { MilestoneBadge, ProgressRing } from "@/components/exam/exam-chrome";
 import { PageHeader } from "@/components/layout/page-header";
 import { SegmentedNav } from "@/components/layout/segmented-nav";
 import { RowLink, RowList } from "@/components/layout/row-list";
@@ -15,13 +15,13 @@ function best(attempts: MockAttempt[]): MockAttempt | null {
 }
 
 /**
- * Trang Luyện thi: đầu trang, tab cấp đề, rồi danh sách đề — mỗi kỳ một dòng
- * gọn: tiến độ luyện từng câu (vòng tròn) và điểm thi thử cao nhất kèm cấp.
+ * Trang Luyện thi: đầu trang, tab kỳ thi, rồi danh sách đề — mỗi đề một dòng
+ * gọn: tiến độ luyện từng câu (vòng tròn) và điểm thi thử cao nhất kèm mốc.
  * Cùng khung với Thư viện và Cẩm nang (PageHeader + SegmentedNav + RowList).
  *
- * Cấp đề đến từ URL (`/exam/topik-i`, `/exam/topik-ii`) chứ không phải state
- * của trang: header điện thoại hiện tab cấp đề và đổi được, chia sẻ link hay
- * bấm quay lại cũng giữ đúng cấp.
+ * Kỳ thi đến từ URL (`/exam/toeic`) chứ không phải state của trang: header
+ * điện thoại hiện tab kỳ thi và đổi được, chia sẻ link hay bấm quay lại cũng
+ * giữ đúng kỳ thi.
  */
 export function ExamList({ exams, level }: { exams: Exam[]; level: ExamLevel }) {
   const isClient = useIsClient();
@@ -30,7 +30,7 @@ export function ExamList({ exams, level }: { exams: Exam[]; level: ExamLevel }) 
 
   const info = examLevelInfo(level);
   // Tầng ngôn ngữ đã chọn trên header; hàng chọn trong trang là KỲ THI của
-  // ngôn ngữ đó (TOPIK I, TOPIK II, …) — một kỳ thì khỏi hiện hàng.
+  // ngôn ngữ đó — một kỳ thì khỏi hiện hàng.
   const siblings = levelsOfLang(info.lang);
   const langLabel = LANGUAGES.find((l) => l.code === info.lang)?.label ?? "";
   const shown = exams.filter((e) => e.level === level);
@@ -44,7 +44,7 @@ export function ExamList({ exams, level }: { exams: Exam[]; level: ExamLevel }) 
       <div className="flex flex-col gap-3">
         <PageHeader
           title={`Luyện thi ${langLabel.replace(/^Tiếng/, "tiếng")}`.trim()}
-          subtitle="Đề TOPIK thật đã công bố — luyện từng câu và chấm ngay, hoặc thi thử có tính giờ."
+          subtitle="Đề luyện do VieLang tự biên soạn theo đúng format TOEIC — luyện từng câu có giải thích, hoặc thi thử có tính giờ."
         />
         {siblings.length > 1 && (
           <SegmentedNav
@@ -59,13 +59,13 @@ export function ExamList({ exams, level }: { exams: Exam[]; level: ExamLevel }) 
         )}
       </div>
 
-      {/* Gợi ý của cấp (trước đây là dòng thứ hai trong nút tab) chuyển xuống
-          đây — tab chỉ còn một dòng như ở Thư viện và Cẩm nang. */}
+      {/* Gợi ý của kỳ thi (trước đây là dòng thứ hai trong nút tab) chuyển
+          xuống đây — tab chỉ còn một dòng như ở Thư viện và Cẩm nang. */}
       <p className="-mt-3 text-sm text-muted-foreground">
         {info.hint} · {shown.length} đề
         {sample ? ` · mỗi đề ${totalMinutes(sample)} phút` : ""}
         {triedExams > 0 && top
-          ? ` · đã thi thử ${triedExams} đề, cao nhất ${top.score} điểm${top.level ? ` (${top.level})` : ""}`
+          ? ` · đã thi thử ${triedExams} đề, cao nhất ${top.score} điểm`
           : ""}
       </p>
 
@@ -77,8 +77,10 @@ export function ExamList({ exams, level }: { exams: Exam[]; level: ExamLevel }) 
           return (
             <RowLink key={exam.id} href={`/exam/${exam.id}`}>
                 <span className="min-w-0 flex-1">
-                  <span className="block font-medium">Kỳ {exam.round}</span>
-                  <span className="block text-sm text-muted-foreground">Năm {exam.year}</span>
+                  <span className="block font-medium">{examTitle(exam)}</span>
+                  <span className="block text-sm text-muted-foreground">
+                    {exam.sections.map((s) => s.title).join(" · ")}
+                  </span>
                 </span>
                 <span
                   className="flex items-center gap-2 text-xs text-muted-foreground tabular-nums"
@@ -93,7 +95,7 @@ export function ExamList({ exams, level }: { exams: Exam[]; level: ExamLevel }) 
                   {b ? (
                     <>
                       <span className="font-medium">{b.score} điểm</span>
-                      <LevelBadge level={b.level} />
+                      <MilestoneBadge exam={exam} score={b.score ?? 0} />
                     </>
                   ) : (
                     <span className="text-xs text-muted-foreground">Chưa thi thử</span>

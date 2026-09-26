@@ -1,5 +1,6 @@
 "use client";
 
+import { Lightbulb } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   examAssetUrl,
@@ -12,26 +13,26 @@ import {
   type ExamQuestion,
 } from "@/lib/exams";
 
-const MARKS = ["①", "②", "③", "④"];
-const FILLED = ["❶", "❷", "❸", "❹"];
-
 /**
- * HTML của đề — ĐÃ LÀM SẠCH lúc nhập (`lib/exam-html`: chỉ <br> <b> <u>
- * <div class="exam-box"> <img>), nên mới dám đưa thẳng vào DOM.
+ * HTML của đề — đề do VieLang tự soạn, nằm trong repo, và chỉ dùng <br> <b>
+ * <u> <div class="exam-box"> <img> (exams.test soát từng đề), nên mới dám
+ * đưa thẳng vào DOM.
  *
- * Khung `.exam-box` là ô viền quanh đoạn văn như trên đề in. Ảnh luôn có nền
- * trắng: tranh/biểu đồ của đề vẽ trên nền giấy, để nền tối là lộ mép.
+ * Khung `.exam-box` là ô viền quanh từng văn bản (e-mail, thông báo…) như
+ * trên đề in. Ảnh luôn có nền trắng: tranh/biểu đồ vẽ trên nền giấy, để nền
+ * tối là lộ mép.
  */
 function ExamHtml({ html, className }: { html: string; className?: string }) {
   if (!html.trim()) return null;
   return (
     <div
       className={cn(
-        "leading-relaxed break-keep",
+        "leading-relaxed",
         "[&_.exam-box]:my-2 [&_.exam-box]:rounded-md [&_.exam-box]:border [&_.exam-box]:border-border [&_.exam-box]:px-3 [&_.exam-box]:py-2",
         "[&_img]:mx-auto [&_img]:my-2 [&_img]:h-auto [&_img]:max-w-full [&_img]:rounded-md [&_img]:bg-white",
         className
       )}
+      lang="en"
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );
@@ -63,7 +64,7 @@ export function ContentView({
   return <ExamHtml html={content.html} className={className} />;
 }
 
-/** Đề câu hỏi (đã bỏ "(N점)" lặp lại — xem `questionPrompt`); không có gì thì không hiện. */
+/** Đề câu hỏi; không có gì thì không hiện (câu Part 6 — chỗ trống nằm trong văn bản của khối). */
 export function PromptView({ exam, question, className }: { exam: Exam; question: ExamQuestion; className?: string }) {
   const content = questionPrompt(question.prompt);
   if (!content) return null;
@@ -71,8 +72,9 @@ export function PromptView({ exam, question, className }: { exam: Exam; question
 }
 
 /**
- * Khối "※ [a~b]": lời chỉ dẫn, câu mẫu <보기> (đã có sẵn đáp án, tô đen như
- * đề in) và đoạn văn dùng chung cho các câu trong khối.
+ * Đầu khối: nhãn phần ("Part 6") và khoảng câu, lời chỉ dẫn tiếng Anh như đề
+ * in, rồi văn bản dùng chung (Part 6: văn bản có chỗ trống; Part 7: một, hai
+ * hoặc ba văn bản — mỗi văn bản một khung `.exam-box`).
  */
 export function GroupBlock({
   group,
@@ -83,37 +85,30 @@ export function GroupBlock({
   /** Hiện nhãn "Câu a–b" (tắt khi tiêu đề trang đã ghi khoảng câu). */
   showRange?: boolean;
 }) {
-  const { range, text } = splitInstruction(group.instruction);
+  const { part, range, text } = splitInstruction(group.instruction);
+  const tag = "mr-2 inline-block rounded bg-muted px-1.5 py-0.5 align-[1px] text-xs font-medium text-muted-foreground tabular-nums";
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-[0.95rem] leading-relaxed break-keep text-foreground/85">
-        {range && showRange && (
-          <span className="mr-2 inline-block rounded bg-muted px-1.5 py-0.5 align-[1px] font-sans text-xs font-medium text-muted-foreground tabular-nums">
-            Câu {range}
-          </span>
-        )}
-        {text}
+      <p className="text-[0.95rem] leading-relaxed text-foreground/85">
+        {part && <span className={tag}>{part}</span>}
+        {range && showRange && <span className={tag}>Câu {range}</span>}
+        <span lang="en">{text}</span>
       </p>
-      {group.example && (
-        <div className="relative rounded-lg border border-border px-4 pt-5 pb-3">
-          <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-background px-2 text-xs text-muted-foreground">
-            〈보 기〉
-          </span>
-          <ExamHtml html={group.example.html} className="text-sm" />
-          <OptionsGrid layout={group.example.layout} count={group.example.options.length}>
-            {group.example.options.map((o, i) => (
-              <span key={i} className={cn("text-sm", i + 1 === group.example!.answer && "font-semibold")}>
-                {i + 1 === group.example!.answer ? FILLED[i] : MARKS[i]} {o}
-              </span>
-            ))}
-          </OptionsGrid>
-        </div>
-      )}
-      {group.passage && (
-        <div className="rounded-lg border border-border px-4 py-3">
-          <ExamHtml html={group.passage} className="text-[0.95rem]" />
-        </div>
-      )}
+      {group.passage && <ExamHtml html={group.passage} className="text-[0.95rem]" />}
+    </div>
+  );
+}
+
+/** Lời giải thích đáp án (tiếng Việt) — hiện sau khi kiểm tra câu và khi xem lại bài thi thử. */
+export function Explanation({ question }: { question: ExamQuestion }) {
+  if (!question.explanation) return null;
+  return (
+    <div className="flex items-start gap-2 rounded-lg bg-muted/60 px-3 py-2.5 text-sm leading-relaxed">
+      <Lightbulb className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden />
+      <p className="min-w-0 flex-1">
+        <span className="sr-only">Giải thích: </span>
+        {question.explanation}
+      </p>
     </div>
   );
 }

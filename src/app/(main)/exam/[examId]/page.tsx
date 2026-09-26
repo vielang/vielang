@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/seo";
-import { getExam, listExams } from "@/lib/exams";
+import { examTitle, getExam, listExams, sectionCount, sectionVi, totalMinutes } from "@/lib/exams";
 import { ExamOverview } from "@/components/exam/exam-overview";
 
 export function generateStaticParams() {
@@ -12,9 +12,10 @@ export const dynamicParams = false;
 export async function generateMetadata({ params }: { params: Promise<{ examId: string }> }): Promise<Metadata> {
   const exam = getExam((await params).examId);
   if (!exam) return { title: "Không tìm thấy đề" };
+  const parts = exam.sections.map((sec) => `${sectionVi(sec.id).toLowerCase()} ${sectionCount(sec)} câu`).join(", ");
   return pageMetadata({
-    title: `Đề thi ${exam.level} kỳ ${exam.round} (${exam.year}) – làm online, chấm điểm`,
-    description: `Đề thi ${exam.level} lần thứ ${exam.round} năm ${exam.year}: làm bài online có file nghe, chấm điểm tự động.`,
+    title: `${examTitle(exam)} – làm online, chấm điểm, có giải thích`,
+    description: `${examTitle(exam)} (${parts}, ${totalMinutes(exam)} phút): luyện từng câu có giải thích tiếng Việt, thi thử tính giờ, quy đổi điểm TOEIC ước tính.`,
     path: `/exam/${exam.id}`,
   });
 }

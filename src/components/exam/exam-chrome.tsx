@@ -6,7 +6,15 @@ import { Check, CheckCircle2, ChevronRight, Grid3x3, XCircle } from "lucide-reac
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
-import { examTitle, sectionVi, type Exam, type ExamSection } from "@/lib/exams";
+import {
+  examTitle,
+  milestoneLabel,
+  milestones,
+  reachedMilestone,
+  sectionVi,
+  type Exam,
+  type ExamSection,
+} from "@/lib/exams";
 import { BackLink } from "@/components/layout/back-link";
 
 /**
@@ -57,30 +65,26 @@ export function ProgressRing({ value, max, size = 32 }: { value: number; max: nu
   );
 }
 
-/** Huy hiệu cấp đạt được ("Cấp 2"), hoặc "Chưa đạt". */
-export function LevelBadge({
-  level,
-  emptyLabel = "Chưa đạt",
-  className,
-}: {
-  level: string | null | undefined;
-  emptyLabel?: string;
-  className?: string;
-}) {
+/**
+ * Huy hiệu mốc mục tiêu cao nhất đã chạm với số điểm này ("Mốc 600"), hoặc
+ * "Dưới mốc 450" — TOEIC không có cấp đậu/trượt, mốc là thứ người học nhắm tới.
+ */
+export function MilestoneBadge({ exam, score, className }: { exam: Exam; score: number; className?: string }) {
+  const m = reachedMilestone(exam, score);
   return (
     <span
       className={cn(
         "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap",
-        level ? "bg-foreground text-background" : "bg-muted text-muted-foreground",
+        m ? "bg-foreground text-background" : "bg-muted text-muted-foreground",
         className
       )}
     >
-      {level ?? emptyLabel}
+      {m ? `Mốc ${milestoneLabel(exam, m)}` : `Dưới mốc ${milestoneLabel(exam, milestones(exam)[0])}`}
     </span>
   );
 }
 
-/** Đầu trang luyện tập: về trang đề, chuyển phần Nghe / Viết / Đọc, tiến độ phần đang luyện. */
+/** Đầu trang luyện tập: về trang đề, chuyển phần Nghe / Đọc, tiến độ phần đang luyện. */
 export function PracticeHeader({
   exam,
   section,
@@ -155,8 +159,6 @@ export type CellState = "idle" | "answered" | "right" | "wrong";
 export interface GridItem {
   no: number;
   state: CellState;
-  /** Chữ thêm sau số câu (vd điểm tự chấm câu viết). */
-  suffix?: string;
   label?: string;
 }
 
@@ -179,7 +181,6 @@ export function QuestionGrid({
   onPick: (index: number) => void;
   className?: string;
 }) {
-  const wide = items.some((x) => x.suffix);
   return (
     <div className={cn("flex flex-wrap gap-1", className)}>
       {items.map((x, i) => (
@@ -190,14 +191,12 @@ export function QuestionGrid({
           aria-current={i === current ? "step" : undefined}
           aria-label={x.label ?? `Câu ${x.no}`}
           className={cn(
-            "flex h-8 items-center justify-center rounded-md text-xs tabular-nums transition-colors",
-            wide ? "min-w-12 px-2" : "w-8",
+            "flex h-8 w-9 items-center justify-center rounded-md text-xs tabular-nums transition-colors",
             CELL[x.state],
             i === current && "ring-2 ring-foreground/70 ring-offset-1 ring-offset-background"
           )}
         >
           {x.no}
-          {x.suffix}
         </button>
       ))}
     </div>

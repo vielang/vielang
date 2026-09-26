@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
 /**
- * Lối quay lại trang cha ở đầu trang con ("← Luyện thi TOPIK", "← Góc học
+ * Lối quay lại trang cha ở đầu trang con ("← Luyện thi TOEIC", "← Góc học
  * tập"…). Một kiểu cho mọi trang — trước đây chép tay ở 7 chỗ, lệch nhau cả
  * `w-fit` (thiếu thì vùng bấm kéo dài hết hàng).
  */

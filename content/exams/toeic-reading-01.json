@@ -1,0 +1,2539 @@
+{
+  "id": "toeic-reading-01",
+  "round": 1,
+  "year": 2026,
+  "level": "TOEIC",
+  "title": "Đề luyện TOEIC Reading số 1",
+  "assetDir": "toeic-01",
+  "source": "Đề luyện do VieLang tự biên soạn theo format TOEIC Listening & Reading. Không phải đề thi thật của ETS.",
+  "sections": [
+    {
+      "id": "reading",
+      "title": "Reading · Part 5–7 (câu 101–200)",
+      "minutes": 75,
+      "groups": [
+        {
+          "from": 101,
+          "to": 130,
+          "instruction": "Part 5 — Incomplete Sentences. A word or phrase is missing in each of the sentences below. Four answer choices are given below each sentence. Select the best answer to complete the sentence."
+        },
+        {
+          "from": 131,
+          "to": 134,
+          "instruction": "Part 6 — Questions 131-134 refer to the following e-mail.",
+          "passage": "<div class=\"exam-box\"><b>To:</b> All Staff<br><b>From:</b> Grace Holloway, Facilities Manager<br><b>Date:</b> March 3<br><b>Subject:</b> Parking lot resurfacing<br><br>Dear colleagues,<br><br>The east parking lot will be closed from Monday, March 10, to Friday, March 14, while it is being resurfaced. During this period, employees who normally park there should use the Garfield Street garage, located two blocks north of our building. The company has arranged for parking fees there to be <b>(131)</b> ------- covered. Simply show your employee ID card to the attendant when you exit.<br><br>We understand that this change may be <b>(132)</b> -------. <b>(133)</b> ------- The shuttle service will operate from 7:00 A.M. to 7:00 P.M. on weekdays.<br><br><b>(134)</b> ------- you have any questions, please contact the facilities office at extension 215.<br><br>Grace Holloway</div>"
+        },
+        {
+          "from": 135,
+          "to": 138,
+          "instruction": "Part 6 — Questions 135-138 refer to the following notice.",
+          "passage": "<div class=\"exam-box\"><b>Linwood Public Library — Renovation Notice</b><br>Posted: May 2<br><br>Linwood Public Library is pleased to announce that the renovation of its second floor <b>(135)</b> ------- in early June. When the project is finished, the floor will feature a larger children's section, twelve private study rooms, and a new computer lab. <b>(136)</b> -------, the library's collection of local history materials will be moved to a climate-controlled room on the same floor.<br><br>During the renovation, the second floor will be closed to the public. However, patrons may still borrow books normally shelved there through our online request service. Items <b>(137)</b> ------- by noon will be ready for pickup at the main desk the following day.<br><br><b>(138)</b> -------</div>"
+        },
+        {
+          "from": 139,
+          "to": 142,
+          "instruction": "Part 6 — Questions 139-142 refer to the following article.",
+          "passage": "<div class=\"exam-box\">HAMILTON (April 8) — Corvane Logistics, a regional shipping company based in Hamilton, announced yesterday that it will open a new distribution center in the town of Westbrook. The facility, which is expected to <b>(139)</b> ------- about 250 new jobs, will be the company's largest to date. Construction is scheduled to start this summer, and the center should be fully <b>(140)</b> ------- by the end of next year.<br><br>According to Corvane CEO Nadia Brooks, Westbrook was chosen mainly for its location. <b>(141)</b> ------- \"This will allow us to reach customers across the region much faster,\" Brooks said.<br><br>The company plans to hold a job fair at the Westbrook Community Center next month. Those interested in applying are encouraged to visit Corvane's Web site, <b>(142)</b> ------- a full list of available positions will be posted.</div>"
+        },
+        {
+          "from": 143,
+          "to": 146,
+          "instruction": "Part 6 — Questions 143-146 refer to the following letter.",
+          "passage": "<div class=\"exam-box\"><b>Maplecrest Home Furnishings</b><br>418 Birch Avenue, Dayton Falls<br><br>September 9<br><br>Mr. Daniel Castellano<br>72 Orchard Lane<br>Dayton Falls<br><br>Dear Mr. Castellano,<br><br>Thank you for your recent purchase from Maplecrest Home Furnishings. We are writing to inform you that the oak dining table you ordered on September 2 is <b>(143)</b> ------- out of stock. We expect to <b>(144)</b> ------- a new shipment from our supplier by October 15, and we will deliver your table within five business days of its arrival.<br><br>We apologize for this delay. To thank you for your patience, we would like to offer you a 15 percent discount <b>(145)</b> ------- your order. This amount will be refunded to the credit card you used for the purchase. <b>(146)</b> -------<br><br>Sincerely,<br>Owen Marsh<br>Customer Service Manager</div>"
+        },
+        {
+          "from": 147,
+          "to": 148,
+          "instruction": "Part 7 — Questions 147-148 refer to the following text-message chain.",
+          "passage": "<div class=\"exam-box\"><b>Tanya Ruiz (10:14 A.M.)</b><br>Hi Marcus, are you still at the Delford warehouse?<br><br><b>Marcus Webb (10:16 A.M.)</b><br>Just leaving. Why?<br><br><b>Tanya Ruiz (10:17 A.M.)</b><br>The client from Harlow Interiors called. The sample tiles we shipped on Monday arrived cracked, and she needs replacements before her presentation on Thursday.<br><br><b>Marcus Webb (10:18 A.M.)</b><br>That's unfortunate. Which line were they from?<br><br><b>Tanya Ruiz (10:19 A.M.)</b><br>The slate gray, 30-by-30 centimeters. Four pieces.<br><br><b>Marcus Webb (10:21 A.M.)</b><br>I can turn around. We have plenty of those on shelf C.<br><br><b>Tanya Ruiz (10:22 A.M.)</b><br>Great. Could you send them by courier this time instead of regular post? And please use extra padding.<br><br><b>Marcus Webb (10:23 A.M.)</b><br>Will do. I'll e-mail you the tracking number once they've been picked up.</div>"
+        },
+        {
+          "from": 149,
+          "to": 150,
+          "instruction": "Part 7 — Questions 149-150 refer to the following notice.",
+          "passage": "<div class=\"exam-box\"><b>NOTICE TO ALL TENANTS OF PELLHAM TOWER</b><br><br>The underground parking garage will be resurfaced from Monday, May 11, through Friday, May 15. To keep part of the garage available at all times, the work will be carried out on one level per day, as follows:<br><br>Level B1 closed: Monday, Wednesday, Friday<br>Level B2 closed: Tuesday, Thursday<br><br>Vehicles must be removed from the closed level by 7:00 A.M. on the day of the work. Any vehicle remaining after that time will be towed at the owner's expense.<br><br>During the project, tenants may park at the Carver Street Public Garage for a reduced rate of $6 per day. To receive this rate, simply present your Pellham Tower access card to the attendant when you leave.<br><br>Questions may be directed to the building management office in Suite 104 or at extension 2210.</div>"
+        },
+        {
+          "from": 151,
+          "to": 152,
+          "instruction": "Part 7 — Questions 151-152 refer to the following advertisement.",
+          "passage": "<div class=\"exam-box\"><b>Brightline Office Furniture — Spring Clearance Event</b><br><br>Make room for the new season! From now until April 30, our showroom at 88 Kessler Avenue is offering savings of up to 40 percent on discontinued desks, chairs, and filing cabinets.<br><br>• Free delivery within city limits on all orders over $500<br>• Professional assembly available for $45 per item<br>• Floor models priced to sell — all floor models are sold as is and cannot be returned or exchanged<br><br>Showroom hours: Monday to Saturday, 9:00 A.M. to 7:00 P.M. Visit us or call 555-0192 to check availability.</div>"
+        },
+        {
+          "from": 153,
+          "to": 154,
+          "instruction": "Part 7 — Questions 153-154 refer to the following e-mail.",
+          "passage": "<div class=\"exam-box\"><b>To:</b> Daniel Oyelaran &lt;d.oyelaran@ferrowaysolutions.com&gt;<br><b>From:</b> Priya Anand &lt;events@castellanhotel.com&gt;<br><b>Date:</b> September 8<br><b>Subject:</b> Your booking on September 24<br><br>Dear Mr. Oyelaran,<br><br>Thank you for letting us know that attendance at your sales seminar has increased from 40 to 65 participants. Since the Birch Room can comfortably seat only 45 people, I have moved your event to Maple Hall on the ground floor. The rate for the day remains the same as in your original agreement.<br><br>Maple Hall is equipped with a projector and a sound system, but please confirm your audiovisual requirements, such as the number of microphones you will need, by this Friday so that our technicians can prepare the room. I will also update the catering order to reflect the new number of guests.<br><br>Best regards,<br>Priya Anand<br>Events Coordinator, Castellan Hotel</div>"
+        },
+        {
+          "from": 155,
+          "to": 157,
+          "instruction": "Part 7 — Questions 155-157 refer to the following article.",
+          "passage": "<div class=\"exam-box\"><b>Greenhill Bakery to Open Second Location</b><br><br>ASHFORD (June 3) — Greenhill Bakery, the family-run shop on Market Street known for its sourdough loaves, will open a second location on Fenwick Road next month. Owner Clara Mendes said the decision was driven by demand from customers in the northern part of the city, many of whom had been making the long drive across town every weekend.<br><br>The new shop will be larger than the original and will include a seating area for 30 customers. Ms. Mendes also plans to offer baking classes on weekday evenings beginning in September. \"We have always wanted a space where people could learn what goes into a good loaf,\" she said.<br><br>Greenhill will hire twelve additional staff members for the Fenwick Road shop, which is scheduled to open on July 8. Applications can be submitted in person at the Market Street location or through the bakery's Web site.</div>"
+        },
+        {
+          "from": 158,
+          "to": 160,
+          "instruction": "Part 7 — Questions 158-160 refer to the following web page.",
+          "passage": "<div class=\"exam-box\"><b>www.tidewatercowork.com/membership</b><br><br><b>Find the Plan That Works for You</b><br><br>Tidewater Coworking offers a bright, quiet workspace just minutes from the harbor. Choose from three monthly plans:<br><br><b>Flex Desk — $180/month</b><br>Use any open desk, Monday to Friday, 8:00 A.M. to 6:00 P.M.<br><br><b>Dedicated Desk — $320/month</b><br>Your own reserved desk and a personal locker, with 24-hour access, seven days a week.<br><br><b>Private Office — from $750/month</b><br>All Dedicated Desk benefits, plus a lockable office for up to four people and 10 hours of meeting room use per month.<br><br>Every plan includes high-speed Internet, unlimited coffee and tea, and up to 100 printed pages per month.<br><br>Our meeting rooms may also be booked by Flex Desk and Dedicated Desk members for $15 per hour, and by nonmembers for $25 per hour.<br><br>Not sure which plan is right for you? Fill out the form below to schedule a free one-day trial.</div>"
+        },
+        {
+          "from": 161,
+          "to": 163,
+          "instruction": "Part 7 — Questions 161-163 refer to the following online chat discussion.",
+          "passage": "<div class=\"exam-box\"><b>Gloria Pham [9:02 A.M.]</b><br>Morning, team. The printer just told me our banners for the Lisbon trade show won't be ready until Wednesday.<br><br><b>Kenji Sato [9:04 A.M.]</b><br>That's cutting it close. We fly out Thursday morning.<br><br><b>Gloria Pham [9:05 A.M.]</b><br>Exactly. They've offered to ship them directly to the convention center instead.<br><br><b>Dev Mallick [9:07 A.M.]</b><br>Would they arrive in time for setup on Friday?<br><br><b>Gloria Pham [9:08 A.M.]</b><br>They're guaranteeing delivery by 10 A.M. on Friday. Booth setup starts at noon.<br><br><b>Kenji Sato [9:09 A.M.]</b><br>I'd rather not take chances. Is there a printer in Lisbon we could use if something goes wrong?<br><br><b>Dev Mallick [9:11 A.M.]</b><br>I worked with one there last year, Grafica Tavares. I still have their contact information.<br><br><b>Gloria Pham [9:12 A.M.]</b><br>Perfect. Dev, could you get a price quote from them just in case? I'll go ahead and approve the direct shipping.<br><br><b>Dev Mallick [9:13 A.M.]</b><br>On it.</div>"
+        },
+        {
+          "from": 164,
+          "to": 167,
+          "instruction": "Part 7 — Questions 164-167 refer to the following memo.",
+          "passage": "<div class=\"exam-box\"><b>MEMO</b><br><b>To:</b> All Staff<br><b>From:</b> Helena Brandt, Director of Human Resources<br><b>Date:</b> February 2<br><b>Subject:</b> New peer mentoring program<br><br>I am pleased to announce that Corvane Logistics will launch a peer mentoring program on March 1. The program will pair employees who have been with the company for less than a year with experienced colleagues from a different department. — [1] — Our goal is to help new staff build connections across the organization and gain a broader understanding of how our operations fit together.<br><br>Mentors will meet with their mentees for one hour every two weeks during regular working hours. — [2] — Supervisors have agreed to accommodate these meetings in their team schedules. Participants will also be invited to a quarterly lunch hosted by the executive team.<br><br>Employees with at least three years of service are eligible to serve as mentors. — [3] — Those interested should complete the application form on the HR portal by February 16. Selected mentors will attend a half-day training workshop on February 24.<br><br>— [4] — If you have any questions, please contact Tomas Reyes in Human Resources at extension 415.</div>"
+        },
+        {
+          "from": 168,
+          "to": 171,
+          "instruction": "Part 7 — Questions 168-171 refer to the following online review.",
+          "passage": "<div class=\"exam-box\"><b>StayScore — Guest Reviews</b><br><b>Haverly Suites, Downtown</b><br>Rating: ★★★★☆<br>Posted by Adaeze N., Toronto<br><br>I stayed at the Haverly Suites for five nights in October while attending a medical conference downtown. The location could not have been better — the convention center is a ten-minute walk away, and there are several good restaurants on the same block.<br><br>My room was spacious and spotless, with a kitchenette that I used to prepare breakfast most mornings. The only drawback was noise from the street on my first night. When I mentioned it at the front desk the next morning, the staff moved me to a quieter room on the eighth floor without any fuss.<br><br>I did not try the hotel's restaurant, but the rooftop lounge is worth a visit, especially at sunset. The fitness center is small but well equipped. One tip for future guests: parking is limited, so reserve a space when you book your room. I learned this the hard way and had to leave my rental car in a public garage two blocks away.<br><br>I would gladly stay here again on my next trip.</div>"
+        },
+        {
+          "from": 172,
+          "to": 175,
+          "instruction": "Part 7 — Questions 172-175 refer to the following article.",
+          "passage": "<div class=\"exam-box\"><b>Mirabel Foods to Acquire Juice Maker</b><br><br>TORVILLE (August 14) — Mirabel Foods, one of the region's largest packaged-food producers, announced on Tuesday that it has reached an agreement to acquire Sunward Press, a maker of cold-pressed juices based in the nearby town of Elkridge. The terms of the deal were not disclosed.<br><br>Sunward Press was founded eight years ago by Rafael and Nina Ostrowski, who started out selling juice at weekend farmers' markets. The company now supplies more than 300 grocery stores and cafés and employs about 90 people.<br><br>According to Mirabel's chief executive, Leonard Haas, the acquisition will allow Mirabel to enter the fast-growing market for fresh beverages without having to build a production facility from the ground up. \"Sunward has an excellent reputation and a loyal customer base,\" Mr. Haas said. \"We intend to preserve both.\"<br><br>Mr. Haas added that Sunward will keep its brand name and continue to operate from its plant in Elkridge. The Ostrowskis will remain with the company as advisors for at least two years. Mirabel plans to make Sunward products available through its distribution network in four neighboring states by next spring.</div>"
+        },
+        {
+          "from": 176,
+          "to": 180,
+          "instruction": "Part 7 — Questions 176-180 refer to the following invoice and e-mail.",
+          "passage": "<div class=\"exam-box\"><b>Pinecrest Office Supply</b><br>1200 Delmar Road, Westport<br><br><b>INVOICE</b><br>Invoice No.: 50872<br>Date: March 9<br>Customer: Lindqvist Architects, 45 Harbor Street, Westport<br><br><b>Item — Quantity — Unit Price — Amount</b><br>A3 printer paper (ream) — 10 — $12.50 — $125.00<br>Drafting pencils (box of 12) — 6 — $8.00 — $48.00<br>Ergonomic desk chair, model C-40 — 2 — $210.00 — $420.00<br>Large-format ink cartridge, black — 4 — $36.00 — $144.00<br><br>Subtotal: $737.00<br>Delivery: waived (orders over $500)<br><b>Total due: $737.00</b><br><br>Payment is due within 30 days of the invoice date. Furniture may be returned in its original packaging within 14 days of delivery for a full refund.</div><div class=\"exam-box\"><b>To:</b> billing@pinecrestoffice.com<br><b>From:</b> Samuel Ekwueme &lt;s.ekwueme@lindqvistarch.com&gt;<br><b>Date:</b> March 12<br><b>Subject:</b> Invoice No. 50872<br><br>Hello,<br><br>I am writing about the invoice that came with our delivery on March 10. Everything arrived in good condition, but we were charged for four ink cartridges, while we ordered and received only two. The packing slip also lists two. Please send us a corrected invoice.<br><br>In addition, one of the chairs does not suit our needs. Our designers found that its armrests are too high for our drafting tables, so we would like to return it. It is still in its original box. Could you let me know how to arrange a pickup?<br><br>Finally, we are interested in setting up a standing monthly order for printer paper. Would a discount be available for regular orders?<br><br>Samuel Ekwueme<br>Office Manager, Lindqvist Architects</div>"
+        },
+        {
+          "from": 181,
+          "to": 185,
+          "instruction": "Part 7 — Questions 181-185 refer to the following notice and form.",
+          "passage": "<div class=\"exam-box\"><b>Hollis Community Business Center</b><br><b>Autumn Small Business Workshop Series</b><br><br>Whether you are just starting out or looking to grow, our evening workshops offer practical advice from experienced professionals. All sessions run from 6:30 to 8:30 P.M.<br><br>October 6 — Bookkeeping Basics — Maria Chen — Room 2 — $40<br>October 13 — Marketing on a Small Budget — Owen Gallagher — Room 5 — $40<br>October 20 — Hiring Your First Employee — Rita Kowalski — Room 2 — $55<br>October 27 — Applying for Business Loans — Samir Haddad — Room 5 — $55<br><br>Members of the Hollis Chamber of Commerce receive 20 percent off all workshop fees. Participants who register for three or more workshops will receive a free copy of <u>Starting Right: A Guide for New Business Owners</u>.<br><br>Registration for each workshop closes two days before the session. Register at the front desk or online at holliscbc.org.</div><div class=\"exam-box\"><b>Hollis Community Business Center — Workshop Registration Form</b><br><br><b>Name:</b> Lucia Ferreira<br><b>Business:</b> Ferreira Floral Design<br><b>E-mail:</b> lucia@ferreirafloral.com<br><b>Hollis Chamber of Commerce member?</b> Yes — Member No. 2231<br><br><b>Workshops selected:</b><br>☐ Bookkeeping Basics<br>☒ Marketing on a Small Budget<br>☒ Hiring Your First Employee<br>☒ Applying for Business Loans<br><br><b>Comments:</b> Because of a delivery commitment, I may arrive about 30 minutes late to the October 27 session. Will the handouts be available afterward?</div>"
+        },
+        {
+          "from": 186,
+          "to": 190,
+          "instruction": "Part 7 — Questions 186-190 refer to the following web page, schedule, and e-mail.",
+          "passage": "<div class=\"exam-box\"><b>www.northbridgesummit.com/register</b><br><br><b>Northbridge Retail Summit — May 18–19</b><br>Calloway Convention Center, Hall B<br><br><b>Registration fees</b><br>Early registration (by April 15): $295<br>Standard registration (after April 15): $350<br>One-day pass: $190<br><br>Groups of five or more from the same company receive 10 percent off each registration. All registrations include lunch on each day of attendance and access to all keynotes and panels.<br><br>Please note: Seating for workshops (marked * in the schedule) is limited and cannot be reserved in advance. Attendees may sign up for workshops at the registration desk on the morning of each summit day.</div><div class=\"exam-box\"><b>Northbridge Retail Summit — Program</b><br><br><b>Monday, May 18</b><br>9:00 A.M. — Opening remarks — Anita Obi, Summit Director<br>9:30 A.M. — Keynote: The Future of the In-Store Experience — Grant Whitfield, Lumora Stores<br>11:00 A.M. — *Visual Merchandising on a Budget — Paula Imre — Room 204<br>12:30 P.M. — Lunch<br>2:00 P.M. — Panel: Managing Seasonal Staff<br>3:30 P.M. — *Data Tools for Inventory Planning — Hiro Tanabe — Room 210<br><br><b>Tuesday, May 19</b><br>9:30 A.M. — Keynote: Building Customer Loyalty Online — Sandra Liu, Harrow &amp; Finch<br>11:00 A.M. — *Writing Effective Product Descriptions — Leo Marsh — Room 204<br>12:30 P.M. — Lunch<br>2:00 P.M. — Panel: Payment Trends for Small Retailers<br>3:30 P.M. — Closing remarks</div><div class=\"exam-box\"><b>To:</b> registration@northbridgesummit.com<br><b>From:</b> Kevin Adair &lt;kadair@fairbrookoutfitters.com&gt;<br><b>Date:</b> April 20<br><b>Subject:</b> Change to registration<br><br>Hello,<br><br>Last week I registered myself and four colleagues from Fairbrook Outfitters for the summit. Unfortunately, I now have a scheduling conflict and will be able to attend only on the first day. Could my registration be changed to a one-day pass, with the difference refunded to our company account? My colleagues still plan to attend both days.<br><br>Also, one of them, Ms. Bello, is particularly interested in the workshop on inventory planning. Would it be possible to reserve a seat for her now?<br><br>Thank you,<br>Kevin Adair<br>Store Operations Manager, Fairbrook Outfitters</div>"
+        },
+        {
+          "from": 191,
+          "to": 195,
+          "instruction": "Part 7 — Questions 191-195 refer to the following advertisement, e-mail, and online review.",
+          "passage": "<div class=\"exam-box\"><b>Saffron Table Catering</b><br><b>Fresh food for business events of every size</b><br><br><b>Breakfast Spread</b> — $14 per person<br>Assorted pastries, fresh fruit, coffee, and tea<br><br><b>Working Lunch</b> — $22 per person<br>Gourmet sandwiches, two seasonal salads, dessert, and beverages<br><br><b>Evening Reception</b> — $38 per person<br>Hot and cold appetizers, served by our professional staff<br><br>Minimum order: 15 guests. Orders placed at least 10 days in advance receive complimentary delivery. Vegetarian and gluten-free meals are available on request at no extra cost.<br><br>Call 555-0148 or order online at saffrontable.com.</div><div class=\"exam-box\"><b>To:</b> orders@saffrontable.com<br><b>From:</b> Meera Joshi &lt;mjoshi@brookvaleconsulting.com&gt;<br><b>Date:</b> June 2<br><b>Subject:</b> Order for June 16<br><br>Hello,<br><br>Brookvale Consulting is holding a workshop for clients on June 16, and we would like to order your Working Lunch package for 25 people. Six of our guests are vegetarian. Please deliver the food to our office at 310 Linden Avenue, 4th floor, by 11:45 A.M.<br><br>Kindly send the invoice to this e-mail address, and let me know whether a deposit is required.<br><br>Meera Joshi<br>Administrative Coordinator, Brookvale Consulting</div><div class=\"exam-box\"><b>BizRate Reviews — Saffron Table Catering</b><br>Posted June 18 by Meera J.<br><br>We hired Saffron Table for a client workshop this week. The food was excellent, and nearly every guest commented on the salads. The vegetarian meals were clearly labeled, which we appreciated. My only complaint is that the delivery arrived twenty minutes after the time I had requested, so our lunch break started late. The driver apologized, and the owner, Hassan Farouk, called me the next day to offer 10 percent off our next order. I will definitely use Saffron Table again.</div>"
+        },
+        {
+          "from": 196,
+          "to": 200,
+          "instruction": "Part 7 — Questions 196-200 refer to the following web page, e-mail, and schedule.",
+          "passage": "<div class=\"exam-box\"><b>www.keswickmedia.com/careers</b><br><br><b>Senior Graphic Designer (Full-time) — Denholm Office</b><br><br>Keswick Media Group is seeking a creative and organized Senior Graphic Designer. The successful candidate will lead design work for our print and digital campaigns and supervise two junior designers.<br><br><b>Requirements:</b> at least five years of professional design experience; strong skills in standard design software; a portfolio of recent work<br><b>Preferred:</b> experience in the publishing industry<br><br>To apply, send your résumé and a link to your online portfolio to hiring@keswickmedia.com by September 30. Shortlisted candidates will be asked to complete a short design exercise and bring it to their interview.</div><div class=\"exam-box\"><b>To:</b> hiring@keswickmedia.com<br><b>From:</b> Tomasz Wieczorek &lt;tomasz.w@mailpost.com&gt;<br><b>Date:</b> September 22<br><b>Subject:</b> Application — Senior Graphic Designer<br><br>Dear Hiring Manager,<br><br>I am writing to apply for the Senior Graphic Designer position. For the past six years, I have worked as a designer at Orla Publishing, where I create book covers and magazine layouts. For the last two years, I have also supervised a team of three designers.<br><br>My résumé is attached, and my portfolio can be viewed at twieczorek-design.com. I will be moving to Denholm in October and would be available to start on November 1.<br><br>Sincerely,<br>Tomasz Wieczorek</div><div class=\"exam-box\"><b>Keswick Media Group — Interview Schedule</b><br><b>Position:</b> Senior Graphic Designer<br><b>Date:</b> Tuesday, October 13<br><b>Location:</b> Conference Room 3<br><br>9:30 A.M. — Aiko Maruyama<br>11:00 A.M. — Tomasz Wieczorek<br>1:30 P.M. — Beatriz Lemos<br>3:00 P.M. — Callum Fraser (by video call)<br><br><b>Interview panel:</b> Diane Holt, Creative Director; Paul Ng, Human Resources<br>Candidates should bring their completed design exercise.</div>"
+        }
+      ],
+      "questions": [
+        {
+          "no": 101,
+          "points": 1,
+          "answer": 3,
+          "layout": 2,
+          "prompt": {
+            "html": "Ms. Tanaka asked all team members to submit ------- expense reports by Thursday."
+          },
+          "options": [
+            {
+              "html": "they"
+            },
+            {
+              "html": "them"
+            },
+            {
+              "html": "their"
+            },
+            {
+              "html": "theirs"
+            }
+          ],
+          "explanation": "Trước cụm danh từ \"expense reports\" cần tính từ sở hữu → their. \"theirs\" là đại từ sở hữu, đứng một mình, không đi kèm danh từ."
+        },
+        {
+          "no": 102,
+          "points": 1,
+          "answer": 2,
+          "layout": 2,
+          "prompt": {
+            "html": "Harlow Electronics has recently ------- its return policy to allow exchanges within 60 days."
+          },
+          "options": [
+            {
+              "html": "extend"
+            },
+            {
+              "html": "extended"
+            },
+            {
+              "html": "extending"
+            },
+            {
+              "html": "extension"
+            }
+          ],
+          "explanation": "Sau \"has (recently)\" là thì hiện tại hoàn thành: have/has + V3 → extended."
+        },
+        {
+          "no": 103,
+          "points": 1,
+          "answer": 1,
+          "layout": 2,
+          "prompt": {
+            "html": "Visitors must sign in at the front desk ------- entering the laboratory."
+          },
+          "options": [
+            {
+              "html": "before"
+            },
+            {
+              "html": "among"
+            },
+            {
+              "html": "whereas"
+            },
+            {
+              "html": "beside"
+            }
+          ],
+          "explanation": "\"before + V-ing\": trước khi làm gì — ký tên trước khi vào phòng thí nghiệm. \"whereas\" là liên từ nối hai mệnh đề; \"among\", \"beside\" không hợp nghĩa."
+        },
+        {
+          "no": 104,
+          "points": 1,
+          "answer": 4,
+          "layout": 2,
+          "prompt": {
+            "html": "The quarterly sales figures were checked ------- before being sent to the board."
+          },
+          "options": [
+            {
+              "html": "care"
+            },
+            {
+              "html": "careful"
+            },
+            {
+              "html": "caring"
+            },
+            {
+              "html": "carefully"
+            }
+          ],
+          "explanation": "Bổ nghĩa cho động từ \"were checked\" cần trạng từ → carefully."
+        },
+        {
+          "no": 105,
+          "points": 1,
+          "answer": 2,
+          "layout": 2,
+          "prompt": {
+            "html": "Employees who wish to attend the training workshop should register ------- the company intranet."
+          },
+          "options": [
+            {
+              "html": "along"
+            },
+            {
+              "html": "through"
+            },
+            {
+              "html": "onto"
+            },
+            {
+              "html": "between"
+            }
+          ],
+          "explanation": "\"register through the intranet\": đăng ký thông qua mạng nội bộ. \"between\" cần hai đối tượng; \"along\", \"onto\" không hợp nghĩa."
+        },
+        {
+          "no": 106,
+          "points": 1,
+          "answer": 3,
+          "layout": 2,
+          "prompt": {
+            "html": "Because of the heavy rain, the outdoor concert has been ------- until next Saturday."
+          },
+          "options": [
+            {
+              "html": "postpone"
+            },
+            {
+              "html": "postponing"
+            },
+            {
+              "html": "postpones"
+            },
+            {
+              "html": "postponed"
+            }
+          ],
+          "explanation": "Buổi hòa nhạc \"bị\" hoãn → bị động hiện tại hoàn thành: has been + V3 → postponed."
+        },
+        {
+          "no": 107,
+          "points": 1,
+          "answer": 1,
+          "layout": 2,
+          "prompt": {
+            "html": "Please contact Mr. Okafor, ------- is responsible for scheduling the conference rooms."
+          },
+          "options": [
+            {
+              "html": "who"
+            },
+            {
+              "html": "whom"
+            },
+            {
+              "html": "which"
+            },
+            {
+              "html": "whose"
+            }
+          ],
+          "explanation": "Tiền ngữ chỉ người (Mr. Okafor) và đại từ quan hệ làm chủ ngữ cho \"is\" → who. \"whom\" làm tân ngữ; \"which\" chỉ vật."
+        },
+        {
+          "no": 108,
+          "points": 1,
+          "answer": 4,
+          "layout": 2,
+          "prompt": {
+            "html": "The new accounting software is ------- easier to use than the previous version."
+          },
+          "options": [
+            {
+              "html": "very"
+            },
+            {
+              "html": "so"
+            },
+            {
+              "html": "more"
+            },
+            {
+              "html": "much"
+            }
+          ],
+          "explanation": "Nhấn mạnh so sánh hơn dùng \"much/far/even + so sánh hơn\" → much easier. \"more easier\" sai vì \"easier\" đã là so sánh hơn; \"very/so\" không đứng trước so sánh hơn."
+        },
+        {
+          "no": 109,
+          "points": 1,
+          "answer": 4,
+          "layout": 2,
+          "prompt": {
+            "html": "Dellmont Hotel guests can enjoy a complimentary breakfast ------- 6:30 and 10:00 A.M. every day."
+          },
+          "options": [
+            {
+              "html": "from"
+            },
+            {
+              "html": "during"
+            },
+            {
+              "html": "within"
+            },
+            {
+              "html": "between"
+            }
+          ],
+          "explanation": "Cấu trúc \"between A and B\" → between. \"from\" phải đi với \"to/until\", không đi với \"and\"."
+        },
+        {
+          "no": 110,
+          "points": 1,
+          "answer": 2,
+          "layout": 2,
+          "prompt": {
+            "html": "Our customer service representatives are trained to respond to inquiries ------- and politely."
+          },
+          "options": [
+            {
+              "html": "prompt"
+            },
+            {
+              "html": "promptly"
+            },
+            {
+              "html": "prompted"
+            },
+            {
+              "html": "promptness"
+            }
+          ],
+          "explanation": "Nối bằng \"and\" với trạng từ \"politely\" và cùng bổ nghĩa cho \"respond\" → trạng từ promptly."
+        },
+        {
+          "no": 111,
+          "points": 1,
+          "answer": 1,
+          "layout": 2,
+          "prompt": {
+            "html": "The marketing team will launch the campaign ------- the budget is approved by the director."
+          },
+          "options": [
+            {
+              "html": "once"
+            },
+            {
+              "html": "despite"
+            },
+            {
+              "html": "during"
+            },
+            {
+              "html": "because of"
+            }
+          ],
+          "explanation": "Sau chỗ trống là mệnh đề (S + V) nên cần liên từ → once (một khi). \"despite\", \"during\", \"because of\" là giới từ, chỉ đi với danh từ/cụm danh từ."
+        },
+        {
+          "no": 112,
+          "points": 1,
+          "answer": 3,
+          "layout": 2,
+          "prompt": {
+            "html": "Anyone ------- in volunteering for the community clean-up event should contact Ms. Reyes."
+          },
+          "options": [
+            {
+              "html": "interest"
+            },
+            {
+              "html": "interesting"
+            },
+            {
+              "html": "interested"
+            },
+            {
+              "html": "interests"
+            }
+          ],
+          "explanation": "\"be interested in\": quan tâm đến; ở đây là rút gọn \"Anyone (who is) interested in...\" → interested. \"interesting\" nghĩa là \"thú vị\", dùng cho vật gây ra cảm xúc."
+        },
+        {
+          "no": 113,
+          "points": 1,
+          "answer": 2,
+          "layout": 2,
+          "prompt": {
+            "html": "The board of directors ------- the proposal to open a new factory in Vietnam at last week's meeting."
+          },
+          "options": [
+            {
+              "html": "approves"
+            },
+            {
+              "html": "approved"
+            },
+            {
+              "html": "will approve"
+            },
+            {
+              "html": "has been approving"
+            }
+          ],
+          "explanation": "\"at last week's meeting\" là mốc thời gian quá khứ → quá khứ đơn approved. Hiện tại hoàn thành không đi với mốc thời gian quá khứ cụ thể."
+        },
+        {
+          "no": 114,
+          "points": 1,
+          "answer": 4,
+          "layout": 2,
+          "prompt": {
+            "html": "Ms. Lindqvist has worked at Norvale Bank for twelve years and is ------- the most experienced loan officer in the branch."
+          },
+          "options": [
+            {
+              "html": "rarely"
+            },
+            {
+              "html": "highly"
+            },
+            {
+              "html": "closely"
+            },
+            {
+              "html": "easily"
+            }
+          ],
+          "explanation": "\"easily + so sánh nhất\" nghĩa là \"rõ ràng là, không nghi ngờ gì là\" → easily the most experienced. Các trạng từ còn lại không đi với so sánh nhất theo nghĩa này."
+        },
+        {
+          "no": 115,
+          "points": 1,
+          "answer": 1,
+          "layout": 2,
+          "prompt": {
+            "html": "Mr. Sato's presentation was so ------- that several clients asked for copies of his slides."
+          },
+          "options": [
+            {
+              "html": "informative"
+            },
+            {
+              "html": "inform"
+            },
+            {
+              "html": "information"
+            },
+            {
+              "html": "informatively"
+            }
+          ],
+          "explanation": "Cấu trúc \"so + tính từ + that\" và sau \"was\" cần tính từ → informative (nhiều thông tin, hữu ích)."
+        },
+        {
+          "no": 116,
+          "points": 1,
+          "answer": 3,
+          "layout": 2,
+          "prompt": {
+            "html": "The contract states that payment must be made ------- 30 days of receiving the invoice."
+          },
+          "options": [
+            {
+              "html": "by"
+            },
+            {
+              "html": "until"
+            },
+            {
+              "html": "within"
+            },
+            {
+              "html": "along"
+            }
+          ],
+          "explanation": "\"within + khoảng thời gian + of\": trong vòng bao lâu kể từ… → within 30 days of. \"by\" đi với mốc thời gian (by May 1), không đi với \"30 days of\"."
+        },
+        {
+          "no": 117,
+          "points": 1,
+          "answer": 3,
+          "layout": 2,
+          "prompt": {
+            "html": "Neither the manager ------- her assistant was available to answer questions about the delay."
+          },
+          "options": [
+            {
+              "html": "and"
+            },
+            {
+              "html": "or"
+            },
+            {
+              "html": "nor"
+            },
+            {
+              "html": "but"
+            }
+          ],
+          "explanation": "Cặp liên từ \"neither … nor\" → nor. \"either … or\", \"both … and\" là các cặp khác."
+        },
+        {
+          "no": 118,
+          "points": 1,
+          "answer": 1,
+          "layout": 2,
+          "prompt": {
+            "html": "Kestrel Airlines passengers ------- luggage exceeds the weight limit will be charged an additional fee."
+          },
+          "options": [
+            {
+              "html": "whose"
+            },
+            {
+              "html": "who"
+            },
+            {
+              "html": "which"
+            },
+            {
+              "html": "whom"
+            }
+          ],
+          "explanation": "Chỗ trống đứng trước danh từ \"luggage\" và chỉ sự sở hữu (hành lý của hành khách) → whose."
+        },
+        {
+          "no": 119,
+          "points": 1,
+          "answer": 2,
+          "layout": 2,
+          "prompt": {
+            "html": "The company's profits have increased ------- since it began selling its products online."
+          },
+          "options": [
+            {
+              "html": "signify"
+            },
+            {
+              "html": "significantly"
+            },
+            {
+              "html": "significant"
+            },
+            {
+              "html": "significance"
+            }
+          ],
+          "explanation": "Bổ nghĩa cho động từ \"have increased\" cần trạng từ → significantly (đáng kể)."
+        },
+        {
+          "no": 120,
+          "points": 1,
+          "answer": 4,
+          "layout": 2,
+          "prompt": {
+            "html": "Due to a scheduling -------, the product demonstration has been moved to Room 204."
+          },
+          "options": [
+            {
+              "html": "conflicted"
+            },
+            {
+              "html": "conflicting"
+            },
+            {
+              "html": "conflicts"
+            },
+            {
+              "html": "conflict"
+            }
+          ],
+          "explanation": "Sau mạo từ \"a\" cần danh từ số ít; \"scheduling conflict\" là cụm danh từ ghép (trùng lịch) → conflict. \"conflicts\" là số nhiều, không đi với \"a\"."
+        },
+        {
+          "no": 121,
+          "points": 1,
+          "answer": 2,
+          "layout": 2,
+          "prompt": {
+            "html": "The human resources department is ------- applications for the position of senior accountant until May 15."
+          },
+          "options": [
+            {
+              "html": "admitting"
+            },
+            {
+              "html": "accepting"
+            },
+            {
+              "html": "agreeing"
+            },
+            {
+              "html": "allowing"
+            }
+          ],
+          "explanation": "Collocation \"accept applications\": nhận hồ sơ ứng tuyển. \"agree\" cần giới từ (agree to/with); \"admit\", \"allow\" không đi với \"applications\" theo nghĩa này."
+        },
+        {
+          "no": 122,
+          "points": 1,
+          "answer": 1,
+          "layout": 2,
+          "prompt": {
+            "html": "Ms. Park will be out of the office next week, so please direct all urgent matters to Mr. Evans -------."
+          },
+          "options": [
+            {
+              "html": "instead"
+            },
+            {
+              "html": "rather"
+            },
+            {
+              "html": "otherwise"
+            },
+            {
+              "html": "however"
+            }
+          ],
+          "explanation": "\"instead\" đứng cuối câu nghĩa là \"thay vào đó\" (gửi cho ông Evans thay vì bà Park). \"rather\", \"however\", \"otherwise\" không dùng ở cuối câu với nghĩa này."
+        },
+        {
+          "no": 123,
+          "points": 1,
+          "answer": 4,
+          "layout": 2,
+          "prompt": {
+            "html": "Applicants for the internship must have a strong ------- of spreadsheet software."
+          },
+          "options": [
+            {
+              "html": "knowing"
+            },
+            {
+              "html": "known"
+            },
+            {
+              "html": "knowledgeable"
+            },
+            {
+              "html": "knowledge"
+            }
+          ],
+          "explanation": "Sau \"a strong\" (mạo từ + tính từ) cần danh từ → knowledge. Cụm \"have a strong knowledge of\": am hiểu tốt về."
+        },
+        {
+          "no": 124,
+          "points": 1,
+          "answer": 3,
+          "layout": 2,
+          "prompt": {
+            "html": "The warranty does not cover damage ------- by improper use of the device."
+          },
+          "options": [
+            {
+              "html": "cause"
+            },
+            {
+              "html": "causing"
+            },
+            {
+              "html": "caused"
+            },
+            {
+              "html": "causes"
+            }
+          ],
+          "explanation": "Mệnh đề quan hệ rút gọn bị động: damage (which is) caused by… → caused. Có \"by\" chỉ tác nhân nên dùng V3, không dùng V-ing."
+        },
+        {
+          "no": 125,
+          "points": 1,
+          "answer": 1,
+          "layout": 2,
+          "prompt": {
+            "html": "Brightwell Foods has decided to ------- its product line to include organic snacks."
+          },
+          "options": [
+            {
+              "html": "expand"
+            },
+            {
+              "html": "rise"
+            },
+            {
+              "html": "arise"
+            },
+            {
+              "html": "prolong"
+            }
+          ],
+          "explanation": "\"expand a product line\": mở rộng dòng sản phẩm. \"rise\", \"arise\" là nội động từ, không có tân ngữ; \"prolong\" là kéo dài thời gian."
+        },
+        {
+          "no": 126,
+          "points": 1,
+          "answer": 2,
+          "layout": 2,
+          "prompt": {
+            "html": "------- the heavy traffic, most attendees arrived at the conference center on time."
+          },
+          "options": [
+            {
+              "html": "Although"
+            },
+            {
+              "html": "Despite"
+            },
+            {
+              "html": "Because of"
+            },
+            {
+              "html": "Even though"
+            }
+          ],
+          "explanation": "Sau chỗ trống là cụm danh từ và ý nghĩa tương phản (kẹt xe nhưng vẫn đúng giờ) → giới từ Despite. \"Although/Even though\" cần mệnh đề; \"Because of\" sai nghĩa."
+        },
+        {
+          "no": 127,
+          "points": 1,
+          "answer": 4,
+          "layout": 2,
+          "prompt": {
+            "html": "The Riverside Art Museum's new exhibit has received ------- reviews from critics and visitors alike."
+          },
+          "options": [
+            {
+              "html": "favor"
+            },
+            {
+              "html": "favorably"
+            },
+            {
+              "html": "favoring"
+            },
+            {
+              "html": "favorable"
+            }
+          ],
+          "explanation": "Trước danh từ \"reviews\" cần tính từ → favorable (tích cực, thuận lợi)."
+        },
+        {
+          "no": 128,
+          "points": 1,
+          "answer": 3,
+          "layout": 2,
+          "prompt": {
+            "html": "Mr. Adeyemi requested that the report ------- to him no later than Friday afternoon."
+          },
+          "options": [
+            {
+              "html": "sends"
+            },
+            {
+              "html": "is sending"
+            },
+            {
+              "html": "be sent"
+            },
+            {
+              "html": "will send"
+            }
+          ],
+          "explanation": "Sau \"request that\" dùng thể giả định: động từ nguyên mẫu không \"to\"; báo cáo \"được gửi\" nên ở dạng bị động → be sent."
+        },
+        {
+          "no": 129,
+          "points": 1,
+          "answer": 1,
+          "layout": 2,
+          "prompt": {
+            "html": "Only after the final inspection ------- the new warehouse be opened to staff."
+          },
+          "options": [
+            {
+              "html": "can"
+            },
+            {
+              "html": "has"
+            },
+            {
+              "html": "does"
+            },
+            {
+              "html": "is"
+            }
+          ],
+          "explanation": "\"Only after + cụm từ\" đứng đầu câu gây đảo ngữ; phía sau có động từ nguyên mẫu \"be opened\" nên cần trợ động từ khuyết thiếu → can."
+        },
+        {
+          "no": 130,
+          "points": 1,
+          "answer": 2,
+          "layout": 2,
+          "prompt": {
+            "html": "Our financial advisors will help you choose the investment plan that is most ------- to your long-term goals."
+          },
+          "options": [
+            {
+              "html": "capable"
+            },
+            {
+              "html": "suited"
+            },
+            {
+              "html": "eligible"
+            },
+            {
+              "html": "reliant"
+            }
+          ],
+          "explanation": "\"be suited to sth\": phù hợp với điều gì → suited. \"capable of\", \"eligible for\", \"reliant on\" đi với giới từ khác và sai nghĩa."
+        },
+        {
+          "no": 131,
+          "points": 1,
+          "answer": 4,
+          "layout": 2,
+          "prompt": {
+            "html": ""
+          },
+          "options": [
+            {
+              "html": "full"
+            },
+            {
+              "html": "fuller"
+            },
+            {
+              "html": "fullness"
+            },
+            {
+              "html": "fully"
+            }
+          ],
+          "explanation": "Bổ nghĩa cho phân từ \"covered\" cần trạng từ → fully covered (được chi trả toàn bộ)."
+        },
+        {
+          "no": 132,
+          "points": 1,
+          "answer": 1,
+          "layout": 2,
+          "prompt": {
+            "html": ""
+          },
+          "options": [
+            {
+              "html": "inconvenient"
+            },
+            {
+              "html": "inconvenience"
+            },
+            {
+              "html": "inconveniently"
+            },
+            {
+              "html": "inconveniences"
+            }
+          ],
+          "explanation": "Sau \"may be\" cần tính từ mô tả chủ ngữ \"this change\" → inconvenient (bất tiện). Danh từ \"inconvenience\" cần mạo từ \"an\"."
+        },
+        {
+          "no": 133,
+          "points": 1,
+          "answer": 3,
+          "layout": 1,
+          "prompt": {
+            "html": ""
+          },
+          "options": [
+            {
+              "html": "The west parking lot was resurfaced last year."
+            },
+            {
+              "html": "Please remember to submit your timesheets by Friday."
+            },
+            {
+              "html": "To help, a shuttle will run between the garage and our main entrance every fifteen minutes."
+            },
+            {
+              "html": "The garage is currently closed for repairs."
+            }
+          ],
+          "explanation": "Câu sau nhắc đến \"The shuttle service\" nên câu chèn phải giới thiệu dịch vụ xe đưa đón để giảm bất tiện → (C). (D) mâu thuẫn vì nhân viên được yêu cầu đỗ ở gara này."
+        },
+        {
+          "no": 134,
+          "points": 1,
+          "answer": 2,
+          "layout": 2,
+          "prompt": {
+            "html": ""
+          },
+          "options": [
+            {
+              "html": "Unless"
+            },
+            {
+              "html": "If"
+            },
+            {
+              "html": "Whether"
+            },
+            {
+              "html": "Although"
+            }
+          ],
+          "explanation": "\"If you have any questions, please contact…\": nếu có câu hỏi thì liên hệ → If. \"Unless\", \"Although\" sai nghĩa; \"Whether\" cần \"or not\" và không mở đầu mệnh đề điều kiện."
+        },
+        {
+          "no": 135,
+          "points": 1,
+          "answer": 3,
+          "layout": 2,
+          "prompt": {
+            "html": ""
+          },
+          "options": [
+            {
+              "html": "began"
+            },
+            {
+              "html": "has begun"
+            },
+            {
+              "html": "will begin"
+            },
+            {
+              "html": "beginning"
+            }
+          ],
+          "explanation": "Thông báo đăng ngày 2/5, việc cải tạo diễn ra đầu tháng 6 và các câu sau dùng \"will\" → tương lai will begin. \"beginning\" thiếu động từ chia."
+        },
+        {
+          "no": 136,
+          "points": 1,
+          "answer": 4,
+          "layout": 2,
+          "prompt": {
+            "html": ""
+          },
+          "options": [
+            {
+              "html": "In contrast"
+            },
+            {
+              "html": "Otherwise"
+            },
+            {
+              "html": "Nevertheless"
+            },
+            {
+              "html": "In addition"
+            }
+          ],
+          "explanation": "Câu trước liệt kê tiện ích mới, câu này bổ sung thêm một thay đổi nữa (chuyển bộ sưu tập lịch sử) → In addition. Các từ còn lại chỉ tương phản/điều kiện, sai logic."
+        },
+        {
+          "no": 137,
+          "points": 1,
+          "answer": 1,
+          "layout": 2,
+          "prompt": {
+            "html": ""
+          },
+          "options": [
+            {
+              "html": "requested"
+            },
+            {
+              "html": "requesting"
+            },
+            {
+              "html": "requests"
+            },
+            {
+              "html": "request"
+            }
+          ],
+          "explanation": "Rút gọn mệnh đề quan hệ bị động: Items (that are) requested by noon → requested. Sách \"được yêu cầu\", không tự yêu cầu nên không dùng V-ing."
+        },
+        {
+          "no": 138,
+          "points": 1,
+          "answer": 2,
+          "layout": 1,
+          "prompt": {
+            "html": ""
+          },
+          "options": [
+            {
+              "html": "The library will be closed on national holidays."
+            },
+            {
+              "html": "We appreciate your patience as we work to improve our facilities."
+            },
+            {
+              "html": "The children's section is on the first floor."
+            },
+            {
+              "html": "Library cards can be renewed online."
+            }
+          ],
+          "explanation": "Câu kết thông báo cải tạo thường là lời cảm ơn sự kiên nhẫn của bạn đọc → (B). (C) mâu thuẫn vì khu thiếu nhi mới nằm ở tầng hai; (A), (D) lạc đề."
+        },
+        {
+          "no": 139,
+          "points": 1,
+          "answer": 4,
+          "layout": 2,
+          "prompt": {
+            "html": ""
+          },
+          "options": [
+            {
+              "html": "invent"
+            },
+            {
+              "html": "attend"
+            },
+            {
+              "html": "compose"
+            },
+            {
+              "html": "create"
+            }
+          ],
+          "explanation": "Collocation \"create jobs\": tạo việc làm → create. \"invent\" là phát minh, \"compose\" là soạn/sáng tác."
+        },
+        {
+          "no": 140,
+          "points": 1,
+          "answer": 3,
+          "layout": 2,
+          "prompt": {
+            "html": ""
+          },
+          "options": [
+            {
+              "html": "operate"
+            },
+            {
+              "html": "operation"
+            },
+            {
+              "html": "operational"
+            },
+            {
+              "html": "operationally"
+            }
+          ],
+          "explanation": "Sau \"be (fully)\" cần tính từ → operational (đi vào hoạt động). \"fully\" là trạng từ bổ nghĩa cho tính từ đó."
+        },
+        {
+          "no": 141,
+          "points": 1,
+          "answer": 1,
+          "layout": 1,
+          "prompt": {
+            "html": ""
+          },
+          "options": [
+            {
+              "html": "The town sits at the intersection of two major highways and is close to a freight rail line."
+            },
+            {
+              "html": "Corvane was founded more than 30 years ago."
+            },
+            {
+              "html": "Westbrook's mayor was reelected last year."
+            },
+            {
+              "html": "Several employees have complained about the new schedule."
+            }
+          ],
+          "explanation": "Câu trước nói Westbrook được chọn vì vị trí, câu sau nói \"giúp tiếp cận khách hàng nhanh hơn\" → câu chèn phải mô tả vị trí giao thông thuận lợi → (A)."
+        },
+        {
+          "no": 142,
+          "points": 1,
+          "answer": 2,
+          "layout": 2,
+          "prompt": {
+            "html": ""
+          },
+          "options": [
+            {
+              "html": "which"
+            },
+            {
+              "html": "where"
+            },
+            {
+              "html": "what"
+            },
+            {
+              "html": "whose"
+            }
+          ],
+          "explanation": "Tiền ngữ là \"Corvane's Web site\" (nơi chốn) và mệnh đề sau đã đủ chủ ngữ, động từ (a full list … will be posted) → where. \"which\" cần thiếu chủ ngữ/tân ngữ phía sau."
+        },
+        {
+          "no": 143,
+          "points": 1,
+          "answer": 3,
+          "layout": 2,
+          "prompt": {
+            "html": ""
+          },
+          "options": [
+            {
+              "html": "previously"
+            },
+            {
+              "html": "eventually"
+            },
+            {
+              "html": "temporarily"
+            },
+            {
+              "html": "formerly"
+            }
+          ],
+          "explanation": "Cửa hàng sắp nhận lô hàng mới ngày 15/10, tức hết hàng chỉ tạm thời → temporarily. \"previously/formerly\" nói về quá khứ, sai với thì hiện tại \"is\"."
+        },
+        {
+          "no": 144,
+          "points": 1,
+          "answer": 4,
+          "layout": 2,
+          "prompt": {
+            "html": ""
+          },
+          "options": [
+            {
+              "html": "receiving"
+            },
+            {
+              "html": "received"
+            },
+            {
+              "html": "receives"
+            },
+            {
+              "html": "receive"
+            }
+          ],
+          "explanation": "Cấu trúc \"expect to + V nguyên mẫu\" → receive."
+        },
+        {
+          "no": 145,
+          "points": 1,
+          "answer": 1,
+          "layout": 2,
+          "prompt": {
+            "html": ""
+          },
+          "options": [
+            {
+              "html": "on"
+            },
+            {
+              "html": "at"
+            },
+            {
+              "html": "by"
+            },
+            {
+              "html": "since"
+            }
+          ],
+          "explanation": "Collocation \"a discount on + sản phẩm/đơn hàng\": giảm giá cho đơn hàng → on."
+        },
+        {
+          "no": 146,
+          "points": 1,
+          "answer": 2,
+          "layout": 1,
+          "prompt": {
+            "html": ""
+          },
+          "options": [
+            {
+              "html": "Our store will be closed for inventory next week."
+            },
+            {
+              "html": "If you would prefer to cancel your order instead, please let us know and we will issue a full refund."
+            },
+            {
+              "html": "Your table was delivered on September 5."
+            },
+            {
+              "html": "Delivery is free for orders over $500."
+            }
+          ],
+          "explanation": "Sau khi báo trễ hàng và đề nghị giảm giá, hợp lý là đưa thêm lựa chọn hủy đơn và hoàn tiền → (B). (C) mâu thuẫn vì bàn chưa được giao."
+        },
+        {
+          "no": 147,
+          "points": 1,
+          "answer": 3,
+          "layout": 1,
+          "prompt": {
+            "html": "What problem does Ms. Ruiz mention?"
+          },
+          "options": [
+            {
+              "html": "A shipment arrived later than expected."
+            },
+            {
+              "html": "A client received tiles in the wrong color."
+            },
+            {
+              "html": "Some product samples were damaged."
+            },
+            {
+              "html": "A client presentation was canceled."
+            }
+          ],
+          "explanation": "Ms. Ruiz viết \"The sample tiles ... arrived cracked\" (gạch mẫu bị nứt) → mẫu hàng bị hư hỏng. Không có chi tiết giao trễ hay sai màu."
+        },
+        {
+          "no": 148,
+          "points": 1,
+          "answer": 1,
+          "layout": 1,
+          "prompt": {
+            "html": "At 10:21 A.M., what does Mr. Webb most likely mean when he writes, \"I can turn around\"?"
+          },
+          "options": [
+            {
+              "html": "He will go back to the warehouse to get the tiles."
+            },
+            {
+              "html": "He can change the date of the delivery."
+            },
+            {
+              "html": "He will check the client's order again."
+            },
+            {
+              "html": "He is able to meet the client in person."
+            }
+          ],
+          "explanation": "Mr. Webb vừa nói \"Just leaving\" (đang rời kho), rồi thêm \"We have plenty of those on shelf C\" → anh sẽ quay lại kho lấy gạch thay thế."
+        },
+        {
+          "no": 149,
+          "points": 1,
+          "answer": 2,
+          "layout": 1,
+          "prompt": {
+            "html": "What is the purpose of the notice?"
+          },
+          "options": [
+            {
+              "html": "To announce an increase in parking fees"
+            },
+            {
+              "html": "To inform tenants of temporary closures"
+            },
+            {
+              "html": "To introduce a new access card system"
+            },
+            {
+              "html": "To ask tenants to register their vehicles"
+            }
+          ],
+          "explanation": "Thông báo nói bãi đỗ xe được làm lại mặt sàn từ 11 đến 15/5, mỗi ngày đóng một tầng → thông báo việc đóng cửa tạm thời."
+        },
+        {
+          "no": 150,
+          "points": 1,
+          "answer": 4,
+          "layout": 1,
+          "prompt": {
+            "html": "What must tenants show to receive a discount at the Carver Street Public Garage?"
+          },
+          "options": [
+            {
+              "html": "A parking receipt"
+            },
+            {
+              "html": "A letter from the management office"
+            },
+            {
+              "html": "A vehicle registration document"
+            },
+            {
+              "html": "Their Pellham Tower access card"
+            }
+          ],
+          "explanation": "Câu \"simply present your Pellham Tower access card to the attendant\" → cần xuất trình thẻ ra vào của tòa nhà."
+        },
+        {
+          "no": 151,
+          "points": 1,
+          "answer": 1,
+          "layout": 1,
+          "prompt": {
+            "html": "What is indicated about floor models?"
+          },
+          "options": [
+            {
+              "html": "They cannot be returned."
+            },
+            {
+              "html": "They are delivered free of charge."
+            },
+            {
+              "html": "They are sold only online."
+            },
+            {
+              "html": "They come fully assembled."
+            }
+          ],
+          "explanation": "Quảng cáo ghi \"all floor models are sold as is and cannot be returned or exchanged\" → không được trả lại. Giao hàng miễn phí chỉ áp dụng cho đơn trên $500, không riêng hàng trưng bày."
+        },
+        {
+          "no": 152,
+          "points": 1,
+          "answer": 4,
+          "layout": 1,
+          "prompt": {
+            "html": "What is NOT offered by Brightline Office Furniture?"
+          },
+          "options": [
+            {
+              "html": "Reduced prices on discontinued items"
+            },
+            {
+              "html": "Free delivery for some orders"
+            },
+            {
+              "html": "Assembly service for a fee"
+            },
+            {
+              "html": "An extended product warranty"
+            }
+          ],
+          "explanation": "Bài có giảm giá hàng ngừng sản xuất, giao miễn phí cho đơn trên $500 và lắp ráp $45/món; không hề nhắc tới bảo hành mở rộng."
+        },
+        {
+          "no": 153,
+          "points": 1,
+          "answer": 2,
+          "layout": 1,
+          "prompt": {
+            "html": "Why was Mr. Oyelaran's event moved to a different room?"
+          },
+          "options": [
+            {
+              "html": "The Birch Room is being renovated."
+            },
+            {
+              "html": "More people are expected to attend."
+            },
+            {
+              "html": "Mr. Oyelaran asked for a room on the ground floor."
+            },
+            {
+              "html": "The date of the seminar has changed."
+            }
+          ],
+          "explanation": "Số người tham dự tăng từ 40 lên 65 mà Birch Room chỉ chứa 45 người → phải đổi sang Maple Hall."
+        },
+        {
+          "no": 154,
+          "points": 1,
+          "answer": 3,
+          "layout": 1,
+          "prompt": {
+            "html": "What is Mr. Oyelaran asked to do by Friday?"
+          },
+          "options": [
+            {
+              "html": "Pay a deposit for the room"
+            },
+            {
+              "html": "Send a list of participants' names"
+            },
+            {
+              "html": "Confirm his equipment needs"
+            },
+            {
+              "html": "Visit the hotel to inspect Maple Hall"
+            }
+          ],
+          "explanation": "\"please confirm your audiovisual requirements ... by this Friday\" → xác nhận nhu cầu thiết bị nghe nhìn. Việc cập nhật suất ăn là do khách sạn tự làm."
+        },
+        {
+          "no": 155,
+          "points": 1,
+          "answer": 1,
+          "layout": 1,
+          "prompt": {
+            "html": "What is the article mainly about?"
+          },
+          "options": [
+            {
+              "html": "The expansion of a local business"
+            },
+            {
+              "html": "A change in a bakery's ownership"
+            },
+            {
+              "html": "The opening of a cooking school"
+            },
+            {
+              "html": "A baking competition in Ashford"
+            }
+          ],
+          "explanation": "Bài báo nói Greenhill Bakery mở thêm cửa hàng thứ hai trên Fenwick Road → doanh nghiệp địa phương mở rộng. Lớp dạy làm bánh chỉ là chi tiết phụ."
+        },
+        {
+          "no": 156,
+          "points": 1,
+          "answer": 2,
+          "layout": 1,
+          "prompt": {
+            "html": "What is suggested about some of Greenhill Bakery's customers?"
+          },
+          "options": [
+            {
+              "html": "They have complained about the prices."
+            },
+            {
+              "html": "They live far from the Market Street shop."
+            },
+            {
+              "html": "They asked for a larger seating area."
+            },
+            {
+              "html": "They have already taken baking classes."
+            }
+          ],
+          "explanation": "Nhiều khách ở phía bắc thành phố phải \"making the long drive across town every weekend\" → họ sống xa cửa hàng Market Street. Lớp học đến tháng 9 mới bắt đầu."
+        },
+        {
+          "no": 157,
+          "points": 1,
+          "answer": 3,
+          "layout": 1,
+          "prompt": {
+            "html": "The word \"driven\" in paragraph 1 is closest in meaning to"
+          },
+          "options": [
+            {
+              "html": "transported"
+            },
+            {
+              "html": "operated"
+            },
+            {
+              "html": "motivated"
+            },
+            {
+              "html": "steered"
+            }
+          ],
+          "explanation": "\"the decision was driven by demand\" = quyết định được thúc đẩy bởi nhu cầu → motivated. \"transported/steered\" là nghĩa lái xe, chở, không hợp ngữ cảnh."
+        },
+        {
+          "no": 158,
+          "points": 1,
+          "answer": 4,
+          "layout": 1,
+          "prompt": {
+            "html": "What is the purpose of the web page?"
+          },
+          "options": [
+            {
+              "html": "To advertise office furniture for sale"
+            },
+            {
+              "html": "To announce the opening of a new branch"
+            },
+            {
+              "html": "To recruit staff for a workspace"
+            },
+            {
+              "html": "To describe options at a shared workspace"
+            }
+          ],
+          "explanation": "Trang web giới thiệu ba gói thành viên (Flex Desk, Dedicated Desk, Private Office) của một không gian làm việc chung."
+        },
+        {
+          "no": 159,
+          "points": 1,
+          "answer": 3,
+          "layout": 1,
+          "prompt": {
+            "html": "What is included only with the Private Office plan?"
+          },
+          "options": [
+            {
+              "html": "A monthly printing allowance"
+            },
+            {
+              "html": "Access to the building at any hour"
+            },
+            {
+              "html": "Free use of a meeting room"
+            },
+            {
+              "html": "Unlimited coffee and tea"
+            }
+          ],
+          "explanation": "Chỉ gói Private Office có \"10 hours of meeting room use per month\"; truy cập 24 giờ cũng có ở gói Dedicated Desk, còn in ấn và cà phê có ở mọi gói."
+        },
+        {
+          "no": 160,
+          "points": 1,
+          "answer": 2,
+          "layout": 1,
+          "prompt": {
+            "html": "What is indicated about the meeting rooms?"
+          },
+          "options": [
+            {
+              "html": "They can hold up to four people."
+            },
+            {
+              "html": "They can be reserved by nonmembers."
+            },
+            {
+              "html": "They are available only on weekdays."
+            },
+            {
+              "html": "They must be booked a month in advance."
+            }
+          ],
+          "explanation": "Trang web ghi phòng họp \"may also be booked ... by nonmembers for $25 per hour\" → người ngoài cũng đặt được (có tính phí). \"Up to four people\" là sức chứa văn phòng riêng."
+        },
+        {
+          "no": 161,
+          "points": 1,
+          "answer": 2,
+          "layout": 1,
+          "prompt": {
+            "html": "What problem is being discussed?"
+          },
+          "options": [
+            {
+              "html": "A flight to Lisbon has been canceled."
+            },
+            {
+              "html": "Some promotional materials will be delayed."
+            },
+            {
+              "html": "The convention center has no space available."
+            },
+            {
+              "html": "A printer made a mistake in a design."
+            }
+          ],
+          "explanation": "Gloria báo băng rôn cho hội chợ \"won't be ready until Wednesday\", sát ngày bay → tài liệu quảng bá bị chậm."
+        },
+        {
+          "no": 162,
+          "points": 1,
+          "answer": 4,
+          "layout": 1,
+          "prompt": {
+            "html": "At 9:09 A.M., what does Mr. Sato most likely mean when he writes, \"I'd rather not take chances\"?"
+          },
+          "options": [
+            {
+              "html": "He wants to withdraw from the trade show."
+            },
+            {
+              "html": "He prefers to carry the banners on the plane."
+            },
+            {
+              "html": "He doubts that setup will begin at noon."
+            },
+            {
+              "html": "He thinks the team should have a backup plan."
+            }
+          ],
+          "explanation": "Ngay sau câu đó, Mr. Sato hỏi có nhà in ở Lisbon để dùng \"if something goes wrong\" → anh muốn có phương án dự phòng."
+        },
+        {
+          "no": 163,
+          "points": 1,
+          "answer": 1,
+          "layout": 1,
+          "prompt": {
+            "html": "What will Mr. Mallick most likely do next?"
+          },
+          "options": [
+            {
+              "html": "Contact a printing company in Lisbon"
+            },
+            {
+              "html": "Change the team's flight reservations"
+            },
+            {
+              "html": "Approve a shipping arrangement"
+            },
+            {
+              "html": "Call the convention center"
+            }
+          ],
+          "explanation": "Gloria nhờ Dev \"get a price quote from them\" (Grafica Tavares ở Lisbon) và Dev trả lời \"On it\". Việc duyệt giao hàng là do Gloria làm."
+        },
+        {
+          "no": 164,
+          "points": 1,
+          "answer": 3,
+          "layout": 1,
+          "prompt": {
+            "html": "What is the purpose of the memo?"
+          },
+          "options": [
+            {
+              "html": "To introduce a newly hired director"
+            },
+            {
+              "html": "To announce changes to working hours"
+            },
+            {
+              "html": "To describe a new initiative for employees"
+            },
+            {
+              "html": "To invite staff to a company lunch"
+            }
+          ],
+          "explanation": "Bản ghi nhớ thông báo công ty sẽ triển khai chương trình kèm cặp đồng nghiệp (peer mentoring program) từ 1/3. Bữa trưa hằng quý chỉ là chi tiết phụ."
+        },
+        {
+          "no": 165,
+          "points": 1,
+          "answer": 2,
+          "layout": 1,
+          "prompt": {
+            "html": "What is indicated about mentors and mentees?"
+          },
+          "options": [
+            {
+              "html": "They will work on projects together."
+            },
+            {
+              "html": "They will come from different departments."
+            },
+            {
+              "html": "They will meet once a week."
+            },
+            {
+              "html": "They will attend a workshop together."
+            }
+          ],
+          "explanation": "Chương trình ghép nhân viên mới với đồng nghiệp giàu kinh nghiệm \"from a different department\". Họ gặp \"every two weeks\", không phải hằng tuần."
+        },
+        {
+          "no": 166,
+          "points": 1,
+          "answer": 4,
+          "layout": 1,
+          "prompt": {
+            "html": "According to the memo, what will happen on February 24?"
+          },
+          "options": [
+            {
+              "html": "Mentors will meet their mentees for the first time."
+            },
+            {
+              "html": "The application period will begin."
+            },
+            {
+              "html": "Executives will host a lunch."
+            },
+            {
+              "html": "Some employees will receive training."
+            }
+          ],
+          "explanation": "\"Selected mentors will attend a half-day training workshop on February 24\" → một số nhân viên được đào tạo. Hạn nộp đơn là 16/2, chương trình bắt đầu 1/3."
+        },
+        {
+          "no": 167,
+          "points": 1,
+          "answer": 3,
+          "layout": 1,
+          "prompt": {
+            "html": "In which of the positions marked [1], [2], [3], and [4] does the following sentence best belong?<br>\"Previous management experience is not required.\""
+          },
+          "options": [
+            {
+              "html": "[1]"
+            },
+            {
+              "html": "[2]"
+            },
+            {
+              "html": "[3]"
+            },
+            {
+              "html": "[4]"
+            }
+          ],
+          "explanation": "Câu chèn nói về điều kiện làm mentor, nên đặt ngay sau \"Employees with at least three years of service are eligible to serve as mentors\", tức vị trí [3]."
+        },
+        {
+          "no": 168,
+          "points": 1,
+          "answer": 1,
+          "layout": 1,
+          "prompt": {
+            "html": "Why did Ms. N. travel to the city?"
+          },
+          "options": [
+            {
+              "html": "To attend a professional event"
+            },
+            {
+              "html": "To visit relatives"
+            },
+            {
+              "html": "To inspect a hotel property"
+            },
+            {
+              "html": "To go on a sightseeing tour"
+            }
+          ],
+          "explanation": "Người viết ở khách sạn \"while attending a medical conference downtown\" → tham dự một sự kiện chuyên môn."
+        },
+        {
+          "no": 169,
+          "points": 1,
+          "answer": 4,
+          "layout": 1,
+          "prompt": {
+            "html": "What did the hotel staff do for Ms. N.?"
+          },
+          "options": [
+            {
+              "html": "They upgraded her to a suite."
+            },
+            {
+              "html": "They served her a free breakfast."
+            },
+            {
+              "html": "They reserved a parking space for her."
+            },
+            {
+              "html": "They gave her a different room."
+            }
+          ],
+          "explanation": "Sau khi cô phàn nàn tiếng ồn, nhân viên \"moved me to a quieter room on the eighth floor\". Bữa sáng là cô tự nấu ở bếp nhỏ."
+        },
+        {
+          "no": 170,
+          "points": 1,
+          "answer": 3,
+          "layout": 1,
+          "prompt": {
+            "html": "What is NOT mentioned as a feature of the Haverly Suites?"
+          },
+          "options": [
+            {
+              "html": "A rooftop lounge"
+            },
+            {
+              "html": "A kitchenette in the room"
+            },
+            {
+              "html": "A swimming pool"
+            },
+            {
+              "html": "A fitness center"
+            }
+          ],
+          "explanation": "Bài đánh giá có nhắc rooftop lounge, kitchenette và fitness center; không nói gì về hồ bơi."
+        },
+        {
+          "no": 171,
+          "points": 1,
+          "answer": 2,
+          "layout": 1,
+          "prompt": {
+            "html": "What is implied about Ms. N.?"
+          },
+          "options": [
+            {
+              "html": "She had dinner at the hotel's restaurant."
+            },
+            {
+              "html": "She did not reserve parking when she booked her room."
+            },
+            {
+              "html": "She stayed on the eighth floor for her entire visit."
+            },
+            {
+              "html": "She does not plan to return to the hotel."
+            }
+          ],
+          "explanation": "Cô khuyên đặt chỗ đỗ xe khi đặt phòng và nói \"I learned this the hard way\", phải gửi xe ở bãi công cộng → cô đã không đặt trước. Cô chỉ chuyển lên tầng 8 sau đêm đầu."
+        },
+        {
+          "no": 172,
+          "points": 1,
+          "answer": 2,
+          "layout": 1,
+          "prompt": {
+            "html": "What is the article mainly about?"
+          },
+          "options": [
+            {
+              "html": "A merger between two grocery chains"
+            },
+            {
+              "html": "A company's purchase of a smaller firm"
+            },
+            {
+              "html": "The launch of a new beverage product"
+            },
+            {
+              "html": "The construction of a production plant"
+            }
+          ],
+          "explanation": "Mirabel Foods \"has reached an agreement to acquire Sunward Press\" → một công ty lớn mua lại công ty nhỏ hơn. Mirabel nói rõ không cần xây nhà máy mới."
+        },
+        {
+          "no": 173,
+          "points": 1,
+          "answer": 4,
+          "layout": 1,
+          "prompt": {
+            "html": "What is indicated about Sunward Press?"
+          },
+          "options": [
+            {
+              "html": "It was founded by Leonard Haas."
+            },
+            {
+              "html": "It currently operates in four states."
+            },
+            {
+              "html": "It plans to build a new facility."
+            },
+            {
+              "html": "It originally sold its products at local markets."
+            }
+          ],
+          "explanation": "Nhà sáng lập Ostrowski \"started out selling juice at weekend farmers' markets\". Bốn bang là kế hoạch phân phối trong tương lai của Mirabel."
+        },
+        {
+          "no": 174,
+          "points": 1,
+          "answer": 1,
+          "layout": 1,
+          "prompt": {
+            "html": "The word \"preserve\" in paragraph 3 is closest in meaning to"
+          },
+          "options": [
+            {
+              "html": "maintain"
+            },
+            {
+              "html": "bottle"
+            },
+            {
+              "html": "restrict"
+            },
+            {
+              "html": "store"
+            }
+          ],
+          "explanation": "\"We intend to preserve both\" (danh tiếng và khách hàng trung thành) = giữ gìn, duy trì → maintain. \"bottle/store\" là nghĩa bảo quản thực phẩm, bẫy do bài nói về nước ép."
+        },
+        {
+          "no": 175,
+          "points": 1,
+          "answer": 3,
+          "layout": 1,
+          "prompt": {
+            "html": "According to the article, what will happen by next spring?"
+          },
+          "options": [
+            {
+              "html": "Sunward Press will change its brand name."
+            },
+            {
+              "html": "The Ostrowskis will leave the company."
+            },
+            {
+              "html": "Sunward products will be sold in more locations."
+            },
+            {
+              "html": "Mirabel will open a plant in Elkridge."
+            }
+          ],
+          "explanation": "Mirabel dự định đưa sản phẩm Sunward vào mạng lưới phân phối ở bốn bang lân cận \"by next spring\". Sunward giữ nguyên tên, nhà sáng lập ở lại ít nhất hai năm."
+        },
+        {
+          "no": 176,
+          "points": 1,
+          "answer": 1,
+          "layout": 1,
+          "prompt": {
+            "html": "Why did Mr. Ekwueme write the e-mail?"
+          },
+          "options": [
+            {
+              "html": "To report a billing error and request a return"
+            },
+            {
+              "html": "To place an order for additional furniture"
+            },
+            {
+              "html": "To complain about a late delivery"
+            },
+            {
+              "html": "To cancel a regular monthly order"
+            }
+          ],
+          "explanation": "E-mail báo bị tính tiền 4 hộp mực thay vì 2 (lỗi hóa đơn) và muốn trả lại một chiếc ghế. Hàng giao đúng hạn, còn đơn hàng tháng mới chỉ đang được hỏi."
+        },
+        {
+          "no": 177,
+          "points": 1,
+          "answer": 2,
+          "layout": 1,
+          "prompt": {
+            "html": "By how much was Lindqvist Architects overcharged?"
+          },
+          "options": [
+            {
+              "html": "$36.00"
+            },
+            {
+              "html": "$72.00"
+            },
+            {
+              "html": "$144.00"
+            },
+            {
+              "html": "$210.00"
+            }
+          ],
+          "explanation": "Hóa đơn tính 4 hộp mực × $36; e-mail nói chỉ đặt và nhận 2 hộp → bị tính dư 2 × $36 = $72."
+        },
+        {
+          "no": 178,
+          "points": 1,
+          "answer": 1,
+          "layout": 1,
+          "prompt": {
+            "html": "What is indicated about the chair Mr. Ekwueme wants to return?"
+          },
+          "options": [
+            {
+              "html": "It qualifies for a full refund."
+            },
+            {
+              "html": "It was damaged during delivery."
+            },
+            {
+              "html": "It is a different model from the one ordered."
+            },
+            {
+              "html": "It will be replaced with a model C-40."
+            }
+          ],
+          "explanation": "Hóa đơn: đồ nội thất trả lại trong 14 ngày, còn nguyên bao bì thì được hoàn tiền đầy đủ. Ghế giao ngày 10/3, e-mail viết ngày 12/3 và ghế \"still in its original box\" → đủ điều kiện hoàn tiền."
+        },
+        {
+          "no": 179,
+          "points": 1,
+          "answer": 4,
+          "layout": 1,
+          "prompt": {
+            "html": "Why was Lindqvist Architects not charged for delivery?"
+          },
+          "options": [
+            {
+              "html": "It has a standing monthly order."
+            },
+            {
+              "html": "The delivery arrived later than promised."
+            },
+            {
+              "html": "The items were picked up at the store."
+            },
+            {
+              "html": "The order total was more than $500."
+            }
+          ],
+          "explanation": "Hóa đơn ghi \"Delivery: waived (orders over $500)\" và tổng đơn là $737. Đơn hàng tháng mới chỉ là đề xuất trong e-mail."
+        },
+        {
+          "no": 180,
+          "points": 1,
+          "answer": 3,
+          "layout": 1,
+          "prompt": {
+            "html": "What does Mr. Ekwueme ask about?"
+          },
+          "options": [
+            {
+              "html": "Faster delivery times"
+            },
+            {
+              "html": "A chair with lower armrests"
+            },
+            {
+              "html": "Reduced prices for regular orders"
+            },
+            {
+              "html": "A longer payment period"
+            }
+          ],
+          "explanation": "Cuối e-mail: \"Would a discount be available for regular orders?\" → hỏi về giảm giá cho đơn hàng định kỳ."
+        },
+        {
+          "no": 181,
+          "points": 1,
+          "answer": 1,
+          "layout": 1,
+          "prompt": {
+            "html": "What is the notice mainly about?"
+          },
+          "options": [
+            {
+              "html": "A series of training sessions"
+            },
+            {
+              "html": "A new business loan program"
+            },
+            {
+              "html": "Job openings at a business center"
+            },
+            {
+              "html": "A change in membership fees"
+            }
+          ],
+          "explanation": "Thông báo giới thiệu chuỗi bốn buổi hội thảo (workshop series) cho doanh nghiệp nhỏ trong mùa thu."
+        },
+        {
+          "no": 182,
+          "points": 1,
+          "answer": 3,
+          "layout": 1,
+          "prompt": {
+            "html": "What is indicated about the workshops?"
+          },
+          "options": [
+            {
+              "html": "They are taught by the same instructor."
+            },
+            {
+              "html": "They are free for chamber members."
+            },
+            {
+              "html": "They are held in the evening."
+            },
+            {
+              "html": "Registration closes a week before each session."
+            }
+          ],
+          "explanation": "\"All sessions run from 6:30 to 8:30 P.M.\" → tổ chức buổi tối. Thành viên chỉ được giảm 20%, còn đăng ký đóng trước hai ngày chứ không phải một tuần."
+        },
+        {
+          "no": 183,
+          "points": 1,
+          "answer": 2,
+          "layout": 1,
+          "prompt": {
+            "html": "What will Ms. Ferreira most likely receive?"
+          },
+          "options": [
+            {
+              "html": "A partial refund"
+            },
+            {
+              "html": "A free book"
+            },
+            {
+              "html": "A certificate of completion"
+            },
+            {
+              "html": "A recording of a session"
+            }
+          ],
+          "explanation": "Cô chọn ba workshop, mà thông báo nói ai đăng ký từ ba buổi trở lên sẽ được tặng cuốn \"Starting Right\" → nhận sách miễn phí."
+        },
+        {
+          "no": 184,
+          "points": 1,
+          "answer": 4,
+          "layout": 1,
+          "prompt": {
+            "html": "What is suggested about Ms. Ferreira?"
+          },
+          "options": [
+            {
+              "html": "She has already paid for all four workshops."
+            },
+            {
+              "html": "She will teach one of the workshops."
+            },
+            {
+              "html": "She has attended Bookkeeping Basics before."
+            },
+            {
+              "html": "She is eligible for a discount."
+            }
+          ],
+          "explanation": "Trong phiếu, cô là thành viên Phòng Thương mại Hollis (Member No. 2231); thông báo cho thành viên giảm 20% học phí → cô được giảm giá."
+        },
+        {
+          "no": 185,
+          "points": 1,
+          "answer": 1,
+          "layout": 1,
+          "prompt": {
+            "html": "Whose session does Ms. Ferreira expect to arrive late to?"
+          },
+          "options": [
+            {
+              "html": "Samir Haddad's"
+            },
+            {
+              "html": "Maria Chen's"
+            },
+            {
+              "html": "Owen Gallagher's"
+            },
+            {
+              "html": "Rita Kowalski's"
+            }
+          ],
+          "explanation": "Cô có thể đến muộn buổi ngày 27/10; theo thông báo, buổi 27/10 \"Applying for Business Loans\" do Samir Haddad phụ trách."
+        },
+        {
+          "no": 186,
+          "points": 1,
+          "answer": 2,
+          "layout": 1,
+          "prompt": {
+            "html": "According to the web page, what is included in the registration fee?"
+          },
+          "options": [
+            {
+              "html": "A parking pass"
+            },
+            {
+              "html": "Lunch on the days attended"
+            },
+            {
+              "html": "A printed copy of the presentations"
+            },
+            {
+              "html": "Hotel accommodations"
+            }
+          ],
+          "explanation": "Trang web ghi \"All registrations include lunch on each day of attendance\" → phí bao gồm bữa trưa."
+        },
+        {
+          "no": 187,
+          "points": 1,
+          "answer": 1,
+          "layout": 1,
+          "prompt": {
+            "html": "What is suggested about Mr. Adair and his colleagues?"
+          },
+          "options": [
+            {
+              "html": "They qualified for a group discount."
+            },
+            {
+              "html": "They will attend only on May 18."
+            },
+            {
+              "html": "They work at the Calloway Convention Center."
+            },
+            {
+              "html": "They will lead a panel discussion."
+            }
+          ],
+          "explanation": "Mr. Adair đăng ký cho mình và bốn đồng nghiệp (5 người cùng công ty); trang web giảm 10% cho nhóm từ năm người trở lên. Chỉ riêng anh đi một ngày, đồng nghiệp vẫn dự cả hai ngày."
+        },
+        {
+          "no": 188,
+          "points": 1,
+          "answer": 4,
+          "layout": 1,
+          "prompt": {
+            "html": "Which session will Mr. Adair most likely miss?"
+          },
+          "options": [
+            {
+              "html": "Grant Whitfield's keynote"
+            },
+            {
+              "html": "The workshop on visual merchandising"
+            },
+            {
+              "html": "The panel on managing seasonal staff"
+            },
+            {
+              "html": "Sandra Liu's keynote"
+            }
+          ],
+          "explanation": "Anh chỉ dự được ngày đầu (18/5); theo lịch, bài phát biểu của Sandra Liu diễn ra ngày 19/5, các phương án còn lại đều thuộc ngày 18/5."
+        },
+        {
+          "no": 189,
+          "points": 1,
+          "answer": 3,
+          "layout": 1,
+          "prompt": {
+            "html": "What will Ms. Bello most likely be told?"
+          },
+          "options": [
+            {
+              "html": "She must pay an additional fee for the workshop."
+            },
+            {
+              "html": "She should go directly to Room 204."
+            },
+            {
+              "html": "She must sign up on the morning of the event."
+            },
+            {
+              "html": "She has been moved to a larger room."
+            }
+          ],
+          "explanation": "Mr. Adair xin giữ chỗ trước cho Ms. Bello, nhưng trang web nói chỗ workshop \"cannot be reserved in advance\", phải đăng ký tại bàn tiếp tân vào buổi sáng hôm đó."
+        },
+        {
+          "no": 190,
+          "points": 1,
+          "answer": 1,
+          "layout": 1,
+          "prompt": {
+            "html": "When will the workshop that Ms. Bello is interested in take place?"
+          },
+          "options": [
+            {
+              "html": "On May 18 in the afternoon"
+            },
+            {
+              "html": "On May 18 in the morning"
+            },
+            {
+              "html": "On May 19 in the morning"
+            },
+            {
+              "html": "On May 19 in the afternoon"
+            }
+          ],
+          "explanation": "Ms. Bello quan tâm workshop về lập kế hoạch tồn kho; lịch ghi \"Data Tools for Inventory Planning\" lúc 3:30 P.M. ngày 18/5 → chiều ngày 18/5."
+        },
+        {
+          "no": 191,
+          "points": 1,
+          "answer": 2,
+          "layout": 1,
+          "prompt": {
+            "html": "What is indicated about Saffron Table Catering in the advertisement?"
+          },
+          "options": [
+            {
+              "html": "It charges extra for special dietary requests."
+            },
+            {
+              "html": "It requires a minimum number of guests per order."
+            },
+            {
+              "html": "It provides only vegetarian dishes."
+            },
+            {
+              "html": "It delivers only on weekdays."
+            }
+          ],
+          "explanation": "Quảng cáo ghi \"Minimum order: 15 guests\". Món chay và không gluten được cung cấp \"at no extra cost\", nên phương án 1 sai."
+        },
+        {
+          "no": 192,
+          "points": 1,
+          "answer": 4,
+          "layout": 1,
+          "prompt": {
+            "html": "What is suggested about Ms. Joshi's order?"
+          },
+          "options": [
+            {
+              "html": "It was placed too late to be accepted."
+            },
+            {
+              "html": "It was for an evening event."
+            },
+            {
+              "html": "It was for fewer than 20 people."
+            },
+            {
+              "html": "It was delivered at no charge."
+            }
+          ],
+          "explanation": "Cô đặt ngày 2/6 cho sự kiện 16/6, tức trước 14 ngày; quảng cáo nói đặt trước ít nhất 10 ngày được giao hàng miễn phí."
+        },
+        {
+          "no": 193,
+          "points": 1,
+          "answer": 3,
+          "layout": 1,
+          "prompt": {
+            "html": "What is true about the vegetarian meals?"
+          },
+          "options": [
+            {
+              "html": "They were ordered from a different company."
+            },
+            {
+              "html": "They cost more than the other meals."
+            },
+            {
+              "html": "They were clearly marked."
+            },
+            {
+              "html": "They were served by Saffron Table staff."
+            }
+          ],
+          "explanation": "Bài đánh giá: \"The vegetarian meals were clearly labeled\". Quảng cáo nói món chay không tính thêm tiền, và phục vụ tận nơi chỉ có ở gói Evening Reception."
+        },
+        {
+          "no": 194,
+          "points": 1,
+          "answer": 1,
+          "layout": 1,
+          "prompt": {
+            "html": "At what time did the food most likely arrive?"
+          },
+          "options": [
+            {
+              "html": "At 12:05 P.M."
+            },
+            {
+              "html": "At 11:45 A.M."
+            },
+            {
+              "html": "At 11:25 A.M."
+            },
+            {
+              "html": "At 12:45 P.M."
+            }
+          ],
+          "explanation": "E-mail yêu cầu giao trước 11:45 A.M.; bài đánh giá nói đồ ăn đến trễ hai mươi phút so với giờ đã hẹn → khoảng 12:05 P.M."
+        },
+        {
+          "no": 195,
+          "points": 1,
+          "answer": 2,
+          "layout": 1,
+          "prompt": {
+            "html": "What did Mr. Farouk offer Ms. Joshi?"
+          },
+          "options": [
+            {
+              "html": "A full refund"
+            },
+            {
+              "html": "A discount on a future order"
+            },
+            {
+              "html": "Free delivery on her next order"
+            },
+            {
+              "html": "Additional desserts"
+            }
+          ],
+          "explanation": "Chủ cửa hàng Hassan Farouk gọi điện \"to offer 10 percent off our next order\" → giảm giá cho đơn hàng sau."
+        },
+        {
+          "no": 196,
+          "points": 1,
+          "answer": 4,
+          "layout": 1,
+          "prompt": {
+            "html": "What is indicated about the Senior Graphic Designer position?"
+          },
+          "options": [
+            {
+              "html": "It is a part-time role."
+            },
+            {
+              "html": "It requires experience in publishing."
+            },
+            {
+              "html": "Applications must be submitted by October 13."
+            },
+            {
+              "html": "It involves managing other employees."
+            }
+          ],
+          "explanation": "Trang web ghi ứng viên sẽ \"supervise two junior designers\" → quản lý nhân viên. Kinh nghiệm xuất bản chỉ là \"Preferred\" (ưu tiên), hạn nộp là 30/9."
+        },
+        {
+          "no": 197,
+          "points": 1,
+          "answer": 1,
+          "layout": 1,
+          "prompt": {
+            "html": "What preferred qualification does Mr. Wieczorek have?"
+          },
+          "options": [
+            {
+              "html": "Experience working for a publisher"
+            },
+            {
+              "html": "Skill in using design software"
+            },
+            {
+              "html": "An online portfolio"
+            },
+            {
+              "html": "Five years of design experience"
+            }
+          ],
+          "explanation": "Mục \"Preferred\" trên trang web là kinh nghiệm ngành xuất bản; e-mail cho biết anh làm ở Orla Publishing sáu năm. Các phương án còn lại là yêu cầu bắt buộc, không phải ưu tiên."
+        },
+        {
+          "no": 198,
+          "points": 1,
+          "answer": 3,
+          "layout": 1,
+          "prompt": {
+            "html": "What is suggested about Mr. Wieczorek?"
+          },
+          "options": [
+            {
+              "html": "He has lived in Denholm for several years."
+            },
+            {
+              "html": "He will be interviewed by video call."
+            },
+            {
+              "html": "He was asked to complete a design exercise."
+            },
+            {
+              "html": "He will begin working on October 13."
+            }
+          ],
+          "explanation": "Anh có tên trong lịch phỏng vấn, tức đã lọt vào danh sách rút gọn; trang web nói ứng viên được chọn phải làm bài thiết kế ngắn. Anh mới chuyển tới Denholm vào tháng 10, và phỏng vấn video là của Callum Fraser."
+        },
+        {
+          "no": 199,
+          "points": 1,
+          "answer": 4,
+          "layout": 1,
+          "prompt": {
+            "html": "Which candidate will most likely NOT be in Conference Room 3 during the interview?"
+          },
+          "options": [
+            {
+              "html": "Aiko Maruyama"
+            },
+            {
+              "html": "Tomasz Wieczorek"
+            },
+            {
+              "html": "Beatriz Lemos"
+            },
+            {
+              "html": "Callum Fraser"
+            }
+          ],
+          "explanation": "Lịch phỏng vấn ghi Callum Fraser phỏng vấn \"by video call\" → không có mặt trực tiếp tại phòng họp 3."
+        },
+        {
+          "no": 200,
+          "points": 1,
+          "answer": 2,
+          "layout": 1,
+          "prompt": {
+            "html": "On the web page, the word \"lead\" in paragraph 1 is closest in meaning to"
+          },
+          "options": [
+            {
+              "html": "follow"
+            },
+            {
+              "html": "direct"
+            },
+            {
+              "html": "connect"
+            },
+            {
+              "html": "advance"
+            }
+          ],
+          "explanation": "\"will lead design work for our print and digital campaigns\" = chỉ đạo, phụ trách công việc thiết kế → direct."
+        }
+      ]
+    }
+  ]
+}

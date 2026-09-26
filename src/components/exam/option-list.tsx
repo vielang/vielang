@@ -2,12 +2,13 @@
 
 import { Check, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { isImage, type Exam, type ExamQuestion } from "@/lib/exams";
+import { isImage, optionLabel, type Exam, type ExamQuestion } from "@/lib/exams";
 import { ContentView, OptionsGrid } from "@/components/exam/exam-content";
 
 /**
- * Bốn lựa chọn của một câu — bấm thẳng vào lựa chọn để chọn, như tô vào
- * phiếu. Xếp theo số cột của đề gốc (xem `OptionsGrid`).
+ * Bốn lựa chọn của một câu, nhãn (A)–(D) như đề in (dữ liệu không ghi nhãn)
+ * — bấm thẳng vào lựa chọn để chọn, như tô vào phiếu. Xếp theo số cột của
+ * đề (xem `OptionsGrid`).
  *
  * `reveal`: đã chấm — viền xanh + dấu ✓ ở đáp án đúng, viền đỏ + dấu ✗ ở
  * lựa chọn sai của người học. Có dấu chứ không chỉ đổi màu, để người khó
@@ -60,7 +61,7 @@ export function OptionList({
             >
               <span
                 className={cn(
-                  "flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-medium tabular-nums",
+                  "flex h-6 min-w-8 shrink-0 items-center justify-center rounded-md px-1 text-xs font-medium tabular-nums",
                   isAnswer
                     ? "bg-emerald-600 text-white"
                     : isWrong
@@ -69,11 +70,10 @@ export function OptionList({
                         ? "bg-foreground text-background"
                         : "border border-foreground/25 text-foreground/70"
                 )}
-                aria-hidden
               >
-                {i + 1}
+                {optionLabel(choice)}
               </span>
-              <ContentView exam={exam} content={opt} alt={`Lựa chọn ${choice}`} className="min-w-0 text-[0.95rem]" />
+              <ContentView exam={exam} content={opt} alt={`Lựa chọn ${optionLabel(choice)}`} className="min-w-0 text-[0.95rem]" />
               {isAnswer && (
                 <Check className="absolute top-1.5 right-1.5 size-4 text-emerald-700 dark:text-emerald-400" aria-label="đáp án đúng" />
               )}

@@ -71,9 +71,15 @@ const nextConfig: NextConfig = {
   redirects: async () => [
     // Danh sách khoá IT nay là trang chủ.
     { source: "/it", destination: "/", permanent: true },
+    // Cẩm nang không có trang tổng: mở thẳng mục đầu tiên. Tạm thời (307) —
+    // sau này có trang tổng thì trình duyệt không nhớ mãi đường chuyển cũ.
+    { source: "/cam-nang", destination: "/cam-nang/lo-trinh", permanent: false },
     // Trang đánh dấu đã chuyển vào Góc học tập. Vĩnh viễn (308): link cũ và lối
     // tắt trên màn hình chính vẫn mở đúng chỗ.
     { source: "/bookmarks", destination: "/my/danh-dau", permanent: true },
+    // Luyện thi: mỗi kỳ thi một trang (kỳ thi nằm trên URL để header đổi
+    // được). Tạm thời (307): thêm kỳ thi khác thì /exam có thể thành trang chọn.
+    { source: "/exam", destination: "/exam/toeic", permanent: false },
   ],
   images: {
     // Còn lại cho ảnh từ xa nếu về sau cần; ảnh sách nay đi qua `imageRewrites`.

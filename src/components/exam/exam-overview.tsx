@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronRight, Headphones, ListChecks, PenLine, Play, Timer } from "lucide-react";
+import { ChevronRight, Headphones, ListChecks, Play, Timer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   examTitle,
@@ -14,20 +14,19 @@ import {
   totalMinutes,
   type Exam,
   type ExamSection,
-  type Grades,
 } from "@/lib/exams";
 import { activeAttempt, finishedAttempts, useExamStore } from "@/lib/exam-store";
-import { LevelBadge, ProgressBar } from "@/components/exam/exam-chrome";
+import { MilestoneBadge, ProgressBar } from "@/components/exam/exam-chrome";
 import { useIsClient } from "@/lib/use-is-client";
 import { BackLink } from "@/components/layout/back-link";
 import { examLevelHref } from "@/lib/exam-levels";
 
 function SectionIcon({ section }: { section: ExamSection }) {
-  const Icon = section.audio ? Headphones : section.writing ? PenLine : ListChecks;
+  const Icon = section.audio ? Headphones : ListChecks;
   return <Icon className="size-4 shrink-0 text-muted-foreground" aria-hidden />;
 }
 
-/** Trang một đề: thi thử hoặc luyện tiếp, tiến độ từng phần, các lượt đã thi. */
+/** Trang một đề: nguồn đề, thi thử hoặc luyện tiếp, tiến độ từng phần, các lượt đã thi. */
 export function ExamOverview({ exam, source }: { exam: Exam; source?: string }) {
   const isClient = useIsClient();
   const attempts = useExamStore((s) => s.attempts);
@@ -36,7 +35,6 @@ export function ExamOverview({ exam, source }: { exam: Exam; source?: string }) 
   const active = isClient ? activeAttempt(attempts, exam.id) : undefined;
   const history = isClient ? finishedAttempts(attempts, exam.id) : [];
   const checked = new Set(practice?.checked ?? []);
-  const grades: Grades = practice?.grades ?? {};
   const progress = practiceProgress(exam, practice);
   const target = nextPracticeTarget(exam, practice);
 
@@ -51,6 +49,8 @@ export function ExamOverview({ exam, source }: { exam: Exam; source?: string }) 
             Năm {exam.year} · {exam.sections.map((s) => `${sectionVi(s.id)} ${sectionCount(s)} câu`).join(" · ")} ·{" "}
             {totalMinutes(exam)} phút
           </p>
+          {/* Nói rõ ngay đầu trang đây là đề tự soạn, không phải đề thật của ETS. */}
+          {source && <p className="mt-2 text-sm text-muted-foreground">{source}</p>}
         </div>
         <div className="flex flex-wrap gap-2">
           <Button asChild size="lg">
@@ -85,9 +85,7 @@ export function ExamOverview({ exam, source }: { exam: Exam; source?: string }) 
         <ul className="flex flex-col divide-y divide-border border-y border-border">
           {exam.sections.map((s) => {
             const count = sectionCount(s);
-            const done = s.writing
-              ? s.writing.tasks.filter((t) => grades[t.no] !== undefined).length
-              : s.questions.filter((q) => checked.has(qKey(s.id, q.no))).length;
+            const done = s.questions.filter((q) => checked.has(qKey(s.id, q.no))).length;
             const right = s.questions.filter(
               (q) => checked.has(qKey(s.id, q.no)) && practice?.answers[qKey(s.id, q.no)] === q.answer
             ).length;
@@ -106,7 +104,7 @@ export function ExamOverview({ exam, source }: { exam: Exam; source?: string }) 
                     <ProgressBar value={done} max={count} />
                   </span>
                   <span className="w-28 text-right text-xs text-muted-foreground tabular-nums">
-                    {s.writing ? `tự chấm ${done}/${count}` : done > 0 ? `${done}/${count} · đúng ${right}` : `${count} câu`}
+                    {done > 0 ? `${done}/${count} · đúng ${right}` : `${count} câu`}
                   </span>
                   <ChevronRight
                     className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5"
@@ -133,12 +131,12 @@ export function ExamOverview({ exam, source }: { exam: Exam; source?: string }) 
                     </th>
                   ))}
                   <th className="px-2 py-2 text-right font-normal">Tổng</th>
-                  <th className="py-2 pl-2 text-right font-normal">Cấp</th>
+                  <th className="py-2 pl-2 text-right font-normal">Mốc</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
                 {history.map((a) => {
-                  const r = scoreExam(exam, a.answers, a.grades);
+                  const r = scoreExam(exam, a.answers);
                   return (
                     <tr key={a.id} className="group">
                       <td className="py-2.5 pr-3">
@@ -151,12 +149,12 @@ export function ExamOverview({ exam, source }: { exam: Exam; source?: string }) 
                       </td>
                       {r.sections.map((s) => (
                         <td key={s.id} className="px-2 py-2.5 text-right text-muted-foreground">
-                          {s.id === "writing" && s.correct < s.total ? `${s.score}*` : s.score}
+                          {s.score}
                         </td>
                       ))}
                       <td className="px-2 py-2.5 text-right font-medium">{r.score}</td>
                       <td className="py-2.5 pl-2 text-right">
-                        <LevelBadge level={r.level} />
+                        <MilestoneBadge exam={exam} score={r.score} />
                       </td>
                     </tr>
                   );
@@ -164,13 +162,9 @@ export function ExamOverview({ exam, source }: { exam: Exam; source?: string }) 
               </tbody>
             </table>
           </div>
-          {history.some((a) => scoreExam(exam, a.answers, a.grades).ungraded > 0) && (
-            <p className="text-xs text-muted-foreground">* Phần viết chưa tự chấm hết — mở lượt thi để chấm.</p>
-          )}
+          <p className="text-xs text-muted-foreground">Điểm quy đổi ước tính — không phải điểm chính thức của ETS.</p>
         </section>
       )}
-
-      {source && <p className="text-xs text-muted-foreground">Nguồn: {source}</p>}
     </div>
   );
 }

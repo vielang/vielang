@@ -18,7 +18,7 @@ const IDLE = "text-muted-foreground hover:text-foreground";
  * được mà không phải cuộn ngược lên.
  *
  * Mục có `href` là link (đổi trang), mục có `onSelect` là nút (đổi trạng thái
- * ngay trong trang, vd TOPIK I / II).
+ * ngay trong trang, vd bộ lọc).
  */
 export function SegmentedNav({
   items,

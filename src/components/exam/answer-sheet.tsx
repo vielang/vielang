@@ -3,9 +3,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { qKey, type Answers, type ExamSection } from "@/lib/exams";
+import { optionLabel, optionLetter, qKey, type Answers, type ExamSection } from "@/lib/exams";
 
-/** Bốn ô tròn của một câu trên phiếu — tô thẳng được. */
+/** Bốn ô tròn A–D của một câu trên phiếu, như phiếu trả lời TOEIC — tô thẳng được. */
 function Bubbles({
   no,
   value,
@@ -25,7 +25,7 @@ function Bubbles({
           type="button"
           role="radio"
           aria-checked={value === c}
-          aria-label={`Câu ${no}: chọn ${c}`}
+          aria-label={`Câu ${no}: chọn ${optionLabel(c)}`}
           onClick={() => onAnswer(no, c)}
           className={cn(
             "flex items-center justify-center rounded-full text-[0.65rem] tabular-nums transition-colors",
@@ -35,7 +35,7 @@ function Bubbles({
               : "border border-foreground/20 text-muted-foreground hover:border-foreground/50"
           )}
         >
-          {c}
+          {optionLetter(c)}
         </button>
       ))}
     </span>
@@ -77,7 +77,7 @@ export function AnswerSheet({
               onClick={() => onJump(q.no)}
               aria-label={`Tới câu ${q.no}`}
               className={cn(
-                "w-7 shrink-0 text-right text-xs tabular-nums hover:underline",
+                "w-8 shrink-0 text-right text-xs tabular-nums hover:underline",
                 q.no === current ? "font-semibold text-foreground" : a ? "text-foreground" : "text-muted-foreground"
               )}
             >

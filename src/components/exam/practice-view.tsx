@@ -1,12 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, RotateCcw, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
   examAudioUrl,
   groupAudio,
+  optionLabel,
+  practiceBlocks,
   qKey,
   type Exam,
   type ExamQuestion,
@@ -16,7 +18,7 @@ import {
 import { useExamStore } from "@/lib/exam-store";
 import { useActivityStore } from "@/lib/activity-store";
 import { useActiveTime } from "@/lib/use-study-tracker";
-import { GroupBlock, PromptView } from "@/components/exam/exam-content";
+import { Explanation, GroupBlock, PromptView } from "@/components/exam/exam-content";
 import {
   ActionBar,
   GridLegend,
@@ -32,17 +34,15 @@ import {
 import { OptionList } from "@/components/exam/option-list";
 import { useExamAudio } from "@/components/exam/use-exam-audio";
 import { BlockPlayer } from "@/components/exam/block-player";
-import { WritingPractice } from "@/components/exam/writing-practice";
 import { useIsClient } from "@/lib/use-is-client";
 
-const MARKS = "①②③④";
-
 /**
- * Luyện tập: không tính giờ, chấm ngay khi bấm "Kiểm tra".
+ * Luyện tập: không tính giờ, chấm ngay khi bấm "Kiểm tra", kèm lời giải
+ * thích từng câu.
  *
- * Trắc nghiệm luyện THEO KHỐI "※ [a~b]" như tờ đề: lời chỉ dẫn, câu mẫu,
- * đoạn văn dùng chung hiện một lần, các câu của khối xếp bên dưới, một nút
- * kiểm tra cả khối. Phần viết luyện từng câu (mỗi câu một bài).
+ * Luyện THEO KHỐI như tờ đề (xem `practiceBlocks`): lời chỉ dẫn và văn bản
+ * dùng chung (Part 6–7) hiện một lần, các câu của khối xếp bên dưới, một nút
+ * kiểm tra cả khối. Part 5 thì mỗi câu một màn.
  *
  * Nghe: mỗi khối MỘT audio như đề thật (lời chỉ dẫn + từng câu kèm khoảng
  * dừng trả lời) có thanh điều khiển — xem `BlockPlayer`. Đề chưa đo mốc thời gian
@@ -52,15 +52,10 @@ const MARKS = "①②③④";
  * thấy câu nào đã làm, đúng hay sai.
  */
 export function PracticeView({ exam, sectionId, initialNo }: { exam: Exam; sectionId: SectionId; initialNo?: number }) {
-  const section = exam.sections.find((s) => s.id === sectionId) ?? exam.sections[0];
-  if (section.writing) return <WritingPractice exam={exam} section={section} initialNo={initialNo} />;
-  return <GroupPractice exam={exam} section={section} initialNo={initialNo} />;
-}
-
-/** Luyện trắc nghiệm (nghe, đọc) theo khối. */
-function GroupPractice({ exam, section, initialNo }: { exam: Exam; section: ExamSection; initialNo?: number }) {
+  const section: ExamSection = exam.sections.find((s) => s.id === sectionId) ?? exam.sections[0];
   const isClient = useIsClient();
-  const { groups, questions } = section;
+  const { questions } = section;
+  const groups = useMemo(() => practiceBlocks(section), [section]);
   const key = useCallback((no: number) => qKey(section.id, no), [section.id]);
   const groupIndexOf = useCallback(
     (no: number) =>
@@ -176,7 +171,6 @@ function GroupPractice({ exam, section, initialNo }: { exam: Exam; section: Exam
     : undefined;
 
   const range = rangeLabel(group.from, group.to);
-  const points = items.reduce((n, q) => n + q.points, 0);
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-6 pb-24 sm:pb-12">
@@ -207,10 +201,7 @@ function GroupPractice({ exam, section, initialNo }: { exam: Exam; section: Exam
       )}
 
       <section className="flex flex-col gap-4" aria-label={range}>
-        <h1 className="flex items-baseline gap-2">
-          <span className="text-xl font-semibold tabular-nums">{range}</span>
-          <span className="text-sm text-muted-foreground">{points} điểm</span>
-        </h1>
+        <h1 className="text-xl font-semibold tabular-nums">{range}</h1>
 
         {blockSegments.length > 0 && (
           <BlockPlayer
@@ -243,9 +234,9 @@ function GroupPractice({ exam, section, initialNo }: { exam: Exam; section: Exam
               <span>
                 {items.length === 1
                   ? groupRight.length
-                    ? `Đúng rồi — +${points} điểm.`
-                    : `Chưa đúng — đáp án là ${MARKS[items[0].answer - 1]}. ${section.audio ? "Nghe lại" : "Đọc lại"} rồi thử hiểu vì sao nhé.`
-                  : `Đúng ${groupRight.length}/${items.length} câu · +${groupRight.reduce((n, q) => n + q.points, 0)} điểm.`}
+                    ? "Đúng rồi!"
+                    : `Chưa đúng — đáp án là ${optionLabel(items[0].answer)}. Xem giải thích rồi ${section.audio ? "nghe" : "đọc"} lại nhé.`
+                  : `Đúng ${groupRight.length}/${items.length} câu.`}
               </span>
               <button
                 type="button"
@@ -328,7 +319,7 @@ function GroupPractice({ exam, section, initialNo }: { exam: Exam; section: Exam
   );
 }
 
-/** Một câu trong khối: số câu, đề, nút nghe riêng, bốn lựa chọn, kết quả. */
+/** Một câu trong khối: số câu, đề, bốn lựa chọn, kết quả và lời giải thích. */
 function QuestionItem({
   exam,
   question: q,
@@ -351,7 +342,6 @@ function QuestionItem({
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="flex items-baseline gap-2">
           <span className="font-semibold tabular-nums">{q.no}.</span>
-          <span className="text-xs text-muted-foreground">{q.points} điểm</span>
           {playing && (
             <span className="inline-flex items-center gap-1 text-xs font-medium">
               <Volume2 className="size-3" aria-hidden />
@@ -365,13 +355,14 @@ function QuestionItem({
                 right ? "text-emerald-700 dark:text-emerald-400" : "text-red-700 dark:text-red-400"
               )}
             >
-              {right ? "· đúng" : value === undefined ? `· bỏ trống, đáp án ${MARKS[q.answer - 1]}` : `· sai, đáp án ${MARKS[q.answer - 1]}`}
+              {right ? "· đúng" : value === undefined ? `· bỏ trống, đáp án ${optionLabel(q.answer)}` : `· sai, đáp án ${optionLabel(q.answer)}`}
             </span>
           )}
         </p>
       </div>
       <PromptView exam={exam} question={q} />
       <OptionList exam={exam} question={q} value={value} onChange={onChoose} reveal={checked} disabled={checked} />
+      {checked && <Explanation question={q} />}
     </div>
   );
 }

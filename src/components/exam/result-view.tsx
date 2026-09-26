@@ -9,8 +9,10 @@ import {
   examAudioUrl,
   examTitle,
   groupOf,
-  levelCuts,
-  nextLevel,
+  isFullTest,
+  milestoneLabel,
+  milestones,
+  nextMilestone,
   qKey,
   questionAudio,
   scoreExam,
@@ -19,11 +21,10 @@ import {
   type ExamSection,
 } from "@/lib/exams";
 import { useExamStore, type MockAttempt } from "@/lib/exam-store";
-import { GroupBlock, PromptView } from "@/components/exam/exam-content";
+import { Explanation, GroupBlock, PromptView } from "@/components/exam/exam-content";
 import { OptionList } from "@/components/exam/option-list";
 import { useExamAudio } from "@/components/exam/use-exam-audio";
-import { LevelBadge, ProgressBar } from "@/components/exam/exam-chrome";
-import { WritingTaskView } from "@/components/exam/writing-parts";
+import { MilestoneBadge, ProgressBar } from "@/components/exam/exam-chrome";
 import { useIsClient } from "@/lib/use-is-client";
 import { BackLink } from "@/components/layout/back-link";
 
@@ -33,7 +34,7 @@ function duration(a: MockAttempt): string {
   return `${min} phút`;
 }
 
-/** Kết quả một lượt thi thử + xem lại từng câu. */
+/** Kết quả một lượt thi thử (điểm quy đổi ước tính, mốc mục tiêu) + xem lại từng câu có giải thích. */
 export function ResultView({ exam, attemptId }: { exam: Exam; attemptId?: string }) {
   const isClient = useIsClient();
   const attempts = useExamStore((s) => s.attempts);
@@ -52,8 +53,8 @@ export function ResultView({ exam, attemptId }: { exam: Exam; attemptId?: string
     );
   }
 
-  const result = scoreExam(exam, attempt.answers, attempt.grades);
-  const next = nextLevel(exam.level, result.score);
+  const result = scoreExam(exam, attempt.answers);
+  const next = nextMilestone(exam, result.score);
   const wrong = exam.sections.flatMap((s) =>
     s.questions.filter((q) => attempt.answers[qKey(s.id, q.no)] !== q.answer).map((q) => ({ section: s.id, no: q.no }))
   );
@@ -75,30 +76,19 @@ export function ResultView({ exam, attemptId }: { exam: Exam; attemptId?: string
               <span className="text-xl font-normal text-muted-foreground">/{result.max}</span>
             </span>
             <span className="flex flex-col gap-1">
-              <LevelBadge
-                level={result.level ? `Đạt ${exam.level} ${result.level}` : null}
-                emptyLabel="Chưa đạt cấp nào"
-                className="px-3 py-1 text-sm"
-              />
+              <MilestoneBadge exam={exam} score={result.score} className="px-3 py-1 text-sm" />
               {next && (
                 <span className="text-xs text-muted-foreground">
-                  Còn <b className="text-foreground tabular-nums">{next.need}</b> điểm nữa lên {next.level}
+                  Còn <b className="text-foreground tabular-nums">{next.need}</b> điểm nữa tới mốc{" "}
+                  {milestoneLabel(exam, next.milestone)}
                 </span>
               )}
             </span>
           </div>
+          <p className="text-xs text-muted-foreground">Điểm quy đổi ước tính — không phải điểm chính thức của ETS.</p>
         </div>
 
-        <LevelLadder exam={exam} score={result.score} max={result.max} />
-
-        {result.ungraded > 0 && (
-          <p className="rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-900 dark:bg-amber-950/40 dark:text-amber-200">
-            Còn {result.ungraded} câu viết chưa tự chấm — điểm và cấp trên đây mới là tạm tính.{" "}
-            <a href="#writing" className="font-medium underline underline-offset-2">
-              Chấm phần viết
-            </a>
-          </p>
-        )}
+        <MilestoneLadder exam={exam} score={result.score} max={result.max} />
 
         <ul className="flex flex-col divide-y divide-border border-y border-border">
           {result.sections.map((s) => (
@@ -108,7 +98,7 @@ export function ResultView({ exam, attemptId }: { exam: Exam; attemptId?: string
               <span className="text-right tabular-nums">
                 <b>{s.score}</b>
                 <span className="text-muted-foreground">
-                  /{s.max} · {s.id === "writing" ? "đã chấm" : "đúng"} {s.correct}/{s.total}
+                  /{s.max} · đúng {s.correct}/{s.total} câu
                 </span>
               </span>
             </li>
@@ -149,49 +139,54 @@ export function ResultView({ exam, attemptId }: { exam: Exam; attemptId?: string
           ))}
         </div>
       </div>
-      {exam.sections.map((s) =>
-        s.writing ? (
-          <WritingReview key={s.id} exam={exam} section={s} attempt={attempt} />
-        ) : (
-          <ReviewSection key={s.id} exam={exam} section={s} attempt={attempt} filter={filter} />
-        )
-      )}
+      {exam.sections.map((s) => (
+        <ReviewSection key={s.id} exam={exam} section={s} attempt={attempt} filter={filter} />
+      ))}
     </div>
   );
 }
 
 /**
- * Thang cấp: thanh 0 → điểm tối đa, vạch ở từng ngưỡng cấp, phần đã đạt tô
- * đậm — nhìn là biết mình đứng đâu và cách cấp sau bao xa.
+ * Thang mốc mục tiêu: thanh 0 → điểm tối đa của đề, vạch ở từng mốc, phần đã
+ * đạt tô đậm — nhìn là biết mình đứng đâu và cách mốc sau bao xa. Đề thiếu
+ * phần (vd chỉ Reading) thì mốc là một nửa, dưới mỗi mốc ghi tổng 990 tương
+ * đương.
  */
-function LevelLadder({ exam, score, max }: { exam: Exam; score: number; max: number }) {
-  const cuts = levelCuts(exam.level);
+function MilestoneLadder({ exam, score, max }: { exam: Exam; score: number; max: number }) {
+  const marks = milestones(exam);
+  const full = isFullTest(exam);
   const pct = (n: number) => `${(n / max) * 100}%`;
+  const caption = full
+    ? `Mục tiêu ${marks.map((m) => m.total).join(" / ")}`
+    : `Mục tiêu ${marks.map((m) => m.score).join(" / ")} — tương đương tổng ~${marks.map((m) => m.total).join(" / ")}`;
   return (
-    <div className="flex flex-col gap-1.5" aria-label={`Thang cấp ${exam.level}`} role="img">
+    <div className="flex flex-col gap-1.5" aria-label={`Thang mốc mục tiêu: ${caption}`} role="img">
+      <p className="text-xs text-muted-foreground" aria-hidden>
+        {caption}
+      </p>
       <div className="relative h-2 rounded-full bg-muted">
         <div className="absolute inset-y-0 left-0 rounded-full bg-foreground/80" style={{ width: pct(Math.min(score, max)) }} />
-        {cuts.map(([cut]) => (
+        {marks.map((m) => (
           <span
-            key={cut}
+            key={m.total}
             className="absolute -top-1 h-4 w-0.5 -translate-x-1/2 rounded-full bg-background ring-1 ring-foreground/30"
-            style={{ left: pct(cut) }}
+            style={{ left: pct(m.score) }}
             aria-hidden
           />
         ))}
       </div>
       <div className="relative h-8 text-[0.7rem] text-muted-foreground tabular-nums">
-        {cuts.map(([cut, name]) => (
+        {marks.map((m) => (
           <span
-            key={cut}
+            key={m.total}
             className={cn(
               "absolute flex -translate-x-1/2 flex-col items-center leading-tight",
-              score >= cut && "font-medium text-foreground"
+              score >= m.score && "font-medium text-foreground"
             )}
-            style={{ left: pct(cut) }}
+            style={{ left: pct(m.score) }}
           >
-            <span>{name}</span>
-            <span>{cut}</span>
+            <span>{m.score}</span>
+            {!full && <span>~{m.total}</span>}
           </span>
         ))}
       </div>
@@ -234,8 +229,8 @@ function ReviewSection({
         </p>
       )}
       {shown.map((q, i) => {
-        // Khối chỉ dẫn chỉ hiện ở câu ĐẦU của khối trong danh sách đang xem —
-        // lặp lại ở mọi câu thì [1~4] xuất hiện bốn lần liền nhau.
+        // Khối (lời chỉ dẫn + văn bản) chỉ hiện ở câu ĐẦU của khối trong danh
+        // sách đang xem — lặp lại ở mọi câu thì một bài đọc hiện bốn lần liền.
         const group = groupOf(section, q.no);
         const prev = i > 0 ? groupOf(section, shown[i - 1].no) : undefined;
         const showGroup = group && group !== prev;
@@ -258,7 +253,7 @@ function ReviewSection({
                       : "text-muted-foreground"
                 )}
               >
-                {chosen === q.answer ? `đúng · +${q.points} điểm` : chosen ? `sai · ${q.points} điểm` : `bỏ trống · ${q.points} điểm`}
+                {chosen === q.answer ? "đúng" : chosen ? "sai" : "bỏ trống"}
               </span>
             </p>
             <PromptView exam={exam} question={q} />
@@ -274,46 +269,10 @@ function ReviewSection({
               </Button>
             )}
             <OptionList exam={exam} question={q} value={chosen} onChange={() => {}} reveal disabled />
+            <Explanation question={q} />
           </div>
         );
       })}
-    </section>
-  );
-}
-
-/**
- * Phần viết sau khi nộp: bài đã viết (không sửa được nữa), đáp án mẫu chính
- * thức, và thanh tự chấm từng câu — chấm đến đâu điểm tổng và cấp cập nhật
- * đến đó (cả trong danh sách các lần thi).
- */
-function WritingReview({ exam, section, attempt }: { exam: Exam; section: ExamSection; attempt: MockAttempt }) {
-  const gradeMock = useExamStore((s) => s.gradeMock);
-  const texts = attempt.texts ?? {};
-  const grades = attempt.grades ?? {};
-  const grade = (no: number, points: number) => {
-    const next = { ...grades, [no]: points };
-    const r = scoreExam(exam, attempt.answers, next);
-    gradeMock(attempt.id, no, points, r.score, r.level);
-  };
-  return (
-    <section id="writing" className="flex scroll-mt-20 flex-col gap-4">
-      <h3 className="text-sm font-medium text-muted-foreground">
-        {sectionVi(section.id)} · {section.writing!.tasks.length} câu — tự chấm theo đáp án mẫu
-      </h3>
-      {section.writing!.tasks.map((t) => (
-        <div key={t.no} className="border-t border-border pt-5">
-          <WritingTaskView
-            exam={exam}
-            task={t}
-            texts={texts}
-            onText={() => {}}
-            readOnly
-            revealed
-            grade={grades[t.no]}
-            onGrade={(p) => grade(t.no, p)}
-          />
-        </div>
-      ))}
     </section>
   );
 }

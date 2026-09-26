@@ -1,16 +1,18 @@
 /**
- * Kiểu dữ liệu đề thi TOPIK — tách riêng khỏi `lib/exams.ts` (nơi import từng
- * file đề) để script nhập đề (`scripts/import-topik.ts`) dùng được trước khi
- * các file đề tồn tại.
+ * Kiểu dữ liệu đề thi — tách riêng khỏi `lib/exams.ts` (nơi import từng file
+ * đề) để module nhẹ như `lib/exam-levels.ts` dùng được mà khỏi nạp dữ liệu đề.
+ *
+ * Nay là đề TOEIC Listening & Reading. Mỗi đề là một file
+ * `content/exams/<id>.json` đúng kiểu `Exam` dưới đây.
  */
 
-export type SectionId = "listening" | "reading" | "writing";
+export type SectionId = "listening" | "reading";
 
 /** Chữ đã làm sạch (HTML an toàn — chỉ <br> <b> <u> <div class="exam-box"> <img>). */
 export interface RichText {
   html: string;
 }
-/** Tranh / biểu đồ — đường dẫn tương đối trong thư mục tài nguyên của kỳ thi. */
+/** Tranh / biểu đồ — đường dẫn tương đối trong thư mục tài nguyên của đề. */
 export interface ImageRef {
   image: string;
   alt?: string;
@@ -20,36 +22,44 @@ export type Content = RichText | ImageRef;
 export const isImage = (c: Content): c is ImageRef => "image" in c;
 
 export interface ExamGroup {
-  /** Câu đầu và câu cuối của khối "※ [a~b] …". */
+  /** Câu đầu và câu cuối của khối. */
   from: number;
   to: number;
-  /** Lời chỉ dẫn, chữ thuần: "※ [1～4] 다음을 듣고 <보기>와 같이 …". */
+  /** Lời chỉ dẫn, chữ thuần như đề in: "Part 6 — Questions 131-134 refer to the following e-mail." */
   instruction: string;
-  /** Câu mẫu <보기> (đã có sẵn đáp án). */
-  example?: { html: string; options: string[]; answer: number; layout: number };
-  /** Đoạn văn / thông báo dùng chung cho cả khối (HTML đã làm sạch). */
+  /**
+   * Văn bản dùng chung cho cả khối (HTML đã làm sạch): bài đọc Part 7, hay
+   * văn bản có chỗ trống của Part 6 — chỗ trống nằm ở ĐÂY, đề câu để rỗng.
+   */
   passage?: string;
-  /** Đoạn âm thanh đọc chỉ dẫn + ví dụ (chỉ phần nghe), giây. */
+  /** Đoạn âm thanh đọc lời chỉ dẫn của khối (chỉ phần nghe), giây. */
   audio?: [number, number];
   /**
-   * Hội thoại DÙNG CHUNG cho cả khối (vd [25~26] nghe một đoạn, trả lời hai
-   * câu). Đoạn âm thanh của câu thứ hai chỉ còn tiếng đọc số câu và khoảng
-   * dừng — nghe lại riêng câu đó thì phải phát hội thoại này trước.
+   * Hội thoại / bài nói DÙNG CHUNG cho cả khối (Part 3–4: nghe một đoạn, trả
+   * lời ba câu). Đoạn âm thanh của các câu sau chỉ còn tiếng đọc câu hỏi và
+   * khoảng dừng — nghe lại riêng câu đó thì phải phát hội thoại này trước.
    */
   dialogue?: [number, number];
 }
 
 export interface ExamQuestion {
-  /** Số câu như in trong đề. */
+  /** Số câu như in trong đề (TOEIC: 1–100 nghe, 101–200 đọc). */
   no: number;
+  /** Điểm thô của câu — TOEIC mỗi câu 1; điểm quy đổi tính theo số câu đúng (xem `scaledScore`). */
   points: number;
-  /** Đáp án đúng 1–4 (①–④). */
+  /** Đáp án đúng 1–4, tức (A)–(D). */
   answer: 1 | 2 | 3 | 4;
-  /** Số lựa chọn mỗi hàng như trang gốc: 1, 2 hoặc 4. */
+  /** Số lựa chọn mỗi hàng: 1 (câu dài), 2 hoặc 4 (từ ngắn). */
   layout: number;
-  /** Đề câu hỏi — có thể rỗng (câu nghe chỉ có lựa chọn) hoặc là tranh. */
+  /**
+   * Đề câu hỏi — có thể rỗng (Part 6: chỗ trống nằm trong văn bản của khối;
+   * câu nghe chỉ có lựa chọn) hoặc là tranh.
+   */
   prompt: Content;
+  /** Bốn lựa chọn, KHÔNG kèm nhãn — giao diện tự thêm (A)–(D). */
   options: [Content, Content, Content, Content];
+  /** Giải thích đáp án bằng tiếng Việt — hiện sau khi người học kiểm tra câu. */
+  explanation?: string;
   /**
    * Đoạn âm thanh của câu trong buổi thi (chỉ phần nghe, nếu đã đo), giây:
    * từ lúc đọc số câu tới HẾT khoảng dừng trả lời — dùng để tô câu đang phát
@@ -58,54 +68,30 @@ export interface ExamQuestion {
   audio?: [number, number];
   /**
    * Đoạn NGHE LẠI riêng câu này khi luyện tập: chỉ phần lời đọc, cắt ở đầu
-   * khoảng dừng trả lời — không bắt người học chờ ~20 giây im lặng, và không
-   * lọt sang tiếng đọc số câu sau.
+   * khoảng dừng trả lời — không bắt người học chờ khoảng lặng, và không lọt
+   * sang tiếng đọc số câu sau.
    */
   replay?: [number, number];
 }
 
-/**
- * Một câu VIẾT (TOPIK II, câu 51–54). Không chấm tự động được: người học
- * xem đáp án mẫu chính thức rồi tự chấm theo thang điểm của câu.
- */
-export interface WritingTask {
-  no: number;
-  points: number;
-  /** 51–52: điền hai chỗ trống ㉠ ㉡ (mỗi câu một dòng). 53–54: viết đoạn/bài. */
-  kind: "blanks" | "essay";
-  /** Bài viết: độ dài yêu cầu, ký tự (tính cả dấu cách như ô 원고지). */
-  chars?: [number, number];
-  /**
-   * Ảnh đề của RIÊNG câu này, cắt từ trang đề in (đề viết chỉ có bản in).
-   * Câu 51 kèm luôn lời chỉ dẫn "[51~52]" ở đầu.
-   */
-  image: string;
-  /** Ảnh đáp án mẫu + tiêu chí chấm chính thức của câu này (một dòng của bảng đáp án). */
-  answer: string;
-}
-
 export interface ExamSection {
   id: SectionId;
-  /** Tên như trang gốc: "TOPIKⅠ 듣기 (1번 ～ 30번)". */
+  /** Tên hiện ở trang đề: "Reading · Part 5–7 (câu 101–200)". */
   title: string;
-  /** Thời gian làm bài theo đề thật, phút. */
+  /** Thời gian làm bài theo đề thật, phút (TOEIC: nghe 45, đọc 75). */
   minutes: number;
   /** File nghe của cả phần (chỉ phần nghe), tương đối trong thư mục tài nguyên. */
   audio?: string;
   /** Đoạn hướng dẫn chung ở đầu file nghe, giây (nếu đã đo). */
   intro?: [number, number];
   groups: ExamGroup[];
-  /** Câu trắc nghiệm — phần viết thì rỗng, câu nằm ở `writing.tasks`. */
   questions: ExamQuestion[];
-  /** Chỉ phần viết. */
-  writing?: {
-    tasks: WritingTask[];
-  };
 }
 
 /**
- * Khoá của một câu trong bài làm: "<phần>:<số câu>". Không dùng số câu trơn
- * vì TOPIK II đánh số LẠI từ 1 ở phần đọc — câu 1 nghe và câu 1 đọc trùng số.
+ * Khoá của một câu trong bài làm: "<phần>:<số câu>". TOEIC đánh số liền
+ * 1–200 nên số câu trơn đã đủ phân biệt, nhưng khoá theo phần giữ tương
+ * thích với bài làm đã lưu (xem `migrateExamState`).
  */
 export type QuestionKey = `${SectionId}:${number}`;
 
@@ -113,20 +99,17 @@ export function qKey(section: SectionId, no: number): QuestionKey {
   return `${section}:${no}`;
 }
 
-/** Khoá ô chữ của câu viết: câu 51–52 có hai ô (㉠ = 0, ㉡ = 1), bài viết một ô. */
-export function textKey(no: number, blank = 0): string {
-  return `${no}:${blank}`;
-}
-
-export type ExamLevel = "TOPIK I" | "TOPIK II";
+export type ExamLevel = "TOEIC";
 
 export interface Exam {
   id: string;
-  /** Số kỳ thi: 102. */
+  /** Số thứ tự đề luyện: 1, 2, … */
   round: number;
   year: number;
   level: ExamLevel;
-  /** Thư mục tài nguyên (ảnh, file nghe) — dùng chung cho TOPIK I và II cùng kỳ. */
+  /** Tên hiện ở trang đề: "Đề luyện TOEIC Reading số 1". Không có thì dựng từ kỳ thi + số đề. */
+  title?: string;
+  /** Thư mục tài nguyên (ảnh, file nghe) của đề. */
   assetDir: string;
   /** Ghi nguồn đề (hiện ở trang đề). */
   source: string;
@@ -134,7 +117,7 @@ export interface Exam {
 }
 
 /**
- * Gốc URL tài nguyên của một kỳ thi. Ảnh đi qua CÙNG ORIGIN (`/img/exams/…`,
+ * Gốc URL tài nguyên của một đề. Ảnh đi qua CÙNG ORIGIN (`/img/exams/…`,
  * xem `imageRewrites` trong next.config) — cùng lý do với ảnh sách: service
  * worker cache được, không phải bật CORS cho R2. Lúc dev, Next phục vụ file
  * có sẵn trong `public/img/exams/` trước khi xét rewrite.

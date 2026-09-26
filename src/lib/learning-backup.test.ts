@@ -31,7 +31,7 @@ describe("sao lưu dữ liệu học", () => {
   });
 
   it("từ chối file của phiên bản app mới hơn", () => {
-    const text = JSON.stringify({ app: "vietopik-learning-backup", version: 99, data: {} });
+    const text = JSON.stringify({ app: "vielang-learning-backup", version: 99, data: {} });
     expect(() => restoreBackup(localStorage, text)).toThrow(/phiên bản app mới hơn/);
   });
 
@@ -40,7 +40,7 @@ describe("sao lưu dữ liệu học", () => {
     // mà không ai biết.
     localStorage.setItem("kiip-progress-v1", "old");
     const text = JSON.stringify({
-      app: "vietopik-learning-backup",
+      app: "vielang-learning-backup",
       version: 1,
       data: { "kiip-progress-v1": '{"new":true}', "kiip-quiz-v1": "{broken" },
     });
@@ -52,7 +52,7 @@ describe("sao lưu dữ liệu học", () => {
   it("khoá không có trong file thì giữ nguyên dữ liệu đang có", () => {
     localStorage.setItem("kiip-notes-v1", '{"keep":true}');
     const text = JSON.stringify({
-      app: "vietopik-learning-backup",
+      app: "vielang-learning-backup",
       version: 1,
       data: { "kiip-progress-v1": "{}" },
     });
@@ -62,7 +62,7 @@ describe("sao lưu dữ liệu học", () => {
   });
 
   it("tên file có ngày để cất nhiều bản không đè nhau", () => {
-    expect(backupFileName(new Date(2025, 8, 3))).toBe("vietopik-du-lieu-hoc-2025-09-03.json");
+    expect(backupFileName(new Date(2025, 8, 3))).toBe("vielang-du-lieu-hoc-2025-09-03.json");
   });
 });
 

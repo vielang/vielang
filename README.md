@@ -1,4 +1,4 @@
-# VieTopik
+# VieLang
 
 Web app đọc sách văn hóa – xã hội Hàn Quốc (chương trình 사회통합프로그램 / KIIP),
 dành cho người Việt học tiếng Hàn. Đọc theo trang ảnh scan, có zoom/vuốt

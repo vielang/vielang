@@ -11,8 +11,8 @@ import type { MetadataRoute } from "next";
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "VieTopik – Đọc sách tiếng Hàn",
-    short_name: "VieTopik",
+    name: "VieLang – Đọc sách tiếng Hàn",
+    short_name: "VieLang",
     description:
       "Đọc sách văn hóa – xã hội Hàn Quốc (chương trình KIIP) dành cho người Việt học tiếng Hàn.",
     start_url: "/",

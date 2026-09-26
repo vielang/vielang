@@ -1,5 +1,5 @@
 /**
- * Service worker cho VieTopik.
+ * Service worker cho VieLang.
  *
  * Mục tiêu hẹp và cố ý hẹp: đọc lại được những trang sách ĐÃ XEM khi mất
  * mạng. Không đặt ra tham vọng chạy trọn vẹn offline.
@@ -25,7 +25,7 @@
  *   khác; còn người dùng bấm thì trang được tải lại ngay sau đó nên an toàn.
  */
 /**
- * Tên cache giữ tiền tố `kiip-` dù app đã đổi tên thành VieTopik: đây là
+ * Tên cache giữ tiền tố `kiip-` dù app đã đổi tên thành VieLang: đây là
  * KHOÁ TRA CACHE chứ không phải nhãn. Đáng ngại nhất là `kiip-book-` — cache
  * sách người dùng chủ động tải, cố ý không bao giờ bị dọn tự động. Đổi tiền
  * tố thì những cache cũ vừa không còn được tra, vừa lọt khỏi diện "giữ lại"

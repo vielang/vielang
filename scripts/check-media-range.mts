@@ -13,7 +13,7 @@
  * cache thật đứng trước.
  *
  * Chạy sau mỗi lần deploy:
- *   npx tsx scripts/check-media-range.mts https://www.vietopik.com
+ *   npx tsx scripts/check-media-range.mts https://<tên-miền-của-bạn>
  */
 import { readFileSync } from "node:fs";
 import { BOOKS } from "../src/lib/books";

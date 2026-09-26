@@ -40,7 +40,7 @@ export function SiteHeader() {
             )}
           >
             <BookOpenText className="size-5 text-primary" aria-hidden />
-            VieTopik
+            VieLang
           </Link>
           {current && <MobileSubnav tab={current} pathname={pathname} />}
           <DesktopNav current={current} pathname={pathname} />

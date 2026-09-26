@@ -449,7 +449,7 @@ function updateMediaSession() {
   navigator.mediaSession.metadata = new MediaMetadata({
     title: item.label,
     artist: `Trang ${item.page} · ${index + 1}/${queue.length}`,
-    album: "VieTopik",
+    album: "VieLang",
   });
 }
 

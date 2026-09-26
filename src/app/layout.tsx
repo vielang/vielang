@@ -28,8 +28,8 @@ export const metadata: Metadata = {
   // Gốc cho mọi URL tương đối trong metadata (canonical, og:image…).
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "VieTopik – Học tiếng Hàn KIIP, TOPIK cho người Việt",
-    template: "%s | VieTopik",
+    default: "VieLang – Học tiếng Hàn KIIP, TOPIK cho người Việt",
+    template: "%s | VieLang",
   },
   description: SITE_DESCRIPTION,
   applicationName: SITE_NAME,
@@ -52,12 +52,12 @@ export const metadata: Metadata = {
       : undefined,
   },
   // Apple bỏ qua manifest, chỉ đọc thẻ link này khi thêm vào màn hình chính.
-  appleWebApp: { capable: true, title: "VieTopik", statusBarStyle: "black-translucent" },
+  appleWebApp: { capable: true, title: "VieLang", statusBarStyle: "black-translucent" },
   icons: { apple: "/icons/apple-touch-icon.png" },
 };
 
 /**
- * Tên site + tổ chức cho Google: giúp kết quả tìm kiếm hiện "VieTopik" thay
+ * Tên site + tổ chức cho Google: giúp kết quả tìm kiếm hiện "VieLang" thay
  * vì tên miền trần, và gắn logo cho site.
  */
 const SITE_LD = [
@@ -65,7 +65,7 @@ const SITE_LD = [
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: SITE_NAME,
-    alternateName: ["Vie Topik", "vietopik.com"],
+    alternateName: ["Vie Lang", "vielang"],
     url: absoluteUrl("/"),
     inLanguage: "vi",
     description: SITE_DESCRIPTION,

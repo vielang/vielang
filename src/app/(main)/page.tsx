@@ -7,12 +7,12 @@ import { SITE_DESCRIPTION, pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = {
   ...pageMetadata({
-    title: "VieTopik – Học tiếng Hàn KIIP, TOPIK cho người Việt",
+    title: "VieLang – Học tiếng Hàn KIIP, TOPIK cho người Việt",
     description: SITE_DESCRIPTION,
     path: "/",
   }),
-  // Trang chủ không ghép đuôi "| VieTopik" — tên đã nằm đầu tiêu đề.
-  title: { absolute: "VieTopik – Học tiếng Hàn KIIP, TOPIK cho người Việt" },
+  // Trang chủ không ghép đuôi "| VieLang" — tên đã nằm đầu tiêu đề.
+  title: { absolute: "VieLang – Học tiếng Hàn KIIP, TOPIK cho người Việt" },
 };
 
 const KOREAN = getLanguage("")!;

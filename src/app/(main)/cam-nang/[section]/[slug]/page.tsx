@@ -60,7 +60,7 @@ export default async function GuideArticlePage({
             inLanguage: "vi",
             mainEntityOfPage: absoluteUrl(path),
             image: absoluteUrl("/og.png"),
-            author: { "@type": "Organization", name: "VieTopik", url: absoluteUrl("/") },
+            author: { "@type": "Organization", name: "VieLang", url: absoluteUrl("/") },
           },
         ]}
       />

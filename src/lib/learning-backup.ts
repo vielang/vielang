@@ -27,7 +27,7 @@ export const BACKUP_KEYS = [
   "kiip-video-prefs-v1",
 ] as const;
 
-const APP_ID = "vietopik-learning-backup";
+const APP_ID = "vielang-learning-backup";
 const FORMAT_VERSION = 1;
 
 export interface LearningBackup {
@@ -62,11 +62,11 @@ export function restoreBackup(storage: Storage, text: string): number {
   try {
     parsed = JSON.parse(text);
   } catch {
-    throw new BackupError("File không đọc được — không phải file sao lưu của VieTopik.");
+    throw new BackupError("File không đọc được — không phải file sao lưu của VieLang.");
   }
   const backup = parsed as Partial<LearningBackup> | null;
   if (!backup || backup.app !== APP_ID || typeof backup.data !== "object" || !backup.data) {
-    throw new BackupError("Đây không phải file sao lưu dữ liệu học của VieTopik.");
+    throw new BackupError("Đây không phải file sao lưu dữ liệu học của VieLang.");
   }
   if (typeof backup.version !== "number" || backup.version > FORMAT_VERSION) {
     throw new BackupError("File được tạo bởi phiên bản app mới hơn — hãy cập nhật app rồi thử lại.");
@@ -94,5 +94,5 @@ export function backupFileName(now = new Date()): string {
   const d = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(
     now.getDate()
   ).padStart(2, "0")}`;
-  return `vietopik-du-lieu-hoc-${d}.json`;
+  return `vielang-du-lieu-hoc-${d}.json`;
 }

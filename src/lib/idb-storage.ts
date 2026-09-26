@@ -24,7 +24,7 @@ import type { StateStorage } from "zustand/middleware";
  * ĐỪNG đổi theo tên thương hiệu. Đây là KHOÁ TÌM DỮ LIỆU, không phải nhãn
  * hiển thị: trình duyệt tra cơ sở dữ liệu đúng theo chuỗi này. App từng tên
  * là "KIIP Reader" và dữ liệu của mọi người đang dùng nằm trong cơ sở dữ
- * liệu mang tên đó. Đổi sang "vietopik" là mở một cơ sở dữ liệu rỗng hoàn
+ * liệu mang tên đó. Đổi sang "vielang" là mở một cơ sở dữ liệu rỗng hoàn
  * toàn mới — nét vẽ trên trang, bản ghi âm, đánh dấu, tiến độ đọc, danh sách
  * sách đã tải offline của họ vẫn nằm nguyên trên máy nhưng app không còn
  * nhìn thấy, nhìn ra ngoài y hệt như bị xoá sạch.

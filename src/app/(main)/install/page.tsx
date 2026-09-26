@@ -5,7 +5,7 @@ import { InstallGuide } from "@/components/layout/install-guide";
 export const metadata: Metadata = pageMetadata({
   title: "Cài app vào máy",
   description:
-    "Hướng dẫn cài VieTopik vào màn hình chính trên iPhone, Android và máy tính để đọc sách tiếng Hàn cả khi không có mạng.",
+    "Hướng dẫn cài VieLang vào màn hình chính trên iPhone, Android và máy tính để đọc sách tiếng Hàn cả khi không có mạng.",
   path: "/install",
 });
 
@@ -15,7 +15,7 @@ export default function InstallPage() {
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Cài app vào máy</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Thêm VieTopik vào màn hình chính để mở nhanh như một ứng dụng thường,
+          Thêm VieLang vào màn hình chính để mở nhanh như một ứng dụng thường,
           không còn thanh địa chỉ che mất chỗ đọc.
         </p>
       </div>

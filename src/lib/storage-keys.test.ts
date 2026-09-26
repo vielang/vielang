@@ -5,14 +5,14 @@ import { describe, expect, it } from "vitest";
 /**
  * Chốt lại những chuỗi `kiip-*` KHÔNG được đổi theo tên thương hiệu.
  *
- * App đã đổi tên từ "KIIP Reader" sang "VieTopik", nhưng dữ liệu người dùng
+ * App đã đổi tên từ "KIIP Reader" sang "VieLang", nhưng dữ liệu người dùng
  * thì vẫn nằm dưới các khoá mang tên cũ. Đây là khoá TRA DỮ LIỆU, không phải
  * nhãn hiển thị: đổi chuỗi là trình duyệt đi tìm một chỗ trống hoàn toàn mới.
  *
  * Rủi ro thật nằm ở chỗ hỏng mà KHÔNG báo lỗi. Không có ngoại lệ, không có
  * màn hình đỏ, build vẫn xanh, máy người viết code (chưa có dữ liệu cũ) nhìn
  * vẫn y hệt. Chỉ người dùng đang có dữ liệu mới thấy nét vẽ, ghi âm, tiến độ
- * và sách đã tải offline biến sạch. Một lần tìm-thay "kiip" -> "vietopik" cho
+ * và sách đã tải offline biến sạch. Một lần tìm-thay "kiip" -> "vielang" cho
  * gọn là đủ gây ra chuyện đó, nên chặn ngay tại đây.
  *
  * Đọc thẳng file nguồn dạng chữ vì các hằng này cố ý không export — chúng là

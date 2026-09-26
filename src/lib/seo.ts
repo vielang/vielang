@@ -4,18 +4,24 @@ import type { Metadata } from "next";
  * Mọi thứ máy tìm kiếm và mạng xã hội đọc về site.
  *
  * Tên miền thật lấy từ env để bản preview của Vercel không tự nhận mình là
- * trang chính (canonical, sitemap đều trỏ về đây). Thiếu env thì dùng tên
- * miền production — deploy quên cấu hình vẫn ra canonical đúng.
+ * trang chính (canonical, sitemap đều trỏ về đây). Chưa khai thì dùng tên
+ * miền production Vercel tự cấp (`VERCEL_PROJECT_PRODUCTION_URL`, có sẵn
+ * lúc build trên Vercel), chạy máy nhà thì localhost.
  */
-export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.vietopik.com").replace(/\/$/, "");
+export const SITE_URL = (
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : "http://localhost:3000")
+).replace(/\/$/, "");
 
-export const SITE_NAME = "VieTopik";
+export const SITE_NAME = "VieLang";
 
 export const SITE_DESCRIPTION =
   "Học tiếng Hàn chương trình KIIP (사회통합프로그램) cho người Việt: đọc sách có dịch tiếng Việt, giải thích ngữ pháp, audio, luyện đề TOPIK và cẩm nang visa, việc làm, du học ở Hàn Quốc.";
 
 /** Ảnh chia sẻ mặc định — sinh bằng `npm run make-icons`. */
-const OG_IMAGE = { url: "/og.png", width: 1200, height: 630, alt: "VieTopik – Học tiếng Hàn KIIP & TOPIK cho người Việt" };
+const OG_IMAGE = { url: "/og.png", width: 1200, height: 630, alt: "VieLang – Học tiếng Hàn KIIP & TOPIK cho người Việt" };
 
 export function absoluteUrl(path: string): string {
   return `${SITE_URL}${path.startsWith("/") ? path : `/${path}`}`;

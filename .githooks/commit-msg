@@ -1,0 +1,8 @@
+#!/bin/sh
+# Xoá các dòng ghi công cụ AI khỏi commit message — xem mục "Quy tắc commit"
+# trong CLAUDE.md. Bật bằng: git config core.hooksPath .githooks
+msg_file="$1"
+tmp="$msg_file.tmp"
+grep -viE '^(co-authored-by:.*(claude|anthropic)|claude-session:|.*generated with \[?claude code)' "$msg_file" > "$tmp"
+git stripspace < "$tmp" > "$msg_file"
+rm -f "$tmp"

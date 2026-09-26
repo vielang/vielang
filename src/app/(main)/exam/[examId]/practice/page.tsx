@@ -1,11 +1,15 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { examTitle, getExam, type SectionId } from "@/lib/exams";
 import { PracticeView } from "@/components/exam/practice-view";
 
 export async function generateMetadata({ params }: { params: Promise<{ examId: string }> }): Promise<Metadata> {
   const exam = getExam((await params).examId);
-  return { title: exam ? `Luyện tập · ${examTitle(exam)}` : "Không tìm thấy đề" };
+  if (!exam) return { title: "Không tìm thấy đề" };
+  // Màn làm bài / chấm điểm — không có gì để tìm, trang đề chính mới là
+  // trang cho Google (xem app/robots.ts).
+  return pageMetadata({ title: `Luyện tập · ${examTitle(exam)}`, path: `/exam/${exam.id}/practice`, noindex: true });
 }
 
 export default async function PracticePage({

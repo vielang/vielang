@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { notFound } from "next/navigation";
 import { GUIDE_SECTIONS, getSection, sectionArticles } from "@/lib/guide";
 import { GroupedArticleList } from "@/components/guide/grouped-article-list";
@@ -20,7 +21,7 @@ export async function generateMetadata({
   const { section } = await params;
   const found = getSection(section);
   return found
-    ? { title: `${found.title} — Cẩm nang`, description: found.description }
+    ? pageMetadata({ title: `${found.title} — Cẩm nang`, description: found.description, path: `/cam-nang/${found.id}` })
     : { title: "Không tìm thấy mục" };
 }
 

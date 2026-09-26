@@ -2,6 +2,18 @@ import { BOOKS, type Book } from "@/lib/books";
 import { getLanguage } from "@/lib/languages";
 import { getAllGrammar } from "@/lib/page-grammar";
 import { LibraryView } from "@/components/library/library-view";
+import type { Metadata } from "next";
+import { SITE_DESCRIPTION, pageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = {
+  ...pageMetadata({
+    title: "VieTopik – Học tiếng Hàn KIIP, TOPIK cho người Việt",
+    description: SITE_DESCRIPTION,
+    path: "/",
+  }),
+  // Trang chủ không ghép đuôi "| VieTopik" — tên đã nằm đầu tiêu đề.
+  title: { absolute: "VieTopik – Học tiếng Hàn KIIP, TOPIK cho người Việt" },
+};
 
 const KOREAN = getLanguage("")!;
 

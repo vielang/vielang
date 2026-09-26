@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { notFound } from "next/navigation";
 import { getBook, isValidPage } from "@/lib/books";
 import { getNoteContent } from "@/lib/notes";
@@ -23,7 +24,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const resolved = resolve(await params);
   if (!resolved) return { title: "Không tìm thấy trang" };
-  return { title: `Bài giảng trang ${resolved.page}` };
+  // Cửa sổ phụ trùng nội dung trang đọc — không cho vào kết quả tìm kiếm.
+  return pageMetadata({
+    title: `Bài giảng trang ${resolved.page}`,
+    path: `/read/${resolved.book.id}/${resolved.page}/note`,
+    noindex: true,
+  });
 }
 
 /**

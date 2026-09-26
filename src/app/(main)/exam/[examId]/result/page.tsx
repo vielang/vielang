@@ -1,11 +1,15 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { examTitle, getExam } from "@/lib/exams";
 import { ResultView } from "@/components/exam/result-view";
 
 export async function generateMetadata({ params }: { params: Promise<{ examId: string }> }): Promise<Metadata> {
   const exam = getExam((await params).examId);
-  return { title: exam ? `Kết quả · ${examTitle(exam)}` : "Không tìm thấy đề" };
+  if (!exam) return { title: "Không tìm thấy đề" };
+  // Màn làm bài / chấm điểm — không có gì để tìm, trang đề chính mới là
+  // trang cho Google (xem app/robots.ts).
+  return pageMetadata({ title: `Kết quả · ${examTitle(exam)}`, path: `/exam/${exam.id}/result`, noindex: true });
 }
 
 export default async function ResultPage({

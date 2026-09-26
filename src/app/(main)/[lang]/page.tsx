@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { BOOKS } from "@/lib/books";
 import { LANGUAGES, getLanguage } from "@/lib/languages";
 import { LibraryView } from "@/components/library/library-view";
@@ -19,7 +20,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { lang } = await params;
   const language = getLanguage(lang);
-  return { title: language ? language.heading : "Không tìm thấy trang" };
+  if (!language) return { title: "Không tìm thấy trang" };
+  return pageMetadata({ title: language.heading, description: language.description, path: `/${language.slug}` });
 }
 
 export default async function LanguageLibraryPage({

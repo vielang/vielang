@@ -6,6 +6,8 @@ import { ServiceWorker } from "@/components/service-worker";
 import { InstallPromptCapture } from "@/components/install-prompt-capture";
 import { AutoplayFollower } from "@/components/autoplay-follower";
 import { Analytics } from "@vercel/analytics/next";
+import { JsonLd } from "@/components/seo/json-ld";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL, absoluteUrl } from "@/lib/seo";
 import "./globals.css";
 
 const inter = Inter({
@@ -23,16 +25,59 @@ const notoSansKr = Noto_Sans_KR({
 });
 
 export const metadata: Metadata = {
+  // Gốc cho mọi URL tương đối trong metadata (canonical, og:image…).
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "VieTopik – Đọc sách tiếng Hàn",
+    default: "VieTopik – Học tiếng Hàn KIIP, TOPIK cho người Việt",
     template: "%s | VieTopik",
   },
-  description:
-    "Đọc sách văn hóa – xã hội Hàn Quốc (chương trình KIIP) dành cho người Việt học tiếng Hàn.",
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  // Trang không tự khai Open Graph (vd trang "không tìm thấy") vẫn có ảnh
+  // xem trước khi share. Trang có nội dung thì khai lại đủ qua
+  // `pageMetadata` — Next gộp nông, không trộn hai cục với nhau.
+  openGraph: {
+    type: "website",
+    siteName: SITE_NAME,
+    locale: "vi_VN",
+    images: [{ url: "/og.png", width: 1200, height: 630 }],
+  },
+  twitter: { card: "summary_large_image", images: ["/og.png"] },
+  // Mã xác minh Google Search Console / Bing Webmaster — điền env trên
+  // Vercel, không cần sửa code.
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+    other: process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION
+      ? { "msvalidate.01": process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION }
+      : undefined,
+  },
   // Apple bỏ qua manifest, chỉ đọc thẻ link này khi thêm vào màn hình chính.
   appleWebApp: { capable: true, title: "VieTopik", statusBarStyle: "black-translucent" },
   icons: { apple: "/icons/apple-touch-icon.png" },
 };
+
+/**
+ * Tên site + tổ chức cho Google: giúp kết quả tìm kiếm hiện "VieTopik" thay
+ * vì tên miền trần, và gắn logo cho site.
+ */
+const SITE_LD = [
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: SITE_NAME,
+    alternateName: ["Vie Topik", "vietopik.com"],
+    url: absoluteUrl("/"),
+    inLanguage: "vi",
+    description: SITE_DESCRIPTION,
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "EducationalOrganization",
+    name: SITE_NAME,
+    url: absoluteUrl("/"),
+    logo: absoluteUrl("/icons/icon-512.png"),
+  },
+];
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -69,6 +114,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         />
       </head>
       <body className="min-h-full flex flex-col">
+        <JsonLd data={SITE_LD} />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

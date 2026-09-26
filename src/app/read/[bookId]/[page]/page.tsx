@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getBook, isValidPage } from "@/lib/books";
 import { getNoteContent } from "@/lib/notes";
+import { getPageGrammar, grammarPattern } from "@/lib/page-grammar";
+import { getPageTranslations } from "@/lib/page-translation";
+import { bookSearchName, lessonOfPage } from "@/lib/book-lessons";
+import { excerpt, pageMetadata } from "@/lib/seo";
 import { ReaderView } from "@/components/reader/reader-view";
 
 interface Params {
@@ -37,7 +41,25 @@ export async function generateMetadata({
   const resolved = resolve(await params);
   if (!resolved) return { title: "Không tìm thấy trang" };
   const { book, page } = resolved;
-  return { title: `Trang ${page}/${book.totalPages} — ${book.titleVi}` };
+  const grammar = getPageGrammar(book.id, page);
+  const translations = getPageTranslations(book.id, page);
+  const note = getNoteContent(book.id, page);
+  const lesson = lessonOfPage(book.id, page);
+  const where = `${bookSearchName(book)}${lesson ? ` Bài ${lesson}` : ""} · Trang ${page}`;
+  // Trang chỉ có ảnh scan thì không có chữ nào cho Google đọc — để nó
+  // theo link đi tiếp nhưng đừng xếp hạng một trang mỏng như vậy.
+  const hasText = grammar.length > 0 || translations.length > 0 || note !== null;
+  const extra = grammar.length > 0 ? `ngữ pháp ${grammar.map((g) => grammarPattern(g.title)).join(", ")}` : "dịch tiếng Việt";
+  return pageMetadata({
+    title: hasText ? `${where} – ${extra}` : `Trang ${page}/${book.totalPages} — ${book.titleVi}`,
+    description: hasText
+      ? excerpt(
+          [...grammar.map((g) => `${g.title}: ${g.vi}`), ...translations.map((t) => t.vi), note ?? ""].join(" ")
+        )
+      : undefined,
+    path: `/read/${book.id}/${page}`,
+    noindex: !hasText,
+  });
 }
 
 export default async function ReadPage({ params }: { params: Promise<Params> }) {

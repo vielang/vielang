@@ -177,6 +177,14 @@ export function GrammarIndex({
           {typed === 0
             ? `${entries.length} điểm ngữ pháp ${books}, kèm nghĩa tiếng Việt và câu ví dụ.`
             : `Gõ thêm ${MIN_QUERY_LENGTH - typed} ký tự nữa để tra cứu.`}
+          {typed === 0 && (
+            <>
+              {" "}
+              <Link href="/ngu-phap" className="text-primary underline-offset-2 hover:underline">
+                Xem tất cả
+              </Link>
+            </>
+          )}
         </p>
       ) : quiet ? null : results.length === 0 ? (
         <div className="px-4 py-6 text-center" aria-live="polite">

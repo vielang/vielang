@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { courseOutline, getCourse, listCourses } from "@/lib/courses";
 import { CourseOverview } from "@/components/it/course-overview";
 
@@ -16,7 +17,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { course } = await params;
   const found = getCourse(course);
-  return { title: found ? found.title : "Không tìm thấy khoá học" };
+  if (!found) return { title: "Không tìm thấy khoá học" };
+  return pageMetadata({ title: found.title, description: found.summary, path: `/it/${found.id}` });
 }
 
 export default async function CoursePage({ params }: { params: Promise<{ course: string }> }) {

@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { notFound } from "next/navigation";
 import { GUIDE_SECTIONS, getArticle, getSection, sectionArticles } from "@/lib/guide";
 import { GuideArticleView } from "@/components/guide/guide-article-view";
+import { JsonLd } from "@/components/seo/json-ld";
+import { absoluteUrl, breadcrumbLd } from "@/lib/seo";
 
 export function generateStaticParams() {
   return GUIDE_SECTIONS.flatMap((s) =>
@@ -20,7 +23,12 @@ export async function generateMetadata({
   const { section, slug } = await params;
   const article = getArticle(section, slug);
   return article
-    ? { title: article.title, description: article.summary || undefined }
+    ? pageMetadata({
+        title: article.title,
+        description: article.summary || undefined,
+        path: `/cam-nang/${section}/${slug}`,
+        type: "article",
+      })
     : { title: "Không tìm thấy bài" };
 }
 
@@ -34,5 +42,29 @@ export default async function GuideArticlePage({
   const article = getArticle(section, slug);
   if (!foundSection || !article) notFound();
 
-  return <GuideArticleView section={foundSection} article={article} />;
+  const path = `/cam-nang/${section}/${slug}`;
+  return (
+    <>
+      <JsonLd
+        data={[
+          breadcrumbLd([
+            { name: `Cẩm nang ${foundSection.title}`, path: `/cam-nang/${section}` },
+            { name: article.title, path },
+          ]),
+          {
+            "@context": "https://schema.org",
+            "@type": "Article",
+            headline: article.title,
+            description: article.summary || undefined,
+            dateModified: article.updated,
+            inLanguage: "vi",
+            mainEntityOfPage: absoluteUrl(path),
+            image: absoluteUrl("/og.png"),
+            author: { "@type": "Organization", name: "VieTopik", url: absoluteUrl("/") },
+          },
+        ]}
+      />
+      <GuideArticleView section={foundSection} article={article} />
+    </>
+  );
 }

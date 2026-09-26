@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { Clapperboard } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { EmptyState } from "@/components/layout/empty-state";
@@ -12,7 +13,11 @@ import { mediaOriginBase } from "@/lib/books";
 
 const KOREAN = getLanguage("")!;
 
-export const metadata: Metadata = { title: "Học tiếng Hàn qua video" };
+export const metadata: Metadata = pageMetadata({
+  title: "Học tiếng Hàn qua video – phụ đề Hàn–Việt",
+  description: "Xem video tiếng Hàn theo từng tập với phụ đề tiếng Hàn và tiếng Việt song song, transcript bấm để nghe lại từng câu.",
+  path: "/video",
+});
 
 /**
  * Danh sách video của Thư viện tiếng Hàn (`/video`) — cùng cấp với bộ sách

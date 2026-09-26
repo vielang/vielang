@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { BOOKS } from "@/lib/books";
 import { BookmarkList } from "@/components/library/bookmark-list";
 import { PageHeader } from "@/components/layout/page-header";
 import { BackLink } from "@/components/layout/back-link";
 
-export const metadata: Metadata = { title: "Trang đã đánh dấu" };
+export const metadata: Metadata = pageMetadata({ title: "Trang đã đánh dấu", path: "/my/danh-dau", noindex: true });
 
 /**
  * Trang đã đánh dấu, gom theo sách — nằm TRONG Góc học tập (`/my/danh-dau`)

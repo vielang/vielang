@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { excerpt, pageMetadata } from "@/lib/seo";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { BackLink } from "@/components/layout/back-link";
 import { VideoPlayer } from "@/components/video/video-player";
@@ -24,7 +25,14 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const lesson = getVideoLesson((await params).id);
-  return { title: lesson ? `${videoLessonTitle(lesson)} — Học tiếng Hàn qua video` : "Không tìm thấy trang" };
+  if (!lesson) return { title: "Không tìm thấy trang" };
+  return pageMetadata({
+    title: `${videoLessonTitle(lesson)} — Học tiếng Hàn qua video`,
+    description: excerpt(
+      `Xem ${videoLessonTitle(lesson)} với phụ đề tiếng Hàn${lesson.hasVi ? " và tiếng Việt" : ""}: ${lesson.koCues.slice(0, 4).map((c) => c.t).join(" ")}`
+    ),
+    path: `/video/${lesson.id}`,
+  });
 }
 
 export default async function VideoPlayerPage({ params }: { params: Promise<{ id: string }> }) {

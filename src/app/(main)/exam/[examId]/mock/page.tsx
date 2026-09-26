@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { examTitle, getExam, listExams } from "@/lib/exams";
 import { MockView } from "@/components/exam/mock-view";
 
@@ -13,7 +14,10 @@ export const dynamicParams = false;
 
 export async function generateMetadata({ params }: { params: Promise<{ examId: string }> }): Promise<Metadata> {
   const exam = getExam((await params).examId);
-  return { title: exam ? `Thi thử · ${examTitle(exam)}` : "Không tìm thấy đề" };
+  if (!exam) return { title: "Không tìm thấy đề" };
+  // Màn làm bài / chấm điểm — không có gì để tìm, trang đề chính mới là
+  // trang cho Google (xem app/robots.ts).
+  return pageMetadata({ title: `Thi thử · ${examTitle(exam)}`, path: `/exam/${exam.id}/mock`, noindex: true });
 }
 
 export default async function MockPage({ params }: { params: Promise<{ examId: string }> }) {

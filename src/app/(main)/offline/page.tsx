@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { WifiOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/layout/empty-state";
 
-export const metadata: Metadata = { title: "Không có mạng" };
+export const metadata: Metadata = pageMetadata({ title: "Không có mạng", path: "/offline", noindex: true });
 
 /**
  * Trang service worker trả về khi mất mạng mà trang được xin lại chưa từng

@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { InstallGuide } from "@/components/layout/install-guide";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Cài app vào máy",
   description:
     "Hướng dẫn cài VieTopik vào màn hình chính trên iPhone, Android và máy tính để đọc sách tiếng Hàn cả khi không có mạng.",
-};
+  path: "/install",
+});
 
 export default function InstallPage() {
   return (

@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { Code2 } from "lucide-react";
 import { courseCard, listCourses } from "@/lib/courses";
 import { CourseList } from "@/components/it/course-list";
 import { PageHeader } from "@/components/layout/page-header";
 import { EmptyState } from "@/components/layout/empty-state";
 
-export const metadata: Metadata = {
-  title: "Thư viện IT",
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Học lập trình C#, SQL, ASP.NET Core bằng tiếng Việt",
+  description: "Khoá học IT tiếng Việt từ nền tảng: C#, lập trình hướng đối tượng, SQL, WinForms, ASP.NET Core, cấu trúc dữ liệu và kiến trúc phần mềm.",
+  path: "/it",
+});
 
 /**
  * Trang mảng IT — lộ trình .NET developer: C# Core → OOP → SQL/Oracle →

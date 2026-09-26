@@ -1,10 +1,12 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { excerpt, pageMetadata } from "@/lib/seo";
 import {
   courseLessons,
   courseOutline,
   getCourse,
   getLesson,
+  lessonHref,
   lessonNeighbours,
   lessonNumber,
   listCourses,
@@ -34,9 +36,14 @@ export async function generateMetadata({
   params: Promise<{ course: string; lesson: string[] }>;
 }): Promise<Metadata> {
   const hit = await resolve(params);
-  return {
-    title: hit ? `${hit.lesson.title} — ${hit.course.title}` : "Không tìm thấy bài học",
-  };
+  if (!hit) return { title: "Không tìm thấy bài học" };
+  return pageMetadata({
+    title: `${hit.lesson.title} — ${hit.course.title}`,
+    // Đoạn mở đầu bài viết — đúng thứ người đọc thấy đầu tiên.
+    description: excerpt(hit.lesson.html),
+    path: lessonHref(hit.course.id, hit.lesson.slug),
+    type: "article",
+  });
 }
 
 export default async function LessonPage({

@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { BOOKS } from "@/lib/books";
 import { MyPageView } from "@/components/my/my-page-view";
 import { PageHeader } from "@/components/layout/page-header";
 
-export const metadata: Metadata = { title: "Góc học tập của bạn" };
+export const metadata: Metadata = pageMetadata({ title: "Góc học tập của bạn", path: "/my", noindex: true });
 
 /**
  * My page: tiến độ, lịch học và kết quả bài tập của người dùng.

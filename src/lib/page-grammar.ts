@@ -146,3 +146,29 @@ export function getAllGrammar(): GrammarEntry[] {
         a.page - b.page
     );
 }
+
+/** Trang tra cứu riêng của một điểm ngữ pháp — xem `app/(main)/ngu-phap`. */
+export function grammarHref(slug: string): string {
+  return `/ngu-phap/${slug}`;
+}
+
+/**
+ * Điểm ngữ pháp theo `slug`, kèm hai điểm đứng trước / sau nó trong thứ tự
+ * học — để trang tra cứu dẫn tiếp được như lật sách.
+ */
+export function getGrammarBySlug(
+  slug: string
+): { entry: GrammarEntry; prev?: GrammarEntry; next?: GrammarEntry } | undefined {
+  const all = getAllGrammar();
+  const i = all.findIndex((e) => e.slug === slug);
+  if (i < 0) return undefined;
+  return { entry: all[i], prev: all[i - 1], next: all[i + 1] };
+}
+
+/**
+ * "명 이에요/예요" → "이에요/예요": bỏ nhãn từ loại (명/동/형) ở đầu, dùng
+ * cho tiêu đề trang — người ta tìm bằng đuôi câu, không ai gõ kèm chữ 명.
+ */
+export function grammarPattern(title: string): string {
+  return title.replace(/^([명동형]\s*)+/, "").trim() || title;
+}

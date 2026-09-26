@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { BOOKS } from "@/lib/books";
 import { LANGUAGES } from "@/lib/languages";
 import { SERIES, getSeries } from "@/lib/series";
@@ -19,7 +20,12 @@ export async function generateMetadata({
   params: Promise<{ series: string }>;
 }): Promise<Metadata> {
   const series = getSeries((await params).series);
-  return { title: series ? series.label : "Không tìm thấy trang" };
+  if (!series) return { title: "Không tìm thấy trang" };
+  return pageMetadata({
+    title: series.id === "kiip" ? "Giáo trình KIIP (사회통합프로그램) – đọc online, dịch tiếng Việt" : series.label,
+    description: series.blurb,
+    path: `/sach/${series.id}`,
+  });
 }
 
 export default async function SeriesPage({ params }: { params: Promise<{ series: string }> }) {

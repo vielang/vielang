@@ -1,26 +1,9 @@
 /**
- * Bài tập CÓ SẴN TRONG SÁCH của từng trang — chép lại đúng đề in trên trang
- * ảnh (`content/quiz/<bookId>/<page>.json`), gộp thành 1 file/sách qua
- * `npm run build-content` (tự chạy qua predev/prebuild).
+ * Kiểu dữ liệu và cách chấm bài tự kiểm tra cuối mỗi bài học IT (khối
+ * ```quiz trong `content/it/**.md`, dựng sẵn vào courses.json lúc build).
  *
- * Đây KHÔNG phải câu hỏi tự nghĩ thêm: người dùng đang nhìn trang sách, phần
- * này chỉ là chỗ để họ nộp đáp án cho chính bài tập in trên trang đó. Vì vậy
- * dữ liệu bám theo cấu trúc của sách — `QuizSection.title` là nhãn mục thật
- * ("연습 1", "읽기", "쓰기"...), `label` là số thứ tự thật ("①", "1)"...).
- *
- * Vì sao tách hẳn khỏi note: note là HTML người dùng SỬA ĐƯỢC và lưu
- * localStorage (xem `note-store`). Nhúng bài tập vào đó thì chỉ cần người
- * dùng sửa bài giảng một lần là cấu trúc bài tập bị editor làm hỏng. Ở đây:
- * đề bài là dữ liệu CHỈ ĐỌC, bài làm nằm ở `quiz-store`, bài giảng vẫn sửa
- * thoải mái — ba thứ vòng đời khác nhau.
- *
- * Import TĨNH như `lib/notes.ts`, cùng lý do (Output File Tracing của Next
- * không lần được file đọc qua path dựng động lúc chạy).
+ * Đề bài là dữ liệu CHỈ ĐỌC, bài làm nằm ở `quiz-store`.
  */
-// Một file gộp mọi sách, do build-content sinh (xem `buildIndex`) — thêm nội
-// dung cho sách mới là tự có mặt, không phải sửa danh sách import ở đây.
-import index from "../../content/quiz/index.json";
-
 interface BaseItem {
   id: string;
   /** Số thứ tự đúng như in trong sách: "①", "1)", "가"... */
@@ -78,12 +61,6 @@ export interface QuizSection {
   /** Câu chỉ dẫn của sách ("보기와 같이 이야기해 보세요."), chép nguyên. */
   instruction?: string;
   items: QuizItem[];
-}
-
-const QUIZZES = index as unknown as Record<string, Record<string, QuizSection[]>>;
-
-export function getPageQuiz(bookId: string, page: number): QuizSection[] {
-  return QUIZZES[bookId]?.[String(page)] ?? [];
 }
 
 export function countItems(sections: QuizSection[]): number {

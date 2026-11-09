@@ -50,7 +50,7 @@ describe("sao lưu dữ liệu học", () => {
   });
 
   it("khoá không có trong file thì giữ nguyên dữ liệu đang có", () => {
-    localStorage.setItem("kiip-notes-v1", '{"keep":true}');
+    localStorage.setItem("kiip-guide-v1", '{"keep":true}');
     const text = JSON.stringify({
       app: "vielang-learning-backup",
       version: 1,
@@ -58,7 +58,7 @@ describe("sao lưu dữ liệu học", () => {
     });
     restoreBackup(localStorage, text);
 
-    expect(localStorage.getItem("kiip-notes-v1")).toBe('{"keep":true}');
+    expect(localStorage.getItem("kiip-guide-v1")).toBe('{"keep":true}');
   });
 
   it("tên file có ngày để cất nhiều bản không đè nhau", () => {
@@ -69,8 +69,6 @@ describe("sao lưu dữ liệu học", () => {
 describe("danh sách khoá sao lưu", () => {
   it("gồm MỌI store lưu localStorage — thêm store mới mà quên sao lưu là báo", () => {
     // Đọc thẳng mã nguồn: store nào dùng localStorage và tên khoá của nó.
-    // Store lưu IndexedDB (nét vẽ, ghi âm) cố ý không nằm trong bản sao lưu
-    // JSON — My page đã nói rõ điều đó.
     const dir = path.resolve(process.cwd(), "src", "lib");
     const missing: string[] = [];
     for (const file of readdirSync(dir).filter((f) => f.endsWith(".ts") && !f.endsWith(".test.ts"))) {

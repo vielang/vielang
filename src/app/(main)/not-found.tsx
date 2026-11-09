@@ -4,9 +4,8 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/layout/empty-state";
 
 /**
- * 404 trong khu có header và thanh tab. Chữ nói CHUNG ("trang") chứ không
- * nói "sách": trang này hiện cho mọi thứ không tìm thấy — sách, đề thi, khoá
- * học, bài cẩm nang — trước đây ghi "Không tìm thấy sách" cho tất cả.
+ * 404 trong khu có header và thanh tab — cho mọi thứ không tìm thấy: khoá
+ * học, bài học, bài cẩm nang.
  */
 export default function MainNotFound() {
   return (
@@ -17,7 +16,7 @@ export default function MainNotFound() {
       description="Nội dung bạn tìm không tồn tại hoặc đã được đổi địa chỉ."
       action={
         <Button asChild>
-          <Link href="/">Về thư viện</Link>
+          <Link href="/">Về trang chủ</Link>
         </Button>
       }
     />

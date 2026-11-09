@@ -4,7 +4,6 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ServiceWorker } from "@/components/service-worker";
 import { InstallPromptCapture } from "@/components/install-prompt-capture";
-import { AutoplayFollower } from "@/components/autoplay-follower";
 import { Analytics } from "@vercel/analytics/next";
 import { JsonLd } from "@/components/seo/json-ld";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL, absoluteUrl } from "@/lib/seo";
@@ -20,7 +19,7 @@ export const metadata: Metadata = {
   // Gốc cho mọi URL tương đối trong metadata (canonical, og:image…).
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "VieLang – Học lập trình và tiếng Anh bằng tiếng Việt",
+    default: "VieLang – Học lập trình .NET bằng tiếng Việt",
     template: "%s | VieLang",
   },
   description: SITE_DESCRIPTION,
@@ -79,8 +78,7 @@ export const viewport: Viewport = {
   // vạch Home / thanh công cụ Safari và bị che mất một phần. Android không
   // có vùng đó nên không lộ ra.
   viewportFit: "cover",
-  // Không khoá pinch-zoom toàn cục (a11y) — trang đọc sách tự quản lý zoom
-  // riêng cho ảnh qua touch-action, không cần chặn zoom trình duyệt ở đây.
+  // Không khoá pinch-zoom toàn cục (a11y).
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#ffffff" },
     { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
@@ -116,22 +114,18 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <TooltipProvider delayDuration={200}>{children}</TooltipProvider>
           <ServiceWorker />
           <InstallPromptCapture />
-          {/* Nghe tự động cả sách phải sống qua các lần lật trang — xem
-              lib/autoplay-player.ts. */}
-          <AutoplayFollower />
           {/* Vercel Analytics — số lượt xem trang, không cookie, không
               theo dấu người dùng qua các trang web khác.
 
-              Đặt trong layout gốc để đếm được cả những lần lật trang trong
-              app: lật trang sách là điều hướng phía client, không tải lại
-              trang, nên nếu chỉ nhúng script một lần thì mọi trang sau đều
-              không được tính.
+              Đặt trong layout gốc để đếm được cả những lần chuyển trang trong
+              app: đó là điều hướng phía client, không tải lại trang, nên nếu
+              chỉ nhúng script một lần thì mọi trang sau đều không được tính.
 
               Service worker KHÔNG cần sửa gì cho chỗ này (đã kiểm `sw.js`):
               beacon là POST nên thoát ngay ở chốt `request.method !== "GET"`,
               còn script `/_vercel/insights/*` không khớp nhánh nào nên rơi
               hết, để trình duyệt tự lo. Mất mạng thì script hỏng lặng lẽ,
-              phần đọc offline không ảnh hưởng. */}
+              phần offline không ảnh hưởng. */}
           <Analytics />
         </ThemeProvider>
       </body>

@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
 /**
  * Kiểm luật phân loại của service worker.
@@ -22,10 +22,10 @@ function loadRules() {
   const factory = new Function(
     "self",
     "caches",
-    `${src}\nreturn { isPageImage, isImmutableAsset, VERSION, MAX_IMAGES, OFFLINE_URL };`
+    `${src}\nreturn { isImage, isImmutableAsset, VERSION, MAX_IMAGES, OFFLINE_URL };`
   );
   return factory(stubSelf, { open: () => {}, keys: () => [] }) as {
-    isPageImage: (url: URL) => boolean;
+    isImage: (url: URL) => boolean;
     isImmutableAsset: (url: URL) => boolean;
     VERSION: string;
     MAX_IMAGES: number;
@@ -36,20 +36,20 @@ function loadRules() {
 const rules = loadRules();
 const url = (p: string) => new URL(p, "https://kiip.example");
 
-describe("ảnh trang sách", () => {
+describe("ảnh", () => {
   it("nhận ảnh đi qua bộ tối ưu của Next", () => {
-    expect(rules.isPageImage(url("/_next/image?url=%2Fx.webp&w=1920&q=90"))).toBe(true);
+    expect(rules.isImage(url("/_next/image?url=%2Fx.webp&w=1920&q=90"))).toBe(true);
   });
 
   it("nhận ảnh theo đuôi tệp", () => {
     for (const p of ["/a.webp", "/a.avif", "/a.png", "/a.jpg", "/a.JPEG"]) {
-      expect(rules.isPageImage(url(p))).toBe(true);
+      expect(rules.isImage(url(p))).toBe(true);
     }
   });
 
   it("không nhận tài liệu hay dữ liệu", () => {
-    for (const p of ["/read/step1/10", "/books/step1", "/manifest.webmanifest"]) {
-      expect(rules.isPageImage(url(p))).toBe(false);
+    for (const p of ["/learn/csharp-core/x/y", "/it/csharp-core", "/manifest.webmanifest"]) {
+      expect(rules.isImage(url(p))).toBe(false);
     }
   });
 });
@@ -59,14 +59,10 @@ describe("tài nguyên bất biến", () => {
     expect(rules.isImmutableAsset(url("/_next/static/chunks/abc123.js"))).toBe(true);
   });
 
-  it("nhận phông Excalidraw tự phục vụ", () => {
-    expect(rules.isImmutableAsset(url("/excalidraw/fonts/Excalifont/a.woff2"))).toBe(true);
-  });
-
   it("KHÔNG nhận tài liệu HTML", () => {
     // Đây là luật quan trọng nhất trong cả file: HTML mà rơi vào nhánh cache
     // trước thì người dùng kẹt ở bản cũ, deploy bao nhiêu lần cũng không thấy.
-    for (const p of ["/", "/read/step1/10", "/my/danh-dau", "/offline"]) {
+    for (const p of ["/", "/learn/csharp-core/x/y", "/my", "/offline"]) {
       expect(rules.isImmutableAsset(url(p))).toBe(false);
     }
   });
@@ -81,7 +77,7 @@ describe("cấu hình", () => {
     expect(rules.OFFLINE_URL).toBe("/offline");
   });
 
-  it("giới hạn số ảnh giữ lại — ảnh trang sách nặng vài trăm KB mỗi tấm", () => {
+  it("giới hạn số ảnh giữ lại", () => {
     expect(rules.MAX_IMAGES).toBeGreaterThan(0);
     expect(rules.MAX_IMAGES).toBeLessThanOrEqual(1000);
   });
@@ -130,113 +126,10 @@ describe("không TỰ tiếp quản giữa chừng", () => {
   });
 });
 
-describe("sách tải chủ động", () => {
-  const src = () =>
-    readFileSync(path.resolve(process.cwd(), "public", "sw.js"), "utf8");
-
-  it("dùng đúng tiền tố cache mà bên tải về đang ghi", () => {
-    // Hai file không import được nhau (một bên là script thô trong public),
-    // nên lệch tiền tố là offline im lặng không hoạt động.
-    const lib = readFileSync(
-      path.resolve(process.cwd(), "src", "lib", "offline-books.ts"),
-      "utf8"
-    );
-    const prefix = lib.match(/BOOK_CACHE_PREFIX = "([^"]+)"/)?.[1];
-
-    expect(prefix).toBe("kiip-book-");
-    expect(src()).toContain(`BOOK_CACHE_PREFIX = "${prefix}"`);
-  });
-
-  it("KHÔNG dọn cache sách khi nâng cấp service worker", () => {
-    // Dọn nhầm là người dùng mất cả cuốn vừa tải 60MB mà không hiểu vì sao.
-    expect(src()).toMatch(/keep\.has\(n\) \|\| n\.startsWith\(BOOK_CACHE_PREFIX\)/);
-  });
-
-  it("tra sách đã tải TRƯỚC cả cache cơ hội lẫn mạng", () => {
-    const body = src();
-    const inCacheFirst = body.indexOf("async function cacheFirst");
-    const lookup = body.indexOf("matchDownloadedBook(request)", inCacheFirst);
-    const opportunistic = body.indexOf("caches.open(cacheName)", inCacheFirst);
-
-    expect(lookup).toBeGreaterThan(inCacheFirst);
-    expect(lookup).toBeLessThan(opportunistic);
-  });
-
-  it("mất mạng thì tài liệu cũng tra sách đã tải", () => {
-    const body = src();
-    const inNetworkFirst = body.indexOf("async function networkFirst");
-    expect(body.indexOf("matchDownloadedBook", inNetworkFirst)).toBeGreaterThan(
-      inNetworkFirst
-    );
-  });
-});
-
-describe("payload RSC (lật trang trong app)", () => {
-  const src = () =>
-    readFileSync(path.resolve(process.cwd(), "public", "sw.js"), "utf8");
-
-  function rules() {
-    const stubSelf = { addEventListener: () => {}, location: { origin: "https://x" } };
-    const factory = new Function(
-      "self",
-      "caches",
-      `${src()}\nreturn { isRscRequest, rscCacheKey };`
-    );
-    return factory(stubSelf, {}) as {
-      isRscRequest: (req: { headers: Headers }, url: URL) => boolean;
-      rscCacheKey: (url: URL) => string;
-    };
-  }
-
-  const req = (headers: Record<string, string> = {}) => ({
-    headers: new Headers(headers),
-  });
-
-  it("nhận yêu cầu mang header rsc", () => {
-    expect(rules().isRscRequest(req({ rsc: "1" }), url("/read/step1/11"))).toBe(true);
-  });
-
-  it("nhận cả dạng đã bị 307 sang ?_rsc", () => {
-    // Next trả 307 từ `rsc: 1` sang `?_rsc=<băm>` — tuỳ lúc ta bắt được cái nào.
-    expect(rules().isRscRequest(req(), url("/read/step1/11?_rsc=abc"))).toBe(true);
-  });
-
-  it("không nhận nhầm yêu cầu thường", () => {
-    expect(rules().isRscRequest(req(), url("/read/step1/11"))).toBe(false);
-  });
-
-  it("khoá cache bỏ hết tham số, khớp hai đầu", () => {
-    // Băm `_rsc` đổi theo trạng thái router nên không dùng làm khoá được.
-    const { rscCacheKey } = rules();
-    expect(rscCacheKey(url("/read/step1/11?_rsc=abc"))).toBe(
-      "/read/step1/11?__offline_rsc=1"
-    );
-    expect(rscCacheKey(url("/read/step1/11?_rsc=xyz"))).toBe(
-      rscCacheKey(url("/read/step1/11"))
-    );
-  });
-
-  it("khoá khớp đúng hàm bên tải về", () => {
-    const lib = readFileSync(
-      path.resolve(process.cwd(), "src", "lib", "offline-books.ts"),
-      "utf8"
-    );
-    const suffix = lib.match(/\?__offline_rsc=1/)?.[0];
-
-    expect(suffix).toBe("?__offline_rsc=1");
-    expect(src()).toContain("?__offline_rsc=1");
-  });
-
-  it("đi MẠNG TRƯỚC, cache chỉ là lưới đỡ", () => {
-    // Bản RSC khai `Vary: next-router-state-tree` — nội dung đổi theo chỗ
-    // router đang đứng, nên đem bản cũ ra dùng lúc còn mạng là chuốc lỗi.
-    const body = src();
-    const fn = body.indexOf("async function rscNetworkFirst");
-    const network = body.indexOf("await fetch(request)", fn);
-    const fallback = body.indexOf("matchDownloadedBook", fn);
-
-    expect(network).toBeGreaterThan(fn);
-    expect(network).toBeLessThan(fallback);
+describe("dọn cache cũ", () => {
+  it("lên phiên bản mới thì xoá mọi cache không còn dùng", () => {
+    const body = readFileSync(path.resolve(process.cwd(), "public", "sw.js"), "utf8");
+    expect(body).toMatch(/keep\.has\(n\) \? null : caches\.delete\(n\)/);
   });
 });
 
@@ -259,8 +152,8 @@ describe("đường của Vercel Analytics", () => {
     expect(rules.isImmutableAsset(vercel)).toBe(false);
   });
 
-  it("không bị nhầm là ảnh trang sách", () => {
-    expect(rules.isPageImage(vercel)).toBe(false);
+  it("không bị nhầm là ảnh", () => {
+    expect(rules.isImage(vercel)).toBe(false);
   });
 
   it("beacon là POST nên service worker buông ngay từ đầu", () => {
@@ -273,157 +166,5 @@ describe("đường của Vercel Analytics", () => {
 
     expect(guard).toBeGreaterThan(handler);
     expect(guard).toBeLessThan(firstRespond);
-  });
-});
-
-/**
- * Bài nghe của cuốn đã tải về máy.
- *
- * Phần cắt khoảng (`Range`) là thứ quyết định iPhone có nghe được hay không,
- * nên chạy hàm thật chứ không chỉ dò chữ trong file.
- */
-describe("bài nghe offline", () => {
-  const src = () =>
-    readFileSync(path.resolve(process.cwd(), "public", "sw.js"), "utf8");
-
-  /** Bản trả về 1000 byte, giả như đã nằm sẵn trong cache. */
-  const cached = () =>
-    new Response(new Uint8Array(1000), {
-      headers: { "Content-Type": "audio/mpeg" },
-    });
-
-  /**
-   * Nạp service worker với một Cache API giả.
-   *
-   * `downloaded = false` là giả cảnh chưa tải cuốn nào về.
-   */
-  function audioRules(downloaded = true) {
-    const stubSelf = { addEventListener: () => {}, location: { origin: "https://x" } };
-    const stubCaches = {
-      keys: async () => (downloaded ? ["kiip-book-step1"] : []),
-      open: async () => ({ match: async () => (downloaded ? cached() : undefined) }),
-    };
-    const factory = new Function(
-      "self",
-      "caches",
-      `${src()}\nreturn { isAudio, sliceForRange, serveAudio };`
-    );
-    return factory(stubSelf, stubCaches) as {
-      isAudio: (url: URL) => boolean;
-      sliceForRange: (res: Response, range: string) => Promise<Response>;
-      serveAudio: (req: Request) => Promise<Response>;
-    };
-  }
-
-  const { isAudio, sliceForRange } = audioRules();
-
-  it("nhận ra file mp3, không nhầm với ảnh trang", () => {
-    expect(isAudio(url("/img/books/step1/audio/1-S.mp3"))).toBe(true);
-    expect(isAudio(url("/img/books/step1/pages/0020.webp"))).toBe(false);
-  });
-
-  it("đòi khoảng thì trả 206 kèm Content-Range", async () => {
-    // Safari/iOS từ chối phát hẳn nếu đòi khoảng mà nhận về 200 — tức là
-    // sách đã tải về vẫn không nghe được trên iPhone.
-    const res = await sliceForRange(cached(), "bytes=0-99");
-
-    expect(res.status).toBe(206);
-    expect(res.headers.get("Content-Range")).toBe("bytes 0-99/1000");
-    expect(res.headers.get("Content-Length")).toBe("100");
-    expect((await res.arrayBuffer()).byteLength).toBe(100);
-  });
-
-  it("tua tới giữa bài (khoảng hở đuôi) thì lấy tới hết file", async () => {
-    const res = await sliceForRange(cached(), "bytes=500-");
-
-    expect(res.headers.get("Content-Range")).toBe("bytes 500-999/1000");
-    expect((await res.arrayBuffer()).byteLength).toBe(500);
-  });
-
-  it("đòi quá cỡ file thì cắt về đúng mép, không vỡ", async () => {
-    const res = await sliceForRange(cached(), "bytes=900-99999");
-
-    expect(res.headers.get("Content-Range")).toBe("bytes 900-999/1000");
-    expect((await res.arrayBuffer()).byteLength).toBe(100);
-  });
-
-  it("dạng lạ thì trả nguyên bản chứ không đoán bừa", async () => {
-    // `bytes=-100` là "100 byte cuối" — thẻ <audio> không dùng dạng này,
-    // đoán bừa thì sai còn tệ hơn nhường cho mạng.
-    const res = await sliceForRange(cached(), "bytes=-100");
-
-    expect(res.status).toBe(200);
-  });
-
-  it("KHÔNG tự cache bài nghe nghe lướt", () => {
-    // Một bài nghe 1,3MB, gấp hơn hai chục lần một trang. Tự cache là đầy
-    // máy người ta mà họ không hề xin.
-    //
-    // Dò `.put(` chứ không dò `cache.put`: đổi tên biến một cái là lọt.
-    const body = src();
-    const fn = body.indexOf("async function serveAudio");
-    const next = body.indexOf("async function sliceForRange");
-    const region = body.slice(fn, next);
-
-    expect(region).toContain("matchDownloadedBook");
-    expect(region).not.toContain(".put(");
-  });
-});
-
-/**
- * `serveAudio` chạy thật, với Cache API giả.
- *
- * Tách khỏi nhóm trên vì nhóm đó chỉ kiểm từng hàm rời. Kiểm rời thôi là
- * chưa đủ: gỡ đúng dòng nối `serveAudio` vào `sliceForRange` thì mọi test
- * rời vẫn xanh, mà trên iPhone thì sách đã tải về không nghe được.
- */
-describe("phục vụ bài nghe từ cuốn đã tải", () => {
-  const src = () =>
-    readFileSync(path.resolve(process.cwd(), "public", "sw.js"), "utf8");
-
-  const cached = () =>
-    new Response(new Uint8Array(1000), {
-      headers: { "Content-Type": "audio/mpeg" },
-    });
-
-  function load(downloaded: boolean) {
-    const stubSelf = { addEventListener: () => {}, location: { origin: "https://x" } };
-    const stubCaches = {
-      keys: async () => (downloaded ? ["kiip-book-step1"] : []),
-      open: async () => ({ match: async () => (downloaded ? cached() : undefined) }),
-    };
-    const factory = new Function("self", "caches", `${src()}\nreturn { serveAudio };`);
-    return factory(stubSelf, stubCaches) as {
-      serveAudio: (req: Request) => Promise<Response>;
-    };
-  }
-
-  const audioRequest = (range?: string) =>
-    new Request("https://x/img/books/step1/audio/1-S.mp3", {
-      headers: range ? { Range: range } : {},
-    });
-
-  it("đòi khoảng thì cắt ra 206, không trả nguyên bản 200", async () => {
-    const res = await load(true).serveAudio(audioRequest("bytes=100-199"));
-
-    expect(res.status).toBe(206);
-    expect(res.headers.get("Content-Range")).toBe("bytes 100-199/1000");
-  });
-
-  it("không đòi khoảng thì trả nguyên bài", async () => {
-    const res = await load(true).serveAudio(audioRequest());
-
-    expect(res.status).toBe(200);
-    expect((await res.arrayBuffer()).byteLength).toBe(1000);
-  });
-
-  it("chưa tải cuốn nào thì ra thẳng mạng", async () => {
-    const fetched = new Response("từ mạng");
-    vi.stubGlobal("fetch", vi.fn(async () => fetched));
-
-    const res = await load(false).serveAudio(audioRequest());
-
-    expect(await res.text()).toBe("từ mạng");
-    vi.unstubAllGlobals();
   });
 });

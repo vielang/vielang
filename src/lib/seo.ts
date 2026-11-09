@@ -18,10 +18,10 @@ export const SITE_URL = (
 export const SITE_NAME = "VieLang";
 
 export const SITE_DESCRIPTION =
-  "Học lập trình và tiếng Anh bằng tiếng Việt: lộ trình .NET developer (C#, OOP, SQL, ASP.NET Core, cấu trúc dữ liệu, kiến trúc phần mềm) và giáo trình tiếng Anh English File có audio.";
+  "Học lập trình bằng tiếng Việt: lộ trình .NET developer (C#, OOP, SQL, ASP.NET Core, WinForms, cấu trúc dữ liệu, kiến trúc phần mềm) và cẩm nang nghề IT.";
 
 /** Ảnh chia sẻ mặc định — sinh bằng `npm run make-icons`. */
-const OG_IMAGE = { url: "/og.png", width: 1200, height: 630, alt: "VieLang – Học lập trình và tiếng Anh bằng tiếng Việt" };
+const OG_IMAGE = { url: "/og.png", width: 1200, height: 630, alt: "VieLang – Học lập trình .NET bằng tiếng Việt" };
 
 export function absoluteUrl(path: string): string {
   return `${SITE_URL}${path.startsWith("/") ? path : `/${path}`}`;

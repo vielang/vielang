@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { QuizBody } from "./quiz-body";
-import { QuizPanel } from "@/components/reader/quiz-panel";
 import { useQuizStore } from "@/lib/quiz-store";
 import { useActivityStore } from "@/lib/activity-store";
 import { dayKey } from "@/lib/activity";
@@ -29,7 +28,7 @@ const SECTIONS: QuizSection[] = [
 beforeEach(() => {
   localStorage.clear();
   useQuizStore.setState({ pages: {} });
-  useActivityStore.setState({ days: {}, studied: {}, weeklyGoalMinutes: 60, grades: {} });
+  useActivityStore.setState({ days: {}, weeklyGoalMinutes: 60 });
 });
 
 describe("chấm bài", () => {
@@ -155,30 +154,6 @@ describe("kiểu bài học: đánh số câu và nhãn A/B/C/D", () => {
   });
 });
 
-describe("bài tập trong sách vẫn chạy như cũ", () => {
-  const sections = SECTIONS;
-  const first = SECTIONS[0].items[0];
-  if (first.kind !== "choice") throw new Error("câu đầu phải là trắc nghiệm");
-
-  it("QuizPanel lưu dưới khoá bookId:page, đúng định dạng đã có", () => {
-    render(<QuizPanel bookId="en-elementary" page={19} sections={sections} />);
-
-    fireEvent.click(screen.getByRole("button", { name: first.options[0] }));
-
-    expect(useQuizStore.getState().pages["en-elementary:19"]?.answers[first.id]).toBe(0);
-  });
-
-  it("đọc được bài làm đã lưu từ phiên trước", () => {
-    // Đúng hình dạng mà bản trước đã ghi vào localStorage.
-    useQuizStore.setState({
-      pages: { "en-elementary:19": { answers: { [first.id]: first.answer }, checked: [first.id] } },
-    });
-    render(<QuizPanel bookId="en-elementary" page={19} sections={sections} />);
-
-    expect(screen.getByText("Đúng")).toBeTruthy();
-  });
-});
-
 describe("câu tự kiểm tra của bài học IT", () => {
   const course = listCourses()[0];
   const lesson = course.modules
@@ -202,7 +177,6 @@ describe("câu tự kiểm tra của bài học IT", () => {
 
     expect(screen.getByText("Đúng")).toBeTruthy();
     expect(useQuizStore.getState().pages[quizId]?.checked).toEqual([item.id]);
-    // Không đụng tới vùng dữ liệu của sách.
     expect(Object.keys(useQuizStore.getState().pages)).toEqual([quizId]);
   });
 });

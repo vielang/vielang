@@ -175,9 +175,7 @@ export function InstallGuide() {
       <div className="flex items-start gap-3 rounded-xl border border-dashed border-border p-4">
         <WifiOff className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden />
         <p className="text-xs text-muted-foreground">
-          Cài xong, vào trang bất kỳ cuốn sách nào và bấm{" "}
-          <span className="font-medium text-foreground">Tải về đọc offline</span> để
-          mang cả cuốn theo — đọc được cả khi không có mạng.
+          Cài xong, những bài bạn đã mở vẫn đọc lại được cả khi không có mạng.
         </p>
       </div>
     </div>

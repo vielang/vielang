@@ -125,20 +125,13 @@
  * nó, còn `env(safe-area-inset-bottom)` lại đổi theo thanh đó đang mở hay đã
  * thu gọn (từ iOS 15) — trang ngắn không cuộn được thì thanh công cụ không
  * bao giờ thu gọn, và thanh tab của app bị cao vọt lên riêng ở những trang
- * đó (Đánh dấu, Góc học tập khi chưa có dữ liệu).
+ * đó (Góc học tập khi chưa có dữ liệu).
  *
  * Hai cách nhận ra PWA: media query cho trình duyệt theo chuẩn, và thuộc tính
  * `data-standalone` do script trong <head> gắn cho Safari iOS (xem layout.tsx).
  */
 :root {
   --standalone-safe-bottom: 0px;
-  /*
-   * Vùng an toàn thật, để JS đọc được (getComputedStyle) — widget-dock dùng
-   * để đặt widget nổi của trình đọc không đè lên hai thanh công cụ, vốn dãn
-   * theo tai thỏ / vạch Home.
-   */
-  --safe-top: env(safe-area-inset-top, 0px);
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 @media (display-mode: standalone) {
   :root {
@@ -152,8 +145,7 @@
 /*
  * PWA trên iOS: trang ngắn vẫn phải phủ kín màn hình, kể cả vùng vạch Home.
  *
- * html/body chỉ đặt `100%` thì trang ngắn (không cuộn được, vd Đánh dấu khi
- * chưa ghim gì) cao bằng khung nhìn ban đầu mà WebKit tính — ở chế độ PWA
+ * html/body chỉ đặt `100%` thì trang ngắn (không cuộn được) cao bằng khung nhìn ban đầu mà WebKit tính — ở chế độ PWA
  * với `viewport-fit=cover`, khung đó có thể hụt phần vạch Home. Thanh tab
  * bám đáy bị đẩy lên đúng chừng ấy mà vẫn giữ khoảng đệm vùng an toàn, nên
  * trông cao hơn các trang khác. `100vh` của WebKit ở chế độ PWA là CẢ màn
@@ -188,56 +180,11 @@
   }
 }
 /*
- * Tiptap/ProseMirror — vùng soạn bài giảng (components/reader/note-editor).
- * Phần typography đã do plugin `prose` lo (xem NOTE_PROSE_CLASS), ở đây chỉ
- * bù những thứ prose không biết: placeholder, con trỏ ô bảng, và bảng rộng
- * hơn màn hình điện thoại.
- */
-@layer components {
-  .ProseMirror {
-    outline: none;
-  }
-
-  /* Placeholder chỉ hiện ở block rỗng đầu tiên khi cả document còn trống. */
-  .ProseMirror p.is-editor-empty:first-child::before {
-    content: attr(data-placeholder);
-    @apply pointer-events-none float-left h-0 text-muted-foreground;
-  }
-
-  /* Bảng ngữ pháp trong sách rộng — cho cuộn ngang thay vì tràn ra ngoài. */
-  .ProseMirror table {
-    @apply w-full table-fixed;
-  }
-  .ProseMirror td,
-  .ProseMirror th {
-    @apply relative align-top;
-  }
-  /* Ô đang chọn khi kéo chuột qua nhiều ô (ProseMirror tables). */
-  .ProseMirror .selectedCell::after {
-    content: "";
-    @apply pointer-events-none absolute inset-0 z-10 bg-primary/15;
-  }
-  /* Tay cầm kéo giãn cột — TableKit configure({ table: { resizable } }). */
-  .ProseMirror .column-resize-handle {
-    @apply pointer-events-none absolute -right-0.5 top-0 bottom-0 z-20 w-1 bg-primary/60;
-  }
-  .ProseMirror.resize-cursor {
-    cursor: col-resize;
-  }
-
-  /* Gap cursor giữa 2 block (vd ngay sau bảng) — mặc định trong suốt. */
-  .ProseMirror-gapcursor::after {
-    @apply border-t-foreground;
-  }
-}
-
-/*
  * Tooltip (Radix) không bao giờ được chặn con trỏ. `pointer-events-none` đặt
  * ở TooltipContent chưa đủ: Radix bọc content trong 1 div định vị riêng
  * (`data-radix-popper-content-wrapper`), và chính div bọc đó mới là thứ nhận
- * click. Đã gặp thật: hover nút bài giảng -> tooltip hiện -> mở panel nổi,
- * panel mọc ngay dưới tooltip và các nút trên thanh tiêu đề panel bị div bọc
- * này nuốt hết click.
+ * click — panel mọc ngay dưới tooltip thì các nút của nó bị div bọc này
+ * nuốt hết click.
  *
  * Chỉ nhắm tooltip, không đụng popper của Popover/Dropdown — những thứ đó
  * bắt buộc phải bấm được.

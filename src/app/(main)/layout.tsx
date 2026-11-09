@@ -2,10 +2,7 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { TabBar } from "@/components/layout/tab-bar";
 
 /**
- * Layout cho các trang "bình thường" (thư viện, chi tiết sách) — có header
- * và (trên điện thoại) thanh tab dưới đáy.
- * Trang đọc (`/read/[bookId]/[page]`) nằm ngoài group này để full-screen,
- * không có header, tối đa không gian đọc.
+ * Layout chung: header và (trên điện thoại) thanh tab dưới đáy.
  */
 export default function MainLayout({
   children,

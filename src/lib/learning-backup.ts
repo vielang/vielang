@@ -5,9 +5,8 @@
  * duyệt web hay đổi máy là mất sạch lịch sử học. File sao lưu là đường lui
  * duy nhất — xuất ra, cất đi, sang máy mới thì nhập lại.
  *
- * CHỈ gồm các khoá localStorage (tiến độ, bài làm, lịch sử học, ghi chú, tuỳ
- * chọn). Ghi âm và nét vẽ nằm trong IndexedDB, nặng hàng chục MB — không
- * nhét vào một file JSON được, và My page nói rõ điều đó.
+ * Gồm các khoá localStorage: tiến độ khoá học, bài làm, lịch sử học và
+ * checklist cẩm nang.
  */
 
 /** Khoá được sao lưu. Tên khoá là khoá tra dữ liệu — xem `storage-keys.test.ts`. */
@@ -15,16 +14,7 @@ export const BACKUP_KEYS = [
   "kiip-progress-v1",
   "kiip-quiz-v1",
   "kiip-activity-v1",
-  "kiip-exam-v1",
-  "kiip-notes-v1",
-  "kiip-reader-prefs-v1",
-  // Checklist của Cẩm nang và chỗ nghe tự động dở — thêm sau, từng bị
-  // sót khỏi danh sách này. `learning-backup.test.ts` giờ tự dò mọi store lưu
-  // localStorage, thiếu khoá nào là báo.
   "kiip-guide-v1",
-  "kiip-autoplay-v1",
-  "kiip-video-progress-v1",
-  "kiip-video-prefs-v1",
 ] as const;
 
 const APP_ID = "vielang-learning-backup";

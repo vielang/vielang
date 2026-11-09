@@ -20,7 +20,7 @@ function shortSummary(summary: string): string {
  * Lộ trình IT: các khoá đánh số theo thứ tự nên học, nối bằng một đường dọc,
  * kèm thẻ "Học tiếp" trỏ về bài mở gần nhất.
  *
- * Tiến độ dùng chung kho với sách (xem `courseProgressId`) nên được đồng bộ
+ * Tiến độ lưu ở `progress-store` (xem `courseProgressId`) nên được đồng bộ
  * giữa các tab và sao lưu cùng dữ liệu học, khỏi dựng kho thứ hai.
  */
 export function CourseList({ courses }: { courses: CourseCard[] }) {

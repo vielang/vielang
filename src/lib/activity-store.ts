@@ -8,44 +8,14 @@ import { syncAcrossTabs } from "@/lib/cross-tab-sync";
 interface ActivityState {
   /** key = "YYYY-MM-DD" theo giờ máy — xem `dayKey`. */
   days: Record<string, DayStats>;
-  /**
-   * Trang đã HỌC (ở lại đủ lâu) theo sách — khác `progress-store.readPages`
-   * vốn ghi ngay khi trang vừa hiện ra, lật nhanh qua cũng tính. Để riêng ở
-   * đây chứ không đổi nghĩa `readPages`: người đang dùng giữ nguyên tiến độ
-   * "đã xem" cũ, còn số "đã học" bắt đầu đếm từ bây giờ.
-   */
-  studied: Record<string, number[]>;
   /** Mục tiêu phút học mỗi tuần, người dùng tự đặt. */
   weeklyGoalMinutes: number;
-  /**
-   * Người học TỰ CHẤM sau khi xem đáp án sách, key = "bookId:page:answerKeyId"
-   * (xem `gradeKey`). Chỉ giữ lần chấm gần nhất: làm lại và chấm lại thì
-   * năng lực phản ánh hiện tại, không bị lần sai đầu tiên kéo xuống mãi.
-   */
-  grades: Record<string, SelfGrade>;
   hasHydrated: boolean;
   setHasHydrated: (v: boolean) => void;
 
   addActiveTime: (ms: number, now?: Date) => void;
-  markPageStudied: (bookId: string, page: number, now?: Date) => void;
   recordQuizCheck: (correct: boolean, now?: Date) => void;
-  recordAnswerOpened: (now?: Date) => void;
-  recordRecording: (now?: Date) => void;
   setWeeklyGoal: (minutes: number) => void;
-  setGrade: (key: string, grade: GradeValue, now?: Date) => void;
-}
-
-/** 1 = đúng hết, 0.5 = sai vài câu, 0 = sai nhiều. */
-export type GradeValue = 0 | 0.5 | 1;
-
-export interface SelfGrade {
-  grade: GradeValue;
-  /** ISO — lúc chấm. */
-  at: string;
-}
-
-export function gradeKey(bookId: string, page: number, answerKeyId: string): string {
-  return `${bookId}:${page}:${answerKeyId}`;
 }
 
 const DEFAULT_WEEKLY_GOAL = 90;
@@ -69,9 +39,7 @@ export const useActivityStore = create<ActivityState>()(
   persist(
     (set) => ({
       days: {},
-      studied: {},
       weeklyGoalMinutes: DEFAULT_WEEKLY_GOAL,
-      grades: {},
       hasHydrated: false,
       setHasHydrated: (v) => set({ hasHydrated: v }),
 
@@ -79,20 +47,6 @@ export const useActivityStore = create<ActivityState>()(
         set((s) => ({
           days: bumpDay(s.days, now, (d) => ({ ...d, activeMs: d.activeMs + ms })),
         })),
-
-      markPageStudied: (bookId, page, now = new Date()) =>
-        set((s) => {
-          const pageKey = `${bookId}:${page}`;
-          const prevBook = s.studied[bookId] ?? [];
-          return {
-            days: bumpDay(s.days, now, (d) =>
-              d.pages.includes(pageKey) ? d : { ...d, pages: [...d.pages, pageKey] }
-            ),
-            studied: prevBook.includes(page)
-              ? s.studied
-              : { ...s.studied, [bookId]: [...prevBook, page] },
-          };
-        }),
 
       recordQuizCheck: (correct, now = new Date()) =>
         set((s) => ({
@@ -103,32 +57,14 @@ export const useActivityStore = create<ActivityState>()(
           })),
         })),
 
-      recordAnswerOpened: (now = new Date()) =>
-        set((s) => ({
-          days: bumpDay(s.days, now, (d) => ({ ...d, answersOpened: d.answersOpened + 1 })),
-        })),
-
-      recordRecording: (now = new Date()) =>
-        set((s) => ({
-          days: bumpDay(s.days, now, (d) => ({ ...d, recordings: d.recordings + 1 })),
-        })),
-
       setWeeklyGoal: (minutes) => set({ weeklyGoalMinutes: minutes }),
-
-      setGrade: (key, grade, now = new Date()) =>
-        set((s) => ({ grades: { ...s.grades, [key]: { grade, at: now.toISOString() } } })),
     }),
     {
       // Khoá tra dữ liệu, KHÔNG đổi theo tên thương hiệu — xem
       // `storage-keys.test.ts`.
       name: "kiip-activity-v1",
       storage: createJSONStorage(() => localStorage),
-      partialize: ({ days, studied, weeklyGoalMinutes, grades }) => ({
-        days,
-        studied,
-        weeklyGoalMinutes,
-        grades,
-      }),
+      partialize: ({ days, weeklyGoalMinutes }) => ({ days, weeklyGoalMinutes }),
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
       },
@@ -136,6 +72,5 @@ export const useActivityStore = create<ActivityState>()(
   )
 );
 
-
-// Hai tab cùng mở (trang đọc + Góc học tập) — xem `cross-tab-sync`.
+// Hai tab cùng mở (bài học + Góc học tập) — xem `cross-tab-sync`.
 syncAcrossTabs(useActivityStore);

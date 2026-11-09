@@ -2,29 +2,18 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, ChevronDown, Flame, Lightbulb } from "lucide-react";
+import { ArrowRight, ChevronDown, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import type { Book } from "@/lib/books";
 import { courseProgressId, lessonHref, type CourseCard } from "@/lib/courses";
-import { EXAM_LEVELS } from "@/lib/exam-levels";
 import { countStudyDays, currentStreak, minutesThisWeek } from "@/lib/activity";
 import { useActivityStore } from "@/lib/activity-store";
-import { computeAbility } from "@/lib/ability";
-import { buildSuggestions, companionMessage, greeting, shortBookName } from "@/lib/companion";
-import { getBookProgress, useProgressStore, resumePage } from "@/lib/progress-store";
-import { useQuizStore } from "@/lib/quiz-store";
-import { useRecordingHydration, useRecordingStore } from "@/lib/recording-store";
+import { companionMessage, greeting } from "@/lib/companion";
+import { getBookProgress, useProgressStore } from "@/lib/progress-store";
 import { StudyHeatmap } from "@/components/my/study-heatmap";
 import { WeekStrip } from "@/components/my/week-strip";
-import { SuggestionList } from "@/components/my/suggestion-list";
-import { BookProgressCard, booksInProgress } from "@/components/my/book-progress";
-import { BookmarkStrip } from "@/components/my/bookmark-strip";
-import { summarizeQuiz, WrongList } from "@/components/my/quiz-review";
-import { RedoList, SkillBars, WeakGrammarList } from "@/components/my/ability-panel";
 import { BackupPanel } from "@/components/my/backup-panel";
-import { ExamCard } from "@/components/my/exam-card";
 import { useIsClient } from "@/lib/use-is-client";
 
 const GOAL_CHOICES = [30, 60, 90, 150, 300];
@@ -35,27 +24,19 @@ const GOAL_CHOICES = [30, 60, 90, 150, 300];
  * Thứ tự theo câu hỏi người học mang tới trang này:
  * 1. "Hôm nay mình thế nào, giờ làm gì?" → lời nhắn + nút học tiếp.
  * 2. "Tuần này có đều không?" → 7 ngày và số phút so với mục tiêu.
- * 3. "Nên ôn gì?" → tối đa 3 gợi ý cụ thể.
- * 4. Khoá học, sách đang học, kỹ năng.
- * 5. Mọi thứ chi tiết (lịch 12 tuần, danh sách đầy đủ, sao lưu) gập lại ở
+ * 3. Khoá học đang học, mỗi khoá một nút học tiếp.
+ * 4. Mọi thứ chi tiết (lịch 12 tuần, danh sách đầy đủ, sao lưu) gập lại ở
  *    cuối — có khi cần, nhưng không đứng chắn đường.
  *
  * Chỉ vẽ sau khi đã ở trình duyệt: server không biết gì về localStorage, vẽ
  * luôn thì server ra "0 ngày" rồi nhảy sang số thật (lệch hydration).
  */
-export function MyPageView({ books, courses = [] }: { books: readonly Book[]; courses?: readonly CourseCard[] }) {
+export function MyPageView({ courses = [] }: { courses?: readonly CourseCard[] }) {
   const isClient = useIsClient();
   const days = useActivityStore((s) => s.days);
-  const studied = useActivityStore((s) => s.studied);
   const goal = useActivityStore((s) => s.weeklyGoalMinutes);
   const setGoal = useActivityStore((s) => s.setWeeklyGoal);
-  const grades = useActivityStore((s) => s.grades);
-  const progressByBook = useProgressStore((s) => s.books);
-  const quizPages = useQuizStore((s) => s.pages);
-  const recordings = useRecordingStore((s) => s.recordings);
-  // Bản ghi âm nằm ở IndexedDB và chỉ nạp khi có người gọi — trước đây chỉ
-  // trang đọc gọi, nên số bản ghi ở đây quay mãi không ra.
-  const recordingsReady = useRecordingHydration();
+  const progressById = useProgressStore((s) => s.books);
   const [editingGoal, setEditingGoal] = useState(false);
 
   if (!isClient) return <MyPageSkeleton />;
@@ -64,21 +45,16 @@ export function MyPageView({ books, courses = [] }: { books: readonly Book[]; co
   const streak = currentStreak(days, now);
   const weekMinutes = minutesThisWeek(days, now);
   const goalPercent = Math.min(100, Math.round((weekMinutes / goal) * 100));
-  const rows = booksInProgress(books, progressByBook, studied);
-  const courseRows = coursesInProgress(courses, progressByBook);
-  const quiz = summarizeQuiz(quizPages);
-  const ability = computeAbility(grades, quizPages);
-  const suggestions = buildSuggestions(ability, quiz.wrong, books);
+  const courseRows = coursesInProgress(courses, progressById);
   const studyDays = countStudyDays(days);
-  const studiedTotal = Object.values(studied).reduce((n, pages) => n + pages.length, 0);
-  const recordingTotal = Object.values(recordings).reduce((n, list) => n + list.length, 0);
+  const lessonsDone = courseRows.reduce((n, row) => n + row.done, 0);
 
-  if (rows.length === 0 && courseRows.length === 0 && studyDays === 0 && ability.total === 0) {
+  if (courseRows.length === 0 && studyDays === 0) {
     return <Welcome />;
   }
 
   const message = companionMessage({ days, now, streak, weekMinutes, goal });
-  const current = rows[0];
+  const current = courseRows.find((row) => row.next);
 
   return (
     <div className="flex flex-col gap-8">
@@ -89,10 +65,10 @@ export function MyPageView({ books, courses = [] }: { books: readonly Book[]; co
           <h2 className="text-xl font-semibold tracking-tight text-balance">{message.title}</h2>
           <p className="text-sm text-muted-foreground text-pretty">{message.body}</p>
         </div>
-        {current && (
+        {current?.next && (
           <Button asChild className="self-start">
-            <Link href={`/read/${current.book.id}/${resumePage(current.progress)}`}>
-              Học tiếp {shortBookName(current.book)} · trang {resumePage(current.progress)}
+            <Link href={lessonHref(current.course.id, current.next.slug)}>
+              Học tiếp {current.course.title}
               <ArrowRight className="size-4" aria-hidden />
             </Link>
           </Button>
@@ -157,33 +133,11 @@ export function MyPageView({ books, courses = [] }: { books: readonly Book[]; co
           )}
         </div>
         <p className="text-xs text-muted-foreground">
-          Tổng cộng {studyDays} ngày học · {studiedTotal} trang
-          {recordingsReady && recordingTotal > 0 ? ` · ${recordingTotal} bản ghi luyện nói` : ""}
+          Tổng cộng {studyDays} ngày học · {lessonsDone} bài đã học
         </p>
       </section>
 
-      {/* 3. Gợi ý */}
-      <section className="flex flex-col gap-3" aria-labelledby="next-title">
-        <h2 id="next-title" className="text-base font-semibold">
-          Gợi ý cho bạn
-        </h2>
-        {suggestions.length > 0 ? (
-          <SuggestionList items={suggestions} />
-        ) : (
-          <p className="flex gap-3 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">
-            <Lightbulb className="mt-0.5 size-4 shrink-0" aria-hidden />
-            <span>
-              Làm bài xong, mở chấm đáp án trên trang sách rồi chọn{" "}
-              <span className="text-foreground">Đúng hết</span>,{" "}
-              <span className="text-foreground">Sai vài câu</span> hoặc{" "}
-              <span className="text-foreground">Sai nhiều</span> — mình sẽ gợi ý bài nào
-              nên ôn lại.
-            </span>
-          </p>
-        )}
-      </section>
-
-      {/* 4. Khoá học đang học */}
+      {/* 3. Khoá học đang học */}
       {courseRows.length > 0 && (
         <section className="flex flex-col gap-3" aria-labelledby="courses-title">
           <h2 id="courses-title" className="text-base font-semibold">
@@ -223,67 +177,11 @@ export function MyPageView({ books, courses = [] }: { books: readonly Book[]; co
         </section>
       )}
 
-      {/* Sách đang học */}
-      {rows.length > 0 && (
-        <section className="flex flex-col gap-3" aria-labelledby="books-title">
-          <h2 id="books-title" className="text-base font-semibold">
-            Sách đang học
-          </h2>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {rows.map((row) => (
-              <BookProgressCard key={row.book.id} row={row} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Trang đã đánh dấu — ngay sau sách đang học, vì cùng nói về việc đọc. */}
-      <BookmarkStrip books={books} progressByBook={progressByBook} />
-
-      {/* Luyện thi — chỉ khi đã có kỳ thi */}
-      {EXAM_LEVELS.length > 0 && (
-        <section className="flex flex-col gap-3" aria-labelledby="exam-title">
-          <h2 id="exam-title" className="text-base font-semibold">
-            Luyện thi
-          </h2>
-          <ExamCard />
-        </section>
-      )}
-
-      {/* 5. Kỹ năng */}
-      {ability.total > 0 && (
-        <section className="flex flex-col gap-3" aria-labelledby="skills-title">
-          <h2 id="skills-title" className="text-base font-semibold">
-            Kỹ năng của bạn
-          </h2>
-          <SkillBars skills={ability.skills} />
-          <p className="text-xs text-muted-foreground">
-            Tính từ các bài bạn tự chấm và câu quiz đã kiểm tra — để biết nên luyện thêm
-            phần nào, không phải điểm thi.
-          </p>
-        </section>
-      )}
-
-      {/* 6. Chi tiết — gập lại */}
+      {/* 4. Chi tiết — gập lại */}
       <section className="flex flex-col divide-y divide-border border-y border-border">
         <Disclosure title="Lịch học 12 tuần">
           <StudyHeatmap days={days} today={now} />
         </Disclosure>
-        {ability.weakGrammar.length > 0 && (
-          <Disclosure title="Điểm ngữ pháp nên ôn" count={ability.weakGrammar.length}>
-            <WeakGrammarList items={ability.weakGrammar} />
-          </Disclosure>
-        )}
-        {ability.redo.length > 0 && (
-          <Disclosure title="Bài tự chấm còn sai" count={ability.redo.length}>
-            <RedoList items={ability.redo} />
-          </Disclosure>
-        )}
-        {quiz.wrong.length > 0 && (
-          <Disclosure title="Câu quiz còn sai" count={quiz.wrong.length}>
-            <WrongList wrong={quiz.wrong} />
-          </Disclosure>
-        )}
         <Disclosure title="Sao lưu & chuyển sang máy khác">
           <BackupPanel />
         </Disclosure>
@@ -293,17 +191,17 @@ export function MyPageView({ books, courses = [] }: { books: readonly Book[]; co
 }
 
 /**
- * Khoá học đã bắt đầu, khoá học gần đây nhất lên trước. Tiến độ khoá học nằm
- * chung kho với sách (xem `courseProgressId`), mỗi "trang" là số thứ tự bài.
+ * Khoá học đã bắt đầu, khoá học gần đây nhất lên trước. Tiến độ nằm trong
+ * `progress-store` (xem `courseProgressId`), mỗi "trang" là số thứ tự bài.
  * Bài học tiếp = bài có số nhỏ nhất chưa học.
  */
 function coursesInProgress(
   courses: readonly CourseCard[],
-  progressByBook: Parameters<typeof getBookProgress>[0]
+  progressById: Parameters<typeof getBookProgress>[0]
 ) {
   return courses
     .map((course) => {
-      const p = getBookProgress(progressByBook, courseProgressId(course.id));
+      const p = getBookProgress(progressById, courseProgressId(course.id));
       const read = new Set(p.readPages);
       const nextIndex = course.lessons.findIndex((_, i) => !read.has(i + 1));
       return { course, done: read.size, next: nextIndex >= 0 ? course.lessons[nextIndex] : undefined, updatedAt: p.updatedAt };
@@ -350,8 +248,7 @@ function Welcome() {
       <div className="flex flex-col gap-2">
         <h2 className="text-xl font-semibold tracking-tight">Bắt đầu hành trình nào 🌱</h2>
         <p className="text-sm text-muted-foreground text-pretty">
-          Mở một khoá học hoặc một cuốn sách và học vài bài. Mình sẽ ghi lại thời gian học, trang đã học,
-          và gợi ý bài nên ôn — tất cả ngay trên máy của bạn, không cần tài khoản.
+          Mở một khoá học và học vài bài. Mình sẽ ghi lại thời gian học và bài đã học — tất cả ngay trên máy của bạn, không cần tài khoản.
         </p>
       </div>
       <Button asChild className="self-start">

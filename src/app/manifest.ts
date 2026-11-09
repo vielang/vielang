@@ -3,18 +3,15 @@ import type { MetadataRoute } from "next";
 /**
  * Manifest để cài app vào màn hình chính.
  *
- * `display: standalone` bỏ thanh địa chỉ — trang đọc vốn đã chiếm trọn màn
- * hình, thêm thanh địa chỉ chỉ tổ ăn mất chiều cao, đúng chiều đang thiếu.
- *
- * `orientation` để tự do: sách đọc dọc là chính, nhưng chế độ 2 trang cần
- * xoay ngang.
+ * `display: standalone` bỏ thanh địa chỉ — thêm thanh địa chỉ chỉ tổ ăn mất
+ * chiều cao đọc bài.
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "VieLang – Học lập trình và tiếng Anh",
+    name: "VieLang – Học lập trình .NET",
     short_name: "VieLang",
     description:
-      "Học lập trình và tiếng Anh bằng tiếng Việt: lộ trình .NET developer (C#, OOP, SQL, ASP.NET Core, cấu trúc dữ liệu, kiến trúc phần mềm) và giáo trình tiếng Anh English File có audio.",
+      "Học lập trình bằng tiếng Việt: lộ trình .NET developer (C#, OOP, SQL, ASP.NET Core, WinForms, cấu trúc dữ liệu, kiến trúc phần mềm) và cẩm nang nghề IT.",
     start_url: "/",
     display: "standalone",
     background_color: "#0a0a0a",

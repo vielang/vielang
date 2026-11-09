@@ -4,7 +4,7 @@ import { useActivityStore } from "./activity-store";
 const MON = new Date(2025, 8, 8, 20, 0);
 const TUE = new Date(2025, 8, 9, 7, 0);
 
-beforeEach(() => useActivityStore.setState({ days: {}, studied: {} }));
+beforeEach(() => useActivityStore.setState({ days: {} }));
 
 describe("lịch sử học", () => {
   it("cộng thời gian học vào đúng ngày", () => {
@@ -16,19 +16,6 @@ describe("lịch sử học", () => {
 
     expect(days["2025-09-08"].activeMs).toBe(30_000);
     expect(days["2025-09-09"].activeMs).toBe(15_000);
-  });
-
-  it("một trang học lại nhiều lần chỉ tính một", () => {
-    const { markPageStudied } = useActivityStore.getState();
-    markPageStudied("step1", 18, MON);
-    markPageStudied("step1", 18, MON);
-    markPageStudied("step1", 18, TUE);
-    const { days, studied } = useActivityStore.getState();
-
-    expect(studied.step1).toEqual([18]);
-    expect(days["2025-09-08"].pages).toEqual(["step1:18"]);
-    // Ngày khác thì vẫn ghi vào lịch sử ngày đó — hôm ấy có học trang này.
-    expect(days["2025-09-09"].pages).toEqual(["step1:18"]);
   });
 
   it("đếm lượt chấm và lượt đúng", () => {
@@ -46,7 +33,7 @@ describe("lịch sử học", () => {
 describe("nhiều tab cùng mở", () => {
   it("tab khác ghi thì tab này nạp lại, không ghi đè bằng bản cũ", async () => {
     const fromOtherTab = {
-      state: { days: { "2025-09-08": { ...useActivityStore.getState().days["2025-09-08"], activeMs: 999_000, pages: [], quizChecked: 0, quizCorrect: 0, answersOpened: 0, recordings: 0 } }, studied: {}, weeklyGoalMinutes: 90, grades: {} },
+      state: { days: { "2025-09-08": { ...useActivityStore.getState().days["2025-09-08"], activeMs: 999_000, quizChecked: 0, quizCorrect: 0 } }, weeklyGoalMinutes: 90 },
       version: 0,
     };
     const newValue = JSON.stringify(fromOtherTab);

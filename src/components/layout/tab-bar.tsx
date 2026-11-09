@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useLayoutEffect } from "react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { NAV_TABS, activeTab, hidesTabBar } from "@/lib/nav";
+import { NAV_TABS, activeTab } from "@/lib/nav";
 
 /**
  * Thanh điều hướng dưới đáy màn hình ĐIỆN THOẠI: các tab có chữ, tab đang
@@ -12,7 +12,7 @@ import { NAV_TABS, activeTab, hidesTabBar } from "@/lib/nav";
  * đang ở đâu và đi đâu. Máy tính dùng nav trong header (xem `SiteHeader`).
  *
  * Trả về cả khoảng trống bằng chiều cao thanh, để nội dung cuối trang không
- * bị che. Màn đang làm bài thì ẩn hẳn (xem `hidesTabBar`).
+ * bị che.
  */
 export function TabBar() {
   const pathname = usePathname();
@@ -26,7 +26,6 @@ export function TabBar() {
     }
   }, []);
 
-  if (hidesTabBar(pathname)) return null;
   const current = activeTab(pathname);
 
   return (

@@ -11,8 +11,8 @@ import { describe, expect, it } from "vitest";
  *
  * Rủi ro thật nằm ở chỗ hỏng mà KHÔNG báo lỗi. Không có ngoại lệ, không có
  * màn hình đỏ, build vẫn xanh, máy người viết code (chưa có dữ liệu cũ) nhìn
- * vẫn y hệt. Chỉ người dùng đang có dữ liệu mới thấy nét vẽ, ghi âm, tiến độ
- * và sách đã tải offline biến sạch. Một lần tìm-thay "kiip" -> "vielang" cho
+ * vẫn y hệt. Chỉ người dùng đang có dữ liệu mới thấy tiến độ, bài làm và
+ * lịch học biến sạch. Một lần tìm-thay "kiip" -> "vielang" cho
  * gọn là đủ gây ra chuyện đó, nên chặn ngay tại đây.
  *
  * Đọc thẳng file nguồn dạng chữ vì các hằng này cố ý không export — chúng là
@@ -22,68 +22,25 @@ function source(...parts: string[]): string {
   return readFileSync(path.resolve(process.cwd(), ...parts), "utf8");
 }
 
-describe("khoá IndexedDB", () => {
-  it("giữ tên cũ, vì dữ liệu người dùng nằm trong cơ sở dữ liệu tên đó", () => {
-    expect(source("src", "lib", "idb-storage.ts")).toContain(
-      'const DB_NAME = "kiip-reader"'
-    );
-  });
-});
-
 describe("khoá localStorage", () => {
-  it("giữ tên cũ, nếu không thì mất chế độ xem và cờ đã-xem-hướng-dẫn", () => {
-    expect(source("src", "lib", "reader-prefs-store.ts")).toContain(
-      'name: "kiip-reader-prefs-v1"'
-    );
-  });
+  const keys: [string, string][] = [
+    ["progress-store.ts", "kiip-progress-v1"],
+    ["quiz-store.ts", "kiip-quiz-v1"],
+    ["activity-store.ts", "kiip-activity-v1"],
+    ["guide-checklist-store.ts", "kiip-guide-v1"],
+  ];
+  for (const [file, key] of keys) {
+    it(`${file} giữ nguyên tên ${key}`, () => {
+      expect(source("src", "lib", file)).toContain(`name: "${key}"`);
+    });
+  }
 });
 
 describe("tên cache của service worker", () => {
-  const sw = source("public", "sw.js");
-
   it("giữ tiền tố cũ cho cache tài liệu, tài nguyên và ảnh", () => {
+    const sw = source("public", "sw.js");
     expect(sw).toContain("`kiip-doc-${VERSION}`");
     expect(sw).toContain("`kiip-asset-${VERSION}`");
     expect(sw).toContain("`kiip-image-${VERSION}`");
-  });
-
-  it("giữ tiền tố cũ cho sách tải offline", () => {
-    // Nguy hiểm nhất trong cả nhóm: cache này cố ý không bao giờ bị dọn tự
-    // động. Đổi tiền tố thì sách cũ vừa không còn được tra, vừa lọt khỏi cả
-    // diện giữ lại lẫn diện người dùng xoá được — rác nằm lại vĩnh viễn trên
-    // máy họ mà sách thì coi như mất.
-    expect(sw).toContain('const BOOK_CACHE_PREFIX = "kiip-book-"');
-  });
-
-  it("phía app dùng đúng tiền tố mà service worker dùng", () => {
-    // Hai file khai báo riêng nên trôi khỏi nhau được; lệch tiền tố là app
-    // tải sách vào một cache mà service worker không bao giờ tra tới.
-    expect(source("src", "lib", "offline-books.ts")).toContain(
-      'const BOOK_CACHE_PREFIX = "kiip-book-"'
-    );
-  });
-});
-
-describe("khoá lịch sử học", () => {
-  it("giữ nguyên tên, nếu không thì mất chuỗi ngày và lịch học của người đang dùng", () => {
-    expect(source("src", "lib", "activity-store.ts")).toContain('name: "kiip-activity-v1"');
-  });
-});
-
-describe("khoá bài làm đề thi", () => {
-  it("giữ nguyên tên, nếu không thì mất lịch sử thi thử của người đang dùng", () => {
-    expect(source("src", "lib", "exam-store.ts")).toContain('name: "kiip-exam-v1"');
-  });
-});
-
-describe("khoá chỗ nghe dở", () => {
-  it("giữ nguyên tên, nếu không thì mất chỗ nghe tự động đang dở của người dùng", () => {
-    expect(source("src", "lib", "autoplay-player.ts")).toContain('name: "kiip-autoplay-v1"');
-  });
-});
-
-describe("khoá checklist cẩm nang", () => {
-  it("giữ nguyên tên, nếu không thì mất các dòng người dùng đã tick", () => {
-    expect(source("src", "lib", "guide-checklist-store.ts")).toContain('name: "kiip-guide-v1"');
   });
 });

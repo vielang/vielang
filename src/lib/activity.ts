@@ -10,27 +10,18 @@
  */
 
 export interface DayStats {
-  /** Thời gian học thật (trang đọc đang hiện VÀ có thao tác gần đây), ms. */
+  /** Thời gian học thật (trang đang hiện VÀ có thao tác gần đây), ms. */
   activeMs: number;
-  /** Trang đã học trong ngày, dạng "bookId:page", không trùng. */
-  pages: string[];
   /** Số lượt bấm "Kiểm tra" trên câu chấm được. */
   quizChecked: number;
   /** Trong số đó, bao nhiêu lượt đúng. */
   quizCorrect: number;
-  /** Số lần mở bong bóng đáp án sách. */
-  answersOpened: number;
-  /** Số bản ghi âm luyện nói đã lưu. */
-  recordings: number;
 }
 
 export const EMPTY_DAY: DayStats = {
   activeMs: 0,
-  pages: [],
   quizChecked: 0,
   quizCorrect: 0,
-  answersOpened: 0,
-  recordings: 0,
 };
 
 /**
@@ -42,7 +33,7 @@ const MIN_STUDY_DAY_MS = 60_000;
 /**
  * "YYYY-MM-DD" theo GIỜ ĐỊA PHƯƠNG của máy, không phải UTC.
  *
- * Dùng `toISOString()` là cắt theo UTC: người ở Hàn (UTC+9) học lúc 8 giờ
+ * Dùng `toISOString()` là cắt theo UTC: người ở Việt Nam (UTC+7) học lúc 6 giờ
  * sáng sẽ bị tính vào ngày hôm trước, và chuỗi ngày gãy vô cớ.
  */
 export function dayKey(d: Date): string {
@@ -59,7 +50,7 @@ export function addDays(d: Date, n: number): Date {
   return out;
 }
 
-/** Thứ Hai đầu tuần chứa `d` — tuần bắt đầu từ thứ Hai như lịch Việt/Hàn. */
+/** Thứ Hai đầu tuần chứa `d` — tuần bắt đầu từ thứ Hai như lịch Việt. */
 export function weekStart(d: Date): Date {
   const offset = (d.getDay() + 6) % 7; // CN=0 -> 6, T2=1 -> 0
   return addDays(d, -offset);

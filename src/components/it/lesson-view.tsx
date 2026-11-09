@@ -18,6 +18,7 @@ import { getBookProgress, useProgressStore } from "@/lib/progress-store";
 import { useQuizAnswers } from "@/lib/quiz-store";
 import { isGradable } from "@/lib/quiz";
 import { useIsClient } from "@/lib/use-is-client";
+import { useActiveTime } from "@/lib/use-study-tracker";
 import { ARTICLE_PROSE_BASE, ArticleTocAside, ArticleTocMobile } from "@/components/layout/article-toc";
 
 /**
@@ -55,7 +56,7 @@ const LESSON_PROSE_CLASS =
  * Một bài học dạng chữ: nội dung đã dựng sẵn thành HTML lúc build, kèm mục
  * lục trong bài, nút đánh dấu đã học và điều hướng bài trước/bài sau.
  *
- * Tiến độ dùng chung kho với sách (xem `courseProgressId`): số thứ tự bài
+ * Tiến độ lưu ở `progress-store` (xem `courseProgressId`): số thứ tự bài
  * đóng vai "số trang".
  */
 export function LessonView({
@@ -80,6 +81,8 @@ export function LessonView({
   next: LessonOutline | null;
 }) {
   const isClient = useIsClient();
+  // Thời gian đọc bài tính vào lịch học ở Góc học tập.
+  useActiveTime();
   const progressByBook = useProgressStore((s) => s.books);
   const hasHydrated = useProgressStore((s) => s.hasHydrated);
   const markPageRead = useProgressStore((s) => s.markPageRead);

@@ -67,8 +67,7 @@ export function BackupPanel({ canExport = true }: { canExport?: boolean }) {
       <p className="text-sm text-muted-foreground">
         {canExport
           ? "Dữ liệu học chỉ nằm trên trình duyệt này. Thỉnh thoảng lưu một bản ra file để không mất khi đổi máy hay xoá dữ liệu trình duyệt."
-          : "Đã học trên máy khác? Nhập file sao lưu từ máy đó để học tiếp."}{" "}
-        <span className="text-xs">(Không gồm bản ghi âm và nét vẽ.)</span>
+          : "Đã học trên máy khác? Nhập file sao lưu từ máy đó để học tiếp."}
       </p>
       <div className="flex flex-wrap gap-2">
         {canExport && (
@@ -102,7 +101,7 @@ export function BackupPanel({ canExport = true }: { canExport?: boolean }) {
             <DialogTitle>Nhập dữ liệu học từ file?</DialogTitle>
             <DialogDescription>
               Dữ liệu trong file <span className="font-medium">{pending?.name}</span> sẽ
-              thay thế tiến độ, bài làm, lịch sử học, ghi chú và tuỳ chọn đang có trên
+              thay thế tiến độ, bài làm, lịch sử học và checklist đang có trên
               trình duyệt này. Không hoàn tác được.
             </DialogDescription>
           </DialogHeader>

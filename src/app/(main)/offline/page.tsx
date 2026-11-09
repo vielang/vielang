@@ -18,10 +18,10 @@ export default function OfflinePage() {
       as="h1"
       icon={WifiOff}
       title="Đang không có mạng"
-      description="Những trang sách bạn đã mở trước đó vẫn đọc được bình thường. Trang này thì chưa tải về máy lần nào."
+      description="Những bài bạn đã mở trước đó vẫn đọc được bình thường. Trang này thì chưa tải về máy lần nào."
       action={
         <Button asChild variant="outline">
-          <Link href="/">Về thư viện</Link>
+          <Link href="/">Về trang chủ</Link>
         </Button>
       }
     />

@@ -7,17 +7,11 @@ import { useActivityStore } from "@/lib/activity-store";
 export const TICK_MS = 15_000;
 
 /**
- * Không thao tác gì quá ngần này thì thôi tính giờ. Đọc một trang sách tiếng
- * Hàn mất cả phút mà không chạm gì là bình thường, nên không để ngắn hơn;
+ * Không thao tác gì quá ngần này thì thôi tính giờ. Đọc một đoạn giải thích
+ * dài mất cả phút mà không chạm gì là bình thường, nên không để ngắn hơn;
  * nhưng để máy đó đi nấu cơm thì phải dừng.
  */
 export const IDLE_MS = 90_000;
-
-/**
- * Ở lại trang ít nhất ngần này mới tính là "đã học" trang đó. Lật lướt để
- * tìm bài thì mỗi trang chỉ dừng một hai giây — không tính.
- */
-export const DWELL_MS = 12_000;
 
 /** Nhịp này có được tính là thời gian học không. */
 export function shouldCountTick(now: number, lastInteraction: number, visible: boolean): boolean {
@@ -29,22 +23,14 @@ const INTERACTIONS = ["pointerdown", "keydown", "wheel", "touchstart"] as const;
 /**
  * Đếm "thời gian học thật" = trang đang hiện trên màn hình VÀ người dùng có
  * thao tác trong `IDLE_MS` gần nhất. Chỉ đo lúc tab mở thì chuyển tab khác,
- * hay mở sách rồi bỏ đó, cũng thành hàng giờ "học".
+ * hay mở bài rồi bỏ đó, cũng thành hàng giờ "học".
  *
  * Mở trang được tính là một thao tác: người ta thường vào trang rồi ngồi đọc
  * luôn, không chạm gì thêm.
- *
- * `isBusy`: trả `true` khi người học đang học mà KHÔNG cần chạm gì — vd đang
- * nghe phần nghe của đề thi (cả chục phút chỉ ngồi nghe). Lúc đó vẫn tính
- * giờ dù quá `IDLE_MS` không có thao tác nào.
  */
-export function useActiveTime(isBusy?: () => boolean) {
+export function useActiveTime() {
   const addActiveTime = useActivityStore((s) => s.addActiveTime);
   const lastInteraction = useRef(0);
-  const busyRef = useRef(isBusy);
-  useEffect(() => {
-    busyRef.current = isBusy;
-  });
 
   useEffect(() => {
     lastInteraction.current = Date.now();
@@ -56,10 +42,7 @@ export function useActiveTime(isBusy?: () => boolean) {
     );
     const timer = window.setInterval(() => {
       const visible = document.visibilityState === "visible";
-      if (
-        shouldCountTick(Date.now(), lastInteraction.current, visible) ||
-        (visible && busyRef.current?.())
-      ) {
+      if (shouldCountTick(Date.now(), lastInteraction.current, visible)) {
         addActiveTime(TICK_MS);
       }
     }, TICK_MS);
@@ -72,24 +55,3 @@ export function useActiveTime(isBusy?: () => boolean) {
   }, [addActiveTime]);
 }
 
-/**
- * Ghi lịch sử học từ trang đọc: thời gian học thật (xem `useActiveTime`) và
- * trang đã học (ở lại ít nhất `DWELL_MS`).
- */
-export function useStudyTracker(bookId: string, pages: number[]) {
-  const markPageStudied = useActivityStore((s) => s.markPageStudied);
-  const pagesKey = pages.join(",");
-  useActiveTime();
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => {
-      // Tab bị ẩn suốt lúc chờ thì không tính: người ta mở trang rồi đi chỗ khác.
-      if (document.visibilityState !== "visible") return;
-      pagesKey
-        .split(",")
-        .map(Number)
-        .forEach((p) => markPageStudied(bookId, p));
-    }, DWELL_MS);
-    return () => window.clearTimeout(timer);
-  }, [bookId, pagesKey, markPageStudied]);
-}
